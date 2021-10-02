@@ -11,7 +11,7 @@ print(f"Welcome to Nougaro Shell ! You are actually using the version {version}.
 
 while True:
     text = input("nougaro> ")
-    result, error = nougaro.run(text)
+    result, error = nougaro.run('<stdin>', text)
 
     if text == "exit":
         break

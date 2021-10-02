@@ -3,6 +3,7 @@
 # this file is part of NOUGARO language, created by Jean Dubois (github.com/jd-develop)
 # Public Domain
 # Actually running with Python 3.9.7
+import nougaro
 
 version = "prototype-v1"
 
@@ -10,6 +11,9 @@ print(f"Welcome to Nougaro Shell ! You are actually using the version {version}.
 
 while True:
     text = input("nougaro> ")
+    result, error = nougaro.run(text)
+
     if text == "exit":
         break
-    print(text)
+    if error is not None: print(error.as_string())
+    else: print(result)

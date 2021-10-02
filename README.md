@@ -1,2 +1,2 @@
-# nougaro
- Un langage de programmation. Interpréteur Python.
+# Nougaro
+ Un langage de programmation. Interpréteur écrit en Python.

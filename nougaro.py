@@ -17,7 +17,7 @@ class Error:
     def __init__(self, error_name, details):
         self.error_name = error_name
         self.details = details
-    
+
     def as_string(self):
         result = f'{self.error_name}: {self.details}'
         return result
@@ -29,14 +29,24 @@ class IllegalCharError(Error):
 
 
 # ##########
+# POSITION
+# ##########
+class Position:
+    def __init__(self, index, line_number, colon):
+        self.index = index
+        self.line_number = line_number
+        self.colon = colon
+
+
+# ##########
 # TOKENS
 # ##########
-TT_INT    = 'INT'
-TT_FLOAT  = 'FLOAT'
-TT_PLUS   = 'PLUS'    # +
-TT_MINUS  = 'MINUS'   # -
-TT_MUL    = 'MUL'     # *
-TT_DIV    = 'DIV'     # /
+TT_INT = 'INT'
+TT_FLOAT = 'FLOAT'
+TT_PLUS = 'PLUS'  # +
+TT_MINUS = 'MINUS'  # -
+TT_MUL = 'MUL'  # *
+TT_DIV = 'DIV'  # /
 TT_RPAREN = 'RPAREN'  # )
 TT_LPAREN = 'LPAREN'  # (
 
@@ -45,9 +55,10 @@ class Token:
     def __init__(self, type_, value=None):
         self.type = type_
         self.value = value
-    
+
     def __repr__(self) -> str:
-        if self.value: return f'{self.type}:{self.value}'
+        if self.value:
+            return f'{self.type}:{self.value}'
         return f'{self.type}'
 
 
@@ -60,11 +71,11 @@ class Lexer:
         self.pos = -1
         self.current_char = None
         self.advance()
-    
+
     def advance(self):  # advance of 1 char in self.text
         self.pos += 1
         self.current_char = self.text[self.pos] if self.pos < len(self.text) else None
-    
+
     def make_tokens(self):
         tokens = []
 
@@ -104,17 +115,19 @@ class Lexer:
 
         while self.current_char is not None and self.current_char in DIGITS + '.':  # if char is still a number or a dot
             if self.current_char == '.':
-                if dot_count == 1: break
+                if dot_count == 1:
+                    break
                 dot_count += 1
                 num_str += '.'
             else:
                 num_str += self.current_char
             self.advance()
-        
+
         if dot_count == 0:
             return Token(TT_INT, int(num_str))
         else:
             return Token(TT_FLOAT, float(num_str))
+
 
 # ##########
 # RUN
@@ -124,4 +137,3 @@ def run(text):
     tokens, error = lexer.make_tokens()
 
     return tokens, error
-

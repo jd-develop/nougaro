@@ -15,5 +15,7 @@ while True:
 
     if text == "exit":
         break
-    if error is not None: print(error.as_string())
-    else: print(result)
+    if error is not None:
+        print(error.as_string())
+    else:
+        print(result)

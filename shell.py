@@ -15,7 +15,9 @@ while True:
 
     if text == "exit":
         break
-    if error is not None:
+    elif text == "ver":
+        print(version)
+    elif error is not None:
         nougaro.print_in_red(error.as_string())
     else:
         print(result)

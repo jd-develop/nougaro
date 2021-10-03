@@ -29,9 +29,9 @@ class Error:
         self.details = details
 
     def as_string(self):
-        result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + \
-            string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end) + '\n' + \
-                 f'{self.error_name} : {self.details}'
+        result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n     ' + \
+            string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end) + '\n ' + \
+            f'{self.error_name} : {self.details}'
         return result
 
 

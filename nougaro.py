@@ -3,6 +3,9 @@
 # this file is part of NOUGARO language, created by Jean Dubois (github.com/jd-develop)
 # Public Domain
 # Actually running with Python 3.9.7
+
+# IMPORTS
+# nougaro modules imports
 from strings_with_arrows import *
 
 

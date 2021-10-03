@@ -3,9 +3,16 @@
 # this file is part of NOUGARO language, created by Jean Dubois (github.com/jd-develop)
 # Public Domain
 # Actually running with Python 3.9.7
-import nougaro
 
-version = "prototype-v1"
+# IMPORTS
+# nougaro modules imports
+import nougaro
+# build in python imports
+import json
+
+with open("version.json") as ver_json:
+    ver_json_loaded = json.load(ver_json)
+    version = ver_json_loaded.get("version")
 
 print(f"Welcome to Nougaro Shell ! You are actually using the version {version}.")
 

@@ -16,6 +16,6 @@ while True:
     if text == "exit":
         break
     if error is not None:
-        print(error.as_string())
+        nougaro.print_in_red(error.as_string())
     else:
         print(result)

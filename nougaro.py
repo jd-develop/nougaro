@@ -3,6 +3,14 @@
 # this file is part of NOUGARO language, created by Jean Dubois (github.com/jd-develop)
 # Public Domain
 # Actually running with Python 3.9.7
+from strings_with_arrows import *
+
+
+# ##########
+# COLORS
+# ##########
+def print_in_red(txt): print("\033[91m {}\033[00m".format(txt))
+
 
 # ##########
 # CONSTANTS
@@ -21,14 +29,20 @@ class Error:
         self.details = details
 
     def as_string(self):
-        result = f'{self.error_name} in file {self.pos_start.file_name} line {self.pos_start.line_number + 1}: ' \
-                 f'{self.details}'
+        result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + \
+            string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end) + '\n' + \
+                 f'{self.error_name} : {self.details}'
         return result
 
 
 class IllegalCharError(Error):
     def __init__(self, pos_start, pos_end, details):
         super().__init__(pos_start, pos_end, "IllegalCharError", details)
+
+
+class InvalidSyntaxError(Error):
+    def __init__(self, pos_start, pos_end, details):
+        super().__init__(pos_start, pos_end, "InvalidSyntaxError", details)
 
 
 # ##########
@@ -150,10 +164,81 @@ class Lexer:
 
 
 # ##########
+# NODES
+# ##########
+class NumberNode:
+    def __init__(self, token):
+        self.token = token
+
+    def __repr__(self):
+        return f'{self.token}'
+
+
+class BinOpNode:
+    def __init__(self, left_node, op_token, right_node):
+        self.left_node = left_node
+        self.op_token = op_token
+        self.right_node = right_node
+
+    def __repr__(self):
+        return f'({self.left_node}, {self.op_token}, {self.right_node})'
+
+
+# ##########
+# PARSER
+# ##########
+class Parser:
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.token_index = -1
+        self.current_token = None
+        self.advance()
+
+    def parse(self):
+        res = self.expr()
+        return res
+
+    def advance(self):
+        self.token_index += 1
+        if self.token_index < len(self.tokens):
+            self.current_token = self.tokens[self.token_index]
+        return self.current_token
+
+    def factor(self):
+        token = self.current_token
+
+        if token.type in (TT_INT, TT_FLOAT):
+            self.advance()
+            return NumberNode(token)
+
+    def term(self):
+        return self.bin_op(self.factor, (TT_MUL, TT_DIV))
+
+    def expr(self):
+        return self.bin_op(self.term, (TT_PLUS, TT_MINUS))
+
+    def bin_op(self, func, ops):
+        left = func()
+
+        while self.current_token.type in ops:
+            op_token = self.current_token
+            self.advance()
+            right = func()
+            left = BinOpNode(left, op_token, right)
+        return left
+
+
+# ##########
 # RUN
 # ##########
 def run(file_name, text):
     lexer = Lexer(file_name, text)
     tokens, error = lexer.make_tokens()
+    if error is not None:
+        return None, error
 
-    return tokens, error
+    # abstract syntax tree
+    parser = Parser(tokens)
+    ast = parser.parse()
+
+    return ast, error

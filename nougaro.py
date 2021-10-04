@@ -126,7 +126,11 @@ class Lexer:
             if self.current_char in ' \t':  # tab and space
                 self.advance()
             elif self.current_char in DIGITS:
-                tokens.append(self.make_number())
+                number, error = self.make_number()
+                if error is None:
+                    tokens.append(number)
+                else:
+                    return [], error
             elif self.current_char == '+':
                 tokens.append(Token(TT_PLUS))
                 self.advance()
@@ -160,7 +164,8 @@ class Lexer:
         while self.current_char is not None and self.current_char in DIGITS + '.':  # if char is still a number or a dot
             if self.current_char == '.':
                 if dot_count == 1:
-                    break
+                    pos_start = self.pos.copy()
+                    return None, InvalidSyntaxError(pos_start, self.pos, "a number can't have more than one dot.")
                 dot_count += 1
                 num_str += '.'
             else:
@@ -168,9 +173,9 @@ class Lexer:
             self.advance()
 
         if dot_count == 0:
-            return Token(TT_INT, int(num_str))
+            return Token(TT_INT, int(num_str)), None
         else:
-            return Token(TT_FLOAT, float(num_str))
+            return Token(TT_FLOAT, float(num_str)), None
 
 
 # ##########

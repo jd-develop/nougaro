@@ -32,8 +32,13 @@ class Error:
         self.details = details
 
     def as_string(self):
-        result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n     ' + \
-            string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end) + '\n ' + \
+        string_line = string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end)
+        while string_line[0] in " ":
+            # delete spaces at the start of the str.
+            # Add chars after the space in the string after the "while string_line[0] in" to delete them.
+            string_line = string_line[1:]
+        result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n \t' + \
+            string_line + '\n ' + \
             f'{self.error_name} : {self.details}'
         return result
 
@@ -76,12 +81,12 @@ class Position:
 # ##########
 # TOKENS
 # ##########
-TT_INT = 'INT'
-TT_FLOAT = 'FLOAT'
-TT_PLUS = 'PLUS'  # +
-TT_MINUS = 'MINUS'  # -
-TT_MUL = 'MUL'  # *
-TT_DIV = 'DIV'  # /
+TT_INT = 'INT'        # integer, correspond to python int
+TT_FLOAT = 'FLOAT'    # float number, correspond to python float
+TT_PLUS = 'PLUS'      # +
+TT_MINUS = 'MINUS'    # -
+TT_MUL = 'MUL'        # *
+TT_DIV = 'DIV'        # /
 TT_RPAREN = 'RPAREN'  # )
 TT_LPAREN = 'LPAREN'  # (
 
@@ -93,6 +98,8 @@ class Token:
 
     def __repr__(self) -> str:
         if self.value:
+            return f'{self.type}:{self.value}'
+        elif self.value == 0:
             return f'{self.type}:{self.value}'
         return f'{self.type}'
 

@@ -18,7 +18,10 @@ print(f"Welcome to Nougaro Shell ! You are actually using the version {version}.
 
 while True:
     text = input("nougaro> ")
-    result, error = nougaro.run('<stdin>', text)
+    if str(text) == "" or text is None:
+        result, error = None, None
+    else:
+        result, error = nougaro.run('<stdin>', text)
 
     if text == "exit":
         break
@@ -27,4 +30,7 @@ while True:
     elif error is not None:
         nougaro.print_in_red(error.as_string())
     else:
-        print(result)
+        if result is not None:
+            print(result)
+        else:
+            pass

@@ -6,7 +6,8 @@
 
 # IMPORTS
 # nougaro modules imports
-from strings_with_arrows import *
+from errors import *
+from token_constants import *
 
 
 # ##########
@@ -19,38 +20,6 @@ def print_in_red(txt): print("\033[91m {}\033[00m".format(txt))
 # CONSTANTS
 # ##########
 DIGITS = '0123456789'
-
-
-# ##########
-# ERRORS
-# ##########
-class Error:
-    def __init__(self, pos_start, pos_end, error_name, details):
-        self.pos_start = pos_start
-        self.pos_end = pos_end
-        self.error_name = error_name
-        self.details = details
-
-    def as_string(self):
-        string_line = string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end)
-        while string_line[0] in " ":
-            # delete spaces at the start of the str.
-            # Add chars after the space in the string after the "while string_line[0] in" to delete them.
-            string_line = string_line[1:]
-        result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n \t' + \
-            string_line + '\n ' + \
-            f'{self.error_name} : {self.details}'
-        return result
-
-
-class IllegalCharError(Error):
-    def __init__(self, pos_start, pos_end, details):
-        super().__init__(pos_start, pos_end, "IllegalCharError", details)
-
-
-class InvalidSyntaxError(Error):
-    def __init__(self, pos_start, pos_end, details):
-        super().__init__(pos_start, pos_end, "InvalidSyntaxError", details)
 
 
 # ##########
@@ -81,15 +50,6 @@ class Position:
 # ##########
 # TOKENS
 # ##########
-TT_INT = 'INT'        # integer, correspond to python int
-TT_FLOAT = 'FLOAT'    # float number, correspond to python float
-TT_PLUS = 'PLUS'      # +
-TT_MINUS = 'MINUS'    # -
-TT_MUL = 'MUL'        # *
-TT_DIV = 'DIV'        # /
-TT_RPAREN = 'RPAREN'  # )
-TT_LPAREN = 'LPAREN'  # (
-TT_EOF = 'EOF'        # end of file
 
 
 class Token:
@@ -189,11 +149,48 @@ class Lexer:
 
 
 # ##########
+# VALUES
+# ##########
+class Number:
+    def __init__(self, value):
+        self.value = value
+        self.pos_start = None
+        self.pos_end = None
+        self.set_pos()
+
+    def __repr__(self):
+        return str(self.value)
+
+    def set_pos(self, pos_start=None, pos_end=None):
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+        return self
+
+    def added_to(self, other):  # ADDITION
+        if isinstance(other, Number):
+            return Number(self.value + other.value)
+
+    def subtracted_by(self, other):  # SUBTRACTION
+        if isinstance(other, Number):
+            return Number(self.value - other.value)
+
+    def multiplied_by(self, other):  # MULTIPLICATION
+        if isinstance(other, Number):
+            return Number(self.value * other.value)
+
+    def divided_by(self, other):  # DIVISION
+        if isinstance(other, Number):
+            return Number(self.value / other.value)
+
+
+# ##########
 # NODES
 # ##########
 class NumberNode:
     def __init__(self, token):
         self.token = token
+        self.pos_start = self.token.pos_start
+        self.pos_end = self.token.pos_end
 
     def __repr__(self):
         return f'{self.token}'
@@ -205,6 +202,9 @@ class BinOpNode:
         self.op_token = op_token
         self.right_node = right_node
 
+        self.pos_start = self.left_node.pos_start
+        self.pos_end = self.right_node.pos_end
+
     def __repr__(self):
         return f'({self.left_node}, {self.op_token}, {self.right_node})'
 
@@ -213,6 +213,9 @@ class UnaryOpNode:
     def __init__(self, op_token, node):
         self.op_token = op_token
         self.node = node
+
+        self.pos_start = self.op_token.pos_start
+        self.pos_end = self.node.pos_end
 
     def __repr__(self):
         return f'({self.op_token}, {self.node})'
@@ -320,6 +323,47 @@ class Parser:
 
 
 # ##########
+# INTERPRETER
+# ##########
+class Interpreter:
+    # this class have not __init__ method
+    def visit(self, node):
+        method_name = f'visit_{type(node).__name__}'
+        method = getattr(self, method_name, self.no_visit_method)
+        return method(node)
+
+    def no_visit_method(self, node):
+        raise Exception(f'No visit_{type(node).__name__} method defined.')
+
+    @staticmethod
+    def visit_NumberNode(node):
+        return Number(node.token.value).set_pos(node.pos_start, node.pos_end)
+
+    def visit_BinOpNode(self, node):
+        left = self.visit(node.left_node)
+        right = self.visit(node.right_node)
+
+        if node.op_token.type == TT_PLUS:
+            result = left.added_to(right)
+        elif node.op_token.type == TT_MINUS:
+            result = left.subtracted_by(right)
+        elif node.op_token.type == TT_MUL:
+            result = left.multiplied_by(right)
+        elif node.op_token.type == TT_DIV:
+            result = left.divided_by(right)
+
+        return result.set_pos(node.pos_start, node.pos_end)
+
+    def visit_UnaryOpNode(self, node):
+        number = self.visit(node.node)
+
+        if node.op_token.type == TT_MINUS:
+            number = number.multiplied_by(Number(-1))
+
+        return number.set_pos(node.pos_start, node.pos_end)
+
+
+# ##########
 # RUN
 # ##########
 def run(file_name, text):
@@ -331,5 +375,11 @@ def run(file_name, text):
     # abstract syntax tree
     parser = Parser(tokens)
     ast = parser.parse()
+    if ast.error is not None:
+        return None, ast.error
 
-    return ast.node, ast.error
+    # run program
+    interpreter = Interpreter()
+    result = interpreter.visit(ast.node)
+
+    return result, None

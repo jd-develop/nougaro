@@ -351,6 +351,9 @@ class Interpreter:
             result = left.multiplied_by(right)
         elif node.op_token.type == TT_DIV:
             result = left.divided_by(right)
+        else:
+            raise Exception("result is not defined after executing nougaro.Interpreter.visit_BinOpNode (python file) "
+                            "because of an invalid token.")
 
         return result.set_pos(node.pos_start, node.pos_end)
 

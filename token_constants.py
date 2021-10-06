@@ -10,6 +10,7 @@ TT_PLUS = 'PLUS'      # +
 TT_MINUS = 'MINUS'    # -
 TT_MUL = 'MUL'        # *
 TT_DIV = 'DIV'        # /
+TT_POW = 'POW'        # ^
 TT_RPAREN = 'RPAREN'  # )
 TT_LPAREN = 'LPAREN'  # (
 TT_EOF = 'EOF'        # end of file

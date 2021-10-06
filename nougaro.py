@@ -111,6 +111,9 @@ class Lexer:
             elif self.current_char == '/':
                 tokens.append(Token(TT_DIV, pos_start=self.pos))
                 self.advance()
+            elif self.current_char == '^':
+                tokens.append(Token(TT_POW, pos_start=self.pos))
+                self.advance()
             elif self.current_char == '(':
                 tokens.append(Token(TT_LPAREN, pos_start=self.pos))
                 self.advance()
@@ -198,21 +201,25 @@ class Number:
         if isinstance(other, Number):
             return Number(self.value + other.value).set_context(self.context), None
 
-    def subtracted_by(self, other):  # SUBTRACTION
+    def subbed_by(self, other):  # SUBTRACTION
         if isinstance(other, Number):
             return Number(self.value - other.value).set_context(self.context), None
 
-    def multiplied_by(self, other):  # MULTIPLICATION
+    def multed_by(self, other):  # MULTIPLICATION
         if isinstance(other, Number):
             return Number(self.value * other.value).set_context(self.context), None
 
-    def divided_by(self, other):  # DIVISION
+    def dived_by(self, other):  # DIVISION
         if isinstance(other, Number):
             if other.value == 0:
                 return None, RunTimeError(
                     other.pos_start, other.pos_end, 'division by zero is not possible.', self.context
                 )
             return Number(self.value / other.value).set_context(self.context), None
+
+    def powed_by(self, other):  # POWER
+        if isinstance(other, Number):
+            return Number(self.value ** other.value).set_context(self.context), None
 
 
 # ##########
@@ -281,6 +288,9 @@ class ParseResult:
 # PARSER
 # ##########
 class Parser:
+    """
+        Please see grammar.txt for operation priority.
+    """
     def __init__(self, tokens):
         self.tokens = tokens
         self.token_index = -1
@@ -302,17 +312,11 @@ class Parser:
             self.current_token = self.tokens[self.token_index]
         return self.current_token
 
-    def factor(self):
+    def atom(self):
         result = ParseResult()
         token = self.current_token
 
-        if token.type in (TT_PLUS, TT_MINUS):
-            result.register(self.advance())
-            factor = result.register(self.factor())
-            if result.error is not None:
-                return result
-            return result.success(UnaryOpNode(token, factor))
-        elif token.type in (TT_INT, TT_FLOAT):
+        if token.type in (TT_INT, TT_FLOAT):
             result.register(self.advance())
             return result.success(NumberNode(token))
         elif token.type == TT_LPAREN:
@@ -329,8 +333,24 @@ class Parser:
                 )
 
         return result.failure(
-            InvalidSyntaxError(token.pos_start, token.pos_end, "excepted int or float.")
+            InvalidSyntaxError(token.pos_start, token.pos_end, "excepted int, float, '+', '-' or '('.")
         )
+
+    def power(self):
+        return self.bin_op(self.atom, (TT_POW, ), self.factor)
+
+    def factor(self):
+        result = ParseResult()
+        token = self.current_token
+
+        if token.type in (TT_PLUS, TT_MINUS):
+            result.register(self.advance())
+            factor = result.register(self.factor())
+            if result.error is not None:
+                return result
+            return result.success(UnaryOpNode(token, factor))
+
+        return self.power()
 
     def term(self):
         return self.bin_op(self.factor, (TT_MUL, TT_DIV))
@@ -338,16 +358,18 @@ class Parser:
     def expr(self):
         return self.bin_op(self.term, (TT_PLUS, TT_MINUS))
 
-    def bin_op(self, func, ops):
+    def bin_op(self, func_a, ops, func_b=None):
+        if func_b is None:
+            func_b = func_a
         result = ParseResult()
-        left = result.register(func())
+        left = result.register(func_a())
         if result.error is not None:
             return result
 
         while self.current_token.type in ops:
             op_token = self.current_token
             result.register(self.advance())
-            right = result.register(func())
+            right = result.register(func_b())
             if result.error:
                 return result
             left = BinOpNode(left, op_token, right)
@@ -383,11 +405,13 @@ class Interpreter:
         if node.op_token.type == TT_PLUS:
             result, error = left.added_to(right)
         elif node.op_token.type == TT_MINUS:
-            result, error = left.subtracted_by(right)
+            result, error = left.subbed_by(right)
         elif node.op_token.type == TT_MUL:
-            result, error = left.multiplied_by(right)
+            result, error = left.multed_by(right)
         elif node.op_token.type == TT_DIV:
-            result, error = left.divided_by(right)
+            result, error = left.dived_by(right)
+        elif node.op_token.type == TT_POW:
+            result, error = left.powed_by(right)
         else:
             raise Exception("result is not defined after executing nougaro.Interpreter.visit_BinOpNode (python file) "
                             "because of an invalid token.")

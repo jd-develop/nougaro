@@ -149,6 +149,28 @@ class Lexer:
 
 
 # ##########
+# RUNTIME RESULT
+# ##########
+class RTResult:
+    def __init__(self):
+        self.value = None
+        self.error = None
+
+    def register(self, result):
+        if result.error is not None:
+            self.error = result.error
+        return result.value
+
+    def success(self, value):
+        self.value = value
+        return self
+
+    def failure(self, error):
+        self.error = error
+        return self
+
+
+# ##########
 # VALUES
 # ##########
 class Number:
@@ -156,10 +178,16 @@ class Number:
         self.value = value
         self.pos_start = None
         self.pos_end = None
+        self.context = None
         self.set_pos()
+        self.set_context()
 
     def __repr__(self):
         return str(self.value)
+
+    def set_context(self, context=None):
+        self.context = context
+        return self
 
     def set_pos(self, pos_start=None, pos_end=None):
         self.pos_start = pos_start
@@ -168,19 +196,23 @@ class Number:
 
     def added_to(self, other):  # ADDITION
         if isinstance(other, Number):
-            return Number(self.value + other.value)
+            return Number(self.value + other.value).set_context(self.context), None
 
     def subtracted_by(self, other):  # SUBTRACTION
         if isinstance(other, Number):
-            return Number(self.value - other.value)
+            return Number(self.value - other.value).set_context(self.context), None
 
     def multiplied_by(self, other):  # MULTIPLICATION
         if isinstance(other, Number):
-            return Number(self.value * other.value)
+            return Number(self.value * other.value).set_context(self.context), None
 
     def divided_by(self, other):  # DIVISION
         if isinstance(other, Number):
-            return Number(self.value / other.value)
+            if other.value == 0:
+                return None, RunTimeError(
+                    other.pos_start, other.pos_end, 'division by zero is not possible.', self.context
+                )
+            return Number(self.value / other.value).set_context(self.context), None
 
 
 # ##########
@@ -327,43 +359,59 @@ class Parser:
 # ##########
 class Interpreter:
     # this class have not __init__ method
-    def visit(self, node):
+    def visit(self, node, context):
         method_name = f'visit_{type(node).__name__}'
         method = getattr(self, method_name, self.no_visit_method)
-        return method(node)
+        return method(node, context)
 
-    def no_visit_method(self, node):
+    def no_visit_method(self, node, context):
         raise Exception(f'No visit_{type(node).__name__} method defined.')
 
     @staticmethod
-    def visit_NumberNode(node):
-        return Number(node.token.value).set_pos(node.pos_start, node.pos_end)
+    def visit_NumberNode(node, context):
+        return RTResult().success(Number(node.token.value).set_context(context).set_pos(node.pos_start, node.pos_end))
 
-    def visit_BinOpNode(self, node):
-        left = self.visit(node.left_node)
-        right = self.visit(node.right_node)
+    def visit_BinOpNode(self, node, context):
+        res = RTResult()
+        left = res.register(self.visit(node.left_node, context))
+        if res.error is not None:
+            return res
+        right = res.register(self.visit(node.right_node, context))
+        if res.error is not None:
+            return res
 
         if node.op_token.type == TT_PLUS:
-            result = left.added_to(right)
+            result, error = left.added_to(right)
         elif node.op_token.type == TT_MINUS:
-            result = left.subtracted_by(right)
+            result, error = left.subtracted_by(right)
         elif node.op_token.type == TT_MUL:
-            result = left.multiplied_by(right)
+            result, error = left.multiplied_by(right)
         elif node.op_token.type == TT_DIV:
-            result = left.divided_by(right)
+            result, error = left.divided_by(right)
         else:
             raise Exception("result is not defined after executing nougaro.Interpreter.visit_BinOpNode (python file) "
                             "because of an invalid token.")
 
-        return result.set_pos(node.pos_start, node.pos_end)
+        if error is not None:
+            return res.failure(error)
+        else:
+            return res.success(result.set_pos(node.pos_start, node.pos_end))
 
-    def visit_UnaryOpNode(self, node):
-        number = self.visit(node.node)
+    def visit_UnaryOpNode(self, node, context):
+        result = RTResult()
+        number = result.register(self.visit(node.node, context))
+        if result.error is not None:
+            return result
+
+        error = None
 
         if node.op_token.type == TT_MINUS:
-            number = number.multiplied_by(Number(-1))
+            number, error = number.multiplied_by(Number(-1))
 
-        return number.set_pos(node.pos_start, node.pos_end)
+        if error is not None:
+            return result.failure(error)
+        else:
+            return result.success(number.set_pos(node.pos_start, node.pos_end))
 
 
 # ##########
@@ -383,6 +431,7 @@ def run(file_name, text):
 
     # run program
     interpreter = Interpreter()
-    result = interpreter.visit(ast.node)
+    context = Context('<program>')
+    result = interpreter.visit(ast.node, context)
 
-    return result, None
+    return result.value, result.error

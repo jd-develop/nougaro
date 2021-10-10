@@ -5,4 +5,4 @@
  
  Minimum : python 3.9
  
- Prend en charge python 3.10 (testé en release candidate 2)
+ Prend en charge python 3.10 :D

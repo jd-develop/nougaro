@@ -6,8 +6,10 @@
 
 # IMPORTS
 # nougaro modules imports
-from errors import *
 from token_constants import *
+from strings_with_arrows import *
+# build in python imports
+import string
 
 
 # ##########
@@ -20,6 +22,8 @@ def print_in_red(txt): print("\033[91m {}\033[00m".format(txt))
 # CONSTANTS
 # ##########
 DIGITS = '0123456789'
+LETTERS = string.ascii_letters
+LETTERS_DIGITS = LETTERS + DIGITS
 
 
 # ##########
@@ -71,6 +75,9 @@ class Token:
             return f'{self.type}:{self.value}'
         return f'{self.type}'
 
+    def matches(self, type_, value):
+        return self.type == type_ and self.value == value
+
 
 # ##########
 # LEXER
@@ -99,6 +106,8 @@ class Lexer:
                     tokens.append(number)
                 else:
                     return [], error
+            elif self.current_char in LETTERS:
+                tokens.append(self.make_identifier())
             elif self.current_char == '+':
                 tokens.append(Token(TT_PLUS, pos_start=self.pos))
                 self.advance()
@@ -114,6 +123,9 @@ class Lexer:
             elif self.current_char == '^':
                 tokens.append(Token(TT_POW, pos_start=self.pos))
                 self.advance()
+            elif self.current_char == '=':
+                tokens.append(Token(TT_EQ, pos_start=self.pos))
+                self.advance()
             elif self.current_char == '(':
                 tokens.append(Token(TT_LPAREN, pos_start=self.pos))
                 self.advance()
@@ -124,10 +136,22 @@ class Lexer:
                 # illegal char
                 pos_start = self.pos.copy()
                 char = self.current_char
-                return [], IllegalCharError(pos_start, self.pos, char + " is an illegal character.")
+                return [], IllegalCharError(pos_start, self.pos, char + " is an illegal character. It may happens when "
+                                                                        "an non-ASCII letter is used in a identifier.")
 
         tokens.append(Token(TT_EOF, pos_start=self.pos))
         return tokens, None
+
+    def make_identifier(self):
+        id_str = ''
+        pos_start = self.pos.copy()
+
+        while self.current_char is not None and self.current_char in LETTERS_DIGITS + '_':
+            id_str += self.current_char
+            self.advance()
+
+        token_type = TT_KEYWORD if id_str in KEYWORDS else TT_IDENTIFIER
+        return Token(token_type, id_str, pos_start, self.pos)
 
     def make_number(self):
         num_str = ''
@@ -235,6 +259,23 @@ class NumberNode:
         return f'{self.token}'
 
 
+class VarAccessNode:
+    def __init__(self, var_name_token):
+        self.var_name_token = var_name_token
+
+        self.pos_start = self.var_name_token.pos_start
+        self.pos_end = self.var_name_token.pos_end
+
+
+class VarAssignNode:
+    def __init__(self, var_name_token, value_node):
+        self.var_name_token = var_name_token
+        self.value_node = value_node
+
+        self.pos_start = self.var_name_token.pos_start
+        self.pos_end = self.value_node.pos_end
+
+
 class BinOpNode:
     def __init__(self, left_node, op_token, right_node):
         self.left_node = left_node
@@ -319,6 +360,9 @@ class Parser:
         if token.type in (TT_INT, TT_FLOAT):
             result.register(self.advance())
             return result.success(NumberNode(token))
+        elif token.type == TT_IDENTIFIER:
+            result.register(self.advance())
+            return result.success(VarAccessNode(token))
         elif token.type == TT_LPAREN:
             result.register(self.advance())
             expr = result.register(self.expr())
@@ -356,6 +400,31 @@ class Parser:
         return self.bin_op(self.factor, (TT_MUL, TT_DIV))
 
     def expr(self):
+        result = ParseResult()
+        if self.current_token.matches(TT_KEYWORD, 'VAR'):
+            result.register(self.advance())
+
+            if self.current_token.type != TT_IDENTIFIER:
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end, f"excepted identifier, "
+                                                                              f"but got {self.current_token.type}."
+                ))
+
+            var_name = self.current_token
+            result.register(self.advance())
+
+            if self.current_token.type != TT_EQ:
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end, f"excepted '=', "
+                                                                              f"but got {self.current_token.type}."
+                ))
+
+            result.register(self.advance())
+            expr = result.register(self.expr())
+            if result.error is not None:
+                return result
+            return result.success(VarAssignNode(var_name, expr))
+
         return self.bin_op(self.term, (TT_PLUS, TT_MINUS))
 
     def bin_op(self, func_a, ops, func_b=None):
@@ -374,6 +443,105 @@ class Parser:
                 return result
             left = BinOpNode(left, op_token, right)
         return result.success(left)
+
+
+# ##########
+# ERRORS
+# ##########
+class Error:
+    def __init__(self, pos_start, pos_end, error_name, details):
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+        self.error_name = error_name
+        self.details = details
+
+    def as_string(self):
+        string_line = string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end)
+        while string_line[0] in " ":
+            # delete spaces at the start of the str.
+            # Add chars after the space in the string after the "while string_line[0] in" to delete them.
+            string_line = string_line[1:]
+        result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n \t' + \
+            string_line + '\n ' + \
+            f'{self.error_name} : {self.details}'
+        return result
+
+
+class IllegalCharError(Error):
+    def __init__(self, pos_start, pos_end, details):
+        super().__init__(pos_start, pos_end, "IllegalCharError", details)
+
+
+class InvalidSyntaxError(Error):
+    def __init__(self, pos_start, pos_end, details):
+        super().__init__(pos_start, pos_end, "InvalidSyntaxError", details)
+
+
+class RunTimeError(Error):
+    def __init__(self, pos_start, pos_end, details, context, rt_error=True, error_name=""):
+
+        super().__init__(pos_start, pos_end, "RunTimeError" if rt_error else error_name, details)
+        self.context = context
+
+    def as_string(self):
+        string_line = string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end)
+        while string_line[0] in " ":
+            # delete spaces at the start of the str.
+            # Add chars after the space in the string after the "while string_line[0] in" to delete them.
+            string_line = string_line[1:]
+        result = self.generate_traceback()
+        result += '\n \t' + string_line + '\n ' + f'{self.error_name} : {self.details}'
+        return result
+
+    def generate_traceback(self):
+        result = ''
+        pos = self.pos_start
+        ctx = self.context
+
+        while ctx is not None:
+            result = f' In file {pos.file_name}, line {pos.line_number + 1}, in {ctx.display_name} :' + result
+            pos = ctx.parent_entry_pos
+            ctx = ctx.parent
+
+        return "Traceback (more recent call last) :\n" + result
+
+
+class NotDefinedError(RunTimeError):
+    def __init__(self, pos_start, pos_end, details, context):
+        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="NotDefinedError")
+        self.context = context
+
+
+# ##########
+# CONTEXT
+# ##########
+class Context:
+    def __init__(self, display_name, parent=None, parent_entry_pos=None):
+        self.display_name = display_name
+        self.parent = parent
+        self.parent_entry_pos = parent_entry_pos
+        self.symbol_table = None
+
+
+# ##########
+# SYMBOL TABLE
+# ##########
+class SymbolTable:
+    def __init__(self):
+        self.symbols = {}
+        self.parent = None
+    
+    def get(self, name):
+        value = self.symbols.get(name, None)
+        if value is None and self.parent is not None:
+            return self.parent.get(name)
+        return value
+
+    def set(self, name, value):
+        self.symbols[name] = value
+
+    def remove(self, name):
+        del self.symbols[name]
 
 
 # ##########
@@ -437,6 +605,34 @@ class Interpreter:
         else:
             return result.success(number.set_pos(node.pos_start, node.pos_end))
 
+    def visit_VarAccessNode(self, node, context):
+        result = RTResult()
+        var_name = node.var_name_token.value
+        value = context.symbol_table.get(var_name)
+
+        if value is None:
+            return result.failure(
+                NotDefinedError(
+                    node.pos_start, node.pos_end, f'{var_name} is not defined', context
+                )
+            )
+
+        return result.success(value)
+
+    def visit_VarAssignNode(self, node, context):
+        result = RTResult()
+        var_name = node.var_name_token.value
+        value = result.register(self.visit(node.value_node, context))
+        if result.error is not None:
+            return result
+
+        context.symbol_table.set(var_name, value)
+        return result.success(value)
+
+
+global_symbol_table = SymbolTable()
+global_symbol_table.set("null", Number(0))
+
 
 # ##########
 # RUN
@@ -456,6 +652,7 @@ def run(file_name, text):
     # run program
     interpreter = Interpreter()
     context = Context('<program>')
+    context.symbol_table = global_symbol_table
     result = interpreter.visit(ast.node, context)
 
     return result.value, result.error

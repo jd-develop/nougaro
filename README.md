@@ -6,3 +6,24 @@
  Minimum : python 3.9
  
  Prend en charge python 3.10 :D
+
+## Syntaxe
+
+```
+┌───────┬───────┐
+│PYTHON │NOUGARO│
+│   *   │   *   │
+│   /   │   /   │
+│   +   │   +   │
+│   -   │   -   │
+│  **   │   ^   │
+└───────┴───────┘
+
+VAR ASSIGN :
+VAR varname = value
+
+VAR ACCESS :
+varname
+```
+
+

@@ -353,7 +353,7 @@ class Parser:
         if result.error is None and self.current_token.type != TT_EOF:
             return result.failure(
                 InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                   "excepted '+', '-', '*' or '/'.")
+                                   "expected '+', '-', '*' or '/'.")
             )
         return result
 
@@ -387,11 +387,11 @@ class Parser:
                 return result.success(expr)
             else:
                 return result.failure(
-                    InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, "excepted ')'.")
+                    InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, "expected ')'.")
                 )
 
         return result.failure(
-            InvalidSyntaxError(token.pos_start, token.pos_end, "excepted int, float, identifier, '+', '-' or '('.")
+            InvalidSyntaxError(token.pos_start, token.pos_end, "expected int, float, identifier, '+', '-' or '('.")
         )
 
     def power(self):
@@ -422,7 +422,7 @@ class Parser:
 
             if self.current_token.type != TT_IDENTIFIER:
                 return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end, f"excepted identifier, "
+                    self.current_token.pos_start, self.current_token.pos_end, f"expected identifier, "
                                                                               f"but got {self.current_token.type}."
                 ))
 
@@ -432,7 +432,7 @@ class Parser:
 
             if self.current_token.type != TT_EQ:
                 return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end, f"excepted '=', "
+                    self.current_token.pos_start, self.current_token.pos_end, f"expected '=', "
                                                                               f"but got {self.current_token.type}."
                 ))
 
@@ -448,7 +448,7 @@ class Parser:
         if result.error is not None:
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
-                "Excepted 'VAR', int, float, identifier, '+', '-' or '('"
+                "Expected 'VAR', int, float, identifier, '+', '-' or '('"
             ))
 
         return result.success(node)
@@ -502,6 +502,11 @@ class IllegalCharError(Error):
 class InvalidSyntaxError(Error):
     def __init__(self, pos_start, pos_end, details):
         super().__init__(pos_start, pos_end, "InvalidSyntaxError", details)
+
+
+class ExpectedCharError(Error):
+    def __init__(self, pos_start, pos_end, details):
+        super().__init__(pos_start, pos_end, "ExpectedCharacterError", details)
 
 
 class RunTimeError(Error):
@@ -584,7 +589,7 @@ class Interpreter:
     @staticmethod
     def no_visit_method(node, context):
         print(context)
-        print(f"NOUGARO INTERNAL ERROR : No visit_{type(node).__name__} method defined."
+        print(f"NOUGARO INTERNAL ERROR : No visit_{type(node).__name__} method defined.\n"
               f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html")
         raise Exception(f'No visit_{type(node).__name__} method defined.')
 
@@ -613,7 +618,8 @@ class Interpreter:
             result, error = left.powered_by(right)
         else:
             raise Exception("result is not defined after executing nougaro.Interpreter.visit_BinOpNode (python file) "
-                            "because of an invalid token.")
+                            "because of an invalid token.\n"
+                            "Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html")
 
         if error is not None:
             return res.failure(error)

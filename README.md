@@ -9,24 +9,22 @@
 
 ## Syntaxe
 
-```
-┌───────┬───────┐
-│PYTHON │NOUGARO│
-│   *   │   *   │
-│   /   │   /   │
-│   +   │   +   │
-│   -   │   -   │
-│  **   │   ^   │
-└───────┴───────┘
-
-VAR ASSIGN :
-VAR varname = value
-VAR varname = VAR varname1 = VAR varname2 = value
-
-You can use assignment in expressions : 1 + (VAR a = 2) returns 3
-
-VAR ACCESS :
-varname
-```
+| Python    | Nougaro   |
+|-----------|-----------|
+| *         | *         |
+| /         | /         |
+| +         | +         |
+| -         | -         |
+| **        | ^         |
 
 
+### Variables :
+
+Défintion : `VAR nom = valeur`.
+
+Définitions multiples avec une même valeur : `VAR nom = VAR nom1 = VAR nom2 = valeur`
+
+Peut être utilisé dans les expressions mathématiques : `1 + (VAR a = 2)` renvoie 3
+
+
+Accès aux variables : `nom`

@@ -229,7 +229,7 @@ class Number:
         if isinstance(other, Number):
             return Number(self.value - other.value).set_context(self.context), None
 
-    def multed_by(self, other):  # MULTIPLICATION
+    def multiplied_by(self, other):  # MULTIPLICATION
         if isinstance(other, Number):
             return Number(self.value * other.value).set_context(self.context), None
 
@@ -241,7 +241,7 @@ class Number:
                 )
             return Number(self.value / other.value).set_context(self.context), None
 
-    def powed_by(self, other):  # POWER
+    def powered_by(self, other):  # POWER
         if isinstance(other, Number):
             return Number(self.value ** other.value).set_context(self.context), None
 
@@ -581,7 +581,11 @@ class Interpreter:
         method = getattr(self, method_name, self.no_visit_method)
         return method(node, context)
 
-    def no_visit_method(self, node, context):
+    @staticmethod
+    def no_visit_method(node, context):
+        print(context)
+        print(f"NOUGARO INTERNAL ERROR : No visit_{type(node).__name__} method defined."
+              f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html")
         raise Exception(f'No visit_{type(node).__name__} method defined.')
 
     @staticmethod
@@ -602,11 +606,11 @@ class Interpreter:
         elif node.op_token.type == TT_MINUS:
             result, error = left.subbed_by(right)
         elif node.op_token.type == TT_MUL:
-            result, error = left.multed_by(right)
+            result, error = left.multiplied_by(right)
         elif node.op_token.type == TT_DIV:
             result, error = left.dived_by(right)
         elif node.op_token.type == TT_POW:
-            result, error = left.powed_by(right)
+            result, error = left.powered_by(right)
         else:
             raise Exception("result is not defined after executing nougaro.Interpreter.visit_BinOpNode (python file) "
                             "because of an invalid token.")
@@ -632,7 +636,8 @@ class Interpreter:
         else:
             return result.success(number.set_pos(node.pos_start, node.pos_end))
 
-    def visit_VarAccessNode(self, node, context):
+    @staticmethod
+    def visit_VarAccessNode(node, context):
         result = RTResult()
         var_name = node.var_name_token.value
         value = context.symbol_table.get(var_name)

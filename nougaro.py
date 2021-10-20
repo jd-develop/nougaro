@@ -245,6 +245,12 @@ class Number:
         if isinstance(other, Number):
             return Number(self.value ** other.value).set_context(self.context), None
 
+    def copy(self):
+        copy = Number(self.value)
+        copy.set_pos(self.pos_start, self.pos_end)
+        copy.set_context(self.context)
+        return copy
+
 
 # ##########
 # NODES
@@ -308,20 +314,24 @@ class ParseResult:
     def __init__(self):
         self.error = None
         self.node = None
+        self.advance_count = 0
+
+    def register_advancement(self):
+        self.advance_count += 1
 
     def register(self, result):
-        if isinstance(result, ParseResult):
-            if result.error:
-                self.error = result.error
-            return result.node
-        return result
+        self.advance_count += result.advance_count
+        if result.error:
+            self.error = result.error
+        return result.node
 
     def success(self, node):
         self.node = node
         return self
 
     def failure(self, error):
-        self.error = error
+        if self.error is None or self.advance_count == 0:
+            self.error = error
         return self
 
 
@@ -358,18 +368,22 @@ class Parser:
         token = self.current_token
 
         if token.type in (TT_INT, TT_FLOAT):
-            result.register(self.advance())
+            result.register_advancement()
+            self.advance()
             return result.success(NumberNode(token))
         elif token.type == TT_IDENTIFIER:
-            result.register(self.advance())
+            result.register_advancement()
+            self.advance()
             return result.success(VarAccessNode(token))
         elif token.type == TT_LPAREN:
-            result.register(self.advance())
+            result.register_advancement()
+            self.advance()
             expr = result.register(self.expr())
             if result.error is not None:
                 return result
             if self.current_token.type == TT_RPAREN:
-                result.register(self.advance())
+                result.register_advancement()
+                self.advance()
                 return result.success(expr)
             else:
                 return result.failure(
@@ -377,7 +391,7 @@ class Parser:
                 )
 
         return result.failure(
-            InvalidSyntaxError(token.pos_start, token.pos_end, "excepted int, float, '+', '-' or '('.")
+            InvalidSyntaxError(token.pos_start, token.pos_end, "excepted int, float, identifier, '+', '-' or '('.")
         )
 
     def power(self):
@@ -388,7 +402,8 @@ class Parser:
         token = self.current_token
 
         if token.type in (TT_PLUS, TT_MINUS):
-            result.register(self.advance())
+            result.register_advancement()
+            self.advance()
             factor = result.register(self.factor())
             if result.error is not None:
                 return result
@@ -402,7 +417,8 @@ class Parser:
     def expr(self):
         result = ParseResult()
         if self.current_token.matches(TT_KEYWORD, 'VAR'):
-            result.register(self.advance())
+            result.register_advancement()
+            self.advance()
 
             if self.current_token.type != TT_IDENTIFIER:
                 return result.failure(InvalidSyntaxError(
@@ -411,7 +427,8 @@ class Parser:
                 ))
 
             var_name = self.current_token
-            result.register(self.advance())
+            result.register_advancement()
+            self.advance()
 
             if self.current_token.type != TT_EQ:
                 return result.failure(InvalidSyntaxError(
@@ -419,13 +436,22 @@ class Parser:
                                                                               f"but got {self.current_token.type}."
                 ))
 
-            result.register(self.advance())
+            result.register_advancement()
+            self.advance()
             expr = result.register(self.expr())
             if result.error is not None:
                 return result
             return result.success(VarAssignNode(var_name, expr))
 
-        return self.bin_op(self.term, (TT_PLUS, TT_MINUS))
+        node = result.register(self.bin_op(self.term, (TT_PLUS, TT_MINUS)))
+
+        if result.error is not None:
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "Excepted 'VAR', int, float, identifier, '+', '-' or '('"
+            ))
+
+        return result.success(node)
 
     def bin_op(self, func_a, ops, func_b=None):
         if func_b is None:
@@ -437,7 +463,8 @@ class Parser:
 
         while self.current_token.type in ops:
             op_token = self.current_token
-            result.register(self.advance())
+            result.register_advancement()
+            self.advance()
             right = result.register(func_b())
             if result.error:
                 return result
@@ -530,7 +557,7 @@ class SymbolTable:
     def __init__(self):
         self.symbols = {}
         self.parent = None
-    
+
     def get(self, name):
         value = self.symbols.get(name, None)
         if value is None and self.parent is not None:
@@ -617,6 +644,7 @@ class Interpreter:
                 )
             )
 
+        value = value.copy().set_pos(node.pos_start, node.pos_end)
         return result.success(value)
 
     def visit_VarAssignNode(self, node, context):

@@ -20,7 +20,7 @@
 
 ### Variables :
 
-Défintion : `VAR nom = valeur`.
+Définition : `VAR nom = valeur`.
 
 Définitions multiples avec une même valeur : `VAR nom = VAR nom1 = VAR nom2 = valeur`
 

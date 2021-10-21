@@ -2,20 +2,20 @@
 # coding:utf-8
 # this file is part of NOUGARO language, created by Jean Dubois (github.com/jd-develop)
 # Public Domain
-# Actually running with Python 3.9.7
+# Actually running with Python 3.9.7, works with Python 3.10
 
 # IMPORTS
 # nougaro modules imports
 from token_constants import *
 from strings_with_arrows import *
-# build in python imports
+# built in python imports
 import string
 
 
 # ##########
 # COLORS
 # ##########
-def print_in_red(txt): print("\033[91m {}\033[00m".format(txt))
+def print_in_red(txt): print(f"\033[91m {txt}\033[00m")
 
 
 # ##########
@@ -24,6 +24,7 @@ def print_in_red(txt): print("\033[91m {}\033[00m".format(txt))
 DIGITS = '0123456789'
 LETTERS = string.ascii_letters
 LETTERS_DIGITS = LETTERS + DIGITS
+VARS_CANNOT_MODIFY = ["null", "True", "False", *KEYWORDS]
 
 
 # ##########
@@ -123,15 +124,26 @@ class Lexer:
             elif self.current_char == '^':
                 tokens.append(Token(TT_POW, pos_start=self.pos))
                 self.advance()
-            elif self.current_char == '=':
-                tokens.append(Token(TT_EQ, pos_start=self.pos))
-                self.advance()
+            # elif self.current_char == '=':
+            #     tokens.append(Token(TT_EQ, pos_start=self.pos))
+            #     self.advance()
             elif self.current_char == '(':
                 tokens.append(Token(TT_LPAREN, pos_start=self.pos))
                 self.advance()
             elif self.current_char == ')':
                 tokens.append(Token(TT_RPAREN, pos_start=self.pos))
                 self.advance()
+            elif self.current_char == '!':
+                token, error = self.make_not_equals()
+                if error is not None:
+                    return [], error
+                tokens.append(token)
+            elif self.current_char == '=':
+                tokens.append(self.make_equals())
+            elif self.current_char == '<':
+                tokens.append(self.make_less_than())
+            elif self.current_char == '>':
+                tokens.append(self.make_greater_than())
             else:
                 # illegal char
                 pos_start = self.pos.copy()
@@ -173,6 +185,50 @@ class Lexer:
             return Token(TT_INT, int(num_str), pos_start, self.pos.copy()), None
         else:
             return Token(TT_FLOAT, float(num_str), pos_start, self.pos.copy()), None
+
+    def make_not_equals(self):
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char == '=':
+            self.advance()
+            return Token(TT_NE, pos_start=pos_start, pos_end=self.pos), None
+
+        self.advance()
+        return None, ExpectedCharError(pos_start, self.pos, "expected : '!=', got : '!'")
+
+    def make_equals(self):
+        token_type = TT_EQ
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char == '=':
+            self.advance()
+            token_type = TT_EE
+
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
+
+    def make_less_than(self):
+        token_type = TT_LT
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char == '=':
+            self.advance()
+            token_type = TT_LTE
+
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
+
+    def make_greater_than(self):
+        token_type = TT_GT
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char == '=':
+            self.advance()
+            token_type = TT_GTE
+
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
 
 # ##########
@@ -244,6 +300,41 @@ class Number:
     def powered_by(self, other):  # POWER
         if isinstance(other, Number):
             return Number(self.value ** other.value).set_context(self.context), None
+
+    def get_comparison_eq(self, other):
+        if isinstance(other, Number):
+            return Number(int(self.value == other.value)).set_context(self.context), None
+
+    def get_comparison_ne(self, other):
+        if isinstance(other, Number):
+            return Number(int(self.value != other.value)).set_context(self.context), None
+
+    def get_comparison_lt(self, other):
+        if isinstance(other, Number):
+            return Number(int(self.value < other.value)).set_context(self.context), None
+
+    def get_comparison_gt(self, other):
+        if isinstance(other, Number):
+            return Number(int(self.value > other.value)).set_context(self.context), None
+
+    def get_comparison_lte(self, other):
+        if isinstance(other, Number):
+            return Number(int(self.value <= other.value)).set_context(self.context), None
+
+    def get_comparison_gte(self, other):
+        if isinstance(other, Number):
+            return Number(int(self.value >= other.value)).set_context(self.context), None
+
+    def and_(self, other):
+        if isinstance(other, Number):
+            return Number(int(self.value and other.value)).set_context(self.context), None
+
+    def or_(self, other):
+        if isinstance(other, Number):
+            return Number(int(self.value or other.value)).set_context(self.context), None
+
+    def not_(self):
+        return Number(1 if self.value == 0 else 0).set_context(self.context), None
 
     def copy(self):
         copy = Number(self.value)
@@ -414,6 +505,27 @@ class Parser:
     def term(self):
         return self.bin_op(self.factor, (TT_MUL, TT_DIV))
 
+    def arith_expr(self):
+        return self.bin_op(self.term, (TT_PLUS, TT_MINUS))
+
+    def comp_expr(self):
+        result = ParseResult()
+        if self.current_token.matches(TT_KEYWORD, 'not'):
+            op_token = self.current_token
+            result.register_advancement()
+            self.advance()
+
+            node = result.register(self.comp_expr())
+            if result.error is not None:
+                return result
+            return result.success(UnaryOpNode(op_token, node))
+
+        node = result.register(self.bin_op(self.arith_expr, (TT_EE, TT_NE, TT_LT, TT_GT, TT_LTE, TT_GTE)))
+        if result.error is not None:
+            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
+                                                     "expected int, float, identifier, '+', '-', '(' or 'not'."))
+        return result.success(node)
+
     def expr(self):
         result = ParseResult()
         if self.current_token.matches(TT_KEYWORD, 'VAR'):
@@ -443,12 +555,12 @@ class Parser:
                 return result
             return result.success(VarAssignNode(var_name, expr))
 
-        node = result.register(self.bin_op(self.term, (TT_PLUS, TT_MINUS)))
+        node = result.register(self.bin_op(self.comp_expr, ((TT_KEYWORD, "and"), (TT_KEYWORD, "or"))))
 
         if result.error is not None:
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
-                "Expected 'VAR', int, float, identifier, '+', '-' or '('"
+                "Expected 'VAR', int, float, identifier, '+', '-', '(' or 'not'"
             ))
 
         return result.success(node)
@@ -461,7 +573,7 @@ class Parser:
         if result.error is not None:
             return result
 
-        while self.current_token.type in ops:
+        while self.current_token.type in ops or (self.current_token.type, self.current_token.value) in ops:
             op_token = self.current_token
             result.register_advancement()
             self.advance()
@@ -616,6 +728,22 @@ class Interpreter:
             result, error = left.dived_by(right)
         elif node.op_token.type == TT_POW:
             result, error = left.powered_by(right)
+        elif node.op_token.type == TT_EE:
+            result, error = left.get_comparison_eq(right)
+        elif node.op_token.type == TT_NE:
+            result, error = left.get_comparison_ne(right)
+        elif node.op_token.type == TT_LT:
+            result, error = left.get_comparison_lt(right)
+        elif node.op_token.type == TT_GT:
+            result, error = left.get_comparison_gt(right)
+        elif node.op_token.type == TT_LTE:
+            result, error = left.get_comparison_lte(right)
+        elif node.op_token.type == TT_GTE:
+            result, error = left.get_comparison_gte(right)
+        elif node.op_token.matches(TT_KEYWORD, 'and'):
+            result, error = left.and_(right)
+        elif node.op_token.matches(TT_KEYWORD, 'or'):
+            result, error = left.or_(right)
         else:
             raise Exception("result is not defined after executing nougaro.Interpreter.visit_BinOpNode (python file) "
                             "because of an invalid token.\n"
@@ -636,6 +764,8 @@ class Interpreter:
 
         if node.op_token.type == TT_MINUS:
             number, error = number.multiplied_by(Number(-1))
+        elif node.op_token.matches(TT_KEYWORD, 'not'):
+            number, error = number.not_()
 
         if error is not None:
             return result.failure(error)
@@ -665,12 +795,20 @@ class Interpreter:
         if result.error is not None:
             return result
 
-        context.symbol_table.set(var_name, value)
+        if var_name not in VARS_CANNOT_MODIFY:
+            context.symbol_table.set(var_name, value)
+        else:
+            return result.failure(RunTimeError(node.pos_start, node.pos_end,
+                                               f"you can not create a variable with builtin name '{var_name}'.",
+                                               value.context))
         return result.success(value)
 
 
 global_symbol_table = SymbolTable()
 global_symbol_table.set("null", Number(0))
+global_symbol_table.set("True", Number(1))
+global_symbol_table.set("False", Number(0))
+global_symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))
 
 
 # ##########

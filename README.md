@@ -16,6 +16,17 @@
 | +         | +         |
 | -         | -         |
 | **        | ^         |
+| ==        | ==        |
+| !=        | !=        |
+| <         | <         |
+| <=        | <=        |
+| \>        | \>        |
+| \>=       | \>=       |
+| and       | and       |
+| or        | or        |
+| not       | not       |
+| True      | True      |
+| False     | False     |
 
 
 ### Variables :
@@ -28,3 +39,6 @@ Peut être utilisé dans les expressions mathématiques : `1 + (VAR a = 2)` renv
 
 
 Accès aux variables : `nom`
+
+Noms de variables protégées (constants) : `null`, `True`, `False`. Leurs valeurs sont respectivement 0, 1, 0
+

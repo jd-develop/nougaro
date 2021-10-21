@@ -2,12 +2,12 @@
 # coding:utf-8
 # this file is part of NOUGARO language, created by Jean Dubois (github.com/jd-develop)
 # Public Domain
-# Actually running with Python 3.9.7
+# Actually running with Python 3.9.7, works with Python 3.10
 
 # IMPORTS
 # nougaro modules imports
 import nougaro
-# build in python imports
+# built in python imports
 import json
 
 with open("version.json") as ver_json:

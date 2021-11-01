@@ -333,6 +333,11 @@ class Number:
         if isinstance(other, Number):
             return Number(int(self.value or other.value)).set_context(self.context), None
 
+    def excl_or(self, other):
+        """ Exclusive or """
+        if isinstance(other, Number):
+            return Number(int(self.value ^ other.value)).set_context(self.context), None
+
     def not_(self):
         return Number(1 if self.value == 0 else 0).set_context(self.context), None
 
@@ -444,7 +449,7 @@ class Parser:
         if result.error is None and self.current_token.type != TT_EOF:
             return result.failure(
                 InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                   "expected '+', '-', '*' or '/'.")
+                                   "expected '+', '-', '*', '/', 'and', 'or' or 'exclor'.")
             )
         return result
 
@@ -555,7 +560,9 @@ class Parser:
                 return result
             return result.success(VarAssignNode(var_name, expr))
 
-        node = result.register(self.bin_op(self.comp_expr, ((TT_KEYWORD, "and"), (TT_KEYWORD, "or"))))
+        node = result.register(self.bin_op(self.comp_expr, (
+            (TT_KEYWORD, "and"), (TT_KEYWORD, "or"), (TT_KEYWORD, 'exclor'))
+                                           ))
 
         if result.error is not None:
             return result.failure(InvalidSyntaxError(
@@ -744,6 +751,8 @@ class Interpreter:
             result, error = left.and_(right)
         elif node.op_token.matches(TT_KEYWORD, 'or'):
             result, error = left.or_(right)
+        elif node.op_token.matches(TT_KEYWORD, 'exclor'):
+            result, error = left.excl_or(right)
         else:
             raise Exception("result is not defined after executing nougaro.Interpreter.visit_BinOpNode (python file) "
                             "because of an invalid token.\n"
@@ -809,6 +818,8 @@ global_symbol_table.set("null", Number(0))
 global_symbol_table.set("True", Number(1))
 global_symbol_table.set("False", Number(0))
 global_symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))
+global_symbol_table.set("numberOfHornsOnAnUnicorn", Number(1))
+global_symbol_table.set("theLoneliestNumber", Number(1))
 
 
 # ##########

@@ -9,24 +9,34 @@
 
 ## Syntaxe
 
-| Python    | Nougaro   |
-|-----------|-----------|
-| *         | *         |
-| /         | /         |
-| +         | +         |
-| -         | -         |
-| **        | ^         |
-| ==        | ==        |
-| !=        | !=        |
-| <         | <         |
-| <=        | <=        |
-| \>        | \>        |
-| \>=       | \>=       |
-| and       | and       |
-| or        | or        |
-| not       | not       |
-| True      | True      |
-| False     | False     |
+### Opérateurs numériques
+| Python    | Nougaro   | Remarques                 |
+|-----------|-----------|---------------------------|
+| *         | *         | multiplication            |
+| /         | /         | division                  |
+| +         | +         | addition                  |
+| -         | -         | soustraction              |
+| **        | ^         | puissance                 |
+
+### Opérateurs booléens et de tests
+| Python    | Nougaro   | Remarques                 |
+|-----------|-----------|---------------------------|
+| ==        | ==        | est égal à                |
+| !=        | !=        | est différent de          |
+| <         | <         | strictement inférieur à   |
+| <=        | <=        | inférieur ou égal à       |
+| \>        | \>        | strictement supérieur à   |
+| \>=       | \>=       | supérieur ou égal à       |
+
+### Opérateurs et variables logiques
+| Python    | Nougaro   | Remarques                 |
+|-----------|-----------|---------------------------|
+| and       | and       | 'et' logique              |
+| or        | or        | 'ou' logique              |
+| ^         | exclor    | 'ou exclusif' logique     |
+| not       | not       | 'non' logique (inverseur) |
+| True      | True      | 'vrai' logique, égal à 1  |
+| False     | False     | 'faux' logique, égal à 0  |
 
 
 ### Variables :

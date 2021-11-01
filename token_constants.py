@@ -27,5 +27,6 @@ KEYWORDS = [
     'VAR',
     'and',
     'or',
-    'not'
+    'not',
+    'exclor'
 ]

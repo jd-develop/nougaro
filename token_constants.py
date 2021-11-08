@@ -28,5 +28,9 @@ KEYWORDS = [
     'and',
     'or',
     'not',
-    'exclor'
+    'exclor',
+    'if',
+    'then',
+    'elif',
+    'else'
 ]

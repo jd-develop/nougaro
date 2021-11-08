@@ -29,8 +29,7 @@ while True:
         print(version)
     elif error is not None:
         nougaro.print_in_red(error.as_string())
+    elif result is not None:
+        print(result)
     else:
-        if result is not None:
-            print(result)
-        else:
-            pass
+        pass

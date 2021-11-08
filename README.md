@@ -46,6 +46,15 @@
 | True      | True      | 'vrai' logique, égal à 1        |
 | False     | False     | 'faux' logique, égal à 0        |
 
+### Boucles
+| Python    | Nougaro   | Remarques                       |
+|-----------|-----------|---------------------------------|
+| while     | while     | while <cond> then <expr>        |
+| for       | for       | please see under the table      |
+
+FOR : for <identifier> = <start value> to <end value> (step <step>) then <expr>
+
+NOTE : start value PEUT ÊTRE INFÉRIEUR À end value !! Dans ce cas n'oubliez pas de fournir un pas (step) négatif ;)
 
 ### Variables :
 

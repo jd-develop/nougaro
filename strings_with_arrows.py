@@ -2,7 +2,7 @@
 # coding:utf-8
 # this file is part of NOUGARO language, created by Jean Dubois (github.com/jd-develop)
 # Public Domain
-# Actually running with Python 3.9.7
+# Actually running with Python 3.9.8
 
 def string_with_arrows(text, pos_start, pos_end):
     result = ''

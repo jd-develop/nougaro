@@ -16,7 +16,14 @@ power      : atom (POW factor)*
 atom       : INT|FLOAT|IDENTIFIER
            : LPAREN expr RPAREN
            : if_expr
+           : for_expr
+           : while_expr
 
 if_expr    : KEYWORD:IF expr KEYWORD:THEN expr
              (KEYWORD:ELIF expr KEYWORD:THEN expr)*
              (KEYWORD:ELSE expr)?
+
+for_expr   : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr
+             (KEYWORD:STEP expr)? KEYWORD:THEN expr
+
+while_expr : KEYWORD:WHILE expr KEYWORD:THEN expr

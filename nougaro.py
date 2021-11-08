@@ -2,7 +2,7 @@
 # coding:utf-8
 # this file is part of NOUGARO language, created by Jean Dubois (github.com/jd-develop)
 # Public Domain
-# Actually running with Python 3.9.7, works with Python 3.10
+# Actually running with Python 3.9.8, works with Python 3.10
 
 # IMPORTS
 # nougaro modules imports
@@ -416,6 +416,28 @@ class IfNode:
         self.pos_end = (self.else_case or self.cases[len(self.cases) - 1][0]).pos_end
 
 
+class ForNode:
+    def __init__(self, var_name_token, start_value_node, end_value_node, step_value_node, body_node):
+        # by default step_value_node is None
+        self.var_name_token: Token = var_name_token
+        self.start_value_node = start_value_node
+        self.end_value_node = end_value_node
+        self.step_value_node = step_value_node
+        self.body_node = body_node
+
+        self.pos_start = self.var_name_token.pos_start
+        self.pos_end = self.body_node.pos_end
+
+
+class WhileNode:
+    def __init__(self, condition_node, body_node):
+        self.condition_node = condition_node
+        self.body_node = body_node
+
+        self.pos_start = self.condition_node.pos_start
+        self.pos_end = self.body_node.pos_end
+
+
 # ##########
 # PARSE RESULT
 # ##########
@@ -451,6 +473,7 @@ class Parser:
     """
         Please see grammar.txt for operation priority.
     """
+
     def __init__(self, tokens):
         self.tokens = tokens
         self.token_index = -1
@@ -503,6 +526,16 @@ class Parser:
             if result.error is not None:
                 return result
             return result.success(if_expr)
+        elif token.matches(TT_KEYWORD, 'for'):
+            for_expr = result.register(self.for_expr())
+            if result.error is not None:
+                return result
+            return result.success(for_expr)
+        elif token.matches(TT_KEYWORD, 'while'):
+            while_expr = result.register(self.while_expr())
+            if result.error is not None:
+                return result
+            return result.success(while_expr)
 
         return result.failure(
             InvalidSyntaxError(token.pos_start, token.pos_end, "expected int, float, identifier, '+', '-' or '('.")
@@ -515,7 +548,7 @@ class Parser:
 
         if not self.current_token.matches(TT_KEYWORD, 'if'):
             return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end, "Expected 'if'"
+                self.current_token.pos_start, self.current_token.pos_end, "expected 'if'"
             ))
 
         result.register_advancement()
@@ -527,7 +560,7 @@ class Parser:
 
         if not self.current_token.matches(TT_KEYWORD, 'then'):
             return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end, "Expected 'then'"
+                self.current_token.pos_start, self.current_token.pos_end, "expected 'then'"
             ))
 
         result.register_advancement()
@@ -548,7 +581,7 @@ class Parser:
 
             if not self.current_token.matches(TT_KEYWORD, 'then'):
                 return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end, "Expected 'then'"
+                    self.current_token.pos_start, self.current_token.pos_end, "expected 'then'"
                 ))
 
             result.register_advancement()
@@ -569,8 +602,98 @@ class Parser:
 
         return result.success(IfNode(cases, else_case))
 
+    def for_expr(self):
+        result = ParseResult()
+        if not self.current_token.matches(TT_KEYWORD, 'for'):
+            return result.error(InvalidSyntaxError, self.current_token.pos_start, self.current_token.pos_end,
+                                "expected 'for'")
+
+        result.register_advancement()
+        self.advance()
+
+        if self.current_token.type != TT_IDENTIFIER:
+            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
+                                                     f"expected identifier, but got {self.current_token.type}. "
+                                                     f"Maybe you used a reserved name as a variable name."))
+
+        var_name = self.current_token
+        result.register_advancement()
+        self.advance()
+
+        if self.current_token.type != TT_EQ:
+            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
+                                                     f"expected '=', but got {self.current_token.type}."))
+
+        result.register_advancement()
+        self.advance()
+
+        start_value = result.register(self.expr())
+        if result.error is not None:
+            return result
+
+        if not self.current_token.matches(TT_KEYWORD, 'to'):
+            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
+                                                     f"expected 'to'."))
+
+        result.register_advancement()
+        self.advance()
+
+        end_value = result.register(self.expr())
+        if result.error is not None:
+            return result
+
+        if self.current_token.matches(TT_KEYWORD, 'step'):
+            result.register_advancement()
+            self.advance()
+
+            step_value = result.register(self.expr())
+            if result.error is not None:
+                return result
+        else:
+            step_value = None
+
+        if not self.current_token.matches(TT_KEYWORD, 'then'):
+            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
+                                                     "expected 'then'"))
+
+        result.register_advancement()
+        self.advance()
+
+        body = result.register(self.expr())
+        if result.error is not None:
+            return result
+
+        return result.success(ForNode(var_name, start_value, end_value, step_value, body))
+
+    def while_expr(self):
+        result = ParseResult()
+
+        if not self.current_token.matches(TT_KEYWORD, 'while'):
+            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
+                                                     "expected 'while'"))
+
+        result.register_advancement()
+        self.advance()
+
+        condition = result.register(self.expr())
+        if result.error is not None:
+            return result
+
+        if not self.current_token.matches(TT_KEYWORD, 'then'):
+            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
+                                                     "expected 'then'"))
+
+        result.register_advancement()
+        self.advance()
+
+        body = result.register(self.expr())
+        if result.error is not None:
+            return result
+
+        return result.success(WhileNode(condition, body))
+
     def power(self):
-        return self.bin_op(self.atom, (TT_POW, ), self.factor)
+        return self.bin_op(self.atom, (TT_POW,), self.factor)
 
     def factor(self):
         result = ParseResult()
@@ -619,7 +742,9 @@ class Parser:
             if self.current_token.type != TT_IDENTIFIER:
                 return result.failure(InvalidSyntaxError(
                     self.current_token.pos_start, self.current_token.pos_end, f"expected identifier, "
-                                                                              f"but got {self.current_token.type}."
+                                                                              f"but got {self.current_token.type}. "
+                                                                              f"Maybe you used a reserved name as a "
+                                                                              f"variable name."
                 ))
 
             var_name = self.current_token
@@ -687,8 +812,8 @@ class Error:
             # Add chars after the space in the string after the "while string_line[0] in" to delete them.
             string_line = string_line[1:]
         result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n \t' + \
-            string_line + '\n ' + \
-            f'{self.error_name} : {self.details}'
+                 string_line + '\n ' + \
+                 f'{self.error_name} : {self.details}'
         return result
 
 
@@ -909,6 +1034,54 @@ class Interpreter:
             if result.error is not None:
                 return result
             return result.success(else_value)
+
+        return result.success(None)
+
+    def visit_ForNode(self, node, context):
+        result = RTResult()
+
+        start_value = result.register(self.visit(node.start_value_node, context))
+        if result.error is not None:
+            return result
+
+        end_value = result.register(self.visit(node.end_value_node, context))
+        if result.error is not None:
+            return result
+
+        if node.step_value_node is not None:
+            step_value = result.register(self.visit(node.step_value_node, context))
+            if result.error is not None:
+                return result
+        else:
+            step_value = Number(1)
+
+        i = start_value.value
+        condition = (lambda: i < end_value.value) if step_value.value >= 0 else (lambda: i > end_value.value)
+
+        while condition():
+            context.symbol_table.set(node.var_name_token.value, Number(i))
+            i += step_value.value
+
+            result.register(self.visit(node.body_node, context))
+            if result.error is not None:
+                return result
+
+        return result.success(None)
+
+    def visit_WhileNode(self, node, context):
+        result = RTResult()
+
+        while True:
+            condition = result.register(self.visit(node.condition_node, context))
+            if result.error is not None:
+                return result
+
+            if not condition.is_true():
+                break
+
+            result.register(self.visit(node.body_node, context))
+            if result.error is not None:
+                return result
 
         return result.success(None)
 

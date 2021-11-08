@@ -49,11 +49,11 @@
 
 ### Variables :
 
-Définition : `VAR nom = valeur`.
+Définition : `var nom = valeur`.
 
-Définitions multiples avec une même valeur : `VAR nom = VAR nom1 = VAR nom2 = valeur`
+Définitions multiples avec une même valeur : `var nom = var nom1 = var nom2 = valeur`
 
-Peut être utilisé dans les expressions mathématiques : `1 + (VAR a = 2)` renvoie 3
+Peut être utilisé dans les expressions mathématiques : `1 + (var a = 2)` renvoie 3
 
 
 Accès aux variables : `nom`

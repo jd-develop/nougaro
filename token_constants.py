@@ -24,7 +24,7 @@ TT_LTE = 'LTE'                # <=
 TT_GTE = 'GTE'                # >=
 TT_EOF = 'EOF'                # end of file
 KEYWORDS = [
-    'VAR',
+    'var',
     'and',
     'or',
     'not',

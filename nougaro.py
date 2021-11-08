@@ -612,7 +612,7 @@ class Parser:
 
     def expr(self):
         result = ParseResult()
-        if self.current_token.matches(TT_KEYWORD, 'VAR'):
+        if self.current_token.matches(TT_KEYWORD, 'var'):
             result.register_advancement()
             self.advance()
 
@@ -646,7 +646,7 @@ class Parser:
         if result.error is not None:
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
-                "Expected 'VAR', int, float, identifier, '+', '-', '(' or 'not'"
+                "Expected 'var', int, float, identifier, '+', '-', '(' or 'not'"
             ))
 
         return result.success(node)

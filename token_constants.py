@@ -4,10 +4,10 @@
 # Public Domain
 # no imports
 
-TT_INT = 'INT'                # integer, correspond to python int
-TT_FLOAT = 'FLOAT'            # float number, correspond to python float
+TT_INT = 'INT'                # integer, corresponds to python int
+TT_FLOAT = 'FLOAT'            # float number, corresponds to python float
 TT_IDENTIFIER = 'IDENTIFIER'  # Identifier of a var name
-TT_KEYWORD = 'KEYWORD'        # Keyword, like "VAR"
+TT_KEYWORD = 'KEYWORD'        # Keyword, like "var"
 TT_PLUS = 'PLUS'              # +
 TT_MINUS = 'MINUS'            # -
 TT_MUL = 'MUL'                # *
@@ -22,6 +22,8 @@ TT_LT = 'LT'                  # <
 TT_GT = 'GT'                  # >
 TT_LTE = 'LTE'                # <=
 TT_GTE = 'GTE'                # >=
+TT_COMMA = 'COMMA'            # ,
+TT_ARROW = 'ARROW'            # ->
 TT_EOF = 'EOF'                # end of file
 KEYWORDS = [
     'var',
@@ -36,5 +38,6 @@ KEYWORDS = [
     'for',
     'to',
     'step',
-    'while'
+    'while',
+    'def'
 ]

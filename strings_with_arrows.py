@@ -4,7 +4,23 @@
 # Public Domain
 # Actually running with Python 3.9.8
 
-def string_with_arrows(text, pos_start, pos_end):
+def string_with_arrows(text: str, pos_start, pos_end) -> str:
+    """
+        In this example, text will be 'var 1a = 123'
+        If you execute this line with nougaro, it crashes with an :
+            InvalidSyntaxError : expected identifier, but got INT.
+
+        It generates this view of the line with arrows (^) under line :
+            var 1a = 123
+                ^
+
+        The pos_start is the 1 token pos_start, same for pos end.
+
+    :param text: base text
+    :param pos_start: position start
+    :param pos_end: position end
+    :return: str as defined above
+    """
     result = ''
 
     # Calculate indices

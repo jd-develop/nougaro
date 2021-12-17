@@ -1350,9 +1350,17 @@ class Interpreter:
         value = context.symbol_table.get(var_name)
 
         if value is None:
+
+            if var_name == 'eexit' or var_name == 'exxit' or var_name == 'exiit' or var_name == 'exitt':
+                return result.failure(
+                    NotDefinedError(
+                        node.pos_start, node.pos_end, f'{var_name} is not defined. Did you mean \'exit\' ?', context
+                    )
+                )
+
             return result.failure(
                 NotDefinedError(
-                    node.pos_start, node.pos_end, f'{var_name} is not defined', context
+                    node.pos_start, node.pos_end, f'{var_name} is not defined.', context
                 )
             )
 

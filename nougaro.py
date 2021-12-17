@@ -6,8 +6,8 @@
 
 # IMPORTS
 # nougaro modules imports
-from token_constants import *
-from strings_with_arrows import *
+from src.token_constants import *
+from src.strings_with_arrows import *
 # built in python imports
 import string
 
@@ -266,38 +266,114 @@ class RTResult:
 # ##########
 # VALUES
 # ##########
-class Number:
-    def __init__(self, value):
-        self.value = value
-        self.pos_start = None
-        self.pos_end = None
-        self.context = None
+class Value:
+    def __init__(self):
+        self.pos_start = self.pos_end = self.context = None
         self.set_pos()
         self.set_context()
-
-    def __repr__(self):
-        return str(self.value)
-
-    def set_context(self, context=None):
-        self.context = context
-        return self
 
     def set_pos(self, pos_start=None, pos_end=None):
         self.pos_start = pos_start
         self.pos_end = pos_end
         return self
 
+    def set_context(self, context=None):
+        self.context = context
+        return self
+
+    def added_to(self, other):
+        return None, self.illegal_operation(other)
+
+    def subbed_by(self, other):
+        return None, self.illegal_operation(other)
+
+    def multiplied_by(self, other):
+        return None, self.illegal_operation(other)
+
+    def dived_by(self, other):
+        return None, self.illegal_operation(other)
+
+    def powered_by(self, other):
+        return None, self.illegal_operation(other)
+
+    def get_comparison_eq(self, other):
+        return None, self.illegal_operation(other)
+
+    def get_comparison_ne(self, other):
+        return None, self.illegal_operation(other)
+
+    def get_comparison_lt(self, other):
+        return None, self.illegal_operation(other)
+
+    def get_comparison_gt(self, other):
+        return None, self.illegal_operation(other)
+
+    def get_comparison_lte(self, other):
+        return None, self.illegal_operation(other)
+
+    def get_comparison_gte(self, other):
+        return None, self.illegal_operation(other)
+
+    def and_(self, other):
+        return None, self.illegal_operation(other)
+
+    def or_(self, other):
+        return None, self.illegal_operation(other)
+
+    def not_(self):
+        return None, self.illegal_operation()
+
+    def excl_or(self, other):
+        """ Exclusive or """
+        return None, self.illegal_operation(other)
+
+    def execute(self, args):
+        return RTResult().failure(self.illegal_operation())
+
+    def copy(self):
+        print(self.context)
+        print('NOUGARO INTERNAL ERROR : No copy method defined in Value.copy().\n'
+              'Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with the information below'
+              )
+        raise Exception('No copy method defined in Value.copy().')
+
+    @staticmethod
+    def is_true():
+        return False
+
+    def illegal_operation(self, other=None):
+        if other is None:
+            other = self
+        return RunTimeError(
+            self.pos_start, other.pos_end, 'illegal operation.', self.context
+        )
+
+
+class Number(Value):
+    def __init__(self, value):
+        super().__init__()
+        self.value = value
+
+    def __repr__(self):
+        return str(self.value)
+
     def added_to(self, other):  # ADDITION
         if isinstance(other, Number):
             return Number(self.value + other.value).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def subbed_by(self, other):  # SUBTRACTION
         if isinstance(other, Number):
             return Number(self.value - other.value).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def multiplied_by(self, other):  # MULTIPLICATION
         if isinstance(other, Number):
             return Number(self.value * other.value).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def dived_by(self, other):  # DIVISION
         if isinstance(other, Number):
@@ -306,47 +382,69 @@ class Number:
                     other.pos_start, other.pos_end, 'division by zero is not possible.', self.context
                 )
             return Number(self.value / other.value).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def powered_by(self, other):  # POWER
         if isinstance(other, Number):
             return Number(self.value ** other.value).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def get_comparison_eq(self, other):
         if isinstance(other, Number):
             return Number(int(self.value == other.value)).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def get_comparison_ne(self, other):
         if isinstance(other, Number):
             return Number(int(self.value != other.value)).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def get_comparison_lt(self, other):
         if isinstance(other, Number):
             return Number(int(self.value < other.value)).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def get_comparison_gt(self, other):
         if isinstance(other, Number):
             return Number(int(self.value > other.value)).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def get_comparison_lte(self, other):
         if isinstance(other, Number):
             return Number(int(self.value <= other.value)).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def get_comparison_gte(self, other):
         if isinstance(other, Number):
             return Number(int(self.value >= other.value)).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def and_(self, other):
         if isinstance(other, Number):
             return Number(int(self.value and other.value)).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def or_(self, other):
         if isinstance(other, Number):
             return Number(int(self.value or other.value)).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def excl_or(self, other):
         """ Exclusive or """
         if isinstance(other, Number):
             return Number(int(self.value ^ other.value)).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
 
     def not_(self):
         return Number(1 if self.value == 0 else 0).set_context(self.context), None
@@ -358,6 +456,58 @@ class Number:
         copy = Number(self.value)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
+        return copy
+
+
+class Function(Value):
+    def __init__(self, name, body_node, arg_names):
+        super().__init__()
+        self.name = name if name is not None else '<function>'
+        self.body_node = body_node
+        self.arg_names = arg_names
+
+    def __repr__(self):
+        return f'<function {self.name}>'
+
+    def execute(self, args):
+        result = RTResult()
+        interpreter = Interpreter()
+        new_context = Context(self.name, self.context, self.pos_start)
+        new_context.symbol_table = SymbolTable(new_context.parent.symbol_table)
+
+        if len(args) > len(self.arg_names):
+            return result.failure(
+                RunTimeError(
+                    self.pos_start, self.pos_end,
+                    f"{len(args) - len(self.arg_names)} too many args passed into '{self.name}'",
+                    self.context
+                )
+            )
+
+        if len(args) < len(self.arg_names):
+            return result.failure(
+                RunTimeError(
+                    self.pos_start, self.pos_end,
+                    f"{len(self.arg_names) - len(args)} too few args passed into '{self.name}'",
+                    self.context
+                )
+            )
+
+        for i in range(len(args)):
+            arg_name = self.arg_names[i]
+            arg_value = args[i]
+            arg_value.set_context(new_context)
+            new_context.symbol_table.set(arg_name, arg_value)
+
+        value = result.register(interpreter.visit(self.body_node, new_context))
+        if result.error is not None:
+            return result
+        return result.success(value)
+
+    def copy(self):
+        copy = Function(self.name, self.body_node, self.arg_names)
+        copy.set_context(self.context)
+        copy.set_pos(self.pos_start, self.pos_end)
         return copy
 
 
@@ -572,13 +722,12 @@ class Parser:
             return result.success(VarAssignNode(var_name, expr))
 
         node = result.register(self.bin_op(self.comp_expr, (
-            (TT_KEYWORD, "and"), (TT_KEYWORD, "or"), (TT_KEYWORD, 'exclor'))
-                                           ))
+            (TT_KEYWORD, "and"), (TT_KEYWORD, "or"), (TT_KEYWORD, 'exclor'))))
 
         if result.error is not None:
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'var', int, float, identifier, '+', '-', '(' or 'not'"
+                "expected 'var', int, float, identifier, 'if', 'for', 'while', 'def' '+', '-', '(' or 'not'"
             ))
 
         return result.success(node)
@@ -665,6 +814,12 @@ class Parser:
                         )
                     )
 
+                result.register_advancement()
+                self.advance()
+
+            return result.success(CallNode(atom, arg_nodes))
+        return result.success(atom)
+
     def atom(self):
         result = ParseResult()
         token = self.current_token
@@ -713,7 +868,8 @@ class Parser:
             return result.success(func_def)
 
         return result.failure(
-            InvalidSyntaxError(token.pos_start, token.pos_end, "expected int, float, identifier, '+', '-' or '('.")
+            InvalidSyntaxError(token.pos_start, token.pos_end, "expected int, float, identifier, 'if', 'for', 'while', "
+                                                               "'def', '+', '-' or '('.")
         )
 
     def if_expr(self):
@@ -963,6 +1119,8 @@ class Parser:
                 )
             )
 
+        result.register_advancement()
+        self.advance()
         node_to_return = result.register(self.expr())
         if result.error is not None:
             return result
@@ -1051,7 +1209,7 @@ class RunTimeError(Error):
         ctx = self.context
 
         while ctx is not None:
-            result = f' In file {pos.file_name}, line {pos.line_number + 1}, in {ctx.display_name} :' + result
+            result = f' In file {pos.file_name}, line {pos.line_number + 1}, in {ctx.display_name} :\n' + result
             pos = ctx.parent_entry_pos
             ctx = ctx.parent
 
@@ -1079,9 +1237,9 @@ class Context:
 # SYMBOL TABLE
 # ##########
 class SymbolTable:
-    def __init__(self):
+    def __init__(self, parent=None):
         self.symbols = {}
-        self.parent = None
+        self.parent = parent
 
     def get(self, name):
         value = self.symbols.get(name, None)
@@ -1100,24 +1258,24 @@ class SymbolTable:
 # INTERPRETER
 # ##########
 class Interpreter:
-    # this class have not __init__ method
+    # this class does not have __init__ method
     def visit(self, node, context):
         method_name = f'visit_{type(node).__name__}'
         method = getattr(self, method_name, self.no_visit_method)
         return method(node, context)
 
     @staticmethod
-    def no_visit_method(node, context):
+    def no_visit_method(node, context: Context):
         print(context)
         print(f"NOUGARO INTERNAL ERROR : No visit_{type(node).__name__} method defined.\n"
-              f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html")
+              f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with informations above.")
         raise Exception(f'No visit_{type(node).__name__} method defined.')
 
     @staticmethod
-    def visit_NumberNode(node, context):
+    def visit_NumberNode(node: NumberNode, context: Context):
         return RTResult().success(Number(node.token.value).set_context(context).set_pos(node.pos_start, node.pos_end))
 
-    def visit_BinOpNode(self, node, context):
+    def visit_BinOpNode(self, node: BinOpNode, context: Context):
         res = RTResult()
         left = res.register(self.visit(node.left_node, context))
         if res.error is not None:
@@ -1155,16 +1313,19 @@ class Interpreter:
         elif node.op_token.matches(TT_KEYWORD, 'exclor'):
             result, error = left.excl_or(right)
         else:
-            raise Exception("result is not defined after executing nougaro.Interpreter.visit_BinOpNode (python file) "
-                            "because of an invalid token.\n"
-                            "Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html")
+            print(context)
+            print("NOUGARO INTERNAL ERROR : Result is not defined after executing nougaro.Interpreter.visit_BinOpNode "
+                  "because of an invalid token.\n"
+                  "Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with the information "
+                  "below")
+            raise Exception("Result is not defined after executing nougaro.Interpreter.visit_BinOpNode")
 
         if error is not None:
             return res.failure(error)
         else:
             return res.success(result.set_pos(node.pos_start, node.pos_end))
 
-    def visit_UnaryOpNode(self, node, context):
+    def visit_UnaryOpNode(self, node: UnaryOpNode, context: Context):
         result = RTResult()
         number = result.register(self.visit(node.node, context))
         if result.error is not None:
@@ -1183,7 +1344,7 @@ class Interpreter:
             return result.success(number.set_pos(node.pos_start, node.pos_end))
 
     @staticmethod
-    def visit_VarAccessNode(node, context):
+    def visit_VarAccessNode(node: VarAccessNode, context: Context):
         result = RTResult()
         var_name = node.var_name_token.value
         value = context.symbol_table.get(var_name)
@@ -1198,7 +1359,7 @@ class Interpreter:
         value = value.copy().set_pos(node.pos_start, node.pos_end)
         return result.success(value)
 
-    def visit_VarAssignNode(self, node, context):
+    def visit_VarAssignNode(self, node: VarAssignNode, context: Context):
         result = RTResult()
         var_name = node.var_name_token.value
         value = result.register(self.visit(node.value_node, context))
@@ -1213,7 +1374,7 @@ class Interpreter:
                                                value.context))
         return result.success(value)
 
-    def visit_IfNode(self, node: IfNode, context):
+    def visit_IfNode(self, node: IfNode, context: Context):
         result = RTResult()
         for condition, expr in node.cases:
             condition_value = result.register(self.visit(condition, context))
@@ -1234,7 +1395,7 @@ class Interpreter:
 
         return result.success(None)
 
-    def visit_ForNode(self, node, context):
+    def visit_ForNode(self, node: ForNode, context: Context):
         result = RTResult()
 
         start_value = result.register(self.visit(node.start_value_node, context))
@@ -1265,7 +1426,7 @@ class Interpreter:
 
         return result.success(None)
 
-    def visit_WhileNode(self, node, context):
+    def visit_WhileNode(self, node: WhileNode, context: Context):
         result = RTResult()
 
         while True:
@@ -1281,6 +1442,39 @@ class Interpreter:
                 return result
 
         return result.success(None)
+
+    @staticmethod
+    def visit_FuncDefNode(node: FuncDefNode, context: Context):
+        result = RTResult()
+        func_name = node.var_name_token.value if node.var_name_token is not None else None
+        body_node = node.body_node
+        arg_names = [arg_name.value for arg_name in node.arg_name_tokens]
+        func_value = Function(func_name, body_node, arg_names).set_context(context).set_pos(node.pos_start,
+                                                                                            node.pos_end)
+
+        if node.var_name_token is not None:
+            context.symbol_table.set(func_name, func_value)
+
+        return result.success(func_value)
+
+    def visit_CallNode(self, node: CallNode, context: Context):
+        result = RTResult()
+        args = []
+
+        value_to_call = result.register(self.visit(node.node_to_call, context))
+        if result.error is not None:
+            return result
+        value_to_call = value_to_call.copy().set_pos(node.pos_start, node.pos_end)
+
+        for arg_node in node.arg_nodes:
+            args.append(result.register(self.visit(arg_node, context)))
+            if result.error is not None:
+                return result
+
+        return_value = result.register(value_to_call.execute(args))
+        if result.error is not None:
+            return result
+        return result.success(return_value)
 
 
 global_symbol_table = SymbolTable()

@@ -6,6 +6,7 @@
 
 TT_INT = 'INT'                # integer, corresponds to python int
 TT_FLOAT = 'FLOAT'            # float number, corresponds to python float
+TT_STRING = 'STRING'          # string type, corresponds to python str
 TT_IDENTIFIER = 'IDENTIFIER'  # Identifier of a var name
 TT_KEYWORD = 'KEYWORD'        # Keyword, like "var"
 TT_PLUS = 'PLUS'              # +

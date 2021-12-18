@@ -109,6 +109,8 @@ class Lexer:
                     return [], error
             elif self.current_char in LETTERS:
                 tokens.append(self.make_identifier())
+            elif self.current_char == '"' or self.current_char == "'":
+                tokens.append(self.make_string(self.current_char))
             elif self.current_char == '+':
                 tokens.append(Token(TT_PLUS, pos_start=self.pos))
                 self.advance()
@@ -152,6 +154,32 @@ class Lexer:
 
         tokens.append(Token(TT_EOF, pos_start=self.pos))
         return tokens, None
+
+    def make_string(self, quote='"'):
+        string_ = ''
+        pos_start = self.pos.copy()
+        escape_character = False
+        # other_quote = '"' if quote == "'" else "'"
+        self.advance()
+
+        escape_characters = {
+            'n': '\n',
+            't': '\t'
+        }
+
+        while self.current_char is not None and (self.current_char != quote or escape_character):
+            if escape_character:
+                string_ += escape_characters.get(self.current_char, self.current_char)
+                escape_character = False
+            else:
+                if self.current_char == '\\':
+                    escape_character = True
+                else:
+                    string_ += self.current_char
+            self.advance()
+
+        self.advance()
+        return Token(TT_STRING, string_, pos_start, self.pos)
 
     def make_identifier(self):
         id_str = ''
@@ -345,8 +373,39 @@ class Value:
         if other is None:
             other = self
         return RunTimeError(
-            self.pos_start, other.pos_end, 'illegal operation.', self.context
+            self.pos_start, other.pos_end, f'illegal operation between {self.__class__.__name__} and '
+                                           f'{other.__class__.__name__}.', self.context
         )
+
+
+class String(Value):
+    def __init__(self, value):
+        super().__init__()
+        self.value = value
+
+    def __repr__(self):
+        return f'"{self.value}"'
+
+    def added_to(self, other):
+        if isinstance(other, String):
+            return String(self.value + other.value).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
+
+    def multiplied_by(self, other):
+        if isinstance(other, Number):
+            return String(self.value * other.value).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
+
+    def is_true(self):
+        return len(self.value) > 0
+
+    def copy(self):
+        copy = String(self.value)
+        copy.set_pos(self.pos_start, self.pos_end)
+        copy.set_context(self.context)
+        return copy
 
 
 class Number(Value):
@@ -515,6 +574,16 @@ class Function(Value):
 # NODES
 # ##########
 class NumberNode:
+    def __init__(self, token):
+        self.token = token
+        self.pos_start = self.token.pos_start
+        self.pos_end = self.token.pos_end
+
+    def __repr__(self):
+        return f'{self.token}'
+
+
+class StringNode:
     def __init__(self, token):
         self.token = token
         self.pos_start = self.token.pos_start
@@ -828,6 +897,10 @@ class Parser:
             result.register_advancement()
             self.advance()
             return result.success(NumberNode(token))
+        elif token.type == TT_STRING:
+            result.register_advancement()
+            self.advance()
+            return result.success(StringNode(token))
         elif token.type == TT_IDENTIFIER:
             result.register_advancement()
             self.advance()
@@ -1274,6 +1347,12 @@ class Interpreter:
     @staticmethod
     def visit_NumberNode(node: NumberNode, context: Context):
         return RTResult().success(Number(node.token.value).set_context(context).set_pos(node.pos_start, node.pos_end))
+
+    @staticmethod
+    def visit_StringNode(node: StringNode, context: Context):
+        return RTResult().success(
+            String(node.token.value).set_context(context).set_pos(node.pos_start, node.pos_end)
+        )
 
     def visit_BinOpNode(self, node: BinOpNode, context: Context):
         res = RTResult()

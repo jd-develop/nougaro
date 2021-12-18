@@ -21,12 +21,10 @@ while True:
     if str(text) == "" or text is None:
         result, error = None, None
     else:
-        result, error = nougaro.run('<stdin>', text)
+        result, error = nougaro.run('<stdin>', text, version)
 
     if text == "exit":
         break
-    elif text == "ver":
-        print(version)
     elif error is not None:
         nougaro.print_in_red(error.as_string())
     elif result is not None:

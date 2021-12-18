@@ -24,7 +24,7 @@ def print_in_red(txt): print(f"\033[91m {txt}\033[00m")
 DIGITS = '0123456789'
 LETTERS = string.ascii_letters
 LETTERS_DIGITS = LETTERS + DIGITS
-VARS_CANNOT_MODIFY = ["null", "True", "False", *KEYWORDS]
+VARS_CANNOT_MODIFY = ["null", "True", "False", 'noug_version', *KEYWORDS]
 
 
 # ##########
@@ -1576,7 +1576,8 @@ global_symbol_table.set("theLoneliestNumber", Number(1))
 # ##########
 # RUN
 # ##########
-def run(file_name, text):
+def run(file_name, text, version: str = "not defined"):
+    global_symbol_table.set("noug_version", String(version))
     lexer = Lexer(file_name, text)
     tokens, error = lexer.make_tokens()
     if error is not None:

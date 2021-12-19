@@ -524,6 +524,11 @@ class Number(Value):
         return copy
 
 
+Number.null = Number(0)
+Number.false = Number(0)
+Number.true = Number(1)
+
+
 class List(Value):
     def __init__(self, elements):
         super().__init__()
@@ -1712,9 +1717,9 @@ class Interpreter:
 
 
 global_symbol_table = SymbolTable()
-global_symbol_table.set("null", Number(0))
-global_symbol_table.set("True", Number(1))
-global_symbol_table.set("False", Number(0))
+global_symbol_table.set("null", Number.null)
+global_symbol_table.set("True", Number.true)
+global_symbol_table.set("False", Number.false)
 global_symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))
 global_symbol_table.set("numberOfHornsOnAnUnicorn", Number(1))
 global_symbol_table.set("theLoneliestNumber", Number(1))

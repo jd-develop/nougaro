@@ -2126,6 +2126,13 @@ class Interpreter:
             return result
         value_to_call = value_to_call.copy().set_pos(node.pos_start, node.pos_end)
 
+        if not isinstance(value_to_call, BaseFunction):
+            return result.failure(RunTimeError(
+                node.pos_start, node.pos_end,
+                f"{value_to_call.__class__.__name__} is not callable.",
+                context
+            ))
+
         for arg_node in node.arg_nodes:
             args.append(result.register(self.visit(arg_node, context)))
             if result.error is not None:

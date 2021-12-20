@@ -23,9 +23,7 @@ while True:
     else:
         result, error = nougaro.run('<stdin>', text, version)
 
-    if text == "exit":
-        break
-    elif error is not None:
+    if error is not None:
         nougaro.print_in_red(error.as_string())
     elif result is not None:
         print(result)

@@ -1050,6 +1050,12 @@ class BuiltInFunction(BaseFunction):
         return RTResult().success(Number(atan))
     execute_atan.arg_names = ['value']
 
+    def execute_exit(self, exec_context: Context):
+        """Stops the Nougaro Interpreter"""
+        # No params.
+        exit()
+    execute_exit.arg_names = []
+
     # ==================
 
     def copy(self):
@@ -1082,6 +1088,8 @@ BuiltInFunction.TAN = BuiltInFunction('tan')
 BuiltInFunction.ASIN = BuiltInFunction('asin')
 BuiltInFunction.ACOS = BuiltInFunction('acos')
 BuiltInFunction.ATAN = BuiltInFunction('atan')
+
+BuiltInFunction.EXIT = BuiltInFunction('exit')
 
 
 # ##########
@@ -2168,6 +2176,8 @@ global_symbol_table.set("atan", BuiltInFunction.ATAN)
 global_symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))
 global_symbol_table.set("numberOfHornsOnAnUnicorn", Number(1))
 global_symbol_table.set("theLoneliestNumber", Number(1))
+
+global_symbol_table.set("exit", BuiltInFunction.EXIT)
 
 
 # ##########

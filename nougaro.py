@@ -8,8 +8,8 @@
 # nougaro modules imports
 from src.token_constants import *
 from src.strings_with_arrows import *
+from src.constants import *
 # built-in python imports
-import string
 import os
 import math
 
@@ -18,15 +18,6 @@ import math
 # COLORS
 # ##########
 def print_in_red(txt): print(f"\033[91m {txt}\033[00m")
-
-
-# ##########
-# CONSTANTS
-# ##########
-DIGITS = '0123456789'
-LETTERS = string.ascii_letters
-LETTERS_DIGITS = LETTERS + DIGITS
-VARS_CANNOT_MODIFY = ["null", "True", "False", 'noug_version', *KEYWORDS]
 
 
 # ##########
@@ -2028,7 +2019,7 @@ class Interpreter:
             context.symbol_table.set(var_name, value)
         else:
             return result.failure(RunTimeError(node.pos_start, node.pos_end,
-                                               f"you can not create a variable with builtin name '{var_name}'.",
+                                               f"can not create a variable with builtin name '{var_name}'.",
                                                value.context))
         return result.success(value)
 

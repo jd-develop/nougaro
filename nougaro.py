@@ -479,7 +479,7 @@ class Number(Value):
     def dived_by(self, other):  # DIVISION
         if isinstance(other, Number):
             if other.value == 0:
-                return None, RunTimeError(
+                return None, RTArithmeticError(
                     other.pos_start, other.pos_end, 'division by zero is not possible.', self.context
                 )
             return Number(self.value / other.value).set_context(self.context), None
@@ -564,6 +564,7 @@ Number.NULL = Number(0)
 Number.FALSE = Number(0)
 Number.TRUE = Number(1)
 Number.MATH_PI = Number(math.pi)
+Number.MATH_SQRT_PI = Number(math.sqrt(math.pi))
 
 
 class List(Value):
@@ -830,7 +831,7 @@ class BuiltInFunction(BaseFunction):
             ))
 
         list_.elements.append(value)
-        return RTResult().success(value)
+        return RTResult().success(list_)
     execute_append.arg_names = ['list', 'value']
 
     def execute_pop(self, exec_context: Context):
@@ -856,14 +857,14 @@ class BuiltInFunction(BaseFunction):
             ))
 
         try:
-            element = list_.elements.pop(index.value)
+            list_.elements.pop(index.value)
         except Exception:
             return RTResult().failure(RTIndexError(
                 self.pos_start, self.pos_end,
                 f'pop index {index.value} out of range.',
                 self.context
             ))
-        return RTResult().success(element)
+        return RTResult().success(list_)
     execute_pop.arg_names = ['list', 'index']
 
     def execute_extend(self, exec_context: Context):
@@ -889,8 +890,165 @@ class BuiltInFunction(BaseFunction):
             ))
 
         list1.elements.extend(list2.elements)
-        return RTResult().success(Number.NULL)
+        return RTResult().success(list1)
     execute_extend.arg_names = ['list1', 'list2']
+
+    def execute_sqrt(self, exec_context: Context):
+        """Calculates square root of 'value'"""
+        # Params:
+        # * value
+        value = exec_context.symbol_table.get('value')
+        if not isinstance(value, Number):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'sqrt' must be a number.",
+                exec_context
+            ))
+
+        if not value.value >= 0:
+            return RTResult().failure(RTArithmeticError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'sqrt' must be greater than (or equal to) 0.",
+                exec_context
+            ))
+
+        sqrt = math.sqrt(value.value)
+        return RTResult().success(Number(sqrt))
+    execute_sqrt.arg_names = ['value']
+
+    def execute_degrees(self, exec_context: Context):
+        """Converts 'value' (radians) to degrees"""
+        # Params:
+        # * value
+        value = exec_context.symbol_table.get('value')
+        if not isinstance(value, Number):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'degrees' must be a number (angle in radians).",
+                exec_context
+            ))
+        degrees = math.degrees(value.value)
+        return RTResult().success(Number(degrees))
+    execute_degrees.arg_names = ['value']
+
+    def execute_radians(self, exec_context: Context):
+        """Converts 'value' (degrees) to radians"""
+        # Params:
+        # * value
+        value = exec_context.symbol_table.get('value')
+        if not isinstance(value, Number):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'radians' must be a number (angle in degrees).",
+                exec_context
+            ))
+        radians = math.radians(value.value)
+        return RTResult().success(Number(radians))
+    execute_radians.arg_names = ['value']
+
+    def execute_sin(self, exec_context: Context):
+        """Calculates sin('value')"""
+        # Params:
+        # * value
+        value = exec_context.symbol_table.get('value')
+        if not isinstance(value, Number):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'sin' must be a number (angle in radians).",
+                exec_context
+            ))
+        sin = math.sin(value.value)
+        return RTResult().success(Number(sin))
+    execute_sin.arg_names = ['value']
+
+    def execute_cos(self, exec_context: Context):
+        """Calculates cos('value')"""
+        # Params:
+        # * value
+        value = exec_context.symbol_table.get('value')
+        if not isinstance(value, Number):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'cos' must be a number (angle in radians).",
+                exec_context
+            ))
+        cos = math.cos(value.value)
+        return RTResult().success(Number(cos))
+    execute_cos.arg_names = ['value']
+
+    def execute_tan(self, exec_context: Context):
+        """Calculates tan('value')"""
+        # Params:
+        # * value
+        value = exec_context.symbol_table.get('value')
+        if not isinstance(value, Number):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'tan' must be a number (angle in radians).",
+                exec_context
+            ))
+        tan = math.tan(value.value)
+        return RTResult().success(Number(tan))
+    execute_tan.arg_names = ['value']
+
+    def execute_asin(self, exec_context: Context):
+        """Calculates asin('value')"""
+        # Params:
+        # * value
+        value = exec_context.symbol_table.get('value')
+        if not isinstance(value, Number):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'asin' must be a number.",
+                exec_context
+            ))
+        try:
+            asin = math.asin(value.value)
+        except ValueError:
+            return RTResult().failure(RTArithmeticError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'asin' must be a number between -1 and 1.",
+                exec_context
+            ))
+        return RTResult().success(Number(asin))
+    execute_asin.arg_names = ['value']
+
+    def execute_acos(self, exec_context: Context):
+        """Calculates acos('value')"""
+        # Params:
+        # * value
+        value = exec_context.symbol_table.get('value')
+        if not isinstance(value, Number):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'acos' must be a number.",
+                exec_context
+            ))
+        try:
+            acos = math.acos(value.value)
+        except ValueError:
+            return RTResult().failure(RTArithmeticError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'acos' must be a number between -1 and 1.",
+                exec_context
+            ))
+        return RTResult().success(Number(acos))
+    execute_acos.arg_names = ['value']
+
+    def execute_atan(self, exec_context: Context):
+        """Calculates atan('value')"""
+        # Params:
+        # * value
+        value = exec_context.symbol_table.get('value')
+        if not isinstance(value, Number):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'atan' must be a number.",
+                exec_context
+            ))
+        atan = math.atan(value.value)
+        return RTResult().success(Number(atan))
+    execute_atan.arg_names = ['value']
 
     # ==================
 
@@ -913,6 +1071,17 @@ BuiltInFunction.IS_FUNCTION = BuiltInFunction('is_function')
 BuiltInFunction.APPEND = BuiltInFunction('append')
 BuiltInFunction.POP = BuiltInFunction('pop')
 BuiltInFunction.EXTEND = BuiltInFunction('extend')
+
+# Maths
+BuiltInFunction.SQRT = BuiltInFunction('sqrt')
+BuiltInFunction.RADIANS = BuiltInFunction('radians')
+BuiltInFunction.DEGREES = BuiltInFunction('degrees')
+BuiltInFunction.SIN = BuiltInFunction('sin')
+BuiltInFunction.COS = BuiltInFunction('cos')
+BuiltInFunction.TAN = BuiltInFunction('tan')
+BuiltInFunction.ASIN = BuiltInFunction('asin')
+BuiltInFunction.ACOS = BuiltInFunction('acos')
+BuiltInFunction.ATAN = BuiltInFunction('atan')
 
 
 # ##########
@@ -1706,6 +1875,12 @@ class RTIndexError(RunTimeError):
         self.context = context
 
 
+class RTArithmeticError(RunTimeError):
+    def __init__(self, pos_start, pos_end, details, context: Context):
+        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="ArithmeticError")
+        self.context = context
+
+
 class NotDefinedError(RunTimeError):
     def __init__(self, pos_start, pos_end, details, context: Context):
         super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="NotDefinedError")
@@ -1965,6 +2140,7 @@ global_symbol_table.set("True", Number.TRUE)
 global_symbol_table.set("False", Number.FALSE)
 # MATHS
 global_symbol_table.set("math_pi", Number.MATH_PI)
+global_symbol_table.set("sqrt_pi", Number.MATH_SQRT_PI)
 # Built-in functions
 global_symbol_table.set("print", BuiltInFunction.PRINT)
 global_symbol_table.set("print_ret", BuiltInFunction.PRINT_RET)
@@ -1978,6 +2154,16 @@ global_symbol_table.set("is_func", BuiltInFunction.IS_FUNCTION)
 global_symbol_table.set("append", BuiltInFunction.APPEND)
 global_symbol_table.set("pop", BuiltInFunction.POP)
 global_symbol_table.set("extend", BuiltInFunction.EXTEND)
+# Mathematical functions
+global_symbol_table.set("sqrt", BuiltInFunction.SQRT)
+global_symbol_table.set("radians", BuiltInFunction.RADIANS)
+global_symbol_table.set("degrees", BuiltInFunction.DEGREES)
+global_symbol_table.set("sin", BuiltInFunction.SIN)
+global_symbol_table.set("cos", BuiltInFunction.COS)
+global_symbol_table.set("tan", BuiltInFunction.TAN)
+global_symbol_table.set("asin", BuiltInFunction.ASIN)
+global_symbol_table.set("acos", BuiltInFunction.ACOS)
+global_symbol_table.set("atan", BuiltInFunction.ATAN)
 # Hum...
 global_symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))
 global_symbol_table.set("numberOfHornsOnAnUnicorn", Number(1))

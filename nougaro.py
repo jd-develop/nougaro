@@ -2105,7 +2105,12 @@ class Interpreter:
                                                                                             node.pos_end)
 
         if node.var_name_token is not None:
-            context.symbol_table.set(func_name, func_value)
+            if not func_name in VARS_CANNOT_MODIFY:
+                context.symbol_table.set(func_name, func_value)
+            else:
+                return result.failure(RunTimeError(node.pos_start, node.pos_end,
+                                                   f"can not create a function with builtin name '{func_name}'.",
+                                                   context))
 
         return result.success(func_value)
 

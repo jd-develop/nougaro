@@ -555,6 +555,7 @@ Number.NULL = Number(0)
 Number.FALSE = Number(0)
 Number.TRUE = Number(1)
 Number.MATH_PI = Number(math.pi)
+Number.MATH_E = Number(math.e)
 Number.MATH_SQRT_PI = Number(math.sqrt(math.pi))
 
 
@@ -2146,6 +2147,7 @@ global_symbol_table.set("True", Number.TRUE)
 global_symbol_table.set("False", Number.FALSE)
 # MATHS
 global_symbol_table.set("math_pi", Number.MATH_PI)
+global_symbol_table.set("math_e", Number.MATH_E)
 global_symbol_table.set("sqrt_pi", Number.MATH_SQRT_PI)
 # Built-in functions
 global_symbol_table.set("print", BuiltInFunction.PRINT)

@@ -19,5 +19,5 @@ LETTERS_DIGITS = LETTERS + DIGITS
 MATHEMATICAL_FUNCTIONS = ["sqrt", "degrees", "radians", "sin", "cos", "tan", "asin", "acos", "atan"]
 BUILTIN_FUNCTIONS = ["print", "print_ret", "input", "input_int", "clear", "is_num", "is_str", "is_list", "is_func",
                      "append", "pop", "extend", "exit", *MATHEMATICAL_FUNCTIONS]
-MATHEMATICAL_CONSTANTS = ["math_pi", "sqrt_pi"]
+MATHEMATICAL_CONSTANTS = ["math_pi", "sqrt_pi", "math_e"]
 VARS_CANNOT_MODIFY = ["null", "True", "False", 'noug_version', *KEYWORDS, *BUILTIN_FUNCTIONS, *MATHEMATICAL_CONSTANTS]

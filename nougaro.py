@@ -202,7 +202,7 @@ class Lexer:
             if self.current_char == '.':
                 if dot_count == 1:
                     pos_start = self.pos.copy()
-                    return None, RTArithmeticError(pos_start, self.pos, "a number can't have more than one dot.")
+                    return None, SyntaxError(pos_start, self.pos, "a number can't have more than one dot.")
                 dot_count += 1
                 num_str += '.'
             else:

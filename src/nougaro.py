@@ -247,15 +247,14 @@ class Context:
 
     def __repr__(self) -> str:
         repr_str = f'symbol_table: (\n' \
-                   f'   symbols: {self.symbol_table.symbols}\n' \
-                   f'   parent: {self.symbol_table.parent}\n' \
+                   f'{self.symbol_table}' \
                    f')\n' \
                    f'parent: (\n' \
                    f'   {self.parent}\n' \
                    f')\n' \
                    f'parent_entry_pos: {self.parent_entry_pos}\n' \
                    f'display_name: {self.display_name}\n' \
-                   f'NB: this is __repr__ from nougaro.Context'
+                   f'NB: this is __repr__ from nougaro.Context (internal)'
         return repr_str
 
 
@@ -266,6 +265,12 @@ class SymbolTable:
     def __init__(self, parent=None):
         self.symbols = {}
         self.parent = parent
+
+    def __repr__(self) -> str:
+        return f'   symbols: {self.symbols}\n' \
+               f'   parent: (\n' \
+               f'       {self.parent}\n' \
+               f'   )'
 
     def get(self, name):
         value = self.symbols.get(name, None)

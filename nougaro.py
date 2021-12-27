@@ -202,7 +202,7 @@ class Lexer:
             if self.current_char == '.':
                 if dot_count == 1:
                     pos_start = self.pos.copy()
-                    return None, InvalidSyntaxError(pos_start, self.pos, "a number can't have more than one dot.")
+                    return None, RTArithmeticError(pos_start, self.pos, "a number can't have more than one dot.")
                 dot_count += 1
                 num_str += '.'
             else:
@@ -332,6 +332,7 @@ class Value:
         self.pos_start = self.pos_end = self.context = None
         self.set_pos()
         self.set_context()
+        self.type_ = "BaseValue"
 
     def set_pos(self, pos_start=None, pos_end=None):
         self.pos_start = pos_start
@@ -420,6 +421,7 @@ class String(Value):
     def __init__(self, value):
         super().__init__()
         self.value = value
+        self.type_ = "str"
 
     def __repr__(self):
         return f'"{self.value}"'
@@ -453,6 +455,10 @@ class Number(Value):
     def __init__(self, value):
         super().__init__()
         self.value = value
+        if isinstance(self.value, int):
+            self.type_ = 'int'
+        elif isinstance(self.value, float):
+            self.type_ = 'float'
 
     def __repr__(self):
         return str(self.value)
@@ -574,6 +580,7 @@ class List(Value):
     def __init__(self, elements):
         super().__init__()
         self.elements = elements
+        self.type_ = 'list'
 
     def __repr__(self):
         return f'[{", ".join([str(x) for x in self.elements])}]'
@@ -630,6 +637,7 @@ class BaseFunction(Value):
     def __init__(self, name):
         super().__init__()
         self.name = name if name is not None else '<function>'
+        self.type_ = 'BaseFunction'
 
     def generate_new_context(self):
         new_context = Context(self.name, self.context, self.pos_start)
@@ -683,6 +691,7 @@ class Function(BaseFunction):
         super().__init__(name)
         self.body_node = body_node
         self.arg_names = arg_names
+        self.type_ = "func"
 
     def __repr__(self):
         return f'<function {self.name}>'
@@ -711,6 +720,7 @@ class Function(BaseFunction):
 class BuiltInFunction(BaseFunction):
     def __init__(self, name):
         super().__init__(name)
+        self.type_ = 'built-in func'
 
     def __repr__(self):
         return f'<built-in function {self.name}>'
@@ -1059,6 +1069,14 @@ class BuiltInFunction(BaseFunction):
         exit()
     execute_exit.arg_names = []
 
+    def execute_type(self, exec_context: Context):
+        """Stops the Nougaro Interpreter"""
+        # Params :
+        # * value
+        value_to_get_type = exec_context.symbol_table.get('value')
+        return RTResult().success(String(value_to_get_type.type_))
+    execute_type.arg_names = ['value']
+
     # ==================
 
     def copy(self):
@@ -1080,6 +1098,7 @@ BuiltInFunction.IS_FUNCTION = BuiltInFunction('is_function')
 BuiltInFunction.APPEND = BuiltInFunction('append')
 BuiltInFunction.POP = BuiltInFunction('pop')
 BuiltInFunction.EXTEND = BuiltInFunction('extend')
+BuiltInFunction.TYPE = BuiltInFunction('type')
 
 # Maths
 BuiltInFunction.SQRT = BuiltInFunction('sqrt')
@@ -2230,6 +2249,7 @@ global_symbol_table.set("is_func", BuiltInFunction.IS_FUNCTION)
 global_symbol_table.set("append", BuiltInFunction.APPEND)
 global_symbol_table.set("pop", BuiltInFunction.POP)
 global_symbol_table.set("extend", BuiltInFunction.EXTEND)
+global_symbol_table.set("type", BuiltInFunction.TYPE)
 # Mathematical functions
 global_symbol_table.set("sqrt", BuiltInFunction.SQRT)
 global_symbol_table.set("radians", BuiltInFunction.RADIANS)

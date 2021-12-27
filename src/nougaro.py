@@ -2336,23 +2336,54 @@ class Interpreter:
             return result
         value_to_call = value_to_call.copy().set_pos(node.pos_start, node.pos_end)
 
-        if not isinstance(value_to_call, BaseFunction):
-            return result.failure(RunTimeError(
-                node.pos_start, node.pos_end,
-                f"{value_to_call.__class__.__name__} is not callable.",
-                context
-            ))
+        if isinstance(value_to_call, BaseFunction):
+            # call the function
+            for arg_node in node.arg_nodes:
+                args.append(result.register(self.visit(arg_node, context)))
+                if result.error is not None:
+                    return result
 
-        for arg_node in node.arg_nodes:
-            args.append(result.register(self.visit(arg_node, context)))
+            return_value = result.register(value_to_call.execute(args))
             if result.error is not None:
                 return result
+            return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
+            return result.success(return_value)
 
-        return_value = result.register(value_to_call.execute(args))
-        if result.error is not None:
-            return result
-        return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
-        return result.success(return_value)
+        elif isinstance(value_to_call, List):
+            # get the element at the index given
+            if len(node.arg_nodes) == 1:
+                index = result.register(self.visit(node.arg_nodes[0], context))
+                if isinstance(index, Number):
+                    index = index.value
+                    try:
+                        return_value = value_to_call[index]
+                        return result.success(return_value)
+                    except Exception:
+                        return result.failure(
+                            RTIndexError(
+                                node.arg_nodes[0].pos_start, node.arg_nodes[0].pos_end,
+                                f'list index {index} out of range.',
+                                context
+                            )
+                        )
+                else:
+                    return result.failure(RunTimeError(
+                        node.pos_start, node.pos_end,
+                        f"indexes must be integers, not {index.type_}.",
+                        context
+                    ))
+            else:
+                return result.failure(RunTimeError(
+                    node.pos_start, node.pos_end,
+                    f"1 index expected but {len(node.arg_nodes)} given.",
+                    context
+                ))
+        else:
+            return result.failure(RunTimeError(
+                node.pos_start, node.pos_end,
+                f"{value_to_call.type_} is not callable.",
+                context
+            ))
 
     def visit_AbsNode(self, node: AbsNode, context: Context):
         result = RTResult()

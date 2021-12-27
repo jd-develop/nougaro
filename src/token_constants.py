@@ -35,7 +35,7 @@ KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
     'and',
     'or',
     'not',
-    'exclor',
+    'xor',
     'if',
     'then',
     'elif',

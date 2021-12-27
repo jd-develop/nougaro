@@ -436,7 +436,10 @@ class String(Value):
                                                          self.context))
 
     def to_list_(self):
-        return List(list(self.value)).set_context(self.context), None
+        list_ = []
+        for element in list(self.value):
+            list_.append(String(element).set_context(self.context))
+        return List(list_).set_context(self.context), None
 
     def copy(self):
         copy = String(self.value)
@@ -565,7 +568,10 @@ class Number(Value):
         return Number(float(self.value)).set_context(self.context), None
 
     def to_list_(self):
-        return List(list(self.to_str_()[0].value)).set_context(self.context), None
+        list_ = []
+        for element in self.to_str_()[0].to_list_()[0]:
+            list_.append(element.to_int_()[0])
+        return List(list_).set_context(self.context), None
 
     def copy(self):
         copy = Number(self.value)
@@ -590,6 +596,9 @@ class List(Value):
 
     def __repr__(self):
         return f'[{", ".join([str(x) for x in self.elements])}]'
+
+    def __getitem__(self, item):
+        return self.elements.__getitem__(item)
 
     def added_to(self, other):
         new_list = self.copy()
@@ -751,7 +760,10 @@ class BuiltInFunction(BaseFunction):
         try:
             return_value = result.register(method(exec_context))
         except TypeError:
-            return_value = result.register(method())
+            try:
+                return_value = result.register(method())
+            except TypeError:  # it only executes when coding
+                return_value = result.register(method(exec_context))
         if result.error is not None:
             return result
         return result.success(return_value)
@@ -920,6 +932,42 @@ class BuiltInFunction(BaseFunction):
         list1.elements.extend(list2.elements)
         return RTResult().success(list1)
     execute_extend.arg_names = ['list1', 'list2']
+
+    def execute_get(self, exec_context: Context):
+        # Params:
+        # * list
+        # * index
+        list_ = exec_context.symbol_table.get('list')
+        index_ = exec_context.symbol_table.get('index')
+
+        if not isinstance(list_, List):
+            return RTResult().failure(
+                RunTimeError(
+                    self.pos_start, self.pos_end,
+                    "first argument of built-in function 'get' must be a list.",
+                    exec_context
+                )
+            )
+
+        if not isinstance(index_, Number):
+            return RTResult().failure(
+                RunTimeError(
+                    self.pos_start, self.pos_end,
+                    "second argument of built-in function 'get' must be an int.",
+                    exec_context
+                )
+            )
+        index_ = index_.value
+
+        try:
+            return RTResult().success(list_[index_])
+        except Exception:
+            return RTResult().failure(RTIndexError(
+                self.pos_start, self.pos_end,
+                f'index {index_} out of range.',
+                self.context
+            ))
+    execute_get.arg_names = ['list', 'index']
 
     def execute_sqrt(self, exec_context: Context):
         """Calculates square root of 'value'"""
@@ -1172,6 +1220,7 @@ BuiltInFunction.LIST = BuiltInFunction('list')
 BuiltInFunction.APPEND = BuiltInFunction('append')
 BuiltInFunction.POP = BuiltInFunction('pop')
 BuiltInFunction.EXTEND = BuiltInFunction('extend')
+BuiltInFunction.GET = BuiltInFunction('get')
 
 # Maths
 BuiltInFunction.SQRT = BuiltInFunction('sqrt')
@@ -1378,7 +1427,7 @@ class Parser:
         if result.error is None and self.current_token.type != TT_EOF:
             return result.failure(
                 InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                   "expected '+', '-', '*', '/', 'and', 'or' or 'exclor'.")
+                                   "expected '+', '-', '*', '/', 'and', 'or' or 'xor'.")
             )
         return result
 
@@ -1436,7 +1485,7 @@ class Parser:
             return result.success(VarAssignNode(var_name, expr))
 
         node = result.register(self.bin_op(self.comp_expr, (
-            (TT_KEYWORD, "and"), (TT_KEYWORD, "or"), (TT_KEYWORD, 'exclor'))))
+            (TT_KEYWORD, "and"), (TT_KEYWORD, "or"), (TT_KEYWORD, 'xor'))))
 
         if result.error is not None:
             return result.failure(InvalidSyntaxError(
@@ -2124,7 +2173,7 @@ class Interpreter:
             result, error = left.and_(right)
         elif node.op_token.matches(TT_KEYWORD, 'or'):
             result, error = left.or_(right)
-        elif node.op_token.matches(TT_KEYWORD, 'exclor'):
+        elif node.op_token.matches(TT_KEYWORD, 'xor'):
             result, error = left.excl_or(right)
         else:
             print(context)
@@ -2357,6 +2406,7 @@ global_symbol_table.set("float", BuiltInFunction.FLOAT)
 global_symbol_table.set("append", BuiltInFunction.APPEND)
 global_symbol_table.set("pop", BuiltInFunction.POP)
 global_symbol_table.set("extend", BuiltInFunction.EXTEND)
+global_symbol_table.set("get", BuiltInFunction.GET)
 # Mathematical functions
 global_symbol_table.set("sqrt", BuiltInFunction.SQRT)
 global_symbol_table.set("radians", BuiltInFunction.RADIANS)

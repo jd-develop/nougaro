@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# coding:utf-8
+# -*- coding:utf-8 -*-
 # this file is part of NOUGARO language, created by Jean Dubois (github.com/jd-develop)
 # Public Domain
 # Actually running with Python 3.9.8, works with Python 3.10
@@ -17,7 +17,7 @@ import math
 # ##########
 # COLORS
 # ##########
-def print_in_red(txt): print(f"\033[91m {txt}\033[00m")
+def print_in_red(txt): print(u"\033[91m" + txt + u"\033[00m")
 
 
 # ##########
@@ -736,7 +736,10 @@ class BuiltInFunction(BaseFunction):
         if result.error is not None:
             return result
 
-        return_value = result.register(method(exec_context))
+        try:
+            return_value = result.register(method(exec_context))
+        except TypeError:
+            return_value = result.register(method())
         if result.error is not None:
             return result
         return result.success(return_value)
@@ -769,14 +772,14 @@ class BuiltInFunction(BaseFunction):
         return RTResult().success(String(str(exec_context.symbol_table.get('value'))))
     execute_print_ret.arg_names = ["value"]
 
-    def execute_input(self, exec_context: Context):
+    def execute_input(self):
         """Basic input (str)"""
         # No params.
         text = input()
         return RTResult().success(String(text))
     execute_input.arg_names = []
 
-    def execute_input_int(self, exec_context: Context):
+    def execute_input_int(self):
         """Basic input (int). Repeat while entered value is not an int."""
         # No params.
         while True:
@@ -789,7 +792,7 @@ class BuiltInFunction(BaseFunction):
         return RTResult().success(Number(number))
     execute_input_int.arg_names = []
 
-    def execute_clear(self, exec_context: Context):
+    def execute_clear(self):
         """Clear the screen"""
         # No params.
         os.system('cls' if (os.name == "nt" or os.name == "Windows") else 'clear')
@@ -1063,7 +1066,7 @@ class BuiltInFunction(BaseFunction):
         return RTResult().success(Number(atan))
     execute_atan.arg_names = ['value']
 
-    def execute_exit(self, exec_context: Context):
+    def execute_exit(self):
         """Stops the Nougaro Interpreter"""
         # No params.
         exit()
@@ -2215,7 +2218,7 @@ class Interpreter:
         if not isinstance(value_to_abs, Number):
             return result.failure(RunTimeError(
                 node.pos_start, node.pos_end,
-                f"expected int or float, but found {value_to_abs.__class__.__name__}.",
+                f"expected int or float, but found {value_to_abs.type_}.",
                 context
             ))
 

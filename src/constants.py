@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-# coding:utf-8
+# -*- coding:utf-8 -*-
 # this file is part of NOUGARO language, created by Jean Dubois (github.com/jd-develop)
 # Public Domain
-# Actually running with Python 3.9.8, works with Python 3.10
 
 # IMPORTS
 # nougaro modules imports

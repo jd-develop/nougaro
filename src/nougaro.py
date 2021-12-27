@@ -1,74 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
-# this file is part of NOUGARO language, created by Jean Dubois (github.com/jd-develop)
+# this file is part of the NOUGARO language, created by Jean Dubois (https://github.com/jd-develop)
 # Public Domain
-# Actually running with Python 3.9.8, works with Python 3.10
+# Actually running with Python 3.9, works with Python 3.10
 
 # IMPORTS
 # nougaro modules imports
 from src.token_constants import *
 from src.strings_with_arrows import *
 from src.constants import *
+from src.position import *
+from src.tokens import *
 # built-in python imports
 import os
 import math
-
-
-# ##########
-# COLORS
-# ##########
-def print_in_red(txt): print(u"\033[91m" + txt + u"\033[00m")
-
-
-# ##########
-# POSITION
-# ##########
-class Position:
-    def __init__(self, index, line_number, colon, file_name, file_txt):
-        self.index = index
-        self.line_number = line_number
-        self.colon = colon
-        self.file_name = file_name
-        self.file_txt = file_txt
-
-    def advance(self, current_char=None):
-        self.index += 1
-        self.colon += 1
-
-        if current_char == '\n':
-            self.line_number += 1
-            self.colon = 0
-
-        return self
-
-    def copy(self):
-        return Position(self.index, self.line_number, self.colon, self.file_name, self.file_txt)
-
-
-# ##########
-# TOKENS
-# ##########
-class Token:
-    def __init__(self, type_, value=None, pos_start=None, pos_end=None):
-        self.type = type_
-        self.value = value
-
-        if pos_start is not None:
-            self.pos_start = pos_start.copy()
-            self.pos_end = pos_start.copy()
-            self.pos_end.advance()
-        if pos_end is not None:
-            self.pos_end = pos_end
-
-    def __repr__(self) -> str:
-        if self.value:
-            return f'{self.type}:{self.value}'
-        elif self.value == 0:
-            return f'{self.type}:{self.value}'
-        return f'{self.type}'
-
-    def matches(self, type_, value):
-        return self.type == type_ and self.value == value
 
 
 # ##########

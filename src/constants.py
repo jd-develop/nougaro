@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
-# this file is part of NOUGARO language, created by Jean Dubois (github.com/jd-develop)
+# this file is part of the NOUGARO language, created by Jean Dubois (https://github.com/jd-develop)
 # Public Domain
 
 # IMPORTS

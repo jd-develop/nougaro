@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
-# this file is part of NOUGARO language, created by Jean Dubois (github.com/jd-develop)
+# this file is part of the NOUGARO language, created by Jean Dubois (https://github.com/jd-develop)
 # Public Domain
-# Actually running with Python 3.9.8, works with Python 3.10
+# Actually running with Python 3.9, works with Python 3.10
 
 # IMPORTS
 # nougaro modules imports
 import src.nougaro as nougaro
+from src.misc import print_in_red
 # built in python imports
 import json
 
@@ -24,7 +25,7 @@ while True:
         result, error = nougaro.run('<stdin>', text, version)
 
     if error is not None:
-        nougaro.print_in_red(error.as_string())
+        print_in_red(error.as_string())
     elif result is not None:
         print(result)
     else:

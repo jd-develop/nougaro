@@ -160,7 +160,6 @@ class Lexer:
         string_ = ''
         pos_start = self.pos.copy()
         escape_character = False
-        # other_quote = '"' if quote == "'" else "'"
         self.advance()
 
         escape_characters = {
@@ -395,6 +394,18 @@ class Value:
     def abs_(self):
         return RTResult().failure(self.illegal_operation())
 
+    def to_str_(self):
+        return None, RTResult().failure(self.illegal_operation())
+
+    def to_int_(self):
+        return None, RTResult().failure(self.illegal_operation())
+
+    def to_float_(self):
+        return None, RTResult().failure(self.illegal_operation())
+
+    def to_list_(self):
+        return None, RTResult().failure(self.illegal_operation())
+
     def copy(self):
         print(self.context)
         print('NOUGARO INTERNAL ERROR : No copy method defined in Value.copy().\n'
@@ -409,11 +420,10 @@ class Value:
     def illegal_operation(self, other=None):
         if other is None:
             return RunTimeError(
-                self.pos_start, self.pos_end, f'illegal operation with {self.__class__.__name__}.', self.context
+                self.pos_start, self.pos_end, f'illegal operation with {self.type_}.', self.context
             )
         return RunTimeError(
-            self.pos_start, other.pos_end, f'illegal operation between {self.__class__.__name__} and '
-                                           f'{other.__class__.__name__}.', self.context
+            self.pos_start, other.pos_end, f'illegal operation between {self.type_} and {other.type_}.', self.context
         )
 
 
@@ -443,6 +453,28 @@ class String(Value):
 
     def is_true(self):
         return len(self.value) > 0
+
+    def to_str_(self):
+        return self, None
+
+    def to_int_(self):
+        try:
+            return Number(int(float(self.value))).set_context(self.context), None
+        except ValueError:
+            return None, RTResult().failure(RunTimeError(self.pos_start, self.pos_end,
+                                                         f"str {self.value} can not be converted to int.",
+                                                         self.context))
+
+    def to_float_(self):
+        try:
+            return Number(float(self.value)).set_context(self.context), None
+        except ValueError:
+            return None, RTResult().failure(RunTimeError(self.pos_start, self.pos_end,
+                                                         f"str {self.value} can not be converted to int.",
+                                                         self.context))
+
+    def to_list_(self):
+        return List(list(self.value)).set_context(self.context), None
 
     def copy(self):
         copy = String(self.value)
@@ -561,6 +593,18 @@ class Number(Value):
     def abs_(self):
         return Number(abs(self.value))
 
+    def to_str_(self):
+        return String(str(self.value)).set_context(self.context), None
+
+    def to_int_(self):
+        return Number(int(self.value)).set_context(self.context), None
+
+    def to_float_(self):
+        return Number(float(self.value)).set_context(self.context), None
+
+    def to_list_(self):
+        return List(list(self.to_str_()[0].value)).set_context(self.context), None
+
     def copy(self):
         copy = Number(self.value)
         copy.set_pos(self.pos_start, self.pos_end)
@@ -625,6 +669,12 @@ class List(Value):
                 )
         else:
             return None, self.illegal_operation(other)
+
+    def to_str_(self):
+        return String(str(self.elements)).set_context(self.context), None
+
+    def to_list_(self):
+        return self, None
 
     def copy(self):
         copy = List(self.elements)
@@ -1080,6 +1130,58 @@ class BuiltInFunction(BaseFunction):
         return RTResult().success(String(value_to_get_type.type_))
     execute_type.arg_names = ['value']
 
+    def execute_str(self, exec_context: Context):
+        """Python 'str()'"""
+        # Params :
+        # * value
+        result = RTResult()
+        value = exec_context.symbol_table.get('value')
+        str_value, error = value.to_str_()
+        if error is not None:
+            return error
+
+        return result.success(str_value)
+    execute_str.arg_names = ['value']
+
+    def execute_int(self, exec_context: Context):
+        """Python 'int()'"""
+        # Params :
+        # * value
+        result = RTResult()
+        value = exec_context.symbol_table.get('value')
+        int_value, error = value.to_int_()
+        if error is not None:
+            return error
+
+        return result.success(int_value)
+    execute_int.arg_names = ['value']
+
+    def execute_float(self, exec_context: Context):
+        """Python 'float()'"""
+        # Params :
+        # * value
+        result = RTResult()
+        value = exec_context.symbol_table.get('value')
+        float_value, error = value.to_float_()
+        if error is not None:
+            return error
+
+        return result.success(float_value)
+    execute_float.arg_names = ['value']
+
+    def execute_list(self, exec_context: Context):
+        """Python 'list()'"""
+        # Params :
+        # * value
+        result = RTResult()
+        value = exec_context.symbol_table.get('value')
+        list_value, error = value.to_list_()
+        if error is not None:
+            return error
+
+        return result.success(list_value)
+    execute_list.arg_names = ['value']
+
     # ==================
 
     def copy(self):
@@ -1094,14 +1196,20 @@ BuiltInFunction.PRINT_RET = BuiltInFunction('print_ret')
 BuiltInFunction.INPUT = BuiltInFunction('input')
 BuiltInFunction.INPUT_INT = BuiltInFunction('input_int')
 BuiltInFunction.CLEAR = BuiltInFunction('clear')
+
 BuiltInFunction.IS_NUMBER = BuiltInFunction('is_number')
 BuiltInFunction.IS_STRING = BuiltInFunction('is_string')
 BuiltInFunction.IS_LIST = BuiltInFunction('is_list')
 BuiltInFunction.IS_FUNCTION = BuiltInFunction('is_function')
+BuiltInFunction.TYPE = BuiltInFunction('type')
+BuiltInFunction.INT = BuiltInFunction('int')
+BuiltInFunction.FLOAT = BuiltInFunction('float')
+BuiltInFunction.STR = BuiltInFunction('str')
+BuiltInFunction.LIST = BuiltInFunction('list')
+
 BuiltInFunction.APPEND = BuiltInFunction('append')
 BuiltInFunction.POP = BuiltInFunction('pop')
 BuiltInFunction.EXTEND = BuiltInFunction('extend')
-BuiltInFunction.TYPE = BuiltInFunction('type')
 
 # Maths
 BuiltInFunction.SQRT = BuiltInFunction('sqrt')
@@ -1328,10 +1436,15 @@ class Parser:
 
             if self.current_token.type != TT_IDENTIFIER:
                 if self.current_token.type != TT_KEYWORD:
-                    return result.failure(InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end, f"expected identifier, "
-                                                                                  f"but got {self.current_token.type}. "
-                    ))
+                    if self.current_token.type not in TOKENS_TO_QUOTE:
+                        error_msg = f"expected identifier, but got {self.current_token.type}."
+                    else:
+                        error_msg = f"expected identifier, but got '{self.current_token.type}'."
+                    return result.failure(
+                        InvalidSyntaxError(
+                            self.current_token.pos_start, self.current_token.pos_end, error_msg
+                        )
+                    )
                 else:
                     return result.failure(InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
@@ -1343,10 +1456,15 @@ class Parser:
             self.advance()
 
             if self.current_token.type != TT_EQ:
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end, f"expected '=', "
-                                                                              f"but got {self.current_token.type}."
-                ))
+                if self.current_token.type not in TOKENS_TO_QUOTE:
+                    error_msg = f"expected '=', but got {self.current_token.type}."
+                else:
+                    error_msg = f"expected '=', but got '{self.current_token.type}'."
+                return result.failure(
+                    InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end, error_msg
+                    )
+                )
 
             result.register_advancement()
             self.advance()
@@ -1663,8 +1781,15 @@ class Parser:
 
         if self.current_token.type != TT_IDENTIFIER:
             if self.current_token.type != TT_KEYWORD:
-                return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                                         f"expected identifier, but got {self.current_token.type}."))
+                if self.current_token.type not in TOKENS_TO_QUOTE:
+                    error_msg = f"expected identifier, but got {self.current_token.type}."
+                else:
+                    error_msg = f"expected identifier, but got '{self.current_token.type}'."
+                return result.failure(
+                    InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end, error_msg
+                    )
+                )
             else:
                 return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
                                                          f"use keyword as identifier is illegal."))
@@ -1674,8 +1799,15 @@ class Parser:
         self.advance()
 
         if self.current_token.type != TT_EQ:
-            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                                     f"expected '=', but got {self.current_token.type}."))
+            if self.current_token.type not in TOKENS_TO_QUOTE:
+                error_msg = f"expected '=', but got {self.current_token.type}."
+            else:
+                error_msg = f"expected '=', but got '{self.current_token.type}'."
+            return result.failure(
+                InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end, error_msg
+                )
+            )
 
         result.register_advancement()
         self.advance()
@@ -1795,10 +1927,14 @@ class Parser:
 
                 if self.current_token.type != TT_IDENTIFIER:
                     if self.current_token.type != TT_KEYWORD:
+                        if self.current_token.type not in TOKENS_TO_QUOTE:
+                            error_msg = f"expected identifier after comma, but got {self.current_token.type}."
+                        else:
+                            error_msg = f"expected identifier after comma, but got '{self.current_token.type}'."
                         return result.failure(
-                            InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                               f"expected identifier after comma,"
-                                               f" but got {self.current_token.type}.")
+                            InvalidSyntaxError(
+                                self.current_token.pos_start, self.current_token.pos_end, error_msg
+                            )
                         )
                     else:
                         return result.failure(
@@ -2245,14 +2381,20 @@ global_symbol_table.set("print_ret", BuiltInFunction.PRINT_RET)
 global_symbol_table.set("input", BuiltInFunction.INPUT)
 global_symbol_table.set("input_int", BuiltInFunction.INPUT_INT)
 global_symbol_table.set("clear", BuiltInFunction.CLEAR)
+
 global_symbol_table.set("is_num", BuiltInFunction.IS_NUMBER)
 global_symbol_table.set("is_str", BuiltInFunction.IS_STRING)
 global_symbol_table.set("is_list", BuiltInFunction.IS_LIST)
 global_symbol_table.set("is_func", BuiltInFunction.IS_FUNCTION)
+global_symbol_table.set("type", BuiltInFunction.TYPE)
+global_symbol_table.set("str", BuiltInFunction.STR)
+global_symbol_table.set("list", BuiltInFunction.LIST)
+global_symbol_table.set("int", BuiltInFunction.INT)
+global_symbol_table.set("float", BuiltInFunction.FLOAT)
+
 global_symbol_table.set("append", BuiltInFunction.APPEND)
 global_symbol_table.set("pop", BuiltInFunction.POP)
 global_symbol_table.set("extend", BuiltInFunction.EXTEND)
-global_symbol_table.set("type", BuiltInFunction.TYPE)
 # Mathematical functions
 global_symbol_table.set("sqrt", BuiltInFunction.SQRT)
 global_symbol_table.set("radians", BuiltInFunction.RADIANS)

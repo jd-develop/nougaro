@@ -6,7 +6,7 @@
 
 # IMPORTS
 # nougaro modules imports
-import nougaro
+import src.nougaro as nougaro
 # built in python imports
 import json
 

@@ -20,6 +20,7 @@ TT_RPAREN = 'RPAREN'          # )
 TT_LPAREN = 'LPAREN'          # (
 TT_RSQUARE = 'RSQUARE'        # ]
 TT_LSQUARE = 'LSQUARE'        # [
+TT_ABS = 'ABS'                # |
 TT_EE = 'EE'                  # ==
 TT_NE = 'NE'                  # !=
 TT_LT = 'LT'                  # <

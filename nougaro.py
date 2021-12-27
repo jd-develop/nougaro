@@ -128,6 +128,9 @@ class Lexer:
             elif self.current_char == ']':
                 tokens.append(Token(TT_RSQUARE, pos_start=self.pos))
                 self.advance()
+            elif self.current_char == '|':
+                tokens.append(Token(TT_ABS, pos_start=self.pos))
+                self.advance()
             elif self.current_char == '!':
                 token, error = self.make_not_equals()
                 if error is not None:
@@ -388,6 +391,9 @@ class Value:
     def execute(self, args):
         return RTResult().failure(self.illegal_operation())
 
+    def abs_(self):
+        return RTResult().failure(self.illegal_operation())
+
     def copy(self):
         print(self.context)
         print('NOUGARO INTERNAL ERROR : No copy method defined in Value.copy().\n'
@@ -401,7 +407,9 @@ class Value:
 
     def illegal_operation(self, other=None):
         if other is None:
-            other = self
+            return RunTimeError(
+                self.pos_start, self.pos_end, f'illegal operation with {self.__class__.__name__}.', self.context
+            )
         return RunTimeError(
             self.pos_start, other.pos_end, f'illegal operation between {self.__class__.__name__} and '
                                            f'{other.__class__.__name__}.', self.context
@@ -543,6 +551,9 @@ class Number(Value):
 
     def is_true(self):
         return self.value != 0
+
+    def abs_(self):
+        return Number(abs(self.value))
 
     def copy(self):
         copy = Number(self.value)
@@ -1220,6 +1231,14 @@ class CallNode:
             self.pos_end = self.node_to_call.pos_end
 
 
+class AbsNode:
+    def __init__(self, node_to_abs):
+        self.node_to_abs = node_to_abs
+
+        self.pos_start = self.node_to_abs.pos_start
+        self.pos_end = self.node_to_abs.pos_end
+
+
 # ##########
 # PARSE RESULT
 # ##########
@@ -1320,7 +1339,7 @@ class Parser:
         if result.error is not None:
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'var', int, float, identifier, 'if', 'for', 'while', 'def' '+', '-', '(', '[' or 'not'"
+                "expected 'var', int, float, identifier, 'if', 'for', 'while', 'def' '+', '-', '(', '[', '|' or 'not'"
             ))
 
         return result.success(node)
@@ -1368,7 +1387,7 @@ class Parser:
 
     def call(self):
         result = ParseResult()
-        atom = result.register(self.atom())
+        abs_ = result.register(self.abs_())
         if result.error is not None:
             return result
 
@@ -1387,7 +1406,7 @@ class Parser:
                         InvalidSyntaxError(
                             self.current_token.pos_start, self.current_token.pos_end,
                             "expected ')', 'var', 'if', 'for', 'while', 'def', int, float, identifier, '+', '-', '(', "
-                            "'[' or 'not'"
+                            "'[' or 'not'."
                         )
                     )
 
@@ -1403,15 +1422,40 @@ class Parser:
                     return result.failure(
                         InvalidSyntaxError(
                             self.current_token.pos_start, self.current_token.pos_end,
-                            "expected ',' or ')'"
+                            "expected ',' or ')'."
                         )
                     )
 
                 result.register_advancement()
                 self.advance()
 
-            return result.success(CallNode(atom, arg_nodes))
-        return result.success(atom)
+            return result.success(CallNode(abs_, arg_nodes))
+        return result.success(abs_)
+
+    def abs_(self):
+        result = ParseResult()
+
+        if self.current_token.type == TT_ABS:
+            result.register_advancement()
+            self.advance()
+            expr = result.register(self.expr())
+            if result.error is not None:
+                return result
+            if self.current_token.type != TT_ABS:
+                return result.failure(
+                    InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        "expected '|'."
+                    )
+                )
+            result.register_advancement()
+            self.advance()
+            return result.success(AbsNode(expr))
+        else:
+            atom = result.register(self.atom())
+            if result.error is not None:
+                return result
+            return result.success(atom)
 
     def atom(self):
         result = ParseResult()
@@ -2105,7 +2149,7 @@ class Interpreter:
                                                                                             node.pos_end)
 
         if node.var_name_token is not None:
-            if not func_name in VARS_CANNOT_MODIFY:
+            if func_name not in VARS_CANNOT_MODIFY:
                 context.symbol_table.set(func_name, func_value)
             else:
                 return result.failure(RunTimeError(node.pos_start, node.pos_end,
@@ -2138,6 +2182,25 @@ class Interpreter:
         return_value = result.register(value_to_call.execute(args))
         if result.error is not None:
             return result
+        return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
+        return result.success(return_value)
+
+    def visit_AbsNode(self, node: AbsNode, context: Context):
+        result = RTResult()
+
+        value_to_abs = result.register(self.visit(node.node_to_abs, context))
+        if result.error is not None:
+            return result
+        value_to_abs = value_to_abs.copy().set_pos(node.pos_start, node.pos_end)
+
+        if not isinstance(value_to_abs, Number):
+            return result.failure(RunTimeError(
+                node.pos_start, node.pos_end,
+                f"expected int or float, but found {value_to_abs.__class__.__name__}.",
+                context
+            ))
+
+        return_value = value_to_abs.abs_()
         return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
         return result.success(return_value)
 

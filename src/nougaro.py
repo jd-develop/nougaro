@@ -94,8 +94,7 @@ class Lexer:
                 # illegal char
                 pos_start = self.pos.copy()
                 char = self.current_char
-                return [], IllegalCharError(pos_start, self.pos, char + " is an illegal character. It may happens when "
-                                                                        "an non-ASCII letter is used in a identifier.")
+                return [], IllegalCharError(pos_start, self.pos, "'" + char + "' is an illegal character.")
 
         tokens.append(Token(TT_EOF, pos_start=self.pos))
         # print(tokens)
@@ -167,7 +166,7 @@ class Lexer:
             return Token(TT_NE, pos_start=pos_start, pos_end=self.pos), None
 
         self.advance()
-        return None, ExpectedCharError(pos_start, self.pos, "expected : '!=', got : '!'")
+        return None, ExpectedCharError(pos_start, self.pos, "expected : '!=' but got : '!'")
 
     def make_equals(self):
         token_type = TT_EQ
@@ -244,7 +243,20 @@ class Context:
         self.display_name = display_name
         self.parent = parent
         self.parent_entry_pos = parent_entry_pos
-        self.symbol_table = None
+        self.symbol_table: SymbolTable = None
+
+    def __repr__(self) -> str:
+        repr_str = f'symbol_table: (\n' \
+                   f'   symbols: {self.symbol_table.symbols}\n' \
+                   f'   parent: {self.symbol_table.parent}\n' \
+                   f')\n' \
+                   f'parent: (\n' \
+                   f'   {self.parent}\n' \
+                   f')\n' \
+                   f'parent_entry_pos: {self.parent_entry_pos}\n' \
+                   f'display_name: {self.display_name}\n' \
+                   f'NB: this is __repr__ from nougaro.Context'
+        return repr_str
 
 
 # ##########

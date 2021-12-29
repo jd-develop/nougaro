@@ -2372,10 +2372,33 @@ class Interpreter:
                         f"indexes must be integers, not {index.type_}.",
                         context
                     ))
+            elif len(node.arg_nodes) > 1:
+                return_value = []
+                for arg_node in node.arg_nodes:
+                    index = result.register(self.visit(arg_node, context))
+                    if isinstance(index, Number):
+                        index = index.value
+                        try:
+                            return_value.append(value_to_call[index])
+                        except Exception:
+                            return result.failure(
+                                RTIndexError(
+                                    arg_node.pos_start, arg_node.pos_end,
+                                    f'list index {index} out of range.',
+                                    context
+                                )
+                            )
+                    else:
+                        return result.failure(RunTimeError(
+                            arg_node.pos_start, arg_node.pos_end,
+                            f"indexes must be integers, not {index.type_}.",
+                            context
+                        ))
+                return result.success(List(return_value).set_context(context).set_pos(node.pos_start, node.pos_end))
             else:
                 return result.failure(RunTimeError(
                     node.pos_start, node.pos_end,
-                    f"1 index expected but {len(node.arg_nodes)} given.",
+                    f"please give at least one index.",
                     context
                 ))
         else:

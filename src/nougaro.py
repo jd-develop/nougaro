@@ -222,6 +222,8 @@ class RTResult:
         self.error = None
 
     def register(self, result):
+        if result is None:
+            return Number.NULL
         if result.error is not None:
             self.error = result.error
         return result.value
@@ -778,6 +780,12 @@ class BuiltInFunction(BaseFunction):
     # BUILD IN FUNCTIONS
     # ==================
 
+    def execute_void(self):
+        """Do nothing"""
+        # No params.
+        pass
+    execute_void.arg_names = []
+
     def execute_print(self, exec_context: Context):
         """Print 'value'"""
         # Params:
@@ -1201,6 +1209,7 @@ class BuiltInFunction(BaseFunction):
         return copy
 
 
+BuiltInFunction.VOID = BuiltInFunction('void')
 BuiltInFunction.PRINT = BuiltInFunction('print')
 BuiltInFunction.PRINT_RET = BuiltInFunction('print_ret')
 BuiltInFunction.INPUT = BuiltInFunction('input')
@@ -2315,14 +2324,6 @@ class Interpreter:
         else:
             step_value = Number(1)
 
-        # list_ = node.list_
-
-        # for i in list_.elements:
-        #     context.symbol_table.set(node.var_name_token.value, i)
-        #     elements.append(result.register(self.visit(node.body_node, context)))
-        #     if result.error is not None:
-        #         return result
-
         i = start_value.value
         condition = (lambda: i < end_value.value) if step_value.value >= 0 else (lambda: i > end_value.value)
 
@@ -2509,6 +2510,7 @@ global_symbol_table.set("math_pi", Number.MATH_PI)
 global_symbol_table.set("math_e", Number.MATH_E)
 global_symbol_table.set("sqrt_pi", Number.MATH_SQRT_PI)
 # Built-in functions
+global_symbol_table.set("void", BuiltInFunction.VOID)
 global_symbol_table.set("print", BuiltInFunction.PRINT)
 global_symbol_table.set("print_ret", BuiltInFunction.PRINT_RET)
 global_symbol_table.set("input", BuiltInFunction.INPUT)

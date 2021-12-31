@@ -1,5 +1,5 @@
 # Nougaro
-## Englisg description
+## English description
  A programming language. Interpreter written in Python.
  
  For the moment, only the shell is working. Execuute it with `python3 shell.py`.

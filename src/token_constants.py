@@ -44,7 +44,8 @@ KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
     'to',
     'step',
     'while',
-    'def'
+    'def',
+    'in'
 ]
 
 TOKENS_TO_QUOTE = [

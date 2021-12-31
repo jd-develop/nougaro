@@ -1334,6 +1334,20 @@ class ForNode:
         self.pos_end = self.body_node.pos_end
 
 
+class ForNodeList:
+    def __init__(self, var_name_token, body_node, list_node: ListNode):
+        # if list = [1, 2, 3]
+        # for var in list == for var = 1 to 3 (step 1)
+
+        self.var_name_token: Token = var_name_token
+        self.body_node = body_node
+        self.list_node = list_node
+
+        # Position
+        self.pos_start = self.var_name_token.pos_start
+        self.pos_end = self.body_node.pos_end
+
+
 class WhileNode:
     def __init__(self, condition_node, body_node):
         self.condition_node = condition_node
@@ -1809,11 +1823,31 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        if self.current_token.type != TT_EQ:
+        if self.current_token.matches(TT_KEYWORD, 'in'):
+            result.register_advancement()
+            self.advance()
+
+            list_ = result.register(self.expr())
+            if result.error is not None:
+                return result
+
+            if not self.current_token.matches(TT_KEYWORD, 'then'):
+                return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
+                                                         "expected 'then'"))
+
+            result.register_advancement()
+            self.advance()
+
+            body = result.register(self.expr())
+            if result.error is not None:
+                return result
+
+            return result.success(ForNodeList(var_name_token=var_name, body_node=body, list_node=list_))
+        elif self.current_token.type != TT_EQ:
             if self.current_token.type not in TOKENS_TO_QUOTE:
-                error_msg = f"expected '=', but got {self.current_token.type}."
+                error_msg = f"expected 'in' or '=', but got {self.current_token.type}."
             else:
-                error_msg = f"expected '=', but got '{self.current_token.type}'."
+                error_msg = f"expected 'in' or '=', but got '{self.current_token.type}'."
             return result.failure(
                 InvalidSyntaxError(
                     self.current_token.pos_start, self.current_token.pos_end, error_msg
@@ -1859,7 +1893,11 @@ class Parser:
         if result.error is not None:
             return result
 
-        return result.success(ForNode(var_name, start_value, end_value, step_value, body))
+        # list_ =
+        # List(list(range(start_value.value, end_value.value, step_value.value if step_value is not None else 1)))
+
+        return result.success(ForNode(var_name_token=var_name, body_node=body, start_value_node=start_value,
+                                      end_value_node=end_value, step_value_node=step_value))
 
     def while_expr(self):
         result = ParseResult()
@@ -2277,6 +2315,14 @@ class Interpreter:
         else:
             step_value = Number(1)
 
+        # list_ = node.list_
+
+        # for i in list_.elements:
+        #     context.symbol_table.set(node.var_name_token.value, i)
+        #     elements.append(result.register(self.visit(node.body_node, context)))
+        #     if result.error is not None:
+        #         return result
+
         i = start_value.value
         condition = (lambda: i < end_value.value) if step_value.value >= 0 else (lambda: i > end_value.value)
 
@@ -2289,6 +2335,28 @@ class Interpreter:
                 return result
 
         return result.success(List(elements).set_context(context).set_pos(node.pos_start, node.pos_end))
+
+    def visit_ForNodeList(self, node: ForNodeList, context: Context):
+        result = RTResult()
+        elements = []
+
+        list_ = result.register(self.visit(node.list_node, context))
+        if result.error is not None:
+            return result
+
+        if isinstance(list_, List):
+            for i in list_.elements:
+                context.symbol_table.set(node.var_name_token.value, i)
+                elements.append(result.register(self.visit(node.body_node, context)))
+                if result.error is not None:
+                    return result
+            return result.success(List(elements).set_context(context).set_pos(node.pos_start, node.pos_end))
+        else:
+            return result.failure(
+                RunTimeError(node.list_node.pos_start, node.list_node.pos_end,
+                             f"expected a list after 'in', but found {list_.type_}.",
+                             context)
+            )
 
     def visit_WhileNode(self, node: WhileNode, context: Context):
         result = RTResult()

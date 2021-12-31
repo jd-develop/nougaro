@@ -1,5 +1,5 @@
 expr       : KEYWORD:VAR IDENTIFIER EQ expr
-           : comp_expr ((KEYWORD:AND|KEYWORD:OR|KEYWORD:EXCLOR) comp_expr)*
+           : comp_expr ((KEYWORD:AND|KEYWORD:OR|KEYWORD:XOR) comp_expr)*
 
 comp_expr  : KEYWORD:NOT comp_expr
            : arith_expr ((EE|LT|GT|LTE|GTE) arith_expr)*
@@ -30,8 +30,8 @@ if_expr    : KEYWORD:IF expr KEYWORD:THEN expr
              (KEYWORD:ELIF expr KEYWORD:THEN expr)*
              (KEYWORD:ELSE expr)?
 
-for_expr   : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr
-             (KEYWORD:STEP expr)? KEYWORD:THEN expr
+for_expr   : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr (KEYWORD:STEP expr)? KEYWORD:THEN expr
+           : KEYWORD:FOR IDENTIFIER IN expr KEYWORD:THEN expr
 
 while_expr : KEYWORD:WHILE expr KEYWORD:THEN expr
 

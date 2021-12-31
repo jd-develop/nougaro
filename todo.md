@@ -11,10 +11,12 @@
 * add `var id ^= *`
 * add `var id++` (same as java, same as id += 1)
 * add `var id#`  (same as id += 2)
-* add `var id#+` (same as id += 3)
+* add `var id#++` (same as id += 3)
+* add `var id##` (same as id += 4)
 * add `var id--` (same as id -= 1)
 * add `var id-_-` (same as id -= 2)
 * add `var id-__-` (same as id -= 3)
+* add `var id-___-` (same as id -= 4)
 * add `var id**` (same as var id ^= 2)
 * add `var id//` (same as var id = 1)
 * add `var id^^` (same as var id ^= id)

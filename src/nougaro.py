@@ -14,6 +14,7 @@ from src.tokens import *
 # built-in python imports
 import os
 import math
+import pprint
 
 
 # ##########
@@ -260,17 +261,19 @@ class Context:
         self.parent_entry_pos = parent_entry_pos
         self.symbol_table: SymbolTable = None
 
-    def __repr__(self) -> str:
-        repr_str = f'symbol_table: (\n' \
-                   f'{self.symbol_table}' \
-                   f')\n' \
-                   f'parent: (\n' \
-                   f'   {self.parent}\n' \
-                   f')\n' \
-                   f'parent_entry_pos: {self.parent_entry_pos}\n' \
-                   f'display_name: {self.display_name}\n' \
-                   f'NB: this is __repr__ from nougaro.Context (internal)'
-        return repr_str
+    def dict_(self) -> dict:
+        repr_dict = {'symbol_table': self.symbol_table,
+                     'parent': self.parent,
+                     'parent_entry_pos': self.parent_entry_pos,
+                     'display_name': self.display_name,
+                     'NB': 'this is __repr__ from nougaro.Context (internal)'}
+        return repr_dict
+
+    def __repr__(self):
+        return pprint.pformat(self.dict_())
+
+    def __str__(self) -> str:
+        return str(self.__repr__())
 
 
 # ##########
@@ -281,11 +284,12 @@ class SymbolTable:
         self.symbols = {}
         self.parent = parent
 
+    def dict_(self) -> dict:
+        return {'symbols': self.symbols,
+                'parent': self.parent}
+
     def __repr__(self) -> str:
-        return f'   symbols: {self.symbols}\n' \
-               f'   parent: (\n' \
-               f'       {self.parent}\n' \
-               f'   )'
+        return pprint.pformat(self.dict_())
 
     def get(self, name):
         value = self.symbols.get(name, None)
@@ -2754,23 +2758,28 @@ global_symbol_table.set("exit", BuiltInFunction.EXIT)
 # RUN
 # ##########
 def run(file_name, text, version: str = "not defined"):
+    """Run the given code"""
+    # set version in symbol table
     global_symbol_table.set("noug_version", String(version))
+
+    # make tokens
     lexer = Lexer(file_name, text)
     tokens, error = lexer.make_tokens()
     if error is not None:
         return None, error
     # print(tokens)
 
-    # abstract syntax tree
+    # make the abstract syntax tree (parser)
     parser = Parser(tokens)
     ast = parser.parse()
     if ast.error is not None:
         return None, ast.error
 
-    # run program
+    # run the code (interpreter)
     interpreter = Interpreter()
     context = Context('<program>')
     context.symbol_table = global_symbol_table
     result = interpreter.visit(ast.node, context)
+    # print(context)
 
     return result.value, result.error

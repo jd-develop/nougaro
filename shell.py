@@ -27,6 +27,10 @@ while True:
     if error is not None:
         print_in_red(error.as_string())
     elif result is not None:
-        print(result)
+        if isinstance(result, nougaro.NoneValue):
+            if result.do_i_print:
+                print(result)
+        else:
+            print(result)
     else:
         pass

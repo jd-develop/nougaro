@@ -813,9 +813,10 @@ class BuiltInFunction(BaseFunction):
     # ==================
 
     def execute_void(self):
-        """Do nothing"""
+        """Return nothing"""
         # No params.
-        pass
+        result = RTResult()
+        return result.success(NoneValue(False))
     execute_void.arg_names = []
     execute_void.optional_args = []
     execute_void.have_to_respect_args_number = False
@@ -828,16 +829,29 @@ class BuiltInFunction(BaseFunction):
             print(exec_context.symbol_table.get('value').to_str())
         except Exception:
             print(str(exec_context.symbol_table.get('value')))
-        return RTResult().success(Number.NULL)
+        return RTResult().success(NoneValue(False))
     execute_print.arg_names = ["value"]
     execute_print.optional_args = []
     execute_print.have_to_respect_args_number = True
 
     def execute_print_ret(self, exec_context: Context):
-        """Print 'value' in a returned str"""
+        """Print 'value' and returns 'value'"""
         # Params:
         # * value
-        return RTResult().success(String(str(exec_context.symbol_table.get('value'))))
+        try:
+            print(exec_context.symbol_table.get('value').to_str())
+            return RTResult().success(
+                String(
+                    exec_context.symbol_table.get('value').to_str()
+                )
+            )
+        except Exception:
+            print(str(exec_context.symbol_table.get('value')))
+            return RTResult().success(
+                String(
+                    str(exec_context.symbol_table.get('value'))
+                )
+            )
     execute_print_ret.arg_names = ["value"]
     execute_print_ret.optional_args = []
     execute_print_ret.have_to_respect_args_number = True
@@ -882,7 +896,7 @@ class BuiltInFunction(BaseFunction):
         """Clear the screen"""
         # No params.
         os.system('cls' if (os.name == "nt" or os.name == "Windows") else 'clear')
-        return RTResult().success(Number.NULL)
+        return RTResult().success(NoneValue(False))
     execute_clear.arg_names = []
     execute_clear.optional_args = []
     execute_clear.have_to_respect_args_number = False
@@ -901,8 +915,8 @@ class BuiltInFunction(BaseFunction):
         """Check if 'value' is a List"""
         # Params:
         # * value
-        is_number = isinstance(exec_context.symbol_table.get('value'), List)
-        return RTResult().success(Number.TRUE if is_number else Number.FALSE)
+        is_list = isinstance(exec_context.symbol_table.get('value'), List)
+        return RTResult().success(Number.TRUE if is_list else Number.FALSE)
     execute_is_list.arg_names = ['value']
     execute_is_list.optional_args = []
     execute_is_list.have_to_respect_args_number = True
@@ -911,8 +925,8 @@ class BuiltInFunction(BaseFunction):
         """Check if 'value' is a String"""
         # Params:
         # * value
-        is_number = isinstance(exec_context.symbol_table.get('value'), String)
-        return RTResult().success(Number.TRUE if is_number else Number.FALSE)
+        is_str = isinstance(exec_context.symbol_table.get('value'), String)
+        return RTResult().success(Number.TRUE if is_str else Number.FALSE)
     execute_is_str.arg_names = ['value']
     execute_is_str.optional_args = []
     execute_is_str.have_to_respect_args_number = True
@@ -921,11 +935,21 @@ class BuiltInFunction(BaseFunction):
         """Check if 'value' is a BaseFunction"""
         # Params:
         # * value
-        is_number = isinstance(exec_context.symbol_table.get('value'), BaseFunction)
-        return RTResult().success(Number.TRUE if is_number else Number.FALSE)
+        is_func = isinstance(exec_context.symbol_table.get('value'), BaseFunction)
+        return RTResult().success(Number.TRUE if is_func else Number.FALSE)
     execute_is_func.arg_names = ['value']
     execute_is_func.optional_args = []
     execute_is_func.have_to_respect_args_number = True
+
+    def execute_is_none(self, exec_context: Context):
+        """Check if 'value' is a NoneValue"""
+        # Params:
+        # * value
+        is_none = isinstance(exec_context.symbol_table.get('value'), NoneValue)
+        return RTResult().success(Number.TRUE if is_none else Number.FALSE)
+    execute_is_none.arg_names = ['value']
+    execute_is_none.optional_args = []
+    execute_is_none.have_to_respect_args_number = True
 
     def execute_append(self, exec_context: Context):
         """Append 'value' to 'list'"""
@@ -1326,6 +1350,7 @@ BuiltInFunction.IS_NUMBER = BuiltInFunction('is_num')
 BuiltInFunction.IS_STRING = BuiltInFunction('is_str')
 BuiltInFunction.IS_LIST = BuiltInFunction('is_list')
 BuiltInFunction.IS_FUNCTION = BuiltInFunction('is_func')
+BuiltInFunction.IS_NONE = BuiltInFunction('is_none')
 BuiltInFunction.TYPE = BuiltInFunction('type')
 BuiltInFunction.INT = BuiltInFunction('int')
 BuiltInFunction.FLOAT = BuiltInFunction('float')
@@ -1349,6 +1374,43 @@ BuiltInFunction.ACOS = BuiltInFunction('acos')
 BuiltInFunction.ATAN = BuiltInFunction('atan')
 
 BuiltInFunction.EXIT = BuiltInFunction('exit')
+
+
+class NoneValue(Value):
+    def __init__(self, do_i_print: bool = True):
+        super().__init__()
+        self.type_ = 'NoneValue'
+        self.do_i_print = do_i_print
+
+    def __repr__(self):
+        if self.do_i_print:
+            return 'None'
+        else:
+            return None
+
+    def get_comparison_eq(self, other):
+        if isinstance(other, NoneValue):
+            return Number(Number.TRUE), None
+        else:
+            return Number(Number.FALSE), None
+
+    def get_comparison_ne(self, other):
+        if isinstance(other, NoneValue):
+            return Number(Number.FALSE), None
+        else:
+            return Number(Number.TRUE), None
+
+    def to_str_(self):
+        return String('None').set_context(self.context), None
+
+    def to_list_(self):
+        return List([String('None')]).set_context(self.context), None
+
+    def copy(self):
+        copy = NoneValue(self.do_i_print)
+        copy.set_context(self.context)
+        copy.set_pos(self.pos_start, self.pos_end)
+        return copy
 
 
 # ##########
@@ -2611,6 +2673,7 @@ global_symbol_table = SymbolTable()
 global_symbol_table.set("null", Number.NULL)
 global_symbol_table.set("True", Number.TRUE)
 global_symbol_table.set("False", Number.FALSE)
+global_symbol_table.set("None", NoneValue(True))
 # MATHS
 global_symbol_table.set("math_pi", Number.MATH_PI)
 global_symbol_table.set("math_e", Number.MATH_E)
@@ -2627,6 +2690,7 @@ global_symbol_table.set("is_num", BuiltInFunction.IS_NUMBER)
 global_symbol_table.set("is_str", BuiltInFunction.IS_STRING)
 global_symbol_table.set("is_list", BuiltInFunction.IS_LIST)
 global_symbol_table.set("is_func", BuiltInFunction.IS_FUNCTION)
+global_symbol_table.set("is_none", BuiltInFunction.IS_NONE)
 global_symbol_table.set("type", BuiltInFunction.TYPE)
 global_symbol_table.set("str", BuiltInFunction.STR)
 global_symbol_table.set("list", BuiltInFunction.LIST)
@@ -2664,6 +2728,7 @@ def run(file_name, text, version: str = "not defined"):
     tokens, error = lexer.make_tokens()
     if error is not None:
         return None, error
+    # print(tokens)
 
     # abstract syntax tree
     parser = Parser(tokens)

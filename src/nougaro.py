@@ -572,7 +572,21 @@ class Number(Value):
     def to_list_(self):
         list_ = []
         for element in self.to_str_()[0].to_list_()[0]:
-            list_.append(element.to_int_()[0])
+            if isinstance(element, String):
+                if element.value == "0":
+                    list_.append(Number(0))
+                elif element.value == "-":
+                    list_.append(String('-'))
+                elif element.value == ".":
+                    list_.append(String('.'))
+                else:
+                    element_to_int = element.to_int_()[0]
+                    if element_to_int is None:
+                        list_.append(NoneValue())
+                    else:
+                        list_.append(element.to_int_()[0])
+            elif element is None:  # error in converting...
+                list_.append(NoneValue())
         return List(list_).set_context(self.context), None
 
     def copy(self):

@@ -12,7 +12,7 @@ factor     : (PLUS|MINUS) factor
 
 power      : call (POW factor)*
 
-call       : abs (LPAREN (expr (COMMA expr)*)? RPAREN)?
+call       : abs (LPAREN (expr (COMMA expr)*)? RPAREN)?*
 
 abs        : (ABS) atom (ABS)*
 

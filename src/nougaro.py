@@ -1748,44 +1748,48 @@ class Parser:
             return result
 
         if self.current_token.type == TT_LPAREN:
-            result.register_advancement()
-            self.advance()
-            arg_nodes = []
+            call_node = abs_
 
-            if self.current_token.type == TT_RPAREN:
+            while self.current_token.type == TT_LPAREN:
                 result.register_advancement()
                 self.advance()
-            else:
-                arg_nodes.append(result.register(self.expr()))
-                if result.error is not None:
-                    return result.failure(
-                        InvalidSyntaxError(
-                            self.current_token.pos_start, self.current_token.pos_end,
-                            "expected ')', 'var', 'if', 'for', 'while', 'def', int, float, identifier, '+', '-', '(', "
-                            "'[' or 'not'."
-                        )
-                    )
+                arg_nodes = []
 
-                while self.current_token.type == TT_COMMA:
+                if self.current_token.type == TT_RPAREN:
                     result.register_advancement()
                     self.advance()
-
+                else:
                     arg_nodes.append(result.register(self.expr()))
                     if result.error is not None:
-                        return result
-
-                if self.current_token.type != TT_RPAREN:
-                    return result.failure(
-                        InvalidSyntaxError(
-                            self.current_token.pos_start, self.current_token.pos_end,
-                            "expected ',' or ')'."
+                        return result.failure(
+                            InvalidSyntaxError(
+                                self.current_token.pos_start, self.current_token.pos_end,
+                                "expected ')', 'var', 'if', 'for', 'while', 'def', int, float, identifier, '+', '-', "
+                                "'(', '[' or 'not'."
+                            )
                         )
-                    )
 
-                result.register_advancement()
-                self.advance()
+                    while self.current_token.type == TT_COMMA:
+                        result.register_advancement()
+                        self.advance()
 
-            return result.success(CallNode(abs_, arg_nodes))
+                        arg_nodes.append(result.register(self.expr()))
+                        if result.error is not None:
+                            return result
+
+                    if self.current_token.type != TT_RPAREN:
+                        return result.failure(
+                            InvalidSyntaxError(
+                                self.current_token.pos_start, self.current_token.pos_end,
+                                "expected ',' or ')'."
+                            )
+                        )
+
+                    result.register_advancement()
+                    self.advance()
+                call_node = CallNode(call_node, arg_nodes)
+
+            return result.success(call_node)
         return result.success(abs_)
 
     def abs_(self):

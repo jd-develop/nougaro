@@ -46,7 +46,11 @@ class Lexer:
             elif self.current_char in LETTERS:
                 tokens.append(self.make_identifier())
             elif self.current_char == '"' or self.current_char == "'":
-                tokens.append(self.make_string(self.current_char))
+                string_, error = self.make_string(self.current_char)
+                if error is None:
+                    tokens.append(string_)
+                else:
+                    return [], error
             elif self.current_char == '+':
                 tokens.append(Token(TT_PLUS, pos_start=self.pos))
                 self.advance()
@@ -102,6 +106,10 @@ class Lexer:
 
     def make_string(self, quote='"'):
         string_ = ''
+        if quote == '"':
+            other_quote = "'"
+        else:
+            other_quote = '"'
         pos_start = self.pos.copy()
         escape_character = False
         self.advance()
@@ -111,7 +119,12 @@ class Lexer:
             't': '\t'
         }
 
-        while self.current_char is not None and (self.current_char != quote or escape_character):
+        while self.current_char != quote or escape_character:
+            if self.current_char is None:
+                return None, InvalidSyntaxError(
+                    pos_start, self.pos,
+                    f"{other_quote}{quote}{other_quote} was never closed."
+                )
             if escape_character:
                 string_ += escape_characters.get(self.current_char, self.current_char)
                 escape_character = False
@@ -123,7 +136,7 @@ class Lexer:
             self.advance()
 
         self.advance()
-        return Token(TT_STRING, string_, pos_start, self.pos)
+        return Token(TT_STRING, string_, pos_start, self.pos), None
 
     def make_identifier(self):
         id_str = ''

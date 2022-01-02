@@ -737,7 +737,7 @@ class BaseFunction(Value):
                     arg_value.set_context(exec_context)
                     exec_context.symbol_table.set(arg_name, arg_value)
                 else:
-                    arg_name = optional_args[i]
+                    arg_name = optional_args[len(arg_names) - i]
                     arg_value = args[i]
                     arg_value.set_context(exec_context)
                     exec_context.symbol_table.set(arg_name, arg_value)
@@ -1129,6 +1129,45 @@ class BuiltInFunction(BaseFunction):
     execute_sqrt.optional_args = []
     execute_sqrt.have_to_respect_args_number = True
 
+    def execute_math_root(self, exec_context: Context):
+        """Calculates ⁿ√value"""
+        # Params:
+        # * value
+        # Optional params:
+        # * n
+        value = exec_context.symbol_table.get('value')
+        if not isinstance(value, Number):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'math_root' must be a number.",
+                exec_context
+            ))
+
+        if value.value < 0:
+            return RTResult().failure(RTArithmeticError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'math_root' must be greater than (or equal to) 0.",
+                exec_context
+            ))
+
+        n = exec_context.symbol_table.get('n')
+        if n is None:
+            n = Number(2)
+
+        if not isinstance(n, Number):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "second argument of built-in function 'math_root' must be a number.",
+                exec_context
+            ))
+
+        value_to_return = Number(value.value ** (1/n.value))
+
+        return RTResult().success(value_to_return)
+    execute_math_root.arg_names = ['value']
+    execute_math_root.optional_args = ['n']
+    execute_math_root.have_to_respect_args_number = True
+
     def execute_degrees(self, exec_context: Context):
         """Converts 'value' (radians) to degrees"""
         # Params:
@@ -1395,6 +1434,7 @@ BuiltInFunction.GET = BuiltInFunction('get')
 
 # Maths
 BuiltInFunction.SQRT = BuiltInFunction('sqrt')
+BuiltInFunction.MATH_ROOT = BuiltInFunction('math_root')
 BuiltInFunction.RADIANS = BuiltInFunction('radians')
 BuiltInFunction.DEGREES = BuiltInFunction('degrees')
 BuiltInFunction.SIN = BuiltInFunction('sin')
@@ -2738,6 +2778,7 @@ global_symbol_table.set("extend", BuiltInFunction.EXTEND)
 global_symbol_table.set("get", BuiltInFunction.GET)
 # Mathematical functions
 global_symbol_table.set("sqrt", BuiltInFunction.SQRT)
+global_symbol_table.set("math_root", BuiltInFunction.MATH_ROOT)
 global_symbol_table.set("radians", BuiltInFunction.RADIANS)
 global_symbol_table.set("degrees", BuiltInFunction.DEGREES)
 global_symbol_table.set("sin", BuiltInFunction.SIN)

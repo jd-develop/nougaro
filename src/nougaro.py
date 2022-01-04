@@ -1098,11 +1098,135 @@ class BuiltInFunction(BaseFunction):
             return RTResult().failure(RTIndexError(
                 self.pos_start, self.pos_end,
                 f'index {index_} out of range.',
-                self.context
+                exec_context
             ))
     execute_get.arg_names = ['list', 'index']
     execute_get.optional_args = []
     execute_get.have_to_respect_args_number = True
+
+    def execute_max(self, exec_context: Context):
+        """Calculates the max value of a list"""
+        # Params:
+        # * value
+        # Optional params:
+        # * ignore_not_num (default False)
+        list_ = exec_context.symbol_table.get('list')
+        if not isinstance(list_, List):
+            return RTResult().failure(
+                RunTimeError(
+                    self.pos_start, self.pos_end,
+                    "first argument of builtin function 'max' must be a list.",
+                    exec_context
+                )
+            )
+        ignore_not_num = exec_context.symbol_table.get('ignore_not_num')
+        if ignore_not_num is None:
+            ignore_not_num = Number.FALSE
+        if not isinstance(ignore_not_num, Number):
+            return RTResult().failure(
+                RunTimeError(
+                    self.pos_start, self.pos_end,
+                    "second argument of builtin function 'max' must be a number.",
+                    exec_context
+                )
+            )
+        max_ = None
+        for element in list_.elements:
+            if isinstance(element, Number):
+                max_ = element
+                break
+            else:
+                if ignore_not_num.value == Number.FALSE.value:
+                    return RTResult().failure(
+                        RunTimeError(
+                            self.pos_start, self.pos_end,
+                            "first argument of builtin function 'max' must be a list containing only numbers. "
+                            "You can execute the function with True as the second argument to avoid this error.",
+                            exec_context
+                        )
+                    )
+        if max_ is None:
+            return RTResult().success(NoneValue())
+        for element in list_.elements:
+            if isinstance(element, Number):
+                if element.value > max_.value:
+                    max_ = element
+            else:
+                if ignore_not_num.value == Number.FALSE.value:
+                    return RTResult().failure(
+                        RunTimeError(
+                            self.pos_start, self.pos_end,
+                            "first argument of builtin function 'max' must be a list containing only numbers. "
+                            "You can execute the function with True as the second argument to avoid this error.",
+                            exec_context
+                        )
+                    )
+        return RTResult().success(max_)
+    execute_max.arg_names = ['list']
+    execute_max.optional_args = ['ignore_not_num']
+    execute_max.have_to_respect_args_number = True
+
+    def execute_min(self, exec_context: Context):
+        """Calculates the min value of a list"""
+        # Params:
+        # * value
+        # Optional params:
+        # * ignore_not_num (default False)
+        list_ = exec_context.symbol_table.get('list')
+        if not isinstance(list_, List):
+            return RTResult().failure(
+                RunTimeError(
+                    self.pos_start, self.pos_end,
+                    "first argument of builtin function 'min' must be a list.",
+                    exec_context
+                )
+            )
+        ignore_not_num = exec_context.symbol_table.get('ignore_not_num')
+        if ignore_not_num is None:
+            ignore_not_num = Number.FALSE
+        if not isinstance(ignore_not_num, Number):
+            return RTResult().failure(
+                RunTimeError(
+                    self.pos_start, self.pos_end,
+                    "second argument of builtin function 'min' must be a number.",
+                    exec_context
+                )
+            )
+        min_ = None
+        for element in list_.elements:
+            if isinstance(element, Number):
+                min_ = element
+                break
+            else:
+                if ignore_not_num.value == Number.FALSE.value:
+                    return RTResult().failure(
+                        RunTimeError(
+                            self.pos_start, self.pos_end,
+                            "first argument of builtin function 'min' must be a list containing only numbers. "
+                            "You can execute the function with True as the second argument to avoid this error.",
+                            exec_context
+                        )
+                    )
+        if min_ is None:
+            return RTResult().success(NoneValue())
+        for element in list_.elements:
+            if isinstance(element, Number):
+                if element.value < min_.value:
+                    min_ = element
+            else:
+                if ignore_not_num.value == Number.FALSE.value:
+                    return RTResult().failure(
+                        RunTimeError(
+                            self.pos_start, self.pos_end,
+                            "first argument of builtin function 'min' must be a list containing only numbers. "
+                            "You can execute the function with True as the second argument to avoid this error.",
+                            exec_context
+                        )
+                    )
+        return RTResult().success(min_)
+    execute_min.arg_names = ['list']
+    execute_min.optional_args = ['ignore_not_num']
+    execute_min.have_to_respect_args_number = True
 
     def execute_sqrt(self, exec_context: Context):
         """Calculates square root of 'value'"""
@@ -1431,6 +1555,8 @@ BuiltInFunction.APPEND = BuiltInFunction('append')
 BuiltInFunction.POP = BuiltInFunction('pop')
 BuiltInFunction.EXTEND = BuiltInFunction('extend')
 BuiltInFunction.GET = BuiltInFunction('get')
+BuiltInFunction.MAX = BuiltInFunction('max')
+BuiltInFunction.MIN = BuiltInFunction('min')
 
 # Maths
 BuiltInFunction.SQRT = BuiltInFunction('sqrt')
@@ -2776,6 +2902,8 @@ global_symbol_table.set("append", BuiltInFunction.APPEND)
 global_symbol_table.set("pop", BuiltInFunction.POP)
 global_symbol_table.set("extend", BuiltInFunction.EXTEND)
 global_symbol_table.set("get", BuiltInFunction.GET)
+global_symbol_table.set("max", BuiltInFunction.MAX)
+global_symbol_table.set("min", BuiltInFunction.MIN)
 # Mathematical functions
 global_symbol_table.set("sqrt", BuiltInFunction.SQRT)
 global_symbol_table.set("math_root", BuiltInFunction.MATH_ROOT)

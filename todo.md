@@ -1,5 +1,5 @@
 # To-do list :
-* add math_def that just returns numbers. E.g. : math_def f(x) -> |x|+3.
+* add math_def that just returns numbers. E.g. : `math_def f(x) -> |x|+3`.
 * add `var id === *` (if id eq to * so id <- 1 else id <- 0)
 * add `var id =>= *` (etc.)
 * add `var id =<= *`

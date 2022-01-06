@@ -1603,6 +1603,12 @@ class NoneValue(Value):
     def to_list_(self):
         return List([String('None')]).set_context(self.context), None
 
+    def to_int_(self):
+        return Number(0).set_context(self.context), None
+
+    def to_float_(self):
+        return Number(0.0).set_context(self.context), None
+
     def copy(self):
         copy = NoneValue(self.do_i_print)
         copy.set_context(self.context)

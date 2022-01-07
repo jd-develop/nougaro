@@ -38,6 +38,9 @@ class Lexer:
         while self.current_char is not None:
             if self.current_char in ' \t':  # tab and space
                 self.advance()
+            elif self.current_char in ';\n':  # semicolons and new lines
+                tokens.append(Token(TT_NEWLINE, pos_start=self.pos))
+                self.advance()
             elif self.current_char in DIGITS:
                 number, error = self.make_number()
                 if error is None:
@@ -628,7 +631,7 @@ class List(Value):
         self.type_ = 'list'
 
     def __repr__(self):
-        return f'[{", ".join([str(x) for x in self.elements])}]'
+        return f'[{", ".join([x.__str__() for x in self.elements])}]'
 
     def __getitem__(self, item):
         return self.elements.__getitem__(item)
@@ -836,7 +839,8 @@ class BuiltInFunction(BaseFunction):
     def no_visit_method(self, exec_context: Context):
         print(exec_context)
         print(f"NOUGARO INTERNAL ERROR : No execute_{self.name} method defined in nougaro.BuildInFunction.\n"
-              f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with informations above.")
+              f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with all informations "
+              f"above.")
         raise Exception(f'No execute_{self.name} method defined in nougaro.BuildInFunction.')
 
     # ==================
@@ -1585,6 +1589,9 @@ class NoneValue(Value):
         else:
             return None
 
+    def __str__(self):
+        return 'None'
+
     def get_comparison_eq(self, other):
         if isinstance(other, NoneValue):
             return Number(Number.TRUE), None
@@ -1774,6 +1781,10 @@ class AbsNode:
         self.pos_end = self.node_to_abs.pos_end
 
 
+class NoNode:
+    pass
+
+
 # ##########
 # PARSE RESULT
 # ##########
@@ -1782,15 +1793,22 @@ class ParseResult:
         self.error = None
         self.node = None
         self.advance_count = 0
+        self.to_reverse_count = 0
 
     def register_advancement(self):
         self.advance_count += 1
 
     def register(self, result):
         self.advance_count += result.advance_count
-        if result.error:
+        if result.error is not None:
             self.error = result.error
         return result.node
+
+    def try_register(self, result):
+        if result.error is not None:
+            self.to_reverse_count = result.advance_count
+            return None
+        return self.register(result)
 
     def success(self, node):
         self.node = node
@@ -1817,7 +1835,7 @@ class Parser:
         self.advance()
 
     def parse(self):
-        result = self.expr()
+        result = self.statements()
         if result.error is None and self.current_token.type != TT_EOF:
             return result.failure(
                 InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
@@ -1827,11 +1845,63 @@ class Parser:
 
     def advance(self):
         self.token_index += 1
-        if self.token_index < len(self.tokens):
-            self.current_token = self.tokens[self.token_index]
+        self.update_current_token()
         return self.current_token
 
-    # GRAMMARS ATOMS :
+    def reverse(self, amount: int = 1):
+        # this is just the opposite of self.advance ^^
+        self.token_index -= amount
+        self.update_current_token()
+        return self.current_token
+    
+    def update_current_token(self):
+        if 0 <= self.token_index < len(self.tokens):
+            self.current_token = self.tokens[self.token_index]
+
+    # GRAMMARS ATOMS (AST) :
+
+    def statements(self):
+        result = ParseResult()
+        statements = []
+        pos_start = self.current_token.pos_start.copy()
+
+        while self.current_token.type == TT_NEWLINE:
+            result.register_advancement()
+            self.advance()
+
+        if self.current_token.type == TT_EOF:
+            return result.success(NoNode())
+
+        statement = result.register(self.expr())
+        if result.error is not None:
+            return result
+        statements.append(statement)
+
+        more_statements = True
+
+        while True:
+            newline_count = 0
+            while self.current_token.type == TT_NEWLINE:
+                result.register_advancement()
+                self.advance()
+                newline_count += 1
+            if newline_count == 0:
+                more_statements = False
+
+            if not more_statements:
+                break
+            statement = result.try_register(self.expr())
+            if statement is None:
+                self.reverse(result.to_reverse_count)
+                more_statements = False
+                continue
+            statements.append(statement)
+
+        return result.success(ListNode(
+            statements,
+            pos_start,
+            self.current_token.pos_end.copy()
+        ))
 
     def expr(self):
         result = ParseResult()
@@ -2536,7 +2606,8 @@ class Interpreter:
     def no_visit_method(node, context: Context):
         print(context)
         print(f"NOUGARO INTERNAL ERROR : No visit_{type(node).__name__} method defined in nougaro.Interpreter.\n"
-              f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with informations above.")
+              f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with all informations "
+              f"above.")
         raise Exception(f'No visit_{type(node).__name__} method defined in nougaro.Interpreter.')
 
     @staticmethod
@@ -2870,6 +2941,10 @@ class Interpreter:
         return_value = value_to_abs.abs_()
         return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
         return result.success(return_value)
+
+    @staticmethod
+    def visit_NoNode(node, context):
+        return RTResult().success(NoneValue(do_i_print=False))
 
 
 # ##########

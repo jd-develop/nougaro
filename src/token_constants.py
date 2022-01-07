@@ -29,6 +29,7 @@ TT_LTE = '<='                 # <=
 TT_GTE = '>='                 # >=
 TT_COMMA = ','                # ,
 TT_ARROW = '->'               # ->
+TT_NEWLINE = 'new line'       # new line
 TT_EOF = 'end of file'        # end of file
 KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
     'var',
@@ -45,7 +46,8 @@ KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
     'step',
     'while',
     'def',
-    'in'
+    'in',
+    'end'
 ]
 
 TOKENS_TO_QUOTE = [

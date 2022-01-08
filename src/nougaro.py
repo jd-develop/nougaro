@@ -774,10 +774,11 @@ class BaseFunction(Value):
 
 
 class Function(BaseFunction):
-    def __init__(self, name, body_node, arg_names):
+    def __init__(self, name, body_node, arg_names, should_return_none):
         super().__init__(name)
         self.body_node = body_node
         self.arg_names = arg_names
+        self.should_return_none = should_return_none
         self.type_ = "func"
 
     def __repr__(self):
@@ -795,10 +796,10 @@ class Function(BaseFunction):
         value = result.register(interpreter.visit(self.body_node, exec_context))
         if result.error is not None:
             return result
-        return result.success(value)
+        return result.success(NoneValue(False) if self.should_return_none else value)
 
     def copy(self):
-        copy = Function(self.name, self.body_node, self.arg_names)
+        copy = Function(self.name, self.body_node, self.arg_names, self.should_return_none)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
         return copy
@@ -1700,35 +1701,37 @@ class UnaryOpNode:
 
 class IfNode:
     def __init__(self, cases, else_case):
-        # by default else_case is None in Parser.if_expr()
         self.cases = cases
         self.else_case = else_case
 
         self.pos_start = self.cases[0][0].pos_start
-        self.pos_end = (self.else_case or self.cases[len(self.cases) - 1][0]).pos_end
+        self.pos_end = (self.else_case or self.cases[len(self.cases) - 1])[0].pos_end
 
 
 class ForNode:
-    def __init__(self, var_name_token, start_value_node, end_value_node, step_value_node, body_node):
+    def __init__(self, var_name_token, start_value_node, end_value_node, step_value_node, body_node,
+                 should_return_none: bool):
         # by default step_value_node is None
         self.var_name_token: Token = var_name_token
         self.start_value_node = start_value_node
         self.end_value_node = end_value_node
         self.step_value_node = step_value_node
         self.body_node = body_node
+        self.should_return_none = should_return_none
 
         self.pos_start = self.var_name_token.pos_start
         self.pos_end = self.body_node.pos_end
 
 
 class ForNodeList:
-    def __init__(self, var_name_token, body_node, list_node: ListNode):
+    def __init__(self, var_name_token, body_node, list_node: ListNode, should_return_none: bool):
         # if list = [1, 2, 3]
         # for var in list == for var = 1 to 3 (step 1)
 
         self.var_name_token: Token = var_name_token
         self.body_node = body_node
         self.list_node = list_node
+        self.should_return_none = should_return_none
 
         # Position
         self.pos_start = self.var_name_token.pos_start
@@ -1736,19 +1739,21 @@ class ForNodeList:
 
 
 class WhileNode:
-    def __init__(self, condition_node, body_node):
+    def __init__(self, condition_node, body_node, should_return_none: bool):
         self.condition_node = condition_node
         self.body_node = body_node
+        self.should_return_none = should_return_none
 
         self.pos_start = self.condition_node.pos_start
         self.pos_end = self.body_node.pos_end
 
 
 class FuncDefNode:
-    def __init__(self, var_name_token: Token, arg_name_tokens: list[Token], body_node):
+    def __init__(self, var_name_token: Token, arg_name_tokens: list[Token], body_node, should_return_none):
         self.var_name_token = var_name_token
         self.arg_name_tokens = arg_name_tokens
         self.body_node = body_node
+        self.should_return_none = should_return_none
 
         if self.var_name_token is not None:
             self.pos_start = self.var_name_token.pos_start
@@ -2161,7 +2166,7 @@ class Parser:
                     InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
                         "expected ']', 'var', 'if', 'for', 'while', 'def', int, float, identifier, '+', '-', '(', "
-                        "'[' or 'not'"
+                        "'[' or 'not'."
                     )
                 )
 
@@ -2177,7 +2182,7 @@ class Parser:
                 return result.failure(
                     InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
-                        "expected ',' or ']'"
+                        "expected ',' or ']'."
                     )
                 )
 
@@ -2190,12 +2195,73 @@ class Parser:
 
     def if_expr(self):
         result = ParseResult()
+        all_cases = result.register(self.if_expr_cases('if'))
+        if result.error is not None:
+            return result
+        cases, else_cases = all_cases
+        return result.success(IfNode(cases, else_cases))
+
+    def if_expr_b(self):
+        return self.if_expr_cases("elif")
+
+    def if_expr_c(self):
+        result = ParseResult()
+        else_case = None
+
+        if self.current_token.matches(TT_KEYWORD, 'else'):
+            result.register_advancement()
+            self.advance()
+
+            if self.current_token.type == TT_NEWLINE:
+                result.register_advancement()
+                self.advance()
+
+                statements = result.register(self.statements())
+                if result.error is not None:
+                    return result
+                else_case = (statements, True)
+
+                if self.current_token.matches(TT_KEYWORD, 'end'):
+                    result.register_advancement()
+                    self.advance()
+                else:
+                    return result.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        "expected 'end'."
+                    ))
+            else:
+                expr = result.register(self.expr())
+                if result.error is not None:
+                    return result
+                else_case = (expr, False)
+
+        return result.success(else_case)
+
+    def if_expr_b_or_c(self):
+        result = ParseResult()
+        cases, else_case = [], None
+
+        if self.current_token.matches(TT_KEYWORD, 'elif'):
+            all_cases = result.register(self.if_expr_b())
+            if result.error is not None:
+                return result
+            cases, else_case = all_cases
+        else:
+            else_case = result.register(self.if_expr_c())
+            if result.error is not None:
+                return result
+
+        return result.success((cases, else_case))
+
+    def if_expr_cases(self, case_keyword):
+        result = ParseResult()
         cases = []
         else_case = None
 
-        if not self.current_token.matches(TT_KEYWORD, 'if'):
+        if not self.current_token.matches(TT_KEYWORD, case_keyword):
             return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end, "expected 'if'"
+                self.current_token.pos_start, self.current_token.pos_end,
+                f"expected '{case_keyword}'."
             ))
 
         result.register_advancement()
@@ -2207,53 +2273,49 @@ class Parser:
 
         if not self.current_token.matches(TT_KEYWORD, 'then'):
             return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end, "expected 'then'"
+                self.current_token.pos_start, self.current_token.pos_end, "expected 'then'."
             ))
 
         result.register_advancement()
         self.advance()
 
-        expr = result.register(self.expr())
-        if result.error is not None:
-            return result
-        cases.append((condition, expr))
-
-        while self.current_token.matches(TT_KEYWORD, 'elif'):
+        if self.current_token.type == TT_NEWLINE:
             result.register_advancement()
             self.advance()
 
-            condition = result.register(self.expr())
+            statements = result.register(self.statements())
             if result.error is not None:
                 return result
+            cases.append((condition, statements, True))
 
-            if not self.current_token.matches(TT_KEYWORD, 'then'):
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end, "expected 'then'"
-                ))
-
-            result.register_advancement()
-            self.advance()
-
+            if self.current_token.matches(TT_KEYWORD, 'end'):
+                result.register_advancement()
+                self.advance()
+            else:
+                all_cases = result.register(self.if_expr_b_or_c())
+                if result.error is not None:
+                    return result
+                new_cases, else_case = all_cases
+                cases.extend(new_cases)
+        else:  # no newline : single line 'if'
             expr = result.register(self.expr())
             if result.error is not None:
                 return result
-            cases.append((condition, expr))
+            cases.append((condition, expr, False))
 
-        if self.current_token.matches(TT_KEYWORD, 'else'):
-            result.register_advancement()
-            self.advance()
-
-            else_case = result.register(self.expr())
+            all_cases = result.register(self.if_expr_b_or_c())
             if result.error is not None:
                 return result
+            new_cases, else_case = all_cases
+            cases.extend(new_cases)
 
-        return result.success(IfNode(cases, else_case))
+        return result.success((cases, else_case))
 
     def for_expr(self):
         result = ParseResult()
         if not self.current_token.matches(TT_KEYWORD, 'for'):
             return result.error(InvalidSyntaxError, self.current_token.pos_start, self.current_token.pos_end,
-                                "expected 'for'")
+                                "expected 'for'.")
 
         result.register_advancement()
         self.advance()
@@ -2287,16 +2349,35 @@ class Parser:
 
             if not self.current_token.matches(TT_KEYWORD, 'then'):
                 return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                                         "expected 'then'"))
+                                                         "expected 'then'."))
 
             result.register_advancement()
             self.advance()
+
+            if self.current_token.type == TT_NEWLINE:
+                result.register_advancement()
+                self.advance()
+
+                body = result.register(self.statements())
+                if result.error is not None:
+                    return result
+
+                if not self.current_token.matches(TT_KEYWORD, 'end'):
+                    return result.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        "expected 'end'."
+                    ))
+
+                result.register_advancement()
+                self.advance()
+
+                return result.success(ForNodeList(var_name, body, list_, True))
 
             body = result.register(self.expr())
             if result.error is not None:
                 return result
 
-            return result.success(ForNodeList(var_name_token=var_name, body_node=body, list_node=list_))
+            return result.success(ForNodeList(var_name, body, list_, False))
         elif self.current_token.type != TT_EQ:
             if self.current_token.type not in TOKENS_TO_QUOTE:
                 error_msg = f"expected 'in' or '=', but got {self.current_token.type}."
@@ -2338,27 +2419,42 @@ class Parser:
 
         if not self.current_token.matches(TT_KEYWORD, 'then'):
             return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                                     "expected 'then'"))
+                                                     "expected 'then'."))
 
         result.register_advancement()
         self.advance()
+
+        if self.current_token.type == TT_NEWLINE:
+            result.register_advancement()
+            self.advance()
+
+            body = result.register(self.statements())
+            if result.error is not None:
+                return result
+
+            if not self.current_token.matches(TT_KEYWORD, 'end'):
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected 'end'."
+                ))
+
+            result.register_advancement()
+            self.advance()
+
+            return result.success(ForNode(var_name, start_value, end_value, step_value, body, True))
 
         body = result.register(self.expr())
         if result.error is not None:
             return result
 
-        # list_ =
-        # List(list(range(start_value.value, end_value.value, step_value.value if step_value is not None else 1)))
-
-        return result.success(ForNode(var_name_token=var_name, body_node=body, start_value_node=start_value,
-                                      end_value_node=end_value, step_value_node=step_value))
+        return result.success(ForNode(var_name, start_value, end_value, step_value, body, False))
 
     def while_expr(self):
         result = ParseResult()
 
         if not self.current_token.matches(TT_KEYWORD, 'while'):
             return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                                     "expected 'while'"))
+                                                     "expected 'while'."))
 
         result.register_advancement()
         self.advance()
@@ -2369,16 +2465,35 @@ class Parser:
 
         if not self.current_token.matches(TT_KEYWORD, 'then'):
             return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                                     "expected 'then'"))
+                                                     "expected 'then'."))
 
         result.register_advancement()
         self.advance()
+
+        if self.current_token.type == TT_NEWLINE:
+            result.register_advancement()
+            self.advance()
+
+            body = result.register(self.statements())
+            if result.error is not None:
+                return result
+
+            if not self.current_token.matches(TT_KEYWORD, 'end'):
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected 'end'."
+                ))
+
+            result.register_advancement()
+            self.advance()
+
+            return result.success(WhileNode(condition, body, True))
 
         body = result.register(self.expr())
         if result.error is not None:
             return result
 
-        return result.success(WhileNode(condition, body))
+        return result.success(WhileNode(condition, body, False))
 
     def func_def(self):
         result = ParseResult()
@@ -2387,7 +2502,7 @@ class Parser:
             return result.failure(
                 InvalidSyntaxError(
                     self.current_token.pos_start, self.current_token.pos_end,
-                    "expected 'def'"
+                    "expected 'def'."
                 )
             )
 
@@ -2402,7 +2517,7 @@ class Parser:
                 return result.failure(
                     InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
-                        "expected '('"
+                        "expected '('."
                     )
                 )
         else:
@@ -2411,7 +2526,7 @@ class Parser:
                 return result.failure(
                     InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
-                        "expected identifier or '('"
+                        "expected identifier or '('."
                     )
                 )
 
@@ -2469,24 +2584,49 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        if self.current_token.type != TT_ARROW:
+        if self.current_token.type == TT_ARROW:
+            result.register_advancement()
+            self.advance()
+
+            body = result.register(self.expr())
+            if result.error is not None:
+                return result
+
+            return result.success(FuncDefNode(
+                var_name_token,
+                arg_name_tokens,
+                body,
+                False
+            ))
+
+        if self.current_token.type != TT_NEWLINE:
             return result.failure(
                 InvalidSyntaxError(
                     self.current_token.pos_start, self.current_token.pos_end,
-                    "expected '->'."
+                    "expected '->' or new line."
                 )
             )
 
         result.register_advancement()
         self.advance()
-        node_to_return = result.register(self.expr())
+
+        body = result.register(self.statements())
         if result.error is not None:
             return result
+
+        if not self.current_token.matches(TT_KEYWORD, 'end'):
+            return result.failure(
+                InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected 'end'."
+                )
+            )
 
         return result.success(FuncDefNode(
             var_name_token,
             arg_name_tokens,
-            node_to_return
+            body,
+            True
         ))
 
     def bin_op(self, func_a, ops, func_b=None):
@@ -2732,7 +2872,7 @@ class Interpreter:
 
     def visit_IfNode(self, node: IfNode, context: Context):
         result = RTResult()
-        for condition, expr in node.cases:
+        for condition, expr, should_return_none in node.cases:
             condition_value = result.register(self.visit(condition, context))
             if result.error is not None:
                 return result
@@ -2741,15 +2881,16 @@ class Interpreter:
                 expr_value = result.register(self.visit(expr, context))
                 if result.error is not None:
                     return result
-                return result.success(expr_value)
+                return result.success(NoneValue(False) if should_return_none else expr_value)
 
         if node.else_case is not None:
-            else_value = result.register(self.visit(node.else_case, context))
+            expr, should_return_none = node.else_case
+            else_value = result.register(self.visit(expr, context))
             if result.error is not None:
                 return result
-            return result.success(else_value)
+            return result.success(NoneValue(False) if should_return_none else else_value)
 
-        return result.success(None)
+        return result.success(NoneValue(False))
 
     def visit_ForNode(self, node: ForNode, context: Context):
         result = RTResult()
@@ -2781,7 +2922,10 @@ class Interpreter:
             if result.error is not None:
                 return result
 
-        return result.success(List(elements).set_context(context).set_pos(node.pos_start, node.pos_end))
+        return result.success(
+            NoneValue(False) if node.should_return_none else
+            List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+        )
 
     def visit_ForNodeList(self, node: ForNodeList, context: Context):
         result = RTResult()
@@ -2797,7 +2941,10 @@ class Interpreter:
                 elements.append(result.register(self.visit(node.body_node, context)))
                 if result.error is not None:
                     return result
-            return result.success(List(elements).set_context(context).set_pos(node.pos_start, node.pos_end))
+            return result.success(
+                NoneValue(False) if node.should_return_none else
+                List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+            )
         else:
             return result.failure(
                 RunTimeError(node.list_node.pos_start, node.list_node.pos_end,
@@ -2821,7 +2968,10 @@ class Interpreter:
             if result.error is not None:
                 return result
 
-        return result.success(List(elements).set_context(context).set_pos(node.pos_start, node.pos_end))
+        return result.success(
+            NoneValue(False) if node.should_return_none else
+            List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+        )
 
     @staticmethod
     def visit_FuncDefNode(node: FuncDefNode, context: Context):
@@ -2829,8 +2979,9 @@ class Interpreter:
         func_name = node.var_name_token.value if node.var_name_token is not None else None
         body_node = node.body_node
         arg_names = [arg_name.value for arg_name in node.arg_name_tokens]
-        func_value = Function(func_name, body_node, arg_names).set_context(context).set_pos(node.pos_start,
-                                                                                            node.pos_end)
+        func_value = Function(func_name, body_node, arg_names, node.should_return_none).set_context(context).set_pos(
+            node.pos_start, node.pos_end
+        )
 
         if node.var_name_token is not None:
             if func_name not in VARS_CANNOT_MODIFY:

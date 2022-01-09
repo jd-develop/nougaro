@@ -15,6 +15,7 @@ from src.tokens import *
 import os
 import math
 import pprint
+from typing import Protocol, Any
 
 
 # ##########
@@ -305,6 +306,18 @@ class SymbolTable:
 
     def remove(self, name):
         del self.symbols[name]
+
+
+# ##########
+# CUSTOM BUILTIN FUNC METHOD
+# ##########
+class CustomBuiltInFuncMethod(Protocol):
+    arg_names: list[str]
+    optional_args: list[str]
+    have_to_respect_args_number: bool
+
+    def __call__(self, exec_context: Context = None) -> Any:
+        ...
 
 
 # ##########
@@ -818,7 +831,7 @@ class BuiltInFunction(BaseFunction):
         exec_context = self.generate_new_context()
 
         method_name = f'execute_{self.name}'
-        method = getattr(self, method_name, self.no_visit_method)
+        method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)
 
         result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
                                                      optional_args=method.optional_args,
@@ -897,11 +910,12 @@ class BuiltInFunction(BaseFunction):
         # Optional params:
         # * text_to_display
         text_to_display = exec_context.symbol_table.get('text_to_display')
-        if text_to_display is None or not isinstance(text_to_display, String) \
-                or not isinstance(text_to_display, Number):
+        if text_to_display is None:
             text = input()
-        else:
+        elif isinstance(text_to_display, String) or isinstance(text_to_display, Number):
             text = input(text_to_display.value)
+        else:
+            text = input()
         return RTResult().success(String(text))
     execute_input.arg_names = []
     execute_input.optional_args = ['text_to_display']
@@ -913,11 +927,13 @@ class BuiltInFunction(BaseFunction):
         # * text_to_display
         while True:
             text_to_display = exec_context.symbol_table.get('text_to_display')
-            if text_to_display is None or not isinstance(text_to_display, String) \
-                    or not isinstance(text_to_display, Number):
+            if text_to_display is None:
                 text = input()
-            else:
+            elif isinstance(text_to_display, String) or isinstance(text_to_display, Number):
                 text = input(text_to_display.value)
+            else:
+                text = input()
+            
             try:
                 number = int(text)
                 break

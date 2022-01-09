@@ -312,6 +312,9 @@ class SymbolTable:
 # CUSTOM BUILTIN FUNC METHOD
 # ##########
 class CustomBuiltInFuncMethod(Protocol):
+    """
+        Just a class for typing the methods `execute_{name}` in BuiltInFunction
+    """
     arg_names: list[str]
     optional_args: list[str]
     have_to_respect_args_number: bool
@@ -933,7 +936,7 @@ class BuiltInFunction(BaseFunction):
                 text = input(text_to_display.value)
             else:
                 text = input()
-            
+
             try:
                 number = int(text)
                 break
@@ -953,15 +956,41 @@ class BuiltInFunction(BaseFunction):
     execute_clear.optional_args = []
     execute_clear.have_to_respect_args_number = False
 
-    def execute_is_num(self, exec_context: Context):
-        """Check if 'value' is a Number"""
+    def execute_is_int(self, exec_context: Context):
+        """Check if 'value' is an integer"""
         # Params:
         # * value
-        is_number = isinstance(exec_context.symbol_table.get('value'), Number)
-        return RTResult().success(Number.TRUE if is_number else Number.FALSE)
-    execute_is_num.arg_names = ['value']
-    execute_is_num.optional_args = []
-    execute_is_num.have_to_respect_args_number = True
+        value = exec_context.symbol_table.get('value')
+        is_number = isinstance(value, Number)
+        if is_number:
+            if value.type_ == 'int':
+                is_int = True
+            else:
+                is_int = False
+        else:
+            is_int = False
+        return RTResult().success(Number.TRUE if is_int else Number.FALSE)
+    execute_is_int.arg_names = ['value']
+    execute_is_int.optional_args = []
+    execute_is_int.have_to_respect_args_number = True
+
+    def execute_is_float(self, exec_context: Context):
+        """Check if 'value' is a float"""
+        # Params:
+        # * value
+        value = exec_context.symbol_table.get('value')
+        is_number = isinstance(value, Number)
+        if is_number:
+            if value.type_ == 'float':
+                is_float = True
+            else:
+                is_float = False
+        else:
+            is_float = False
+        return RTResult().success(Number.TRUE if is_float else Number.FALSE)
+    execute_is_float.arg_names = ['value']
+    execute_is_float.optional_args = []
+    execute_is_float.have_to_respect_args_number = True
 
     def execute_is_list(self, exec_context: Context):
         """Check if 'value' is a List"""
@@ -1561,7 +1590,8 @@ BuiltInFunction.INPUT = BuiltInFunction('input')
 BuiltInFunction.INPUT_INT = BuiltInFunction('input_int')
 BuiltInFunction.CLEAR = BuiltInFunction('clear')
 
-BuiltInFunction.IS_NUMBER = BuiltInFunction('is_num')
+BuiltInFunction.IS_INT = BuiltInFunction('is_int')
+BuiltInFunction.IS_FLOAT = BuiltInFunction('is_float')
 BuiltInFunction.IS_STRING = BuiltInFunction('is_str')
 BuiltInFunction.IS_LIST = BuiltInFunction('is_list')
 BuiltInFunction.IS_FUNCTION = BuiltInFunction('is_func')
@@ -3110,7 +3140,7 @@ class Interpreter:
         return result.success(return_value)
 
     @staticmethod
-    def visit_NoNode(node, context):
+    def visit_NoNode(node: NoNode, context: Context):
         return RTResult().success(NoneValue(do_i_print=False))
 
 
@@ -3135,7 +3165,8 @@ global_symbol_table.set("input", BuiltInFunction.INPUT)
 global_symbol_table.set("input_int", BuiltInFunction.INPUT_INT)
 global_symbol_table.set("clear", BuiltInFunction.CLEAR)
 
-global_symbol_table.set("is_num", BuiltInFunction.IS_NUMBER)
+global_symbol_table.set("is_int", BuiltInFunction.IS_INT)
+global_symbol_table.set("is_float", BuiltInFunction.IS_FLOAT)
 global_symbol_table.set("is_str", BuiltInFunction.IS_STRING)
 global_symbol_table.set("is_list", BuiltInFunction.IS_LIST)
 global_symbol_table.set("is_func", BuiltInFunction.IS_FUNCTION)

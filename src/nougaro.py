@@ -583,7 +583,7 @@ class Number(Value):
             return None, self.illegal_operation(other)
 
     def excl_or(self, other):
-        """ Exclusive or """
+        """ Exclusive or (xor) """
         if isinstance(other, Number):
             return Number(int(self.value ^ other.value)).set_context(self.context), None
         else:
@@ -752,7 +752,7 @@ class BaseFunction(Value):
             optional_args = []
         if have_to_respect_args_number:
             for i in range(len(args)):
-                if i+1 < len(arg_names)+1:
+                if i + 1 < len(arg_names) + 1:
                     arg_name = arg_names[i]
                     arg_value = args[i]
                     arg_value.set_context(exec_context)
@@ -871,6 +871,7 @@ class BuiltInFunction(BaseFunction):
         # No params.
         result = RTResult()
         return result.success(NoneValue(False))
+
     execute_void.arg_names = []
     execute_void.optional_args = []
     execute_void.have_to_respect_args_number = False
@@ -884,6 +885,7 @@ class BuiltInFunction(BaseFunction):
         except Exception:
             print(str(exec_context.symbol_table.get('value')))
         return RTResult().success(NoneValue(False))
+
     execute_print.arg_names = ["value"]
     execute_print.optional_args = []
     execute_print.have_to_respect_args_number = True
@@ -906,6 +908,7 @@ class BuiltInFunction(BaseFunction):
                     str(exec_context.symbol_table.get('value'))
                 )
             )
+
     execute_print_ret.arg_names = ["value"]
     execute_print_ret.optional_args = []
     execute_print_ret.have_to_respect_args_number = True
@@ -922,6 +925,7 @@ class BuiltInFunction(BaseFunction):
         else:
             text = input()
         return RTResult().success(String(text))
+
     execute_input.arg_names = []
     execute_input.optional_args = ['text_to_display']
     execute_input.have_to_respect_args_number = True
@@ -945,6 +949,7 @@ class BuiltInFunction(BaseFunction):
             except ValueError:
                 print(f'{text} must be an integer. Try again :')
         return RTResult().success(Number(number))
+
     execute_input_int.arg_names = []
     execute_input_int.optional_args = ['text_to_display']
     execute_input_int.have_to_respect_args_number = True
@@ -954,6 +959,7 @@ class BuiltInFunction(BaseFunction):
         # No params.
         os.system('cls' if (os.name == "nt" or os.name == "Windows") else 'clear')
         return RTResult().success(NoneValue(False))
+
     execute_clear.arg_names = []
     execute_clear.optional_args = []
     execute_clear.have_to_respect_args_number = False
@@ -972,6 +978,7 @@ class BuiltInFunction(BaseFunction):
         else:
             is_int = False
         return RTResult().success(Number.TRUE if is_int else Number.FALSE)
+
     execute_is_int.arg_names = ['value']
     execute_is_int.optional_args = []
     execute_is_int.have_to_respect_args_number = True
@@ -990,6 +997,7 @@ class BuiltInFunction(BaseFunction):
         else:
             is_float = False
         return RTResult().success(Number.TRUE if is_float else Number.FALSE)
+
     execute_is_float.arg_names = ['value']
     execute_is_float.optional_args = []
     execute_is_float.have_to_respect_args_number = True
@@ -1000,6 +1008,7 @@ class BuiltInFunction(BaseFunction):
         # * value
         is_list = isinstance(exec_context.symbol_table.get('value'), List)
         return RTResult().success(Number.TRUE if is_list else Number.FALSE)
+
     execute_is_list.arg_names = ['value']
     execute_is_list.optional_args = []
     execute_is_list.have_to_respect_args_number = True
@@ -1010,6 +1019,7 @@ class BuiltInFunction(BaseFunction):
         # * value
         is_str = isinstance(exec_context.symbol_table.get('value'), String)
         return RTResult().success(Number.TRUE if is_str else Number.FALSE)
+
     execute_is_str.arg_names = ['value']
     execute_is_str.optional_args = []
     execute_is_str.have_to_respect_args_number = True
@@ -1020,6 +1030,7 @@ class BuiltInFunction(BaseFunction):
         # * value
         is_func = isinstance(exec_context.symbol_table.get('value'), BaseFunction)
         return RTResult().success(Number.TRUE if is_func else Number.FALSE)
+
     execute_is_func.arg_names = ['value']
     execute_is_func.optional_args = []
     execute_is_func.have_to_respect_args_number = True
@@ -1030,6 +1041,7 @@ class BuiltInFunction(BaseFunction):
         # * value
         is_none = isinstance(exec_context.symbol_table.get('value'), NoneValue)
         return RTResult().success(Number.TRUE if is_none else Number.FALSE)
+
     execute_is_none.arg_names = ['value']
     execute_is_none.optional_args = []
     execute_is_none.have_to_respect_args_number = True
@@ -1051,6 +1063,7 @@ class BuiltInFunction(BaseFunction):
 
         list_.elements.append(value)
         return RTResult().success(list_)
+
     execute_append.arg_names = ['list', 'value']
     execute_append.optional_args = []
     execute_append.have_to_respect_args_number = True
@@ -1086,6 +1099,7 @@ class BuiltInFunction(BaseFunction):
                 self.context
             ))
         return RTResult().success(list_)
+
     execute_pop.arg_names = ['list', 'index']
     execute_pop.optional_args = []
     execute_pop.have_to_respect_args_number = True
@@ -1114,6 +1128,7 @@ class BuiltInFunction(BaseFunction):
 
         list1.elements.extend(list2.elements)
         return RTResult().success(list1)
+
     execute_extend.arg_names = ['list1', 'list2']
     execute_extend.optional_args = []
     execute_extend.have_to_respect_args_number = True
@@ -1152,6 +1167,7 @@ class BuiltInFunction(BaseFunction):
                 f'index {index_} out of range.',
                 exec_context
             ))
+
     execute_get.arg_names = ['list', 'index']
     execute_get.optional_args = []
     execute_get.have_to_respect_args_number = True
@@ -1214,6 +1230,7 @@ class BuiltInFunction(BaseFunction):
                         )
                     )
         return RTResult().success(max_)
+
     execute_max.arg_names = ['list']
     execute_max.optional_args = ['ignore_not_num']
     execute_max.have_to_respect_args_number = True
@@ -1276,6 +1293,7 @@ class BuiltInFunction(BaseFunction):
                         )
                     )
         return RTResult().success(min_)
+
     execute_min.arg_names = ['list']
     execute_min.optional_args = ['ignore_not_num']
     execute_min.have_to_respect_args_number = True
@@ -1301,6 +1319,7 @@ class BuiltInFunction(BaseFunction):
 
         sqrt = math.sqrt(value.value)
         return RTResult().success(Number(sqrt))
+
     execute_sqrt.arg_names = ['value']
     execute_sqrt.optional_args = []
     execute_sqrt.have_to_respect_args_number = True
@@ -1337,9 +1356,10 @@ class BuiltInFunction(BaseFunction):
                 exec_context
             ))
 
-        value_to_return = Number(value.value ** (1/n.value))
+        value_to_return = Number(value.value ** (1 / n.value))
 
         return RTResult().success(value_to_return)
+
     execute_math_root.arg_names = ['value']
     execute_math_root.optional_args = ['n']
     execute_math_root.have_to_respect_args_number = True
@@ -1357,6 +1377,7 @@ class BuiltInFunction(BaseFunction):
             ))
         degrees = math.degrees(value.value)
         return RTResult().success(Number(degrees))
+
     execute_degrees.arg_names = ['value']
     execute_degrees.optional_args = []
     execute_degrees.have_to_respect_args_number = True
@@ -1374,6 +1395,7 @@ class BuiltInFunction(BaseFunction):
             ))
         radians = math.radians(value.value)
         return RTResult().success(Number(radians))
+
     execute_radians.arg_names = ['value']
     execute_radians.optional_args = []
     execute_radians.have_to_respect_args_number = True
@@ -1391,6 +1413,7 @@ class BuiltInFunction(BaseFunction):
             ))
         sin = math.sin(value.value)
         return RTResult().success(Number(sin))
+
     execute_sin.arg_names = ['value']
     execute_sin.optional_args = []
     execute_sin.have_to_respect_args_number = True
@@ -1408,6 +1431,7 @@ class BuiltInFunction(BaseFunction):
             ))
         cos = math.cos(value.value)
         return RTResult().success(Number(cos))
+
     execute_cos.arg_names = ['value']
     execute_cos.optional_args = []
     execute_cos.have_to_respect_args_number = True
@@ -1425,6 +1449,7 @@ class BuiltInFunction(BaseFunction):
             ))
         tan = math.tan(value.value)
         return RTResult().success(Number(tan))
+
     execute_tan.arg_names = ['value']
     execute_tan.optional_args = []
     execute_tan.have_to_respect_args_number = True
@@ -1449,6 +1474,7 @@ class BuiltInFunction(BaseFunction):
                 exec_context
             ))
         return RTResult().success(Number(asin))
+
     execute_asin.arg_names = ['value']
     execute_asin.optional_args = []
     execute_asin.have_to_respect_args_number = True
@@ -1473,6 +1499,7 @@ class BuiltInFunction(BaseFunction):
                 exec_context
             ))
         return RTResult().success(Number(acos))
+
     execute_acos.arg_names = ['value']
     execute_acos.optional_args = []
     execute_acos.have_to_respect_args_number = True
@@ -1490,6 +1517,7 @@ class BuiltInFunction(BaseFunction):
             ))
         atan = math.atan(value.value)
         return RTResult().success(Number(atan))
+
     execute_atan.arg_names = ['value']
     execute_atan.optional_args = []
     execute_atan.have_to_respect_args_number = True
@@ -1502,6 +1530,7 @@ class BuiltInFunction(BaseFunction):
         if isinstance(code, Number) or isinstance(code, String):
             exit(code.value)
         exit()
+
     execute_exit.arg_names = []
     execute_exit.optional_args = ['code']
     execute_exit.have_to_respect_args_number = True
@@ -1512,6 +1541,7 @@ class BuiltInFunction(BaseFunction):
         # * value
         value_to_get_type = exec_context.symbol_table.get('value')
         return RTResult().success(String(value_to_get_type.type_))
+
     execute_type.arg_names = ['value']
     execute_type.optional_args = []
     execute_type.have_to_respect_args_number = True
@@ -1527,6 +1557,7 @@ class BuiltInFunction(BaseFunction):
             return error
 
         return result.success(str_value)
+
     execute_str.arg_names = ['value']
     execute_str.optional_args = []
     execute_str.have_to_respect_args_number = True
@@ -1542,6 +1573,7 @@ class BuiltInFunction(BaseFunction):
             return error
 
         return result.success(int_value)
+
     execute_int.arg_names = ['value']
     execute_int.optional_args = []
     execute_int.have_to_respect_args_number = True
@@ -1557,6 +1589,7 @@ class BuiltInFunction(BaseFunction):
             return error
 
         return result.success(float_value)
+
     execute_float.arg_names = ['value']
     execute_float.optional_args = []
     execute_float.have_to_respect_args_number = True
@@ -1572,6 +1605,7 @@ class BuiltInFunction(BaseFunction):
             return error
 
         return result.success(list_value)
+
     execute_list.arg_names = ['value']
     execute_list.optional_args = []
     execute_list.have_to_respect_args_number = True
@@ -1906,7 +1940,7 @@ class Parser:
         self.token_index -= amount
         self.update_current_token()
         return self.current_token
-    
+
     def update_current_token(self):
         if 0 <= self.token_index < len(self.tokens):
             self.current_token = self.tokens[self.token_index]

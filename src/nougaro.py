@@ -185,7 +185,7 @@ class Lexer:
             return Token(TT_NE, pos_start=pos_start, pos_end=self.pos), None
 
         self.advance()
-        return None, InvalidSyntaxError(pos_start, self.pos, "expected : '!=' but got : '!'")
+        return None, InvalidSyntaxError(pos_start, self.pos, "expected '!=', but got '!'.")
 
     def make_equals(self):
         token_type = TT_EQ
@@ -728,7 +728,7 @@ class BaseFunction(Value):
             return result.failure(
                 RunTimeError(
                     self.pos_start, self.pos_end,
-                    f"{len(args) - len(arg_names + optional_args)} too many args passed into '{self.name}'",
+                    f"{len(args) - len(arg_names + optional_args)} too many args passed into '{self.name}'.",
                     self.context
                 )
             )
@@ -737,7 +737,7 @@ class BaseFunction(Value):
             return result.failure(
                 RunTimeError(
                     self.pos_start, self.pos_end,
-                    f"{len(arg_names) - len(args)} too few args passed into '{self.name}'",
+                    f"{len(arg_names) - len(args)} too few args passed into '{self.name}'.",
                     self.context
                 )
             )
@@ -2041,7 +2041,7 @@ class Parser:
         if result.error is not None:
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'var', int, float, identifier, 'if', 'for', 'while', 'def' '+', '-', '(', '[', '|' or 'not'"
+                "expected 'var', int, float, identifier, 'if', 'for', 'while', 'def' '+', '-', '(', '[', '|' or 'not'."
             ))
 
         return result.success(node)

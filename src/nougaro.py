@@ -11,6 +11,7 @@ from src.strings_with_arrows import *
 from src.constants import *
 from src.position import *
 from src.tokens import *
+from src.set_symbol_table import set_symbol_table
 # built-in python imports
 import os
 import math
@@ -3148,58 +3149,7 @@ class Interpreter:
 # SYMBOL TABLE
 # ##########
 global_symbol_table = SymbolTable()
-# Constants
-global_symbol_table.set("null", Number.NULL)
-global_symbol_table.set("True", Number.TRUE)
-global_symbol_table.set("False", Number.FALSE)
-global_symbol_table.set("None", NoneValue(True))
-# MATHS
-global_symbol_table.set("math_pi", Number.MATH_PI)
-global_symbol_table.set("math_e", Number.MATH_E)
-global_symbol_table.set("sqrt_pi", Number.MATH_SQRT_PI)
-# Built-in functions
-global_symbol_table.set("void", BuiltInFunction.VOID)
-global_symbol_table.set("print", BuiltInFunction.PRINT)
-global_symbol_table.set("print_ret", BuiltInFunction.PRINT_RET)
-global_symbol_table.set("input", BuiltInFunction.INPUT)
-global_symbol_table.set("input_int", BuiltInFunction.INPUT_INT)
-global_symbol_table.set("clear", BuiltInFunction.CLEAR)
-
-global_symbol_table.set("is_int", BuiltInFunction.IS_INT)
-global_symbol_table.set("is_float", BuiltInFunction.IS_FLOAT)
-global_symbol_table.set("is_str", BuiltInFunction.IS_STRING)
-global_symbol_table.set("is_list", BuiltInFunction.IS_LIST)
-global_symbol_table.set("is_func", BuiltInFunction.IS_FUNCTION)
-global_symbol_table.set("is_none", BuiltInFunction.IS_NONE)
-global_symbol_table.set("type", BuiltInFunction.TYPE)
-global_symbol_table.set("str", BuiltInFunction.STR)
-global_symbol_table.set("list", BuiltInFunction.LIST)
-global_symbol_table.set("int", BuiltInFunction.INT)
-global_symbol_table.set("float", BuiltInFunction.FLOAT)
-
-global_symbol_table.set("append", BuiltInFunction.APPEND)
-global_symbol_table.set("pop", BuiltInFunction.POP)
-global_symbol_table.set("extend", BuiltInFunction.EXTEND)
-global_symbol_table.set("get", BuiltInFunction.GET)
-global_symbol_table.set("max", BuiltInFunction.MAX)
-global_symbol_table.set("min", BuiltInFunction.MIN)
-# Mathematical functions
-global_symbol_table.set("sqrt", BuiltInFunction.SQRT)
-global_symbol_table.set("math_root", BuiltInFunction.MATH_ROOT)
-global_symbol_table.set("radians", BuiltInFunction.RADIANS)
-global_symbol_table.set("degrees", BuiltInFunction.DEGREES)
-global_symbol_table.set("sin", BuiltInFunction.SIN)
-global_symbol_table.set("cos", BuiltInFunction.COS)
-global_symbol_table.set("tan", BuiltInFunction.TAN)
-global_symbol_table.set("asin", BuiltInFunction.ASIN)
-global_symbol_table.set("acos", BuiltInFunction.ACOS)
-global_symbol_table.set("atan", BuiltInFunction.ATAN)
-# Hum...
-global_symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))
-global_symbol_table.set("numberOfHornsOnAnUnicorn", Number(1))
-global_symbol_table.set("theLoneliestNumber", Number(1))
-
-global_symbol_table.set("exit", BuiltInFunction.EXIT)
+set_symbol_table(global_symbol_table, Number, NoneValue, BuiltInFunction)  # This function is in src.set_symbol_table
 
 
 # ##########

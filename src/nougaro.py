@@ -185,7 +185,7 @@ class Lexer:
             return Token(TT_NE, pos_start=pos_start, pos_end=self.pos), None
 
         self.advance()
-        return None, ExpectedCharError(pos_start, self.pos, "expected : '!=' but got : '!'")
+        return None, InvalidSyntaxError(pos_start, self.pos, "expected : '!=' but got : '!'")
 
     def make_equals(self):
         token_type = TT_EQ
@@ -2760,11 +2760,6 @@ class IllegalCharError(Error):
 class InvalidSyntaxError(Error):
     def __init__(self, pos_start, pos_end, details):
         super().__init__(pos_start, pos_end, "InvalidSyntaxError", details)
-
-
-class ExpectedCharError(Error):
-    def __init__(self, pos_start, pos_end, details):
-        super().__init__(pos_start, pos_end, "ExpectedCharacterError", details)
 
 
 class RunTimeError(Error):

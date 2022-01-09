@@ -316,6 +316,7 @@ class CustomBuiltInFuncMethod(Protocol):
     """
         Just a class for typing the methods `execute_{name}` in BuiltInFunction
     """
+    # This class was made to bypass a pycharm bug.
     arg_names: list[str]
     optional_args: list[str]
     have_to_respect_args_number: bool

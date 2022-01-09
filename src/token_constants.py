@@ -44,9 +44,9 @@ KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
     'for',
     'to',
     'step',
+    'in',
     'while',
     'def',
-    'in',
     'end'
 ]
 

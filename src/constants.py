@@ -49,6 +49,8 @@ BUILTIN_FUNCTIONS = [
     "list",
     "int",
     "float",
+    "max",
+    "min",
     *MATHEMATICAL_FUNCTIONS
 ]
 MATHEMATICAL_CONSTANTS = [

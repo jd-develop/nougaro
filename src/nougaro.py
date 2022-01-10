@@ -360,22 +360,22 @@ class Value:
         return None, self.illegal_operation(other)
 
     def get_comparison_eq(self, other):
-        return None, self.illegal_operation(other)
+        return None, self.can_not_compare(other)
 
     def get_comparison_ne(self, other):
-        return None, self.illegal_operation(other)
+        return None, self.can_not_compare(other)
 
     def get_comparison_lt(self, other):
-        return None, self.illegal_operation(other)
+        return None, self.can_not_compare(other)
 
     def get_comparison_gt(self, other):
-        return None, self.illegal_operation(other)
+        return None, self.can_not_compare(other)
 
     def get_comparison_lte(self, other):
-        return None, self.illegal_operation(other)
+        return None, self.can_not_compare(other)
 
     def get_comparison_gte(self, other):
-        return None, self.illegal_operation(other)
+        return None, self.can_not_compare(other)
 
     def and_(self, other):
         return None, self.illegal_operation(other)
@@ -426,6 +426,11 @@ class Value:
             )
         return RunTimeError(
             self.pos_start, other.pos_end, f'illegal operation between {self.type_} and {other.type_}.', self.context
+        )
+
+    def can_not_compare(self, other):
+        return RunTimeError(
+            self.pos_start, other.pos_end, f'can not compare {self.type_} and {other.type_}.', self.context
         )
 
 
@@ -480,6 +485,18 @@ class String(Value):
         for element in list(self.value):
             list_.append(String(element).set_context(self.context))
         return List(list_).set_context(self.context), None
+
+    def get_comparison_eq(self, other):
+        if isinstance(other, String):
+            return Number(int(self.value == other.value)).set_context(self.context), None
+        else:
+            return None, self.can_not_compare(other)
+
+    def get_comparison_ne(self, other):
+        if isinstance(other, String):
+            return Number(int(self.value != other.value)).set_context(self.context), None
+        else:
+            return None, self.can_not_compare(other)
 
     def copy(self):
         copy = String(self.value)
@@ -538,37 +555,37 @@ class Number(Value):
         if isinstance(other, Number):
             return Number(int(self.value == other.value)).set_context(self.context), None
         else:
-            return None, self.illegal_operation(other)
+            return None, self.can_not_compare(other)
 
     def get_comparison_ne(self, other):
         if isinstance(other, Number):
             return Number(int(self.value != other.value)).set_context(self.context), None
         else:
-            return None, self.illegal_operation(other)
+            return None, self.can_not_compare(other)
 
     def get_comparison_lt(self, other):
         if isinstance(other, Number):
             return Number(int(self.value < other.value)).set_context(self.context), None
         else:
-            return None, self.illegal_operation(other)
+            return None, self.can_not_compare(other)
 
     def get_comparison_gt(self, other):
         if isinstance(other, Number):
             return Number(int(self.value > other.value)).set_context(self.context), None
         else:
-            return None, self.illegal_operation(other)
+            return None, self.can_not_compare(other)
 
     def get_comparison_lte(self, other):
         if isinstance(other, Number):
             return Number(int(self.value <= other.value)).set_context(self.context), None
         else:
-            return None, self.illegal_operation(other)
+            return None, self.can_not_compare(other)
 
     def get_comparison_gte(self, other):
         if isinstance(other, Number):
             return Number(int(self.value >= other.value)).set_context(self.context), None
         else:
-            return None, self.illegal_operation(other)
+            return None, self.can_not_compare(other)
 
     def and_(self, other):
         if isinstance(other, Number):
@@ -700,6 +717,52 @@ class List(Value):
 
     def to_list_(self):
         return self, None
+
+    def is_eq(self, other):
+        if isinstance(other, List):
+            if len(self.elements) != len(other.elements):
+                return False
+            else:
+                for index, element in enumerate(self.elements):
+                    if isinstance(element, Number) and isinstance(other.elements[index], Number):
+                        if element.value == other.elements[index].value:
+                            continue
+                        else:
+                            return False
+                    elif isinstance(element, String) and isinstance(other.elements[index], String):
+                        if element.value == other.elements[index].value:
+                            continue
+                        else:
+                            return False
+                    elif isinstance(element, List) and isinstance(other.elements[index], List):
+                        if element.is_eq(other.elements[index]):
+                            continue
+                        else:
+                            return False
+                    else:
+                        return False
+                return True
+        else:
+            return None
+
+    def get_comparison_eq(self, other):
+        # does not work
+        is_eq = self.is_eq(other)
+        if is_eq is None:
+            return None, self.can_not_compare(other)
+        elif is_eq:
+            return Number.TRUE.set_context(self.context), None
+        else:
+            return Number.FALSE.set_context(self.context), None
+
+    def get_comparison_ne(self, other):
+        is_eq = self.is_eq(other)
+        if is_eq is None:
+            return None, self.can_not_compare(other)
+        elif is_eq:
+            return Number.FALSE.set_context(self.context), None
+        else:
+            return Number.TRUE.set_context(self.context), None
 
     def copy(self):
         copy = List(self.elements)

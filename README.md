@@ -18,7 +18,10 @@
  Prend en charge python 3.10
 
 # Documentation
+ Please refer to the [wiki](https://github.com/jd-develop/nougaro/wiki/) for documentation.
 
-Please refer to the [wiki](https://github.com/jd-develop/nougaro/wiki/) for documentation.
+# About syntax highlighting
+ A [file](highlight%20theme%20for%20NPP.xml) can be imported in Notepad++ for syntax highlighting, but only in dark theme.
+ Light theme will be uploaded later :D
 
 Enjoy :)

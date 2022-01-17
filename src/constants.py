@@ -64,6 +64,7 @@ VARS_CANNOT_MODIFY = [
     "False",
     "None",
     'noug_version',
+    'answerToTheLifeTheUniverseAndEverything',
     *KEYWORDS,
     *BUILTIN_FUNCTIONS,
     *MATHEMATICAL_CONSTANTS

@@ -1,6 +1,7 @@
 statements : NEWLINE* expr (NEWLINE+ expr)* NEWLINE
 
 expr       : KEYWORD:VAR IDENTIFIER EQ expr
+           : KEYWORD:DEL IDENTIFIER
            : comp_expr ((KEYWORD:AND|KEYWORD:OR|KEYWORD:XOR) comp_expr)*
 
 comp_expr  : KEYWORD:NOT comp_expr

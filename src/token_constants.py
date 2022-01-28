@@ -33,6 +33,7 @@ TT_NEWLINE = 'new line'       # new line
 TT_EOF = 'end of file'        # end of file
 KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
     'var',
+    'del',
     'and',
     'or',
     'not',

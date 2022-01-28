@@ -1819,6 +1819,14 @@ class VarAssignNode:
         self.pos_end = self.value_node.pos_end
 
 
+class VarDeleteNode:
+    def __init__(self, var_name_token):
+        self.var_name_token = var_name_token
+
+        self.pos_start = self.var_name_token.pos_start
+        self.pos_end = self.var_name_token.pos_end
+
+
 class BinOpNode:
     def __init__(self, left_node, op_token, right_node):
         self.left_node = left_node
@@ -1986,7 +1994,7 @@ class Parser:
 
     def parse(self):
         result = self.statements()
-        if result.error is None and self.current_token.type != TT_EOF:
+        if result.error is not None and self.current_token.type != TT_EOF:
             return result.failure(
                 InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
                                    "expected '+', '-', '*', '/', 'and', 'or' or 'xor'.")
@@ -2097,6 +2105,35 @@ class Parser:
             if result.error is not None:
                 return result
             return result.success(VarAssignNode(var_name, expr))
+
+        if self.current_token.matches(TT_KEYWORD, 'del'):
+            result.register_advancement()
+            self.advance()
+
+            if self.current_token.type != TT_IDENTIFIER:
+                if self.current_token.type != TT_KEYWORD:
+                    if self.current_token.type not in TOKENS_TO_QUOTE:
+                        error_msg = f"expected identifier, but got {self.current_token.type}."
+                    else:
+                        error_msg = f"expected identifier, but got '{self.current_token.type}'."
+                    return result.failure(
+                        InvalidSyntaxError(
+                            self.current_token.pos_start, self.current_token.pos_end, error_msg
+                        )
+                    )
+                else:
+                    return result.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        "use keyword as identifier is illegal."
+                    ))
+
+            var_name = self.current_token
+            result.register_advancement()
+            self.advance()
+
+            if result.error is not None:
+                return result
+            return result.success(VarDeleteNode(var_name))
 
         node = result.register(self.bin_op(self.comp_expr, (
             (TT_KEYWORD, "and"), (TT_KEYWORD, "or"), (TT_KEYWORD, 'xor'))))
@@ -3009,6 +3046,22 @@ class Interpreter:
                                                f"can not create a variable with builtin name '{var_name}'.",
                                                value.context))
         return result.success(value)
+
+    @staticmethod
+    def visit_VarDeleteNode(node: VarDeleteNode, context: Context):
+        result = RTResult()
+        var_name = node.var_name_token.value
+
+        if var_name not in context.symbol_table.symbols:
+            return result.failure(NotDefinedError(node.pos_start, node.pos_end, f"{var_name} is not defined.", context))
+
+        if var_name not in VARS_CANNOT_MODIFY:
+            context.symbol_table.remove(var_name)
+        else:
+            return result.failure(RunTimeError(node.pos_start, node.pos_end,
+                                               f"can not delete builtin variable '{var_name}'.",
+                                               context))
+        return result.success(NoneValue(False))
 
     def visit_IfNode(self, node: IfNode, context: Context):
         result = RTResult()

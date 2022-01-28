@@ -24,7 +24,8 @@ MATHEMATICAL_FUNCTIONS = [
     "tan",
     "asin",
     "acos",
-    "atan"
+    "atan",
+    "math_root"
 ]
 BUILTIN_FUNCTIONS = [
     "void",

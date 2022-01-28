@@ -3325,5 +3325,6 @@ def run(file_name, text, version: str = "not defined"):
     context.symbol_table = global_symbol_table
     result = interpreter.visit(ast.node, context)
     # print(context)
+    # pprint.pprint(global_symbol_table)
 
     return result.value, result.error

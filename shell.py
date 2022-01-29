@@ -8,6 +8,7 @@
 # nougaro modules imports
 import src.nougaro as nougaro
 from src.misc import print_in_red
+from src.values.basevalues import List, NoneValue
 # built in python imports
 import json
 
@@ -27,9 +28,9 @@ while True:
     if error is not None:
         print_in_red(error.as_string())
     elif result is not None:
-        if isinstance(result, nougaro.List):
+        if isinstance(result, List):
             if len(result.elements) == 1:
-                if not isinstance(result.elements[0], nougaro.NoneValue):
+                if not isinstance(result.elements[0], NoneValue):
                     print(result.elements[0])
                 else:
                     if result.elements[0].do_i_print:

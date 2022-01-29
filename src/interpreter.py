@@ -1,0 +1,400 @@
+#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+# this file is part of the NOUGARO language, created by Jean Dubois (https://github.com/jd-develop)
+# Public Domain
+
+# IMPORTS
+# nougaro modules imports
+from src.values.basevalues import Number, String, List, NoneValue
+from src.values.functions.function import Function
+from src.values.functions.base_function import BaseFunction
+from src.constants import VARS_CANNOT_MODIFY
+from src.nodes import *
+from src.errors import NotDefinedError, RunTimeError, RTIndexError
+from src.token_constants import *
+from src.runtime_result import RTResult
+from src.context import Context
+# built-in python imports
+# no imports
+
+
+# ##########
+# INTERPRETER
+# ##########
+class Interpreter:
+    # this class does not have __init__ method
+    def visit(self, node, context):
+        method_name = f'visit_{type(node).__name__}'
+        method = getattr(self, method_name, self.no_visit_method)
+        return method(node, context)
+
+    @staticmethod
+    def no_visit_method(node, context: Context):
+        print(context)
+        print(f"NOUGARO INTERNAL ERROR : No visit_{type(node).__name__} method defined in nougaro.Interpreter.\n"
+              f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with all informations "
+              f"above.")
+        raise Exception(f'No visit_{type(node).__name__} method defined in nougaro.Interpreter.')
+
+    @staticmethod
+    def visit_NumberNode(node: NumberNode, context: Context):
+        return RTResult().success(Number(node.token.value).set_context(context).set_pos(node.pos_start, node.pos_end))
+
+    @staticmethod
+    def visit_StringNode(node: StringNode, context: Context):
+        return RTResult().success(
+            String(node.token.value).set_context(context).set_pos(node.pos_start, node.pos_end)
+        )
+
+    def visit_ListNode(self, node: ListNode, context: Context):
+        result = RTResult()
+        elements = []
+
+        for element_node in node.element_nodes:
+            elements.append(result.register(self.visit(element_node, context)))
+            if result.error is not None:
+                return result
+
+        return result.success(List(elements).set_context(context).set_pos(node.pos_start, node.pos_end))
+
+    def visit_BinOpNode(self, node: BinOpNode, context: Context):
+        res = RTResult()
+        left = res.register(self.visit(node.left_node, context))
+        if res.error is not None:
+            return res
+        right = res.register(self.visit(node.right_node, context))
+        if res.error is not None:
+            return res
+
+        if node.op_token.type == TT_PLUS:
+            result, error = left.added_to(right)
+        elif node.op_token.type == TT_MINUS:
+            result, error = left.subbed_by(right)
+        elif node.op_token.type == TT_MUL:
+            result, error = left.multiplied_by(right)
+        elif node.op_token.type == TT_DIV:
+            result, error = left.dived_by(right)
+        elif node.op_token.type == TT_POW:
+            result, error = left.powered_by(right)
+        elif node.op_token.type == TT_EE:
+            result, error = left.get_comparison_eq(right)
+        elif node.op_token.type == TT_NE:
+            result, error = left.get_comparison_ne(right)
+        elif node.op_token.type == TT_LT:
+            result, error = left.get_comparison_lt(right)
+        elif node.op_token.type == TT_GT:
+            result, error = left.get_comparison_gt(right)
+        elif node.op_token.type == TT_LTE:
+            result, error = left.get_comparison_lte(right)
+        elif node.op_token.type == TT_GTE:
+            result, error = left.get_comparison_gte(right)
+        elif node.op_token.matches(TT_KEYWORD, 'and'):
+            result, error = left.and_(right)
+        elif node.op_token.matches(TT_KEYWORD, 'or'):
+            result, error = left.or_(right)
+        elif node.op_token.matches(TT_KEYWORD, 'xor'):
+            result, error = left.excl_or(right)
+        else:
+            print(context)
+            print("NOUGARO INTERNAL ERROR : Result is not defined after executing nougaro.Interpreter.visit_BinOpNode "
+                  "because of an invalid token.\n"
+                  "Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with the information "
+                  "below")
+            raise Exception("Result is not defined after executing nougaro.Interpreter.visit_BinOpNode")
+
+        if error is not None:
+            return res.failure(error)
+        else:
+            return res.success(result.set_pos(node.pos_start, node.pos_end))
+
+    def visit_UnaryOpNode(self, node: UnaryOpNode, context: Context):
+        result = RTResult()
+        number = result.register(self.visit(node.node, context))
+        if result.error is not None:
+            return result
+
+        error = None
+
+        if node.op_token.type == TT_MINUS:
+            number, error = number.multiplied_by(Number(-1))
+        elif node.op_token.matches(TT_KEYWORD, 'not'):
+            number, error = number.not_()
+
+        if error is not None:
+            return result.failure(error)
+        else:
+            return result.success(number.set_pos(node.pos_start, node.pos_end))
+
+    @staticmethod
+    def visit_VarAccessNode(node: VarAccessNode, context: Context):
+        result = RTResult()
+        var_name = node.var_name_token.value
+        value = context.symbol_table.get(var_name)
+
+        if value is None:
+            return result.failure(
+                NotDefinedError(
+                    node.pos_start, node.pos_end, f'{var_name} is not defined.', context
+                )
+            )
+
+        value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
+        return result.success(value)
+
+    def visit_VarAssignNode(self, node: VarAssignNode, context: Context):
+        result = RTResult()
+        var_name = node.var_name_token.value
+        value = result.register(self.visit(node.value_node, context))
+        if result.error is not None:
+            return result
+
+        if var_name not in VARS_CANNOT_MODIFY:
+            context.symbol_table.set(var_name, value)
+        else:
+            return result.failure(RunTimeError(node.pos_start, node.pos_end,
+                                               f"can not create a variable with builtin name '{var_name}'.",
+                                               value.context))
+        return result.success(value)
+
+    @staticmethod
+    def visit_VarDeleteNode(node: VarDeleteNode, context: Context):
+        result = RTResult()
+        var_name = node.var_name_token.value
+
+        if var_name not in context.symbol_table.symbols:
+            return result.failure(NotDefinedError(node.pos_start, node.pos_end, f"{var_name} is not defined.", context))
+
+        if var_name not in VARS_CANNOT_MODIFY:
+            context.symbol_table.remove(var_name)
+        else:
+            return result.failure(RunTimeError(node.pos_start, node.pos_end,
+                                               f"can not delete builtin variable '{var_name}'.",
+                                               context))
+        return result.success(NoneValue(False))
+
+    def visit_IfNode(self, node: IfNode, context: Context):
+        result = RTResult()
+        for condition, expr, should_return_none in node.cases:
+            condition_value = result.register(self.visit(condition, context))
+            if result.error is not None:
+                return result
+
+            if condition_value.is_true():
+                expr_value = result.register(self.visit(expr, context))
+                if result.error is not None:
+                    return result
+                return result.success(NoneValue(False) if should_return_none else expr_value)
+
+        if node.else_case is not None:
+            expr, should_return_none = node.else_case
+            else_value = result.register(self.visit(expr, context))
+            if result.error is not None:
+                return result
+            return result.success(NoneValue(False) if should_return_none else else_value)
+
+        return result.success(NoneValue(False))
+
+    def visit_ForNode(self, node: ForNode, context: Context):
+        result = RTResult()
+        elements = []
+
+        start_value = result.register(self.visit(node.start_value_node, context))
+        if result.error is not None:
+            return result
+
+        end_value = result.register(self.visit(node.end_value_node, context))
+        if result.error is not None:
+            return result
+
+        if node.step_value_node is not None:
+            step_value = result.register(self.visit(node.step_value_node, context))
+            if result.error is not None:
+                return result
+        else:
+            step_value = Number(1)
+
+        i = start_value.value
+        condition = (lambda: i < end_value.value) if step_value.value >= 0 else (lambda: i > end_value.value)
+
+        while condition():
+            context.symbol_table.set(node.var_name_token.value, Number(i))
+            i += step_value.value
+
+            elements.append(result.register(self.visit(node.body_node, context)))
+            if result.error is not None:
+                return result
+
+        return result.success(
+            NoneValue(False) if node.should_return_none else
+            List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+        )
+
+    def visit_ForNodeList(self, node: ForNodeList, context: Context):
+        result = RTResult()
+        elements = []
+
+        list_ = result.register(self.visit(node.list_node, context))
+        if result.error is not None:
+            return result
+
+        if isinstance(list_, List):
+            for i in list_.elements:
+                context.symbol_table.set(node.var_name_token.value, i)
+                elements.append(result.register(self.visit(node.body_node, context)))
+                if result.error is not None:
+                    return result
+            return result.success(
+                NoneValue(False) if node.should_return_none else
+                List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+            )
+        else:
+            return result.failure(
+                RunTimeError(node.list_node.pos_start, node.list_node.pos_end,
+                             f"expected a list after 'in', but found {list_.type_}.",
+                             context)
+            )
+
+    def visit_WhileNode(self, node: WhileNode, context: Context):
+        result = RTResult()
+        elements = []
+
+        while True:
+            condition = result.register(self.visit(node.condition_node, context))
+            if result.error is not None:
+                return result
+
+            if not condition.is_true():
+                break
+
+            elements.append(result.register(self.visit(node.body_node, context)))
+            if result.error is not None:
+                return result
+
+        return result.success(
+            NoneValue(False) if node.should_return_none else
+            List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+        )
+
+    @staticmethod
+    def visit_FuncDefNode(node: FuncDefNode, context: Context):
+        result = RTResult()
+        func_name = node.var_name_token.value if node.var_name_token is not None else None
+        body_node = node.body_node
+        arg_names = [arg_name.value for arg_name in node.arg_name_tokens]
+        func_value = Function(func_name, body_node, arg_names, node.should_return_none).set_context(context).set_pos(
+            node.pos_start, node.pos_end
+        )
+
+        if node.var_name_token is not None:
+            if func_name not in VARS_CANNOT_MODIFY:
+                context.symbol_table.set(func_name, func_value)
+            else:
+                return result.failure(RunTimeError(node.pos_start, node.pos_end,
+                                                   f"can not create a function with builtin name '{func_name}'.",
+                                                   context))
+
+        return result.success(func_value)
+
+    def visit_CallNode(self, node: CallNode, context: Context):
+        result = RTResult()
+        args = []
+
+        value_to_call = result.register(self.visit(node.node_to_call, context))
+        if result.error is not None:
+            return result
+        value_to_call = value_to_call.copy().set_pos(node.pos_start, node.pos_end)
+
+        if isinstance(value_to_call, BaseFunction):
+            # call the function
+            for arg_node in node.arg_nodes:
+                args.append(result.register(self.visit(arg_node, context)))
+                if result.error is not None:
+                    return result
+
+            return_value = result.register(value_to_call.execute(args, Interpreter))
+            if result.error is not None:
+                return result
+            return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
+            return result.success(return_value)
+
+        elif isinstance(value_to_call, List):
+            # get the element at the index given
+            if len(node.arg_nodes) == 1:
+                index = result.register(self.visit(node.arg_nodes[0], context))
+                if isinstance(index, Number):
+                    index = index.value
+                    try:
+                        return_value = value_to_call[index]
+                        return result.success(return_value)
+                    except Exception:
+                        return result.failure(
+                            RTIndexError(
+                                node.arg_nodes[0].pos_start, node.arg_nodes[0].pos_end,
+                                f'list index {index} out of range.',
+                                context
+                            )
+                        )
+                else:
+                    return result.failure(RunTimeError(
+                        node.pos_start, node.pos_end,
+                        f"indexes must be integers, not {index.type_}.",
+                        context
+                    ))
+            elif len(node.arg_nodes) > 1:
+                return_value = []
+                for arg_node in node.arg_nodes:
+                    index = result.register(self.visit(arg_node, context))
+                    if isinstance(index, Number):
+                        index = index.value
+                        try:
+                            return_value.append(value_to_call[index])
+                        except Exception:
+                            return result.failure(
+                                RTIndexError(
+                                    arg_node.pos_start, arg_node.pos_end,
+                                    f'list index {index} out of range.',
+                                    context
+                                )
+                            )
+                    else:
+                        return result.failure(RunTimeError(
+                            arg_node.pos_start, arg_node.pos_end,
+                            f"indexes must be integers, not {index.type_}.",
+                            context
+                        ))
+                return result.success(List(return_value).set_context(context).set_pos(node.pos_start, node.pos_end))
+            else:
+                return result.failure(RunTimeError(
+                    node.pos_start, node.pos_end,
+                    f"please give at least one index.",
+                    context
+                ))
+        else:
+            return result.failure(RunTimeError(
+                node.pos_start, node.pos_end,
+                f"{value_to_call.type_} is not callable.",
+                context
+            ))
+
+    def visit_AbsNode(self, node: AbsNode, context: Context):
+        result = RTResult()
+
+        value_to_abs = result.register(self.visit(node.node_to_abs, context))
+        if result.error is not None:
+            return result
+        value_to_abs = value_to_abs.copy().set_pos(node.pos_start, node.pos_end)
+
+        if not isinstance(value_to_abs, Number):
+            return result.failure(RunTimeError(
+                node.pos_start, node.pos_end,
+                f"expected int or float, but found {value_to_abs.type_}.",
+                context
+            ))
+
+        return_value = value_to_abs.abs_()
+        return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
+        return result.success(return_value)
+
+    @staticmethod
+    def visit_NoNode(node: NoNode, context: Context):
+        return RTResult().success(NoneValue(do_i_print=False))

@@ -9,7 +9,7 @@ def string_with_arrows(text: str, pos_start, pos_end) -> str:
         If you execute this line with nougaro, it crashes with an :
             InvalidSyntaxError : expected identifier, but got INT.
 
-        It generates this view of the line with arrows (^) under line :
+        It generates this view of the line with arrows (^) under the line :
             var 1a = 123
                 ^
 

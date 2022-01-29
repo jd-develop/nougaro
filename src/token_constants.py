@@ -14,6 +14,7 @@ TT_PLUS = '+'                 # +
 TT_MINUS = '-'                # -
 TT_MUL = '*'                  # *
 TT_DIV = '/'                  # /
+TT_PERC = '%'                 # %
 TT_POW = '^'                  # ^
 TT_EQ = '='                   # =
 TT_RPAREN = ')'               # )

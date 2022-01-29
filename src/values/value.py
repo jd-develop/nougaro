@@ -37,6 +37,10 @@ class Value:
     def multiplied_by(self, other):
         return None, self.illegal_operation(other)
 
+    def modded_by(self, other):
+        """ Mod """
+        return None, self.illegal_operation(other)
+
     def dived_by(self, other):
         return None, self.illegal_operation(other)
 

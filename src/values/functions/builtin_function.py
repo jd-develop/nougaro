@@ -194,6 +194,17 @@ class BuiltInFunction(BaseFunction):
     execute_is_float.optional_args = []
     execute_is_float.have_to_respect_args_number = True
 
+    def execute_is_num(self, exec_context: Context):
+        """Check if 'value' is an int or a float"""
+        # Params:
+        # * value
+        value = exec_context.symbol_table.get('value')
+        is_number = isinstance(value, Number)
+        return RTResult().success(TRUE if is_number else FALSE)
+    execute_is_num.arg_names = ['value']
+    execute_is_num.optional_args = []
+    execute_is_num.have_to_respect_args_number = True
+
     def execute_is_list(self, exec_context: Context):
         """Check if 'value' is a List"""
         # Params:

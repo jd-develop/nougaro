@@ -18,6 +18,7 @@ CLEAR = BuiltInFunction('clear')
 
 IS_INT = BuiltInFunction('is_int')
 IS_FLOAT = BuiltInFunction('is_float')
+IS_NUM = BuiltInFunction('is_num')
 IS_STRING = BuiltInFunction('is_str')
 IS_LIST = BuiltInFunction('is_list')
 IS_FUNCTION = BuiltInFunction('is_func')

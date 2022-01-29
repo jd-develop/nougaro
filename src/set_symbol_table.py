@@ -35,6 +35,7 @@ def set_symbol_table(symbol_table: SymbolTable):
 
     symbol_table.set("is_int", IS_INT)
     symbol_table.set("is_float", IS_FLOAT)
+    symbol_table.set("is_num", IS_NUM)
     symbol_table.set("is_str", IS_STRING)
     symbol_table.set("is_list", IS_LIST)
     symbol_table.set("is_func", IS_FUNCTION)

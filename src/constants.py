@@ -36,6 +36,7 @@ BUILTIN_FUNCTIONS = [
     "clear",
     "is_int",
     "is_float",
+    "is_num",
     "is_str",
     "is_list",
     "is_func",

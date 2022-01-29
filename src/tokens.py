@@ -3,6 +3,8 @@
 # this file is part of the NOUGARO language, created by Jean Dubois (https://github.com/jd-develop)
 # Public Domain
 
+# NO IMPORTS
+
 # ##########
 # TOKENS
 # ##########

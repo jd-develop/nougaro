@@ -3,11 +3,15 @@
 # this file is part of the NOUGARO language, created by Jean Dubois (https://github.com/jd-develop)
 
 # IMPORTS
+# nougaro modules imports
+from src.symbol_table import SymbolTable
+# built-in python imports
 # no imports
 
-def set_symbol_table(symbol_table, number, none_value, builtin_func):
+
+def set_symbol_table(symbol_table: SymbolTable, number, none_value, builtin_func):
     """Configures the global symbol table
-    :param symbol_table: src.nougaro.SymbolTable
+    :param symbol_table: src.symbol_table.SymbolTable
     :param number: src.Nougaro.Number
     :param none_value: src.Nougaro.NoneValue
     :param builtin_func: src.Nougaro.BuiltInFunc

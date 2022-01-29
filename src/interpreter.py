@@ -76,6 +76,8 @@ class Interpreter:
             result, error = left.dived_by(right)
         elif node.op_token.type == TT_PERC:
             result, error = left.modded_by(right)
+        elif node.op_token.type == TT_FLOORDIV:
+            result, error = left.floor_dived_by(right)
         elif node.op_token.type == TT_POW:
             result, error = left.powered_by(right)
         elif node.op_token.type == TT_EE:

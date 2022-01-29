@@ -61,7 +61,7 @@ class Lexer:
                 tokens.append(Token(TT_MUL, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '/':
-                tokens.append(Token(TT_DIV, pos_start=self.pos))
+                tokens.append(self.make_div())
                 self.advance()
             elif self.current_char == '%':
                 tokens.append(Token(TT_PERC, pos_start=self.pos))
@@ -107,6 +107,17 @@ class Lexer:
         tokens.append(Token(TT_EOF, pos_start=self.pos))
         # print(tokens)
         return tokens, None
+
+    def make_div(self):
+        token_type = TT_DIV
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char == '/':
+            self.advance()
+            token_type = TT_FLOORDIV
+
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_string(self, quote='"'):
         string_ = ''

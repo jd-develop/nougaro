@@ -9,7 +9,7 @@ comp_expr  : KEYWORD:NOT comp_expr
 
 arith_expr : term ((PLUS|MINUS) term)*
 
-term       : factor ((MUL|DIV|PERC) factor)*
+term       : factor ((MUL|DIV|PERC|FLOORDIV) factor)*
 
 factor     : (PLUS|MINUS) factor
 

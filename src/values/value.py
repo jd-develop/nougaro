@@ -38,7 +38,11 @@ class Value:
         return None, self.illegal_operation(other)
 
     def modded_by(self, other):
-        """ Mod """
+        """ Modulo """
+        return None, self.illegal_operation(other)
+
+    def floor_dived_by(self, other):
+        """ Floor division """
         return None, self.illegal_operation(other)
 
     def dived_by(self, other):

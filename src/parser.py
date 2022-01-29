@@ -29,10 +29,10 @@ class Parser:
 
     def parse(self):
         result = self.statements()
-        if result.error is not None and self.current_token.type != TT_EOF:
+        if result.error is None and self.current_token.type != TT_EOF:
             return result.failure(
                 InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                   "expected '+', '-', '*', '/', '%', 'and', 'or' or 'xor'.")
+                                   "expected '+', '-', '*', '/', '//', '%', 'and', 'or' or 'xor'.")
             )
         return result
 
@@ -203,7 +203,7 @@ class Parser:
         return self.bin_op(self.term, (TT_PLUS, TT_MINUS))
 
     def term(self):
-        return self.bin_op(self.factor, (TT_MUL, TT_DIV, TT_PERC))
+        return self.bin_op(self.factor, (TT_MUL, TT_DIV, TT_PERC, TT_FLOORDIV))
 
     def factor(self):
         result = ParseResult()

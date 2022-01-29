@@ -125,13 +125,23 @@ class Number(Value):
         else:
             return None, self.illegal_operation(other)
 
-    def modded_by(self, other):  # MOD
+    def modded_by(self, other):  # MODULO
         if isinstance(other, Number):
             if other.value == 0:
                 return None, RTArithmeticError(
                     other.pos_start, other.pos_end, 'division by zero is not possible.', self.context
                 )
             return Number(self.value % other.value).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
+
+    def floor_dived_by(self, other):  # FLOOR_DIVISION
+        if isinstance(other, Number):
+            if other.value == 0:
+                return None, RTArithmeticError(
+                    other.pos_start, other.pos_end, 'division by zero is not possible.', self.context
+                )
+            return Number(self.value // other.value).set_context(self.context), None
         else:
             return None, self.illegal_operation(other)
 

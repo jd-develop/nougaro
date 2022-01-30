@@ -54,6 +54,12 @@ class BuiltInFunction(BaseFunction):
               f"above.")
         raise Exception(f'No execute_{self.name} method defined in nougaro.BuildInFunction.')
 
+    def copy(self):
+        copy = BuiltInFunction(self.name)
+        copy.set_context(self.context)
+        copy.set_pos(self.pos_start, self.pos_end)
+        return copy
+
     # ==================
     # BUILD IN FUNCTIONS
     # ==================
@@ -814,9 +820,3 @@ class BuiltInFunction(BaseFunction):
     execute_list.have_to_respect_args_number = True
 
     # ==================
-
-    def copy(self):
-        copy = BuiltInFunction(self.name)
-        copy.set_context(self.context)
-        copy.set_pos(self.pos_start, self.pos_end)
-        return copy

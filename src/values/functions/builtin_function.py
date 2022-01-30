@@ -11,8 +11,9 @@ from src.values.basevalues import *
 from src.values.specific_values.number import *
 from src.misc import CustomBuiltInFuncMethod
 # built-in python imports
-import os
-import math
+from os import system as os_system, name as os_name
+from math import sqrt as math_sqrt, degrees as math_degrees, radians as math_radians, sin as math_sin, cos as math_cos
+from math import tan as math_tan, asin as math_asin, acos as math_acos, atan as math_atan
 
 
 class BuiltInFunction(BaseFunction):
@@ -155,7 +156,7 @@ class BuiltInFunction(BaseFunction):
     def execute_clear(self):
         """Clear the screen"""
         # No params.
-        os.system('cls' if (os.name == "nt" or os.name == "Windows") else 'clear')
+        os_system('cls' if (os_name == "nt" or os_name == "Windows") else 'clear')
         return RTResult().success(NoneValue(False))
 
     execute_clear.arg_names = []
@@ -207,6 +208,7 @@ class BuiltInFunction(BaseFunction):
         value = exec_context.symbol_table.get('value')
         is_number = isinstance(value, Number)
         return RTResult().success(TRUE if is_number else FALSE)
+
     execute_is_num.arg_names = ['value']
     execute_is_num.optional_args = []
     execute_is_num.have_to_respect_args_number = True
@@ -526,7 +528,7 @@ class BuiltInFunction(BaseFunction):
                 exec_context
             ))
 
-        sqrt_ = math.sqrt(value.value)
+        sqrt_ = math_sqrt(value.value)
         return RTResult().success(Number(sqrt_))
 
     execute_sqrt.arg_names = ['value']
@@ -584,7 +586,7 @@ class BuiltInFunction(BaseFunction):
                 "first argument of built-in function 'degrees' must be a number (angle in radians).",
                 exec_context
             ))
-        degrees = math.degrees(value.value)
+        degrees = math_degrees(value.value)
         return RTResult().success(Number(degrees))
 
     execute_degrees.arg_names = ['value']
@@ -602,7 +604,7 @@ class BuiltInFunction(BaseFunction):
                 "first argument of built-in function 'radians' must be a number (angle in degrees).",
                 exec_context
             ))
-        radians = math.radians(value.value)
+        radians = math_radians(value.value)
         return RTResult().success(Number(radians))
 
     execute_radians.arg_names = ['value']
@@ -620,7 +622,7 @@ class BuiltInFunction(BaseFunction):
                 "first argument of built-in function 'sin' must be a number (angle in radians).",
                 exec_context
             ))
-        sin = math.sin(value.value)
+        sin = math_sin(value.value)
         return RTResult().success(Number(sin))
 
     execute_sin.arg_names = ['value']
@@ -638,7 +640,7 @@ class BuiltInFunction(BaseFunction):
                 "first argument of built-in function 'cos' must be a number (angle in radians).",
                 exec_context
             ))
-        cos = math.cos(value.value)
+        cos = math_cos(value.value)
         return RTResult().success(Number(cos))
 
     execute_cos.arg_names = ['value']
@@ -656,7 +658,7 @@ class BuiltInFunction(BaseFunction):
                 "first argument of built-in function 'tan' must be a number (angle in radians).",
                 exec_context
             ))
-        tan = math.tan(value.value)
+        tan = math_tan(value.value)
         return RTResult().success(Number(tan))
 
     execute_tan.arg_names = ['value']
@@ -675,7 +677,7 @@ class BuiltInFunction(BaseFunction):
                 exec_context
             ))
         try:
-            asin = math.asin(value.value)
+            asin = math_asin(value.value)
         except ValueError:
             return RTResult().failure(RTArithmeticError(
                 self.pos_start, self.pos_end,
@@ -700,7 +702,7 @@ class BuiltInFunction(BaseFunction):
                 exec_context
             ))
         try:
-            acos = math.acos(value.value)
+            acos = math_acos(value.value)
         except ValueError:
             return RTResult().failure(RTArithmeticError(
                 self.pos_start, self.pos_end,
@@ -724,7 +726,7 @@ class BuiltInFunction(BaseFunction):
                 "first argument of built-in function 'atan' must be a number.",
                 exec_context
             ))
-        atan = math.atan(value.value)
+        atan = math_atan(value.value)
         return RTResult().success(Number(atan))
 
     execute_atan.arg_names = ['value']

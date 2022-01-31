@@ -821,4 +821,15 @@ class BuiltInFunction(BaseFunction):
     execute_list.optional_args = []
     execute_list.have_to_respect_args_number = True
 
+    def execute_rickroll(self):
+        """Hum... You haven't seen anything. Close the doc please. Right now."""
+        # no params
+        import webbrowser
+        webbrowser.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", new=2)
+        return RTResult().success(String("I think you've been rickrolled..."))
+
+    execute_rickroll.arg_names = []
+    execute_rickroll.optional_args = []
+    execute_rickroll.have_to_respect_args_number = False
+
     # ==================

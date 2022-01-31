@@ -49,3 +49,5 @@ ACOS = BuiltInFunction('acos')
 ATAN = BuiltInFunction('atan')
 
 EXIT = BuiltInFunction('exit')
+
+RICKROLL = BuiltInFunction('rickroll')

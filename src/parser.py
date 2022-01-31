@@ -123,11 +123,14 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            if self.current_token.type != TT_EQ:
+            equal = self.current_token
+            equals = [TT_EQ, TT_PLUSEQ, TT_MINUSEQ, TT_MULTEQ, TT_DIVEQ, TT_POWEQ, TT_FLOORDIVEQ, TT_PERCEQ]
+
+            if self.current_token.type not in equals:
                 if self.current_token.type not in TOKENS_TO_QUOTE:
-                    error_msg = f"expected '=', but got {self.current_token.type}."
+                    error_msg = f"expected an equal, but got {self.current_token.type}."
                 else:
-                    error_msg = f"expected '=', but got '{self.current_token.type}'."
+                    error_msg = f"expected an equal, but got '{self.current_token.type}'."
                 return result.failure(
                     InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end, error_msg
@@ -139,7 +142,7 @@ class Parser:
             expr = result.register(self.expr())
             if result.error is not None:
                 return result
-            return result.success(VarAssignNode(var_name, expr))
+            return result.success(VarAssignNode(var_name, expr, equal))
 
         if self.current_token.matches(TT_KEYWORD, 'del'):
             result.register_advancement()

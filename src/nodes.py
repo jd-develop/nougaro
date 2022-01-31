@@ -6,6 +6,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.tokens import Token
+from src.token_constants import TT_EQ
 # built-in python imports
 # no imports
 
@@ -52,15 +53,16 @@ class VarAccessNode:
 
 
 class VarAssignNode:
-    def __init__(self, var_name_token, value_node):
+    def __init__(self, var_name_token, value_node, equal=TT_EQ):
         self.var_name_token = var_name_token
         self.value_node = value_node
+        self.equal = equal
 
         self.pos_start = self.var_name_token.pos_start
         self.pos_end = self.value_node.pos_end
 
     def __repr__(self):
-        return f'({self.var_name_token} <- {self.value_node})'
+        return f'(var_assign:{self.var_name_token} {self.equal} {self.value_node})'
 
 
 class VarDeleteNode:
@@ -69,6 +71,9 @@ class VarDeleteNode:
 
         self.pos_start = self.var_name_token.pos_start
         self.pos_end = self.var_name_token.pos_end
+
+    def __repr__(self):
+        return f'(var_delete:{self.var_name_token})'
 
 
 class BinOpNode:
@@ -185,6 +190,9 @@ class CallNode:
         else:
             self.pos_end = self.node_to_call.pos_end
 
+    def __repr__(self):
+        return f'(call:{self.node_to_call})'
+
 
 class AbsNode:
     def __init__(self, node_to_abs):
@@ -192,6 +200,9 @@ class AbsNode:
 
         self.pos_start = self.node_to_abs.pos_start
         self.pos_end = self.node_to_abs.pos_end
+
+    def __repr__(self):
+        return f'|{self.node_to_abs}|'
 
 
 class NoNode:

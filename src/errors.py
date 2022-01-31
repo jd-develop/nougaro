@@ -45,7 +45,6 @@ class InvalidSyntaxError(Error):
 
 class RunTimeError(Error):
     def __init__(self, pos_start, pos_end, details, context: Context, rt_error: bool = True, error_name: str = ""):
-
         super().__init__(pos_start, pos_end, "RunTimeError" if rt_error else error_name, details)
         self.context = context
 
@@ -70,6 +69,10 @@ class RunTimeError(Error):
             ctx = ctx.parent
 
         return "Traceback (more recent call last) :\n" + result
+
+    def set_pos(self, pos_start, pos_end):
+        self.pos_start = pos_start
+        self.pos_end = pos_end
 
 
 class RTIndexError(RunTimeError):

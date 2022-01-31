@@ -1,6 +1,8 @@
+This is the AST of the Nougaro language. This AST is computed by the Parser (src.parser.Parser).
+
 statements : NEWLINE* expr (NEWLINE+ expr)* NEWLINE
 
-expr       : KEYWORD:VAR IDENTIFIER EQ expr
+expr       : KEYWORD:VAR IDENTIFIER (EQ|PLUSEQ|MINUSEQ|MULTEQ|DIVEQ|POWEQ|FLOORDIVEQ|PERCEQ) expr
            : KEYWORD:DEL IDENTIFIER
            : comp_expr ((KEYWORD:AND|KEYWORD:OR|KEYWORD:XOR) comp_expr)*
 

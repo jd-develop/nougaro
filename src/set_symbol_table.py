@@ -67,5 +67,6 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))
     symbol_table.set("numberOfHornsOnAnUnicorn", Number(1))
     symbol_table.set("theLoneliestNumber", Number(1))
+    symbol_table.set("rickroll", RICKROLL)
 
     symbol_table.set("exit", EXIT)

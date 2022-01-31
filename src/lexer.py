@@ -38,6 +38,7 @@ class Lexer:
             elif self.current_char in ';\n':  # semicolons and new lines
                 tokens.append(Token(TT_NEWLINE, pos_start=self.pos))
                 self.advance()
+
             elif self.current_char in DIGITS:
                 number, error = self.make_number()
                 if error is None:
@@ -52,22 +53,20 @@ class Lexer:
                     tokens.append(string_)
                 else:
                     return [], error
+
             elif self.current_char == '+':
-                tokens.append(Token(TT_PLUS, pos_start=self.pos))
-                self.advance()
+                tokens.append(self.make_plus())
             elif self.current_char == '-':
                 tokens.append(self.make_minus_or_arrow())
             elif self.current_char == '*':
-                tokens.append(Token(TT_MUL, pos_start=self.pos))
-                self.advance()
+                tokens.append(self.make_mul())
             elif self.current_char == '/':
                 tokens.append(self.make_div())
-            elif self.current_char == '%':
-                tokens.append(Token(TT_PERC, pos_start=self.pos))
-                self.advance()
             elif self.current_char == '^':
-                tokens.append(Token(TT_POW, pos_start=self.pos))
-                self.advance()
+                tokens.append(self.make_pow())
+            elif self.current_char == '%':
+                tokens.append(self.make_perc())
+
             elif self.current_char == '(':
                 tokens.append(Token(TT_LPAREN, pos_start=self.pos))
                 self.advance()
@@ -83,6 +82,7 @@ class Lexer:
             elif self.current_char == '|':
                 tokens.append(Token(TT_ABS, pos_start=self.pos))
                 self.advance()
+
             elif self.current_char == '!':
                 token, error = self.make_not_equals()
                 if error is not None:
@@ -94,6 +94,7 @@ class Lexer:
                 tokens.append(self.make_less_than())
             elif self.current_char == '>':
                 tokens.append(self.make_greater_than())
+
             elif self.current_char == ',':
                 tokens.append(Token(TT_COMMA, pos_start=self.pos))
                 self.advance()
@@ -107,6 +108,39 @@ class Lexer:
         # print(tokens)
         return tokens, None
 
+    def make_plus(self):
+        token_type = TT_PLUS
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char == '=':
+            self.advance()
+            token_type = TT_PLUSEQ
+
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
+
+    def make_minus(self):
+        token_type = TT_MINUS
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char == '=':
+            self.advance()
+            token_type = TT_MINUSEQ
+
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
+
+    def make_mul(self):
+        token_type = TT_MUL
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char == '=':
+            self.advance()
+            token_type = TT_MULTEQ
+
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
+
     def make_div(self):
         token_type = TT_DIV
         pos_start = self.pos.copy()
@@ -115,6 +149,34 @@ class Lexer:
         if self.current_char == '/':
             self.advance()
             token_type = TT_FLOORDIV
+            if self.current_char == '=':
+                self.advance()
+                token_type = TT_FLOORDIVEQ
+        elif self.current_char == '=':
+            self.advance()
+            token_type = TT_DIVEQ
+
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
+
+    def make_pow(self):
+        token_type = TT_POW
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char == '=':
+            self.advance()
+            token_type = TT_POWEQ
+
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
+
+    def make_perc(self):
+        token_type = TT_PERC
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char == '=':
+            self.advance()
+            token_type = TT_PERCEQ
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
@@ -235,5 +297,8 @@ class Lexer:
         if self.current_char == '>':
             self.advance()
             token_type = TT_ARROW
+        elif self.current_char == '=':
+            self.advance()
+            token_type = TT_MINUSEQ
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)

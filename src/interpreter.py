@@ -5,7 +5,7 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.values.basevalues import Number, String, List, NoneValue
+from src.values.basevalues import Number, String, List, NoneValue, Value
 from src.values.specific_values.number import FALSE
 from src.values.functions.function import Function
 from src.values.functions.base_function import BaseFunction
@@ -205,16 +205,48 @@ class Interpreter:
         result = RTResult()
         var_name = node.var_name_token.value
         value = result.register(self.visit(node.value_node, context))
+        equal = node.equal.type
         if result.error is not None:
             return result
 
         if var_name not in VARS_CANNOT_MODIFY:
-            context.symbol_table.set(var_name, value)
+            if equal == TT_EQ:
+                context.symbol_table.set(var_name, value)
+                final_value = value
+            else:
+                if var_name in context.symbol_table.symbols:
+                    var_actual_value: Value = context.symbol_table.get(var_name)
+                    if equal == TT_PLUSEQ:
+                        final_value, error = var_actual_value.added_to(value)
+                    elif equal == TT_MINUSEQ:
+                        final_value, error = var_actual_value.subbed_by(value)
+                    elif equal == TT_MULTEQ:
+                        final_value, error = var_actual_value.multiplied_by(value)
+                    elif equal == TT_DIVEQ:
+                        final_value, error = var_actual_value.dived_by(value)
+                    elif equal == TT_POWEQ:
+                        final_value, error = var_actual_value.powered_by(value)
+                    elif equal == TT_FLOORDIVEQ:
+                        final_value, error = var_actual_value.floor_dived_by(value)
+                    elif equal == TT_PERCEQ:
+                        final_value, error = var_actual_value.modded_by(value)
+                    else:  # this is not supposed to happen
+                        error = None
+                        final_value = value
+
+                    if error is not None:
+                        error.set_pos(node.pos_start, node.pos_end)
+                        return result.failure(error)
+                    context.symbol_table.set(var_name, final_value)
+                else:
+                    return result.failure(NotDefinedError(node.pos_start, node.pos_end,
+                                                          f"'{var_name}' is not defined yet.",
+                                                          value.context))
         else:
             return result.failure(RunTimeError(node.pos_start, node.pos_end,
                                                f"can not create a variable with builtin name '{var_name}'.",
                                                value.context))
-        return result.success(value)
+        return result.success(final_value)
 
     @staticmethod
     def visit_VarDeleteNode(node: VarDeleteNode, context: Context):

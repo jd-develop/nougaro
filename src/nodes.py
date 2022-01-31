@@ -59,6 +59,9 @@ class VarAssignNode:
         self.pos_start = self.var_name_token.pos_start
         self.pos_end = self.value_node.pos_end
 
+    def __repr__(self):
+        return f'({self.var_name_token} <- {self.value_node})'
+
 
 class VarDeleteNode:
     def __init__(self, var_name_token):
@@ -79,6 +82,17 @@ class BinOpNode:
 
     def __repr__(self):
         return f'({self.left_node}, {self.op_token}, {self.right_node})'
+
+
+class BinOpCompNode:
+    def __init__(self, nodes_and_tokens_list):
+        self.nodes_and_tokens_list = nodes_and_tokens_list
+
+        self.pos_start = self.nodes_and_tokens_list[0].pos_start
+        self.pos_end = self.nodes_and_tokens_list[-1].pos_end
+
+    def __repr__(self):
+        return f'[{", ".join([str(x) for x in self.nodes_and_tokens_list])}]'
 
 
 class UnaryOpNode:

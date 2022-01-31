@@ -6,6 +6,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.values.basevalues import Number, String, List, NoneValue
+from src.values.specific_values.number import FALSE
 from src.values.functions.function import Function
 from src.values.functions.base_function import BaseFunction
 from src.constants import VARS_CANNOT_MODIFY
@@ -100,16 +101,71 @@ class Interpreter:
             result, error = left.excl_or(right)
         else:
             print(context)
-            print("NOUGARO INTERNAL ERROR : Result is not defined after executing nougaro.Interpreter.visit_BinOpNode "
-                  "because of an invalid token.\n"
+            print("NOUGARO INTERNAL ERROR : Result is not defined after executing "
+                  "src.interpreter.Interpreter.visit_BinOpNode because of an invalid token.\n"
                   "Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with the information "
                   "below")
-            raise Exception("Result is not defined after executing nougaro.Interpreter.visit_BinOpNode")
+            raise Exception("Result is not defined after executing src.interpreter.Interpreter.visit_BinOpNode")
 
         if error is not None:
             return res.failure(error)
         else:
             return res.success(result.set_pos(node.pos_start, node.pos_end))
+
+    def visit_BinOpCompNode(self, node: BinOpCompNode, context: Context):
+        res = RTResult()
+        nodes_and_tokens_list = node.nodes_and_tokens_list
+        if len(nodes_and_tokens_list) == 1:
+            return self.visit(nodes_and_tokens_list[0], context)
+        visited_nodes_and_tokens_list = []
+
+        # just list of visited nodes
+        for index, element in enumerate(nodes_and_tokens_list):
+            if index % 2 == 0:  # we take only nodes and not ops
+                visited_nodes_and_tokens_list.append(res.register(self.visit(element, context)))
+                if res.error is not None:
+                    return res
+            else:
+                visited_nodes_and_tokens_list.append(element)
+
+        test_result = FALSE
+        # let's test!
+        for index, element in enumerate(visited_nodes_and_tokens_list):
+            if index % 2 == 0:  # we take only visited nodes and not ops
+                # test
+                try:
+                    op_token = visited_nodes_and_tokens_list[index + 1]
+                    right = visited_nodes_and_tokens_list[index + 2]
+                except IndexError:
+                    break
+                if op_token.type == TT_EE:
+                    test_result, error = element.get_comparison_eq(right)
+                elif op_token.type == TT_NE:
+                    test_result, error = element.get_comparison_ne(right)
+                elif op_token.type == TT_LT:
+                    test_result, error = element.get_comparison_lt(right)
+                elif op_token.type == TT_GT:
+                    test_result, error = element.get_comparison_gt(right)
+                elif op_token.type == TT_LTE:
+                    test_result, error = element.get_comparison_lte(right)
+                elif op_token.type == TT_GTE:
+                    test_result, error = element.get_comparison_gte(right)
+                else:
+                    print(context)
+                    print(
+                        "NOUGARO INTERNAL ERROR : Result is not defined after executing "
+                        "src.interpreter.Interpreter.visit_BinOpCompNode because of an invalid token.\n"
+                        "Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with the "
+                        "information below")
+                    raise Exception("Result is not defined after executing "
+                                    "src.interpreter.Interpreter.visit_BinOpCompNode")
+                if error is not None:
+                    return res
+                if test_result.value == 0:
+                    return res.success(test_result.set_pos(node.pos_start, node.pos_end))
+            else:
+                pass
+        return res.success(test_result.set_pos(node.pos_start, node.pos_end))
 
     def visit_UnaryOpNode(self, node: UnaryOpNode, context: Context):
         result = RTResult()

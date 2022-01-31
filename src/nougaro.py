@@ -46,6 +46,7 @@ def run(file_name, text, version: str = "not defined"):
     ast = parser.parse()
     if ast.error is not None:
         return None, ast.error
+    # print(ast)
 
     # run the code (interpreter)
     interpreter = src.interpreter.Interpreter()

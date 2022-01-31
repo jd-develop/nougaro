@@ -193,7 +193,8 @@ class Parser:
                 return result
             return result.success(UnaryOpNode(op_token, node))
 
-        node = result.register(self.bin_op(self.arith_expr, (TT_EE, TT_NE, TT_LT, TT_GT, TT_LTE, TT_GTE)))
+        node = result.register(self.bin_op(self.arith_expr, (TT_EE, TT_NE, TT_LT, TT_GT, TT_LTE, TT_GTE),
+                                           left_has_priority=False))
         if result.error is not None:
             return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
                                                      "expected int, float, identifier, '+', '-', '(', '[' or 'not'."))
@@ -846,7 +847,9 @@ class Parser:
             True
         ))
 
-    def bin_op(self, func_a, ops, func_b=None):
+    def bin_op(self, func_a, ops, func_b=None, left_has_priority: bool = True):
+        # param left_has_priority is used to know if we have to write (for exemple) ((int:3, ==, int:3), ==, int:3)
+        # or (int:3, ==, int:3, ==, int:3)
         if func_b is None:
             func_b = func_a
         result = ParseResult()
@@ -854,12 +857,25 @@ class Parser:
         if result.error is not None:
             return result
 
-        while self.current_token.type in ops or (self.current_token.type, self.current_token.value) in ops:
-            op_token = self.current_token
-            result.register_advancement()
-            self.advance()
-            right = result.register(func_b())
-            if result.error:
-                return result
-            left = BinOpNode(left, op_token, right)
-        return result.success(left)
+        if left_has_priority:
+            while self.current_token.type in ops or (self.current_token.type, self.current_token.value) in ops:
+                op_token = self.current_token
+                result.register_advancement()
+                self.advance()
+                right = result.register(func_b())
+                if result.error is not None:
+                    return result
+                left = BinOpNode(left, op_token, right)
+            return result.success(left)
+        else:
+            nodes_and_tokens_list = [left]
+            while self.current_token.type in ops or (self.current_token.type, self.current_token.value) in ops:
+                op_token = self.current_token
+                result.register_advancement()
+                self.advance()
+                right = result.register(func_b())
+                if result.error is not None:
+                    return result
+                nodes_and_tokens_list.append(op_token)
+                nodes_and_tokens_list.append(right)
+            return result.success(BinOpCompNode(nodes_and_tokens_list))

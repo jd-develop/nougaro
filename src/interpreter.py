@@ -194,7 +194,7 @@ class Interpreter:
         if value is None:
             return result.failure(
                 NotDefinedError(
-                    node.pos_start, node.pos_end, f'{var_name} is not defined.', context
+                    node.pos_start, node.pos_end, f"name '{var_name}' is not defined.", context
                 )
             )
 
@@ -240,7 +240,7 @@ class Interpreter:
                     context.symbol_table.set(var_name, final_value)
                 else:
                     return result.failure(NotDefinedError(node.pos_start, node.pos_end,
-                                                          f"'{var_name}' is not defined yet.",
+                                                          f"name '{var_name}' is not defined yet.",
                                                           value.context))
         else:
             return result.failure(RunTimeError(node.pos_start, node.pos_end,
@@ -254,13 +254,14 @@ class Interpreter:
         var_name = node.var_name_token.value
 
         if var_name not in context.symbol_table.symbols:
-            return result.failure(NotDefinedError(node.pos_start, node.pos_end, f"{var_name} is not defined.", context))
+            return result.failure(NotDefinedError(node.pos_start, node.pos_end, f"name '{var_name}' is not defined.",
+                                                  context))
 
         if var_name not in VARS_CANNOT_MODIFY:
             context.symbol_table.remove(var_name)
         else:
             return result.failure(RunTimeError(node.pos_start, node.pos_end,
-                                               f"can not delete builtin variable '{var_name}'.",
+                                               f"can not delete value assigned to builtin name '{var_name}'.",
                                                context))
         return result.success(NoneValue(False))
 

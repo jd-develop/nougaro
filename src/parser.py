@@ -196,7 +196,8 @@ class Parser:
                 return result
             return result.success(UnaryOpNode(op_token, node))
 
-        node = result.register(self.bin_op(self.arith_expr, (TT_EE, TT_NE, TT_LT, TT_GT, TT_LTE, TT_GTE),
+        node = result.register(self.bin_op(self.arith_expr, (TT_EE, TT_NE, TT_LT, TT_GT, TT_LTE, TT_GTE,
+                                                             (TT_KEYWORD, "in")),
                                            left_has_priority=False))
         if result.error is not None:
             return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,

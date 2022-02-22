@@ -69,6 +69,9 @@ class Value:
     def get_comparison_gte(self, other):
         return None, self.can_not_compare(other)
 
+    def is_in(self, other):
+        return None, self.can_not_be_in(other)
+
     def and_(self, other):
         return None, self.illegal_operation(other)
 
@@ -123,4 +126,10 @@ class Value:
     def can_not_compare(self, other):
         return RunTimeError(
             self.pos_start, other.pos_end, f'can not compare {self.type_} and {other.type_}.', self.context
+        )
+
+    def can_not_be_in(self, other):
+        return RunTimeError(
+            self.pos_start, other.pos_end, f'{other.type_} is not iterable or can not contain {self.type_}.',
+            self.context
         )

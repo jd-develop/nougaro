@@ -20,5 +20,4 @@
 * add `var id &= *` (etc.)
 * add `var id x= *` (xor)
 * add `var id ~=` (if id != 0 so id <- 0 else id <- 1)
-* add `a in b` (same as python)
 * add a .noughistory in ~ (%userprofile%) and the usage of the arrow keys like every shell (bash, python...)

@@ -150,17 +150,20 @@ class Interpreter:
                     test_result, error = element.get_comparison_lte(right)
                 elif op_token.type == TT_GTE:
                     test_result, error = element.get_comparison_gte(right)
+                elif op_token.matches(TT_KEYWORD, 'in'):
+                    test_result, error = element.is_in(right)
                 else:
                     print(context)
                     print(
-                        "NOUGARO INTERNAL ERROR : Result is not defined after executing "
-                        "src.interpreter.Interpreter.visit_BinOpCompNode because of an invalid token.\n"
-                        "Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with the "
-                        "information below")
+                        f"NOUGARO INTERNAL ERROR : Result is not defined after executing "
+                        f"src.interpreter.Interpreter.visit_BinOpCompNode because of an invalid token.\n"
+                        f"Note for devs : the actual invalid token is {op_token.type}.\n"
+                        f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with the "
+                        f"information below")
                     raise Exception("Result is not defined after executing "
                                     "src.interpreter.Interpreter.visit_BinOpCompNode")
                 if error is not None:
-                    return res
+                    return res.failure(error)
                 if test_result.value == 0:
                     return res.success(test_result.set_pos(node.pos_start, node.pos_end))
             else:

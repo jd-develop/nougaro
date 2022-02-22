@@ -65,8 +65,7 @@ KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
     'in',
     'while',
     'def',
-    'end',
-    'in'
+    'end'
 ]
 
 TOKENS_TO_QUOTE = [

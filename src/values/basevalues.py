@@ -76,6 +76,17 @@ class String(Value):
         else:
             return None, self.can_not_compare(other)
 
+    def is_in(self, other):
+        if isinstance(other, List):
+            for x in other.elements:
+                if self.value == x.value:
+                    return Number.TRUE.set_context(self.context), None
+            return Number.FALSE.set_context(self.context), None
+        elif isinstance(other, String):
+            return Number(int(self.value in other.value)).set_context(self.context), None
+        else:
+            return None, self.can_not_be_in(other)
+
     def copy(self):
         copy = String(self.value)
         copy.set_pos(self.pos_start, self.pos_end)
@@ -244,6 +255,17 @@ class Number(Value):
                 list_.append(NoneValue())
         return List(list_).set_context(self.context), None
 
+    def is_in(self, other):
+        if isinstance(other, List):
+            for x in other.elements:
+                if self.value == x.value:
+                    return Number.TRUE.set_context(self.context), None
+            return Number.FALSE.set_context(self.context), None
+        elif isinstance(other, String):
+            return Number(int(self.to_str_()[0].value in other.value)).set_context(self.context), None
+        else:
+            return None, self.can_not_be_in(other)
+
     def copy(self):
         copy = Number(self.value)
         copy.set_pos(self.pos_start, self.pos_end)
@@ -364,6 +386,14 @@ class List(Value):
         else:
             return Number.TRUE.set_context(self.context), None
 
+    def is_in(self, other):
+        if isinstance(other, List):
+            return Number(int(self.elements in other.elements)).set_context(self.context), None
+        elif isinstance(other, String):
+            return Number(int(self.to_str_()[0].value in other.value)).set_context(self.context), None
+        else:
+            return None, self.can_not_be_in(other)
+
     def copy(self):
         copy = List(self.elements)
         copy.set_pos(self.pos_start, self.pos_end)
@@ -409,6 +439,17 @@ class NoneValue(Value):
 
     def to_float_(self):
         return Number(0.0).set_context(self.context), None
+
+    def is_in(self, other):
+        if isinstance(other, List):
+            for element in other.elements:
+                if isinstance(element, NoneValue):
+                    return Number.TRUE.set_context(self.context), None
+            return Number.FALSE.set_context(self.context), None
+        elif isinstance(other, String):
+            return Number(int('none' in other.value.lower())).set_context(self.context), None
+        else:
+            return None, self.can_not_be_in(other)
 
     def copy(self):
         copy = NoneValue(self.do_i_print)

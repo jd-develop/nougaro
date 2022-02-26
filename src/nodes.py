@@ -14,6 +14,8 @@ from src.token_constants import TT_EQ
 # ##########
 # NODES
 # ##########
+
+# VALUE NODES
 class NumberNode:
     def __init__(self, token):
         self.token = token
@@ -44,14 +46,7 @@ class ListNode:
         return f'{str(self.element_nodes)}'
 
 
-class VarAccessNode:
-    def __init__(self, var_name_token):
-        self.var_name_token = var_name_token
-
-        self.pos_start = self.var_name_token.pos_start
-        self.pos_end = self.var_name_token.pos_end
-
-
+# VAR NODES
 class VarAssignNode:
     def __init__(self, var_name_token, value_node, equal=TT_EQ):
         self.var_name_token = var_name_token
@@ -65,6 +60,14 @@ class VarAssignNode:
         return f'(var_assign:{self.var_name_token} {self.equal} {self.value_node})'
 
 
+class VarAccessNode:
+    def __init__(self, var_name_token):
+        self.var_name_token = var_name_token
+
+        self.pos_start = self.var_name_token.pos_start
+        self.pos_end = self.var_name_token.pos_end
+
+
 class VarDeleteNode:
     def __init__(self, var_name_token):
         self.var_name_token = var_name_token
@@ -76,6 +79,7 @@ class VarDeleteNode:
         return f'(var_delete:{self.var_name_token})'
 
 
+# OPERATOR NODES
 class BinOpNode:
     def __init__(self, left_node, op_token, right_node):
         self.left_node = left_node
@@ -112,6 +116,7 @@ class UnaryOpNode:
         return f'({self.op_token}, {self.node})'
 
 
+# TEST NODES
 class IfNode:
     def __init__(self, cases, else_case):
         self.cases = cases
@@ -121,6 +126,7 @@ class IfNode:
         self.pos_end = (self.else_case or self.cases[len(self.cases) - 1])[0].pos_end
 
 
+# LOOP NODES
 class ForNode:
     def __init__(self, var_name_token, start_value_node, end_value_node, step_value_node, body_node,
                  should_return_none: bool):
@@ -159,8 +165,17 @@ class WhileNode:
 
         self.pos_start = self.condition_node.pos_start
         self.pos_end = self.body_node.pos_end
+        
+
+class BreakNode:
+    pass
 
 
+class ContinueNode:
+    pass
+
+
+# FUNCTION NODES
 class FuncDefNode:
     def __init__(self, var_name_token: Token, arg_name_tokens: list[Token], body_node, should_return_none):
         self.var_name_token = var_name_token
@@ -194,6 +209,11 @@ class CallNode:
         return f'(call:{self.node_to_call})'
 
 
+class ReturnNode:
+    pass
+
+
+# SOME MATH NODES
 class AbsNode:
     def __init__(self, node_to_abs):
         self.node_to_abs = node_to_abs
@@ -205,5 +225,6 @@ class AbsNode:
         return f'|{self.node_to_abs}|'
 
 
+# SPECIAL NODES
 class NoNode:
     pass

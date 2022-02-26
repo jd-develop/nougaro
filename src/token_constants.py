@@ -49,23 +49,31 @@ TT_ARROW = '->'               # ->
 TT_EOF = 'end of file'        # end of file
 
 KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
+    # basic keywords
     'var',
     'del',
+    'end',
+    # boolean
     'and',
     'or',
     'not',
     'xor',
+    # tests
     'if',
     'then',
     'elif',
     'else',
+    'in',
+    # loops
     'for',
     'to',
     'step',
-    'in',
     'while',
+    'break',
+    'continue',
+    # functions
     'def',
-    'end'
+    'return'
 ]
 
 TOKENS_TO_QUOTE = [

@@ -165,14 +165,24 @@ class WhileNode:
 
         self.pos_start = self.condition_node.pos_start
         self.pos_end = self.body_node.pos_end
-        
+
 
 class BreakNode:
-    pass
+    def __init__(self, pos_start, pos_end):
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+    def __repr__(self):
+        return '(break)'
 
 
 class ContinueNode:
-    pass
+    def __init__(self, pos_start, pos_end):
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+    def __repr__(self):
+        return '(continue)'
 
 
 # FUNCTION NODES
@@ -192,6 +202,9 @@ class FuncDefNode:
 
         self.pos_end = self.body_node.pos_end
 
+    def __repr__(self):
+        return f'(funcdef:{self.var_name_token} args:{self.arg_name_tokens})'
+
 
 class CallNode:
     def __init__(self, node_to_call, arg_nodes: list):
@@ -210,7 +223,14 @@ class CallNode:
 
 
 class ReturnNode:
-    pass
+    def __init__(self, node_to_return, pos_start, pos_end):
+        self.node_to_return = node_to_return
+
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+    def __repr__(self):
+        return f'(return:{self.node_to_return})'
 
 
 # SOME MATH NODES

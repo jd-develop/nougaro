@@ -91,7 +91,7 @@ class BaseFunction(Value):
         # We still need the context for the symbol table ;)
         result = RTResult()
         result.register(self.check_args(arg_names, args, optional_args, have_to_respect_args_number))
-        if result.error is not None:
+        if result.should_return():
             return result
         self.populate_args(arg_names, args, exec_context, optional_args, have_to_respect_args_number)
         return result.success(None)

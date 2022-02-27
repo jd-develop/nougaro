@@ -34,7 +34,7 @@ class BuiltInFunction(BaseFunction):
         result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
                                                      optional_args=method.optional_args,
                                                      have_to_respect_args_number=method.have_to_respect_args_number))
-        if result.error is not None:
+        if result.should_return():
             return result
 
         try:
@@ -44,7 +44,7 @@ class BuiltInFunction(BaseFunction):
                 return_value = result.register(method())
             except TypeError:  # it only executes when coding
                 return_value = result.register(method(exec_context))
-        if result.error is not None:
+        if result.should_return():
             return result
         return result.success(return_value)
 

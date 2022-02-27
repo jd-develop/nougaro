@@ -53,7 +53,7 @@ class Interpreter:
 
         for element_node in node.element_nodes:
             elements.append(result.register(self.visit(element_node, context)))
-            if result.error is not None:
+            if result.should_return():
                 return result
 
         return result.success(List(elements).set_context(context).set_pos(node.pos_start, node.pos_end))
@@ -173,7 +173,7 @@ class Interpreter:
     def visit_UnaryOpNode(self, node: UnaryOpNode, context: Context):
         result = RTResult()
         number = result.register(self.visit(node.node, context))
-        if result.error is not None:
+        if result.should_return():
             return result
 
         error = None
@@ -209,7 +209,7 @@ class Interpreter:
         var_name = node.var_name_token.value
         value = result.register(self.visit(node.value_node, context))
         equal = node.equal.type
-        if result.error is not None:
+        if result.should_return():
             return result
 
         if var_name not in VARS_CANNOT_MODIFY:
@@ -272,19 +272,19 @@ class Interpreter:
         result = RTResult()
         for condition, expr, should_return_none in node.cases:
             condition_value = result.register(self.visit(condition, context))
-            if result.error is not None:
+            if result.should_return():
                 return result
 
             if condition_value.is_true():
                 expr_value = result.register(self.visit(expr, context))
-                if result.error is not None:
+                if result.should_return():
                     return result
                 return result.success(NoneValue(False) if should_return_none else expr_value)
 
         if node.else_case is not None:
             expr, should_return_none = node.else_case
             else_value = result.register(self.visit(expr, context))
-            if result.error is not None:
+            if result.should_return():
                 return result
             return result.success(NoneValue(False) if should_return_none else else_value)
 
@@ -295,16 +295,16 @@ class Interpreter:
         elements = []
 
         start_value = result.register(self.visit(node.start_value_node, context))
-        if result.error is not None:
+        if result.should_return():
             return result
 
         end_value = result.register(self.visit(node.end_value_node, context))
-        if result.error is not None:
+        if result.should_return():
             return result
 
         if node.step_value_node is not None:
             step_value = result.register(self.visit(node.step_value_node, context))
-            if result.error is not None:
+            if result.should_return():
                 return result
         else:
             step_value = Number(1)
@@ -316,9 +316,17 @@ class Interpreter:
             context.symbol_table.set(node.var_name_token.value, Number(i))
             i += step_value.value
 
-            elements.append(result.register(self.visit(node.body_node, context)))
-            if result.error is not None:
+            value = result.register(self.visit(node.body_node, context))
+            if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
                 return result
+
+            if result.loop_should_continue:
+                continue  # will continue the 'while condition()' -> the interpreted 'for' loop is continued ^^
+
+            if result.loop_should_break:
+                break  # will break the 'while condition()' -> the interpreted 'for' loop is break
+
+            elements.append(value)
 
         return result.success(
             NoneValue(False) if node.should_return_none else
@@ -330,15 +338,24 @@ class Interpreter:
         elements = []
 
         list_ = result.register(self.visit(node.list_node, context))
-        if result.error is not None:
+        if result.should_return():
             return result
 
         if isinstance(list_, List):
             for i in list_.elements:
                 context.symbol_table.set(node.var_name_token.value, i)
-                elements.append(result.register(self.visit(node.body_node, context)))
-                if result.error is not None:
+                value = result.register(self.visit(node.body_node, context))
+                if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
                     return result
+
+                if result.loop_should_continue:
+                    continue  # will continue the 'for i in list_.elements' -> the interpreted 'for' loop is continued
+
+                if result.loop_should_break:
+                    break  # will break the 'for i in list_.elements' -> the interpreted 'for' loop is break
+
+                elements.append(value)
+
             return result.success(
                 NoneValue(False) if node.should_return_none else
                 List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
@@ -356,15 +373,23 @@ class Interpreter:
 
         while True:
             condition = result.register(self.visit(node.condition_node, context))
-            if result.error is not None:
+            if result.should_return():
                 return result
 
             if not condition.is_true():
                 break
 
-            elements.append(result.register(self.visit(node.body_node, context)))
-            if result.error is not None:
+            value = result.register(self.visit(node.body_node, context))
+            if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
                 return result
+
+            if result.loop_should_continue:
+                continue  # will continue the 'while True' -> the interpreted 'while' loop is continued
+
+            if result.loop_should_break:
+                break  # will break the 'while True' -> the interpreted 'while' loop is break
+
+            elements.append(value)
 
         return result.success(
             NoneValue(False) if node.should_return_none else
@@ -377,7 +402,7 @@ class Interpreter:
         func_name = node.var_name_token.value if node.var_name_token is not None else None
         body_node = node.body_node
         arg_names = [arg_name.value for arg_name in node.arg_name_tokens]
-        func_value = Function(func_name, body_node, arg_names, node.should_return_none).set_context(context).set_pos(
+        func_value = Function(func_name, body_node, arg_names, node.should_auto_return).set_context(context).set_pos(
             node.pos_start, node.pos_end
         )
 
@@ -396,7 +421,7 @@ class Interpreter:
         args = []
 
         value_to_call = result.register(self.visit(node.node_to_call, context))
-        if result.error is not None:
+        if result.should_return():
             return result
         value_to_call = value_to_call.copy().set_pos(node.pos_start, node.pos_end)
 
@@ -404,11 +429,11 @@ class Interpreter:
             # call the function
             for arg_node in node.arg_nodes:
                 args.append(result.register(self.visit(arg_node, context)))
-                if result.error is not None:
+                if result.should_return():
                     return result
 
             return_value = result.register(value_to_call.execute(args, Interpreter))
-            if result.error is not None:
+            if result.should_return():
                 return result
             return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
             return result.success(return_value)
@@ -472,11 +497,31 @@ class Interpreter:
                 context
             ))
 
+    def visit_ReturnNode(self, node: ReturnNode, context: Context):
+        result = RTResult()
+
+        if node.node_to_return is not None:
+            value = result.register(self.visit(node.node_to_return, context))
+            if result.should_return():
+                return result
+        else:
+            value = NoneValue(False)
+
+        return result.success_return(value)
+
+    @staticmethod
+    def visit_ContinueNode(node: ContinueNode, context: Context):
+        return RTResult().success_continue()
+
+    @staticmethod
+    def visit_BreakNode(node: BreakNode, context: Context):
+        return RTResult().success_break()
+
     def visit_AbsNode(self, node: AbsNode, context: Context):
         result = RTResult()
 
         value_to_abs = result.register(self.visit(node.node_to_abs, context))
-        if result.error is not None:
+        if result.should_return():
             return result
         value_to_abs = value_to_abs.copy().set_pos(node.pos_start, node.pos_end)
 
@@ -493,4 +538,4 @@ class Interpreter:
 
     @staticmethod
     def visit_NoNode(node: NoNode, context: Context):
-        return RTResult().success(NoneValue(do_i_print=False))
+        return RTResult().success(NoneValue(False))

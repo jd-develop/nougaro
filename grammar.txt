@@ -1,6 +1,11 @@
 This is the AST of the Nougaro language. This AST is computed by the Parser (src.parser.Parser).
 
-statements : NEWLINE* expr (NEWLINE+ expr)* NEWLINE
+statements : NEWLINE* statement (NEWLINE+ statement)* NEWLINE
+
+statement  : KEYWORD:RETURN expr?
+           : KEYWORD:CONTINUE
+           : KEYWORD:BREAK
+           : expr
 
 expr       : KEYWORD:VAR IDENTIFIER (EQ|PLUSEQ|MINUSEQ|MULTEQ|DIVEQ|POWEQ|FLOORDIVEQ|PERCEQ) expr
            : KEYWORD:DEL IDENTIFIER
@@ -32,24 +37,24 @@ atom       : INT|FLOAT|STRING|IDENTIFIER
 list_expr  : LSQUARE (expr (COMMA expr)*) RSQUARE
 
 if_expr    : KEYWORD:IF expr KEYWORD:THEN
-             (expr if_expr_b|if_expr_c?)
+             (statement if_expr_b|if_expr_c?)
            | (NEWLINE statements KEYWORD:END|if_expr_b|if_expr_c)
 
 if_expr_b  : KEYWORD:ELIF expr KEYWORD:THEN
-             (expr if_expr_b|if_expr_c?)
+             (statement if_expr_b|if_expr_c?)
            | (NEWLINE statements KEYWORD:END|if_expr_b|if_expr_c)
 
 if_expr_c  : KEYWORD:ELSE
-             expr
+             statement
            | (NEWLINE statements KEYWORD:END)
 
 for_expr   : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr (KEYWORD:STEP expr)? KEYWORD:THEN
-             expr | (NEWLINE statements KEYWORD:END)
+             statement | (NEWLINE statements KEYWORD:END)
            : KEYWORD:FOR IDENTIFIER IN expr KEYWORD:THEN
-             expr | (NEWLINE statements KEYWORD:END)
+             statement | (NEWLINE statements KEYWORD:END)
 
 while_expr : KEYWORD:WHILE expr KEYWORD:THEN
-             expr | (NEWLINE statements KEYWORD:END)
+             statement | (NEWLINE statements KEYWORD:END)
 
 func_def   : KEYWORD:DEF IDENTIFIER?
              LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN

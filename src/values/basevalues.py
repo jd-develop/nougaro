@@ -402,13 +402,13 @@ class List(Value):
 
 
 class NoneValue(Value):
-    def __init__(self, do_i_print: bool = True):
+    def __init__(self, should_print: bool = True):
         super().__init__()
         self.type_ = 'NoneValue'
-        self.do_i_print = do_i_print
+        self.should_print = should_print
 
     def __repr__(self):
-        if self.do_i_print:
+        if self.should_print:
             return 'None'
         else:
             return None
@@ -452,7 +452,7 @@ class NoneValue(Value):
             return None, self.can_not_be_in(other)
 
     def copy(self):
-        copy = NoneValue(self.do_i_print)
+        copy = NoneValue(self.should_print)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
         return copy

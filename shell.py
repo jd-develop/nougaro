@@ -33,7 +33,7 @@ while True:
                 if not isinstance(result.elements[0], NoneValue):
                     print(result.elements[0])
                 else:
-                    if result.elements[0].do_i_print:
+                    if result.elements[0].should_print:
                         print(result.elements[0])
             else:
                 print(result)

@@ -187,11 +187,11 @@ class ContinueNode:
 
 # FUNCTION NODES
 class FuncDefNode:
-    def __init__(self, var_name_token: Token, arg_name_tokens: list[Token], body_node, should_return_none):
+    def __init__(self, var_name_token: Token, arg_name_tokens: list[Token], body_node, should_auto_return):
         self.var_name_token = var_name_token
         self.arg_name_tokens = arg_name_tokens
         self.body_node = body_node
-        self.should_return_none = should_return_none
+        self.should_auto_return = should_auto_return
 
         if self.var_name_token is not None:
             self.pos_start = self.var_name_token.pos_start

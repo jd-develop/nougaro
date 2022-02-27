@@ -29,7 +29,7 @@ class Parser:
 
     def parse(self):
         result = self.statements()
-        if result.error is None and self.current_token.type != TT_EOF:
+        if result.error is not None and self.current_token.type != TT_EOF:
             return result.failure(
                 InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
                                    "expected '+', '-', '*', '/', '//', '%', 'and', 'or' or 'xor'.")
@@ -65,7 +65,7 @@ class Parser:
         if self.current_token.type == TT_EOF:
             return result.success(NoNode())
 
-        statement = result.register(self.expr())
+        statement = result.register(self.statement())
         if result.error is not None:
             return result
         statements.append(statement)
@@ -83,7 +83,7 @@ class Parser:
 
             if not more_statements:
                 break
-            statement = result.try_register(self.expr())
+            statement = result.try_register(self.statement())
             if statement is None:
                 self.reverse(result.to_reverse_count)
                 more_statements = False
@@ -95,6 +95,41 @@ class Parser:
             pos_start,
             self.current_token.pos_end.copy()
         ))
+
+    def statement(self):
+        result = ParseResult()
+        pos_start = self.current_token.pos_start.copy()
+
+        if self.current_token.matches(TT_KEYWORD, 'return'):
+            result.register_advancement()
+            self.advance()
+
+            expr = result.try_register(self.expr())
+            if expr is None:
+                self.reverse(result.to_reverse_count)
+            return result.success(ReturnNode(expr, pos_start, self.current_token.pos_start.copy()))
+
+        if self.current_token.matches(TT_KEYWORD, 'continue'):
+            result.register_advancement()
+            self.advance()
+
+            return result.success(ContinueNode(pos_start, self.current_token.pos_start.copy()))
+
+        if self.current_token.matches(TT_KEYWORD, 'break'):
+            result.register_advancement()
+            self.advance()
+
+            return result.success(BreakNode(pos_start, self.current_token.pos_start.copy()))
+
+        expr = result.register(self.expr())
+        if result.error is not None:
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected 'var', int, float, identifier, 'if', 'for', 'while', 'def', 'continue', 'break', 'return', "
+                "'+', '-', '(', '[', '|' or 'not'."
+            ))
+
+        return result.success(expr)
 
     def expr(self):
         result = ParseResult()
@@ -179,7 +214,7 @@ class Parser:
         if result.error is not None:
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'var', int, float, identifier, 'if', 'for', 'while', 'def' '+', '-', '(', '[', '|' or 'not'."
+                "expected 'var', int, float, identifier, 'if', 'for', 'while', 'def', '+', '-', '(', '[', '|' or 'not'."
             ))
 
         return result.success(node)
@@ -452,7 +487,7 @@ class Parser:
                         "expected 'end'."
                     ))
             else:
-                expr = result.register(self.expr())
+                expr = result.register(self.statement())
                 if result.error is not None:
                     return result
                 else_case = (expr, False)
@@ -520,7 +555,7 @@ class Parser:
                 new_cases, else_case = all_cases
                 cases.extend(new_cases)
         else:  # no newline : single line 'if'
-            expr = result.register(self.expr())
+            expr = result.register(self.statement())
             if result.error is not None:
                 return result
             cases.append((condition, expr, False))
@@ -595,7 +630,7 @@ class Parser:
 
                 return result.success(ForNodeList(var_name, body, list_, True))
 
-            body = result.register(self.expr())
+            body = result.register(self.statement())
             if result.error is not None:
                 return result
 
@@ -711,7 +746,7 @@ class Parser:
 
             return result.success(WhileNode(condition, body, True))
 
-        body = result.register(self.expr())
+        body = result.register(self.statement())
         if result.error is not None:
             return result
 
@@ -818,7 +853,7 @@ class Parser:
                 var_name_token,
                 arg_name_tokens,
                 body,
-                False
+                True
             ))
 
         if self.current_token.type != TT_NEWLINE:
@@ -848,7 +883,7 @@ class Parser:
             var_name_token,
             arg_name_tokens,
             body,
-            True
+            False
         ))
 
     def bin_op(self, func_a, ops, func_b=None, left_has_priority: bool = True):

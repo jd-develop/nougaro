@@ -67,6 +67,9 @@ class VarAccessNode:
         self.pos_start = self.var_name_token.pos_start
         self.pos_end = self.var_name_token.pos_end
 
+    def __repr__(self):
+        return f'(var_access:{self.var_name_token})'
+
 
 class VarDeleteNode:
     def __init__(self, var_name_token):

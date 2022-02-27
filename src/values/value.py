@@ -85,7 +85,7 @@ class Value:
         """ Exclusive or """
         return None, self.illegal_operation(other)
 
-    def execute(self, args, interpreter_):
+    def execute(self, args, interpreter_, run):
         return RTResult().failure(self.illegal_operation())
 
     def abs_(self):

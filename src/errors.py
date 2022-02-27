@@ -7,6 +7,8 @@
 # nougaro modules imports
 from src.strings_with_arrows import string_with_arrows
 from src.context import Context
+
+
 # built-in python imports
 # no imports
 
@@ -90,4 +92,11 @@ class RTArithmeticError(RunTimeError):
 class NotDefinedError(RunTimeError):
     def __init__(self, pos_start, pos_end, details, context: Context):
         super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="NotDefinedError")
+        self.context = context
+
+
+class RTFileNotFoundError(RunTimeError):
+    def __init__(self, pos_start, pos_end, file_name, context: Context):
+        super().__init__(pos_start, pos_end, f"file '{file_name}' does not exist.", context, rt_error=False,
+                         error_name="FileNotFoundError")
         self.context = context

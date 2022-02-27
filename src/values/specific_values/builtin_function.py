@@ -10,6 +10,8 @@ from src.values.functions.builtin_function import BuiltInFunction
 # no imports
 
 VOID = BuiltInFunction('void')
+RUN = BuiltInFunction('run')
+
 PRINT = BuiltInFunction('print')
 PRINT_RET = BuiltInFunction('print_ret')
 INPUT = BuiltInFunction('input')
@@ -35,6 +37,7 @@ EXTEND = BuiltInFunction('extend')
 GET = BuiltInFunction('get')
 MAX = BuiltInFunction('max')
 MIN = BuiltInFunction('min')
+LEN = BuiltInFunction('len')
 
 # Maths
 SQRT = BuiltInFunction('sqrt')

@@ -35,6 +35,8 @@ class Lexer:
         while self.current_char is not None:
             if self.current_char in ' \t':  # tab and space
                 self.advance()
+            elif self.current_char == '#':  # for comments
+                self.skip_comment()
             elif self.current_char in ';\n':  # semicolons and new lines
                 tokens.append(Token(TT_NEWLINE, pos_start=self.pos))
                 self.advance()
@@ -105,7 +107,6 @@ class Lexer:
                 return [], IllegalCharError(pos_start, self.pos, "'" + char + "' is an illegal character.")
 
         tokens.append(Token(TT_EOF, pos_start=self.pos))
-        # print(tokens)
         return tokens, None
 
     def make_plus(self):
@@ -302,3 +303,11 @@ class Lexer:
             token_type = TT_MINUSEQ
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
+
+    def skip_comment(self):
+        self.advance()
+
+        while self.current_char != '\n' and self.current_char is not None:  # None -> EOF
+            self.advance()
+
+        self.advance()

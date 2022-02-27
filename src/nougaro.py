@@ -15,8 +15,7 @@ from src.set_symbol_table import set_symbol_table
 from src.errors import *
 from src.values.basevalues import String
 # built-in python imports
-# no imports
-# import pprint
+import json
 
 
 # ##########
@@ -26,10 +25,15 @@ global_symbol_table = SymbolTable()
 set_symbol_table(global_symbol_table)  # This function is in src.set_symbol_table
 
 
+with open("version.json") as ver_json:
+    ver_json_loaded = json.load(ver_json)
+    version_ = ver_json_loaded.get("version")
+
+
 # ##########
 # RUN
 # ##########
-def run(file_name, text, version: str = "not defined"):
+def run(file_name, text, version: str = version_):
     """Run the given code"""
     # set version in symbol table
     global_symbol_table.set("noug_version", String(version))
@@ -49,7 +53,8 @@ def run(file_name, text, version: str = "not defined"):
     # print(ast)
 
     # run the code (interpreter)
-    interpreter = src.interpreter.Interpreter()
+    interpreter = src.interpreter.Interpreter(run)
+    interpreter.__init__(run)
     context = Context('<program>')
     context.symbol_table = global_symbol_table
     result = interpreter.visit(ast.node, context)

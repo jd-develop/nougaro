@@ -27,6 +27,8 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("sqrt_pi", MATH_SQRT_PI)
     # Built-in functions
     symbol_table.set("void", VOID)
+    symbol_table.set("run", RUN)
+
     symbol_table.set("print", PRINT)
     symbol_table.set("print_ret", PRINT_RET)
     symbol_table.set("input", INPUT)
@@ -52,6 +54,8 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("get", GET)
     symbol_table.set("max", MAX)
     symbol_table.set("min", MIN)
+    symbol_table.set("len", LEN)
+
     # Mathematical functions
     symbol_table.set("sqrt", SQRT)
     symbol_table.set("math_root", MATH_ROOT)

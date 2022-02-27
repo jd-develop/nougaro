@@ -23,10 +23,13 @@ from src.context import Context
 # INTERPRETER
 # ##########
 class Interpreter:
-    # this class does not have __init__ method
+    def __init__(self, run):
+        self.run = run
+
     def visit(self, node, context):
         method_name = f'visit_{type(node).__name__}'
         method = getattr(self, method_name, self.no_visit_method)
+
         return method(node, context)
 
     @staticmethod
@@ -432,7 +435,7 @@ class Interpreter:
                 if result.should_return():
                     return result
 
-            return_value = result.register(value_to_call.execute(args, Interpreter))
+            return_value = result.register(value_to_call.execute(args, Interpreter, self.run))
             if result.should_return():
                 return result
             return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)

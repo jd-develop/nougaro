@@ -33,7 +33,7 @@ TT_FLOORDIVEQ = '//='         # //=
 TT_EE = '=='                  # ==
 TT_NE = '!='                  # !=
 TT_LT = '<'                   # <
-TT_GT = '<'                   # >
+TT_GT = '>'                   # >
 TT_LTE = '<='                 # <=
 TT_GTE = '>='                 # >=
 

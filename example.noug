@@ -1,0 +1,131 @@
+# This file was made in nougaro-prototype-v1 version.
+
+# This is a comment
+# Basics :
+# Print
+print("Hello, world!")
+
+# Mathematical operators
+print(1+1)
+print(3-4)
+print(2*3)
+print(6/2)
+print(3^2)
+print(|-5|)
+
+# Variables
+var sometext = "Hello, world!"
+var a = var b = 3
+print(sometext); print(a * b)
+print(noug_version)
+print(None)
+
+# Strings
+print("this is a string quoted by \".")
+print("You can put\nbacklines and\n\ttabs.")
+print("You can add \\ backslashes and \" \' quotes")
+
+print("You can additionate and multiply strings : " + 3*sometext)
+
+# Tests
+var name = input("Whats your name? ")
+if name == "Jean Dubois" then
+    print("You are the creator of this language! Amazing!")
+elif name != "mrlulu51" then
+    print("You aren't MrLulu...")
+else
+    print("You are MrLulu!")
+end
+
+print(1<2)
+print(1>2)
+print(12>=12)
+print(13<=12)
+
+print(True and False)
+print(True or False)
+print(True xor False)
+print(not True)
+
+# Functions
+def fib(n)
+    # calculates all the numbers of the fibonacci list less than n
+    var a = 0; var b = 1
+    if is_int(n) or is_float(n) then
+        while a < n then
+            print(a)
+            var c = a
+            var a = b
+            var b += c
+		end
+    else
+        print("first argument must be an int!")
+	end
+end
+
+print(fib(input_int("Enter number:")))
+
+var a = def()->print("Hello, world!")
+a()
+
+# builtin functions and lists
+var a = print_ret("this string is printed and returned into a")
+print(type(a))  # str
+print(is_str(a))  # True
+print(is_list(a))  # False
+is_func(is_func)  # True
+is_list(a)  # False
+
+print(str(123))  # "123"
+print(int("123"))  # 123
+print(float("123.456")) # 123.456
+print(list("abc"))  # ["a", "b", "c"]
+
+var list_ = [1, 2, 3, "4", '5', '6']
+
+print(append(list_, 7))
+print(var list_ = list_ + 7)
+
+print(pop(list_, -1))
+print(var list_ = list_ - -1)
+
+print(extend(list_, [8, 9, 10]))
+print(list_ * [8, 9, 10])
+
+print(get(list_, -3))
+print(list_ / -3)
+print(list_(-3))
+
+max(list_, True)
+min(list_, True)
+
+void()  # Does ABSOLUTELY nothing... (in fact, returns None...)
+
+# math functions
+print(sqrt(math_pi) == sqrt_pi)  # True
+print(math_root(27, 3))  # returns x with x^3 = 27, so 3
+degrees(12)  # radians -> degrees
+radians(degrees(12))  # 12 :)
+# sin, cos, tan, asin, acos, atan...
+print(math_e)  # euler's number
+
+# loops
+for i = 1 to 10 then
+    print(i)
+end
+# it prints 1, 2, 3, 4, 5, 6, 7, 8, 9
+
+for i = 1 to 10 step 2 then
+    print(i)
+end
+# it prints 1, 3, 5, 7, 9
+
+for i in list_ then
+    print(i)
+end
+# it prints all the elements of list_
+
+# variable deletion
+var a = 1
+print(a)
+del a

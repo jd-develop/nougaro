@@ -23,9 +23,9 @@ class Function(BaseFunction):
     def __repr__(self):
         return f'<function {self.name}>'
 
-    def execute(self, args, interpreter_):
+    def execute(self, args, interpreter_, run):
         result = RTResult()
-        interpreter = interpreter_()
+        interpreter = interpreter_(run)
         exec_context = self.generate_new_context()
 
         result.register(self.check_and_populate_args(self.arg_names, args, exec_context))

@@ -10,6 +10,7 @@ from src.context import Context
 from src.values.basevalues import *
 from src.values.specific_values.number import *
 from src.misc import CustomBuiltInFuncMethod
+from src.errors import RTFileNotFoundError
 # built-in python imports
 from os import system as os_system, name as os_name
 from math import sqrt as math_sqrt, degrees as math_degrees, radians as math_radians, sin as math_sin, cos as math_cos
@@ -24,7 +25,7 @@ class BuiltInFunction(BaseFunction):
     def __repr__(self):
         return f'<built-in function {self.name}>'
 
-    def execute(self, args, interpreter_):
+    def execute(self, args, interpreter_, run):
         result = RTResult()
         exec_context = self.generate_new_context()
 
@@ -36,6 +37,12 @@ class BuiltInFunction(BaseFunction):
                                                      have_to_respect_args_number=method.have_to_respect_args_number))
         if result.should_return():
             return result
+
+        if method_name == 'execute_run':
+            return_value = result.register(self.execute_run(exec_context, run))
+            if result.should_return():
+                return result
+            return result.success(return_value)
 
         try:
             return_value = result.register(method(exec_context))
@@ -821,6 +828,24 @@ class BuiltInFunction(BaseFunction):
     execute_list.optional_args = []
     execute_list.have_to_respect_args_number = True
 
+    def execute_len(self, exec_ctx: Context):
+        """Returns the length of a list"""
+        # Params :
+        # * list
+        list_ = exec_ctx.symbol_table.get('list')
+
+        if not isinstance(list_, List):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'len' must be a list.",
+                exec_ctx
+            ))
+
+        return RTResult().success(Number(len(list_.elements)))
+    execute_len.arg_names = ['list']
+    execute_len.optional_args = []
+    execute_len.have_to_respect_args_number = True
+
     def execute_rickroll(self):
         """Hum... You haven't seen anything. Close the doc please. Right now."""
         # no params
@@ -831,5 +856,47 @@ class BuiltInFunction(BaseFunction):
     execute_rickroll.arg_names = []
     execute_rickroll.optional_args = []
     execute_rickroll.have_to_respect_args_number = False
+
+    def execute_run(self, exec_ctx: Context, run):
+        """Run code from another file. Param 'run' is the 'run' function in nougaro.py"""
+        # Params :
+        # * file_name
+        file_name = exec_ctx.symbol_table.get("file_name")
+
+        if not isinstance(file_name, String):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'run' must be a str.",
+                exec_ctx
+            ))
+
+        file_name = file_name.value
+
+        try:
+            with open(file_name, 'r', encoding='UTF-8') as file:
+                script = file.read()
+        except FileNotFoundError:
+            return RTResult().failure(RTFileNotFoundError(
+                self.pos_start, self.pos_end,
+                file_name,
+                exec_ctx
+            ))
+        except Exception as e:
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                f"failed to load script '{file_name}' due to internal error '{str(e)}'.",
+                exec_ctx
+            ))
+
+        value, error = run(file_name, script)
+
+        if error is not None:
+            return RTResult().failure(error)
+
+        return RTResult().success(NoneValue(False))
+
+    execute_run.arg_names = ["file_name"]
+    execute_run.optional_args = []
+    execute_run.have_to_respect_args_number = True
 
     # ==================

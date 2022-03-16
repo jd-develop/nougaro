@@ -879,6 +879,9 @@ class Parser:
                 )
             )
 
+        result.register_advancement()
+        self.advance()
+
         return result.success(FuncDefNode(
             var_name_token,
             arg_name_tokens,

@@ -51,15 +51,19 @@ print(not True)
 def fib(n)
     # calculates all the numbers of the fibonacci list less than n
     var a = 0; var b = 1
+    var return_list = []
     if is_int(n) or is_float(n) then
         while a < n then
             print(a)
+            var return_list += a
             var c = a
             var a = b
             var b += c
 		end
+		return return_list
     else
         print("first argument must be an int!")
+        return None
 	end
 end
 

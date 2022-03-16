@@ -74,11 +74,11 @@ a()
 
 # builtin functions and lists
 var a = print_ret("this string is printed and returned into a")
-print(type(a))  # str
-print(is_str(a))  # True
-print(is_list(a))  # False
-is_func(is_func)  # True
-is_list(a)  # False
+print("type(a) is " + type(a))  # str
+print("is_str(a) is " + str(is_str(a)))  # True
+print("is_list(a) is " + str(is_list(a)))  # False
+print("is_func(is_func) is " + str(is_func(is_func)))  # True
+print("is_list(a) is " + str(is_list(a)))  # False
 
 print(str(123))  # "123"
 print(int("123"))  # 123
@@ -88,10 +88,10 @@ print(list("abc"))  # ["a", "b", "c"]
 var list_ = [1, 2, 3, "4", '5', '6']
 
 print(append(list_, 7))
-print(var list_ = list_ + 7)
+print(var list_ += 7)
 
 print(pop(list_, -1))
-print(var list_ = list_ - -1)
+print(var list_ -= -1)
 
 print(extend(list_, [8, 9, 10]))
 print(list_ * [8, 9, 10])
@@ -100,16 +100,16 @@ print(get(list_, -3))
 print(list_ / -3)
 print(list_(-3))
 
-max(list_, True)
-min(list_, True)
+print(max(list_, True))
+print(min(list_, True))
 
 void()  # Does ABSOLUTELY nothing... (in fact, returns None...)
 
 # math functions
 print(sqrt(math_pi) == sqrt_pi)  # True
 print(math_root(27, 3))  # returns x with x^3 = 27, so 3
-degrees(12)  # radians -> degrees
-radians(degrees(12))  # 12 :)
+print(degrees(12))  # radians -> degrees
+print(radians(degrees(12)))  # 12 :)
 # sin, cos, tan, asin, acos, atan...
 print(math_e)  # euler's number
 

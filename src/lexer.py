@@ -68,7 +68,21 @@ class Lexer:
                 tokens.append(self.make_pow())
             elif self.current_char == '%':
                 tokens.append(self.make_perc())
-
+            elif self.current_char == "|":
+                token, error = self.make_or()
+                if error is not None:
+                    return [], error
+                tokens.append(token)
+            elif self.current_char == "&":
+                token, error = self.make_and()
+                if error is not None:
+                    return [], error
+                tokens.append(token)
+            elif self.current_char == "~":
+                token, error = self.make_not()
+                if error is not None:
+                    return [], error
+                tokens.append(token)
             elif self.current_char == '(':
                 tokens.append(Token(TT_LPAREN, pos_start=self.pos))
                 self.advance()
@@ -104,7 +118,7 @@ class Lexer:
                 # illegal char
                 pos_start = self.pos.copy()
                 char = self.current_char
-                return [], IllegalCharError(pos_start, self.pos, "'" + char + "' is an illegal character.")
+                return [], IllegalCharError(pos_start, self.pos, f"'{char}' is an illegal character.")
 
         tokens.append(Token(TT_EOF, pos_start=self.pos))
         return tokens, None
@@ -181,6 +195,36 @@ class Lexer:
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
+    def make_or(self):
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char != '=':
+            return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '|'.")
+
+        self.advance()
+        return Token(TT_OREQ, pos_start=pos_start, pos_end=self.pos), None
+
+    def make_and(self):
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char != '=':
+            return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '&'.")
+
+        self.advance()
+        return Token(TT_ANDEQ, pos_start=pos_start, pos_end=self.pos), None
+
+    def make_not(self):
+        pos_start = self.pos.copy()
+        self.advance()
+
+        if self.current_char != '=':
+            return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '~'.")
+
+        self.advance()
+        return Token(TT_NOTEQ, pos_start=pos_start, pos_end=self.pos), None
+
     def make_string(self, quote='"'):
         string_ = ''
         if quote == '"':
@@ -218,6 +262,14 @@ class Lexer:
     def make_identifier(self):
         id_str = ''
         pos_start = self.pos.copy()
+
+        if self.current_char == "x":
+            id_str += self.current_char
+            self.advance()
+
+            if self.current_char == '=':
+                self.advance()
+                return Token(TT_XOREQ, pos_start=pos_start, pos_end=self.pos)
 
         while self.current_char is not None and self.current_char in LETTERS_DIGITS + '_':
             id_str += self.current_char

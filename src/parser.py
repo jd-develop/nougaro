@@ -159,7 +159,8 @@ class Parser:
             self.advance()
 
             equal = self.current_token
-            equals = [TT_EQ, TT_PLUSEQ, TT_MINUSEQ, TT_MULTEQ, TT_DIVEQ, TT_POWEQ, TT_FLOORDIVEQ, TT_PERCEQ]
+            equals = [TT_EQ, TT_PLUSEQ, TT_MINUSEQ, TT_MULTEQ, TT_DIVEQ, TT_POWEQ, TT_FLOORDIVEQ, TT_PERCEQ, TT_OREQ,
+                      TT_ANDEQ, TT_XOREQ]
 
             if self.current_token.type not in equals:
                 if self.current_token.type not in TOKENS_TO_QUOTE:
@@ -174,6 +175,7 @@ class Parser:
 
             result.register_advancement()
             self.advance()
+
             expr = result.register(self.expr())
             if result.error is not None:
                 return result

@@ -236,7 +236,14 @@ class Interpreter:
                         final_value, error = var_actual_value.floor_dived_by(value)
                     elif equal == TT_PERCEQ:
                         final_value, error = var_actual_value.modded_by(value)
+                    elif equal == TT_OREQ:
+                        final_value, error = var_actual_value.or_(value)
+                    elif equal == TT_XOREQ:
+                        final_value, error = var_actual_value.excl_or(value)
+                    elif equal == TT_ANDEQ:
+                        final_value, error = var_actual_value.and_(value)
                     else:  # this is not supposed to happen
+                        print("Note: it was a problem in src.interpreter.Interpreter.visit_VarAssignNode.")
                         error = None
                         final_value = value
 

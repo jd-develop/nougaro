@@ -21,7 +21,7 @@ args = sys.argv
 if args[0].startswith("python"):  # delete first arg if it is "python" or "python3", etc...
     del args[0]
 
-if args[0].startswith("nougaro") or args[0] == "shell.py" or args[0].endswith("shell.py"):
+if args[0].startswith("nougaro") or args[0].endswith("shell.py"):
     del args[0]
 
 # print(args)

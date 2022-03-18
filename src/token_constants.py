@@ -29,6 +29,9 @@ TT_DIVEQ = '/='               # /=
 TT_POWEQ = '^='               # ^=
 TT_PERCEQ = '%='              # %=
 TT_FLOORDIVEQ = '//='         # //=
+TT_OREQ = "|="                # |=
+TT_ANDEQ = "&="               # &=
+TT_XOREQ = "x="               # x=
 
 TT_EE = '=='                  # ==
 TT_NE = '!='                  # !=

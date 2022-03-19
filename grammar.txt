@@ -22,9 +22,7 @@ factor     : (PLUS|MINUS) factor
 
 power      : call (POW factor)*
 
-call       : abs (LPAREN (expr (COMMA expr)*)? RPAREN)?*
-
-abs        : (ABS) atom (ABS)*
+call       : atom (LPAREN (expr (COMMA expr)*)? RPAREN)?*
 
 atom       : INT|FLOAT|STRING|IDENTIFIER
            : LPAREN expr RPAREN

@@ -85,6 +85,18 @@ class Value:
         """ Exclusive or """
         return None, self.illegal_operation(other)
 
+    def bitwise_and(self, other):
+        return None, self.illegal_operation(other)
+
+    def bitwise_or(self, other):
+        return None, self.illegal_operation(other)
+
+    def bitwise_xor(self, other):
+        return None, self.illegal_operation(other)
+
+    def bitwise_not(self):
+        return None, self.illegal_operation()
+
     def execute(self, args, interpreter_, run):
         return RTResult().failure(self.illegal_operation())
 

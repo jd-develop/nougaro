@@ -102,6 +102,12 @@ class Interpreter:
             result, error = left.or_(right)
         elif node.op_token.matches(TT_KEYWORD, 'xor'):
             result, error = left.excl_or(right)
+        elif node.op_token.type == TT_BITWISEAND:
+            result, error = left.bitwise_and(right)
+        elif node.op_token.type == TT_BITWISEOR:
+            result, error = left.bitwise_or(right)
+        elif node.op_token.type == TT_BITWISEXOR:
+            result, error = left.bitwise_xor(right)
         else:
             print(context)
             print("NOUGARO INTERNAL ERROR : Result is not defined after executing "
@@ -185,6 +191,8 @@ class Interpreter:
             number, error = number.multiplied_by(Number(-1))
         elif node.op_token.matches(TT_KEYWORD, 'not'):
             number, error = number.not_()
+        elif node.op_token.type == TT_BITWISENOT:
+            number, error = number.bitwise_not()
 
         if error is not None:
             return result.failure(error)
@@ -242,8 +250,15 @@ class Interpreter:
                         final_value, error = var_actual_value.excl_or(value)
                     elif equal == TT_ANDEQ:
                         final_value, error = var_actual_value.and_(value)
+                    elif equal == TT_BITWISEANDEQ:
+                        final_value, error = var_actual_value.bitwise_and(value)
+                    elif equal == TT_BITWISEOREQ:
+                        final_value, error = var_actual_value.bitwise_or(value)
+                    elif equal == TT_BITWISEXOREQ:
+                        final_value, error = var_actual_value.bitwise_xor(value)
                     else:  # this is not supposed to happen
-                        print("Note: it was a problem in src.interpreter.Interpreter.visit_VarAssignNode.")
+                        print("Note: it was a problem in src.interpreter.Interpreter.visit_VarAssignNode. Please report"
+                              " this error at https://jd-develop.github.io/nougaro/bugreport.html with all infos.")
                         error = None
                         final_value = value
 

@@ -65,7 +65,10 @@ class Lexer:
             elif self.current_char == '/':
                 tokens.append(self.make_div())
             elif self.current_char == '^':
-                tokens.append(self.make_pow())
+                token, error = self.make_pow()
+                if error is not None:
+                    return [], error
+                tokens.append(token)
             elif self.current_char == '%':
                 tokens.append(self.make_perc())
             elif self.current_char == "|":
@@ -78,6 +81,9 @@ class Lexer:
                 if error is not None:
                     return [], error
                 tokens.append(token)
+            elif self.current_char == "~":
+                tokens.append(Token(TT_BITWISENOT, pos_start=self.pos))
+                self.advance()
             elif self.current_char == '(':
                 tokens.append(Token(TT_LPAREN, pos_start=self.pos))
                 self.advance()
@@ -170,11 +176,23 @@ class Lexer:
         pos_start = self.pos.copy()
         self.advance()
 
-        if self.current_char == '=':
+        if self.current_char == '=':  # ^=
             self.advance()
             token_type = TT_POWEQ
+        elif self.current_char == '^':  # ^^
+            self.advance()
+            token_type = TT_BITWISEXOR
+            if self.current_char == '=':  # ^^=
+                self.advance()
+                token_type = TT_BITWISEXOREQ
+            elif self.current_char == '^':  # ^^^
+                self.advance()
+                if self.current_char != "=":  # ^^^=
+                    return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '^^^'.")
+                token_type = TT_XOREQ
+                self.advance()
 
-        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 
     def make_perc(self):
         token_type = TT_PERC
@@ -190,22 +208,36 @@ class Lexer:
     def make_or(self):
         pos_start = self.pos.copy()
         self.advance()
+        token_type = TT_BITWISEOR
 
-        if self.current_char != '=':
-            return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '|'.")
+        if self.current_char == '=':
+            token_type = TT_BITWISEOREQ
+            self.advance()
+        elif self.current_char == '|':
+            self.advance()
+            if self.current_char != "=":
+                return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '||'.")
+            token_type = TT_OREQ
+            self.advance()
 
-        self.advance()
-        return Token(TT_OREQ, pos_start=pos_start, pos_end=self.pos), None
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 
     def make_and(self):
         pos_start = self.pos.copy()
         self.advance()
+        token_type = TT_BITWISEAND
 
-        if self.current_char != '=':
-            return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '&'.")
+        if self.current_char == '=':
+            token_type = TT_BITWISEANDEQ
+            self.advance()
+        elif self.current_char == '&':
+            self.advance()
+            if self.current_char != "=":
+                return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '&&'.")
+            token_type = TT_ANDEQ
+            self.advance()
 
-        self.advance()
-        return Token(TT_ANDEQ, pos_start=pos_start, pos_end=self.pos), None
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 
     def make_string(self, quote='"'):
         string_ = ''
@@ -244,14 +276,6 @@ class Lexer:
     def make_identifier(self):
         id_str = ''
         pos_start = self.pos.copy()
-
-        if self.current_char == "x":
-            id_str += self.current_char
-            self.advance()
-
-            if self.current_char == '=':
-                self.advance()
-                return Token(TT_XOREQ, pos_start=pos_start, pos_end=self.pos)
 
         while self.current_char is not None and self.current_char in LETTERS_DIGITS + '_':
             id_str += self.current_char

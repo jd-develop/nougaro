@@ -7,7 +7,7 @@ def string_with_arrows(text: str, pos_start, pos_end) -> str:
     """
         In this example, text will be 'var 1a = 123'
         If you execute this line with nougaro, it crashes with an :
-            InvalidSyntaxError : expected identifier, but got INT.
+            InvalidSyntaxError : expected identifier, but got int.
 
         It generates this view of the line with arrows (^) under the line :
             var 1a = 123

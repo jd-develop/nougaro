@@ -213,12 +213,38 @@ class Number(Value):
     def excl_or(self, other):
         """ Exclusive or (xor) """
         if isinstance(other, Number):
-            return Number(int(self.value ^ other.value)).set_context(self.context), None
+            if self.value == 0 and other.value != 0:
+                return Number(1).set_context(self.context), None
+            if self.value != 0 and other.value == 0:
+                return Number(1).set_context(self.context), None
+            else:
+                return Number(0).set_context(self.context), None
         else:
             return None, self.illegal_operation(other)
 
     def not_(self):
         return Number(1 if self.value == 0 else 0).set_context(self.context), None
+
+    def bitwise_and(self, other):
+        if isinstance(other, Number):
+            return Number(self.value & other.value).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
+
+    def bitwise_or(self, other):
+        if isinstance(other, Number):
+            return Number(self.value | other.value).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
+
+    def bitwise_xor(self, other):
+        if isinstance(other, Number):
+            return Number(self.value ^ other.value).set_context(self.context), None
+        else:
+            return None, self.illegal_operation(other)
+
+    def bitwise_not(self):
+        return Number(~self.value).set_context(self.context), None
 
     def is_true(self):
         return self.value != 0

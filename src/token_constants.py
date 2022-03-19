@@ -29,9 +29,17 @@ TT_DIVEQ = '/='               # /=
 TT_POWEQ = '^='               # ^=
 TT_PERCEQ = '%='              # %=
 TT_FLOORDIVEQ = '//='         # //=
-TT_OREQ = "|="                # |=
-TT_ANDEQ = "&="               # &=
-TT_XOREQ = "x="               # x=
+TT_OREQ = "||="               # ||=
+TT_ANDEQ = "&&="              # &&=
+TT_XOREQ = "^^^="             # ^^^=
+TT_BITWISEOREQ = "|="         # |=
+TT_BITWISEANDEQ = "&="        # &=
+TT_BITWISEXOREQ = "^^="       # ^^=
+
+TT_BITWISEOR = '|'            # |
+TT_BITWISEAND = '&'           # &
+TT_BITWISEXOR = '^^'          # ^^
+TT_BITWISENOT = '~'           # ~
 
 TT_EE = '=='                  # ==
 TT_NE = '!='                  # !=
@@ -44,7 +52,6 @@ TT_RPAREN = ')'               # )
 TT_LPAREN = '('               # (
 TT_RSQUARE = ']'              # ]
 TT_LSQUARE = '['              # [
-TT_OR = '|'                   # |
 
 TT_COMMA = ','                # ,
 TT_ARROW = '->'               # ->
@@ -98,6 +105,12 @@ TOKENS_TO_QUOTE = [
     TT_ANDEQ,
     TT_OREQ,
     TT_XOREQ,
+    TT_BITWISEOREQ,
+    TT_BITWISEANDEQ,
+    TT_BITWISEXOREQ,
+    TT_BITWISEAND,
+    TT_BITWISEOR,
+    TT_BITWISEXOR,
     TT_RPAREN,
     TT_LPAREN,
     TT_RSQUARE,

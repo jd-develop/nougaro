@@ -160,7 +160,7 @@ class Parser:
 
             equal = self.current_token
             equals = [TT_EQ, TT_PLUSEQ, TT_MINUSEQ, TT_MULTEQ, TT_DIVEQ, TT_POWEQ, TT_FLOORDIVEQ, TT_PERCEQ, TT_OREQ,
-                      TT_ANDEQ, TT_XOREQ]
+                      TT_ANDEQ, TT_XOREQ, TT_BITWISEANDEQ, TT_BITWISEOREQ, TT_BITWISEXOREQ]
 
             if self.current_token.type not in equals:
                 if self.current_token.type not in TOKENS_TO_QUOTE:
@@ -211,7 +211,7 @@ class Parser:
             return result.success(VarDeleteNode(var_name))
 
         node = result.register(self.bin_op(self.comp_expr, (
-            (TT_KEYWORD, "and"), (TT_KEYWORD, "or"), (TT_KEYWORD, 'xor'))))
+            (TT_KEYWORD, "and"), (TT_KEYWORD, "or"), (TT_KEYWORD, 'xor'), TT_BITWISEAND, TT_BITWISEOR, TT_BITWISEXOR)))
 
         if result.error is not None:
             return result.failure(InvalidSyntaxError(
@@ -223,7 +223,7 @@ class Parser:
 
     def comp_expr(self):
         result = ParseResult()
-        if self.current_token.matches(TT_KEYWORD, 'not'):
+        if self.current_token.matches(TT_KEYWORD, 'not') or self.current_token.type == TT_BITWISENOT:
             op_token = self.current_token
             result.register_advancement()
             self.advance()

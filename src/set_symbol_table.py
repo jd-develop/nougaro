@@ -67,6 +67,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("asin", ASIN)
     symbol_table.set("acos", ACOS)
     symbol_table.set("atan", ATAN)
+    symbol_table.set("abs", ABS)
     # Hum...
     symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))
     symbol_table.set("numberOfHornsOnAnUnicorn", Number(1))

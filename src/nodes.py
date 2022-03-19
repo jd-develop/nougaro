@@ -236,18 +236,6 @@ class ReturnNode:
         return f'(return:{self.node_to_return})'
 
 
-# SOME MATH NODES
-class AbsNode:
-    def __init__(self, node_to_abs):
-        self.node_to_abs = node_to_abs
-
-        self.pos_start = self.node_to_abs.pos_start
-        self.pos_end = self.node_to_abs.pos_end
-
-    def __repr__(self):
-        return f'|{self.node_to_abs}|'
-
-
 # SPECIAL NODES
 class NoNode:
     pass

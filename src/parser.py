@@ -266,12 +266,12 @@ class Parser:
 
     def call(self):
         result = ParseResult()
-        abs_ = result.register(self.abs_())
+        atom = result.register(self.atom())
         if result.error is not None:
             return result
 
         if self.current_token.type == TT_LPAREN:
-            call_node = abs_
+            call_node = atom
 
             while self.current_token.type == TT_LPAREN:
                 result.register_advancement()
@@ -313,32 +313,7 @@ class Parser:
                 call_node = CallNode(call_node, arg_nodes)
 
             return result.success(call_node)
-        return result.success(abs_)
-
-    def abs_(self):
-        result = ParseResult()
-
-        if self.current_token.type == TT_ABS:
-            result.register_advancement()
-            self.advance()
-            expr = result.register(self.expr())
-            if result.error is not None:
-                return result
-            if self.current_token.type != TT_ABS:
-                return result.failure(
-                    InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected '|'."
-                    )
-                )
-            result.register_advancement()
-            self.advance()
-            return result.success(AbsNode(expr))
-        else:
-            atom = result.register(self.atom())
-            if result.error is not None:
-                return result
-            return result.success(atom)
+        return result.success(atom)
 
     def atom(self):
         result = ParseResult()

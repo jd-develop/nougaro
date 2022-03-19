@@ -44,7 +44,7 @@ TT_RPAREN = ')'               # )
 TT_LPAREN = '('               # (
 TT_RSQUARE = ']'              # ]
 TT_LSQUARE = '['              # [
-TT_ABS = '|'                  # |
+TT_OR = '|'                   # |
 
 TT_COMMA = ','                # ,
 TT_ARROW = '->'               # ->
@@ -95,11 +95,13 @@ TOKENS_TO_QUOTE = [
     TT_POWEQ,
     TT_PERCEQ,
     TT_FLOORDIVEQ,
+    TT_ANDEQ,
+    TT_OREQ,
+    TT_XOREQ,
     TT_RPAREN,
     TT_LPAREN,
     TT_RSQUARE,
     TT_LSQUARE,
-    TT_ABS,
     TT_EE,
     TT_NE,
     TT_LT,

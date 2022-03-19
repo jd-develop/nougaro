@@ -50,6 +50,7 @@ TAN = BuiltInFunction('tan')
 ASIN = BuiltInFunction('asin')
 ACOS = BuiltInFunction('acos')
 ATAN = BuiltInFunction('atan')
+ABS = BuiltInFunction('abs')
 
 EXIT = BuiltInFunction('exit')
 

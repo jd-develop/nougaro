@@ -78,11 +78,6 @@ class Lexer:
                 if error is not None:
                     return [], error
                 tokens.append(token)
-            elif self.current_char == "~":
-                token, error = self.make_not()
-                if error is not None:
-                    return [], error
-                tokens.append(token)
             elif self.current_char == '(':
                 tokens.append(Token(TT_LPAREN, pos_start=self.pos))
                 self.advance()
@@ -94,9 +89,6 @@ class Lexer:
                 self.advance()
             elif self.current_char == ']':
                 tokens.append(Token(TT_RSQUARE, pos_start=self.pos))
-                self.advance()
-            elif self.current_char == '|':
-                tokens.append(Token(TT_ABS, pos_start=self.pos))
                 self.advance()
 
             elif self.current_char == '!':
@@ -214,16 +206,6 @@ class Lexer:
 
         self.advance()
         return Token(TT_ANDEQ, pos_start=pos_start, pos_end=self.pos), None
-
-    def make_not(self):
-        pos_start = self.pos.copy()
-        self.advance()
-
-        if self.current_char != '=':
-            return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '~'.")
-
-        self.advance()
-        return Token(TT_NOTEQ, pos_start=pos_start, pos_end=self.pos), None
 
     def make_string(self, quote='"'):
         string_ = ''

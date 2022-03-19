@@ -740,6 +740,26 @@ class BuiltInFunction(BaseFunction):
     execute_atan.optional_args = []
     execute_atan.have_to_respect_args_number = True
 
+    def execute_abs(self, exec_context: Context):
+        """Exactly like python `abs()` (absolute value)"""
+        # Params:
+        # * value
+        value: Value = exec_context.symbol_table.get('value')
+        if not isinstance(value, Number):
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "first argument of built-in function 'abs' must be a number.",
+                exec_context
+            ))
+        
+        value_to_return = value.abs_()
+
+        return RTResult().success(value_to_return)
+
+    execute_abs.arg_names = ['value']
+    execute_abs.optional_args = []
+    execute_abs.have_to_respect_args_number = True
+
     def execute_exit(self, exec_context: Context):
         """Stops the Nougaro Interpreter"""
         # Optional params:

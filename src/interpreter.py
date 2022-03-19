@@ -527,25 +527,6 @@ class Interpreter:
     def visit_BreakNode(node: BreakNode, context: Context):
         return RTResult().success_break()
 
-    def visit_AbsNode(self, node: AbsNode, context: Context):
-        result = RTResult()
-
-        value_to_abs = result.register(self.visit(node.node_to_abs, context))
-        if result.should_return():
-            return result
-        value_to_abs = value_to_abs.copy().set_pos(node.pos_start, node.pos_end)
-
-        if not isinstance(value_to_abs, Number):
-            return result.failure(RunTimeError(
-                node.pos_start, node.pos_end,
-                f"expected int or float, but found {value_to_abs.type_}.",
-                context
-            ))
-
-        return_value = value_to_abs.abs_()
-        return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
-        return result.success(return_value)
-
     @staticmethod
     def visit_NoNode(node: NoNode, context: Context):
         return RTResult().success(NoneValue(False))

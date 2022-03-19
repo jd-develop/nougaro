@@ -1,3 +1,4 @@
 {
-    "version": "prototype-1"
+    "noug_version": "prototype-2",
+    "inherit": true
 }

@@ -27,7 +27,7 @@ set_symbol_table(global_symbol_table)  # This function is in src.set_symbol_tabl
 
 with open("version.json") as ver_json:
     ver_json_loaded = json.load(ver_json)
-    version_ = ver_json_loaded.get("version")
+    version_ = ver_json_loaded.get("noug_version")
 
 
 # ##########

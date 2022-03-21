@@ -27,5 +27,8 @@ class Position:
 
         return self
 
+    def __repr__(self):
+        return f"Position at index {self.index} line {self.line_number} colon {self.colon}, in file {self.file_name}."
+
     def copy(self):
         return Position(self.index, self.line_number, self.colon, self.file_name, self.file_txt)

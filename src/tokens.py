@@ -18,7 +18,7 @@ class Token:
             self.pos_end = pos_start.copy()
             self.pos_end.advance()
         if pos_end is not None:
-            self.pos_end = pos_end
+            self.pos_end = pos_end.copy()
 
     def __repr__(self) -> str:
         if self.value:

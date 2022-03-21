@@ -43,7 +43,7 @@ else:  # there is no file
 
 with open("version.json") as ver_json:
     ver_json_loaded = json.load(ver_json)
-    version = ver_json_loaded.get("noug_version")
+    version = ver_json_loaded.get("phase") + " " + ver_json_loaded.get("noug_version")
 
 if path == "<stdin>":
     print(f"Welcome to Nougaro {version}! Contribute : https://github.com/jd-develop/nougaro/")

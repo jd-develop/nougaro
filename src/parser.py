@@ -10,7 +10,7 @@ from src.errors import InvalidSyntaxError
 from src.parse_result import ParseResult
 from src.nodes import *  # src.tokens.Token is imported in src.nodes
 # built-in python imports
-# no imports
+from typing import Any, Union
 
 
 # ##########
@@ -53,7 +53,9 @@ class Parser:
 
     # GRAMMARS ATOMS (AST) :
 
-    def statements(self):
+    def statements(self, stop: list[Union[tuple[str, Any], str]] = None) -> ParseResult:
+        if stop is None:
+            stop = [TT_EOF]
         result = ParseResult()
         statements = []
         pos_start = self.current_token.pos_start.copy()
@@ -81,13 +83,20 @@ class Parser:
             if newline_count == 0:
                 more_statements = False
 
-            if not more_statements:
+            have_to_break = False
+            for e in stop:
+                if isinstance(e, tuple):
+                    if not more_statements or self.current_token.matches(*e):
+                        have_to_break = True
+                else:
+                    if not more_statements or self.current_token.type == e:
+                        have_to_break = True
+            if have_to_break:
                 break
-            statement = result.try_register(self.statement())
-            if statement is None:
-                self.reverse(result.to_reverse_count)
-                more_statements = False
-                continue
+
+            statement = result.register(self.statement())
+            if result.error is not None:
+                return result
             statements.append(statement)
 
         return result.success(ListNode(
@@ -450,7 +459,7 @@ class Parser:
                 result.register_advancement()
                 self.advance()
 
-                statements = result.register(self.statements())
+                statements = result.register(self.statements(stop=[(TT_KEYWORD, 'end')]))
                 if result.error is not None:
                     return result
                 else_case = (statements, True)
@@ -517,7 +526,8 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            statements = result.register(self.statements())
+            statements = result.register(self.statements(stop=[(TT_KEYWORD, 'elif'), (TT_KEYWORD, 'else'),
+                                                               (TT_KEYWORD, 'end')]))
             if result.error is not None:
                 return result
             cases.append((condition, statements, True))
@@ -592,7 +602,7 @@ class Parser:
                 result.register_advancement()
                 self.advance()
 
-                body = result.register(self.statements())
+                body = result.register(self.statements(stop=[(TT_KEYWORD, 'end')]))
                 if result.error is not None:
                     return result
 
@@ -662,7 +672,7 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            body = result.register(self.statements())
+            body = result.register(self.statements(stop=[(TT_KEYWORD, 'end')]))
             if result.error is not None:
                 return result
 
@@ -708,7 +718,7 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            body = result.register(self.statements())
+            body = result.register(self.statements(stop=[(TT_KEYWORD, 'end')]))
             if result.error is not None:
                 return result
 
@@ -844,7 +854,7 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        body = result.register(self.statements())
+        body = result.register(self.statements(stop=[(TT_KEYWORD, 'end')]))
         if result.error is not None:
             return result
 

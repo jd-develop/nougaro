@@ -1,4 +1,5 @@
 {
-    "noug_version": "prototype-2",
+    "noug_version": "0.1",
+    "phase": "alpha",
     "inherit": true
 }

@@ -1,4 +1,4 @@
-# This file was made in nougaro-prototype-1 version.
+# This file was made in nougaro alpha 0.1 version.
 
 # This is a comment
 # Basics :
@@ -11,12 +11,12 @@ print(3-4)
 print(2*3)
 print(6/2)
 print(3^2)
-print(|-5|)
+print(abs(-5))
 
 # Variables
-var sometext = "Hello, world!"
+var some_text = "Hello, world!"
 var a = var b = 3
-print(sometext); print(a * b)
+print(some_text); print(a * b)
 print(noug_version)
 print(None)
 
@@ -25,7 +25,7 @@ print("this is a string quoted by \".")
 print("You can put\nbacklines and\n\ttabs.")
 print("You can add \\ backslashes and \" \' quotes")
 
-print("You can additionate and multiply strings : " + 3*sometext)
+print("You can add up and multiply strings: " + 3*some_text)
 
 # Tests
 var name = input("Whats your name? ")
@@ -67,7 +67,7 @@ def fib(n)
 	end
 end
 
-print(fib(input_int("Enter number:")))
+print(fib(input_int("Enter number: ")))
 
 var a = def()->print("Hello, world!")
 a()

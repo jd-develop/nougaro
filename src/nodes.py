@@ -61,14 +61,14 @@ class VarAssignNode:
 
 
 class VarAccessNode:
-    def __init__(self, var_name_token):
-        self.var_name_token = var_name_token
+    def __init__(self, var_name_tokens_list: list[Token]):
+        self.var_name_tokens_list = var_name_tokens_list
 
-        self.pos_start = self.var_name_token.pos_start
-        self.pos_end = self.var_name_token.pos_end
+        self.pos_start = self.var_name_tokens_list[0].pos_start
+        self.pos_end = self.var_name_tokens_list[-1].pos_end
 
     def __repr__(self):
-        return f'(var_access:{self.var_name_token})'
+        return f'(var_access:{self.var_name_tokens_list})'
 
 
 class VarDeleteNode:

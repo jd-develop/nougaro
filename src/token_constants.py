@@ -55,6 +55,7 @@ TT_LSQUARE = '['              # [
 
 TT_COMMA = ','                # ,
 TT_ARROW = '->'               # ->
+TT_INTERROGATIVE_PNT = '?'    # ?
 
 TT_EOF = 'end of file'        # end of file
 

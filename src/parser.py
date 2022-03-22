@@ -339,7 +339,31 @@ class Parser:
         elif token.type == TT_IDENTIFIER:
             result.register_advancement()
             self.advance()
-            return result.success(VarAccessNode(token))
+
+            choices = [token]
+            while self.current_token.type == TT_INTERROGATIVE_PNT:
+                result.register_advancement()
+                self.advance()
+                if self.current_token.type != TT_IDENTIFIER:
+                    if self.current_token.type in TOKENS_TO_QUOTE:
+                        return result.failure(
+                            InvalidSyntaxError(
+                                self.current_token.pos_start, self.current_token.pos_end,
+                                f"expected identifier after '?', but got '{self.current_token.type}'."
+                            )
+                        )
+                    else:
+                        return result.failure(
+                            InvalidSyntaxError(
+                                self.current_token.pos_start, self.current_token.pos_end,
+                                f"expected identifier after '?', but got {self.current_token.type}."
+                            )
+                        )
+                choices.append(self.current_token)
+                result.register_advancement()
+                self.advance()
+
+            return result.success(VarAccessNode(choices))
         elif token.type == TT_LPAREN:
             result.register_advancement()
             self.advance()

@@ -202,15 +202,27 @@ class Interpreter:
     @staticmethod
     def visit_VarAccessNode(node: VarAccessNode, context: Context):
         result = RTResult()
-        var_name = node.var_name_token.value
-        value = context.symbol_table.get(var_name)
+        var_names_list = node.var_name_tokens_list
+        value = None
+        var_name = var_names_list[0]
+        for var_name in var_names_list:
+            value = context.symbol_table.get(var_name.value)
+            if value is not None:
+                break
 
         if value is None:
-            return result.failure(
-                NotDefinedError(
-                    node.pos_start, node.pos_end, f"name '{var_name}' is not defined.", context
+            if len(var_names_list) == 1:
+                return result.failure(
+                    NotDefinedError(
+                        node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined.", context
+                    )
                 )
-            )
+            else:
+                return result.failure(
+                    NotDefinedError(
+                        node.pos_start, node.pos_end, f"none of the given identifiers is defined.", context
+                    )
+                )
 
         value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
         return result.success(value)

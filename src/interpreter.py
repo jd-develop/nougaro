@@ -212,11 +212,20 @@ class Interpreter:
 
         if value is None:
             if len(var_names_list) == 1:
-                return result.failure(
-                    NotDefinedError(
-                        node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined.", context
+                if var_name.value == "eexit" or var_name.value == "exxit" or var_name.value == "exiit" or \
+                        var_name.value == "exitt":
+                    return result.failure(
+                        NotDefinedError(
+                            node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined. Did you mean 'exit'"
+                                                          f"?", context
+                        )
                     )
-                )
+                else:
+                    return result.failure(
+                        NotDefinedError(
+                            node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined.", context
+                        )
+                    )
             else:
                 return result.failure(
                     NotDefinedError(

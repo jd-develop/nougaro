@@ -48,6 +48,8 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("list", LIST)
     symbol_table.set("int", INT)
     symbol_table.set("float", FLOAT)
+    symbol_table.set("upper", UPPER)
+    symbol_table.set("lower", LOWER)
 
     symbol_table.set("append", APPEND)
     symbol_table.set("pop", POP)

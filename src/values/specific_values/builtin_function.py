@@ -30,6 +30,8 @@ INT = BuiltInFunction('int')
 FLOAT = BuiltInFunction('float')
 STR = BuiltInFunction('str')
 LIST = BuiltInFunction('list')
+LOWER = BuiltInFunction('lower')
+UPPER = BuiltInFunction('upper')
 
 APPEND = BuiltInFunction('append')
 POP = BuiltInFunction('pop')

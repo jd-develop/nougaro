@@ -57,6 +57,8 @@ BUILTIN_FUNCTIONS = [
     "system_call",
     "run",
     "len",
+    'lower',
+    'upper',
     *MATHEMATICAL_FUNCTIONS
 ]
 MATHEMATICAL_CONSTANTS = [

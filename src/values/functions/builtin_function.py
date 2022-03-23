@@ -920,6 +920,8 @@ class BuiltInFunction(BaseFunction):
 
     def execute_system_call(self, exec_ctx: Context):
         """System call. e.g. system_call('ls') lists the directory on bash."""
+        # Params :
+        # * cmd
         cmd = exec_ctx.symbol_table.get("cmd")
         if not isinstance(cmd, String):
             return RTResult().failure(RunTimeError(
@@ -940,5 +942,39 @@ class BuiltInFunction(BaseFunction):
     execute_system_call.arg_names = ["cmd"]
     execute_system_call.optional_args = []
     execute_system_call.have_to_respect_args_number = True
+
+    def execute_lower(self, exec_ctx: Context):
+        """Return lower-cased string. e.g. lower('NOUGARO') returns 'nougaro'."""
+        # Params :
+        # * value
+        value = exec_ctx.symbol_table.get("value")
+        if not isinstance(value, String):
+            return RTResult().failure(RunTimeError(
+                value.pos_start, value.pos_end,
+                f"first argument of builtin function 'lower' must be a str.",
+                exec_ctx
+            ))
+        return RTResult().success(String(value.value.lower()))
+
+    execute_lower.arg_names = ["value"]
+    execute_lower.optional_args = []
+    execute_lower.have_to_respect_args_number = True
+
+    def execute_upper(self, exec_ctx: Context):
+        """Return upper-cased string. e.g. upper('nougaro') returns 'NOUGARO'."""
+        # Params :
+        # * value
+        value = exec_ctx.symbol_table.get("value")
+        if not isinstance(value, String):
+            return RTResult().failure(RunTimeError(
+                value.pos_start, value.pos_end,
+                f"first argument of builtin function 'upper' must be a str.",
+                exec_ctx
+            ))
+        return RTResult().success(String(value.value.upper()))
+
+    execute_upper.arg_names = ["value"]
+    execute_upper.optional_args = []
+    execute_upper.have_to_respect_args_number = True
 
     # ==================

@@ -2,7 +2,7 @@
 ## English description
  A programming language. Interpreter written in Python.
  
- For the moment, only the shell is working. Execute it with `python3 shell.py`.
+Execute the shell with `python3 shell.py`. Open files with `python3 shell.py (filename.extension)`
  
  Minimum : python 3.9
  
@@ -11,7 +11,7 @@
 ## French description
  Un langage de programmation. Interpréteur écrit en Python.
  
- Pour l'instant, seul le shell fonctionne. Exécutez-le avec `python3 shell.py`.
+ Executez le shell avec `python3 shell.py`. Ouvrez des fichiers avec `python3 shell.py (filename.extension)`
  
  Minimum : python 3.9
  

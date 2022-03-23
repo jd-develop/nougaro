@@ -53,5 +53,6 @@ ATAN = BuiltInFunction('atan')
 ABS = BuiltInFunction('abs')
 
 EXIT = BuiltInFunction('exit')
+SYSTEM_CALL = BuiltInFunction('system_call')
 
 RICKROLL = BuiltInFunction('rickroll')

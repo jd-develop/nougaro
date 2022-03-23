@@ -153,7 +153,7 @@ class BuiltInFunction(BaseFunction):
                 number = int(text)
                 break
             except ValueError:
-                print(f'{text} must be an integer. Try again :')
+                print(f"'{text}' must be an integer. Try again :")
         return RTResult().success(Number(number))
 
     execute_input_int.arg_names = []
@@ -163,7 +163,7 @@ class BuiltInFunction(BaseFunction):
     def execute_clear(self):
         """Clear the screen"""
         # No params.
-        os_system('cls' if (os_name == "nt" or os_name == "Windows") else 'clear')
+        os_system('cls' if (os_name.lower() == "nt" or os_name.lower().startswith("windows")) else 'clear')
         return RTResult().success(NoneValue(False))
 
     execute_clear.arg_names = []
@@ -274,7 +274,7 @@ class BuiltInFunction(BaseFunction):
 
         if not isinstance(list_, List):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                list_.pos_start, list_.pos_end,
                 "first argument of built-in function 'append' must be a list.",
                 exec_context
             ))
@@ -296,14 +296,14 @@ class BuiltInFunction(BaseFunction):
 
         if not isinstance(list_, List):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                list_.pos_start, list_.pos_end,
                 "first argument of built-in function 'pop' must be a list.",
                 exec_context
             ))
 
         if not isinstance(index, Number):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                index.pos_start, index.pos_end,
                 "second argument of built-in function 'pop' must be a number.",
                 exec_context
             ))
@@ -312,7 +312,7 @@ class BuiltInFunction(BaseFunction):
             list_.elements.pop(index.value)
         except Exception:
             return RTResult().failure(RTIndexError(
-                self.pos_start, self.pos_end,
+                list_.pos_start, index.pos_end,
                 f'pop index {index.value} out of range.',
                 self.context
             ))
@@ -332,14 +332,14 @@ class BuiltInFunction(BaseFunction):
 
         if not isinstance(list1, List):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                list1.pos_start, list1.pos_end,
                 "first argument of built-in function 'extend' must be a list.",
                 exec_context
             ))
 
         if not isinstance(list2, List):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                list2.pos_start, list2.pos_end,
                 "second argument of built-in function 'extend' must be a list.",
                 exec_context
             ))
@@ -361,7 +361,7 @@ class BuiltInFunction(BaseFunction):
         if not isinstance(list_, List):
             return RTResult().failure(
                 RunTimeError(
-                    self.pos_start, self.pos_end,
+                    list_.pos_start, list_.pos_end,
                     "first argument of built-in function 'get' must be a list.",
                     exec_context
                 )
@@ -370,19 +370,18 @@ class BuiltInFunction(BaseFunction):
         if not isinstance(index_, Number):
             return RTResult().failure(
                 RunTimeError(
-                    self.pos_start, self.pos_end,
+                    index_.pos_start, index_.pos_end,
                     "second argument of built-in function 'get' must be an int.",
                     exec_context
                 )
             )
-        index_ = index_.value
 
         try:
-            return RTResult().success(list_[index_])
+            return RTResult().success(list_[index_.value])
         except Exception:
             return RTResult().failure(RTIndexError(
-                self.pos_start, self.pos_end,
-                f'index {index_} out of range.',
+                list_.pos_start, index_.pos_end,
+                f'list index {index_.value} out of range.',
                 exec_context
             ))
 
@@ -400,18 +399,18 @@ class BuiltInFunction(BaseFunction):
         if not isinstance(list_, List):
             return RTResult().failure(
                 RunTimeError(
-                    self.pos_start, self.pos_end,
+                    list_.pos_start, list_.pos_end,
                     "first argument of builtin function 'max' must be a list.",
                     exec_context
                 )
             )
         ignore_not_num = exec_context.symbol_table.get('ignore_not_num')
         if ignore_not_num is None:
-            ignore_not_num = FALSE
+            ignore_not_num = FALSE.set_pos(list_.pos_end, self.pos_end)
         if not isinstance(ignore_not_num, Number):
             return RTResult().failure(
                 RunTimeError(
-                    self.pos_start, self.pos_end,
+                    ignore_not_num.pos_start, ignore_not_num.pos_end,
                     "second argument of builtin function 'max' must be a number.",
                     exec_context
                 )
@@ -425,7 +424,7 @@ class BuiltInFunction(BaseFunction):
                 if ignore_not_num.value == FALSE.value:
                     return RTResult().failure(
                         RunTimeError(
-                            self.pos_start, self.pos_end,
+                            list_.pos_start, list_.pos_end,
                             "first argument of builtin function 'max' must be a list containing only numbers. "
                             "You can execute the function with True as the second argument to avoid this error.",
                             exec_context
@@ -463,18 +462,18 @@ class BuiltInFunction(BaseFunction):
         if not isinstance(list_, List):
             return RTResult().failure(
                 RunTimeError(
-                    self.pos_start, self.pos_end,
+                    list_.pos_start, list_.pos_end,
                     "first argument of builtin function 'min' must be a list.",
                     exec_context
                 )
             )
         ignore_not_num = exec_context.symbol_table.get('ignore_not_num')
         if ignore_not_num is None:
-            ignore_not_num = FALSE
+            ignore_not_num = FALSE.set_pos(list_.pos_end, self.pos_end)
         if not isinstance(ignore_not_num, Number):
             return RTResult().failure(
                 RunTimeError(
-                    self.pos_start, self.pos_end,
+                    ignore_not_num.pos_start, ignore_not_num.pos_end,
                     "second argument of builtin function 'min' must be a number.",
                     exec_context
                 )
@@ -488,7 +487,7 @@ class BuiltInFunction(BaseFunction):
                 if ignore_not_num.value == FALSE.value:
                     return RTResult().failure(
                         RunTimeError(
-                            self.pos_start, self.pos_end,
+                            list_.pos_start, list_.pos_end,
                             "first argument of builtin function 'min' must be a list containing only numbers. "
                             "You can execute the function with True as the second argument to avoid this error.",
                             exec_context
@@ -523,14 +522,14 @@ class BuiltInFunction(BaseFunction):
         value = exec_context.symbol_table.get('value')
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'sqrt' must be a number.",
                 exec_context
             ))
 
         if not value.value >= 0:
             return RTResult().failure(RTArithmeticError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'sqrt' must be greater than (or equal to) 0.",
                 exec_context
             ))
@@ -551,25 +550,25 @@ class BuiltInFunction(BaseFunction):
         value = exec_context.symbol_table.get('value')
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'math_root' must be a number.",
                 exec_context
             ))
 
         if value.value < 0:
             return RTResult().failure(RTArithmeticError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'math_root' must be greater than (or equal to) 0.",
                 exec_context
             ))
 
         n = exec_context.symbol_table.get('n')
         if n is None:
-            n = Number(2)
+            n = Number(2).set_pos(value.pos_end, self.pos_end)
 
         if not isinstance(n, Number):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                n.pos_start, n.pos_end,
                 "second argument of built-in function 'math_root' must be a number.",
                 exec_context
             ))
@@ -589,7 +588,7 @@ class BuiltInFunction(BaseFunction):
         value = exec_context.symbol_table.get('value')
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'degrees' must be a number (angle in radians).",
                 exec_context
             ))
@@ -607,7 +606,7 @@ class BuiltInFunction(BaseFunction):
         value = exec_context.symbol_table.get('value')
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'radians' must be a number (angle in degrees).",
                 exec_context
             ))
@@ -625,7 +624,7 @@ class BuiltInFunction(BaseFunction):
         value = exec_context.symbol_table.get('value')
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'sin' must be a number (angle in radians).",
                 exec_context
             ))
@@ -643,7 +642,7 @@ class BuiltInFunction(BaseFunction):
         value = exec_context.symbol_table.get('value')
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'cos' must be a number (angle in radians).",
                 exec_context
             ))
@@ -661,7 +660,7 @@ class BuiltInFunction(BaseFunction):
         value = exec_context.symbol_table.get('value')
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'tan' must be a number (angle in radians).",
                 exec_context
             ))
@@ -679,7 +678,7 @@ class BuiltInFunction(BaseFunction):
         value = exec_context.symbol_table.get('value')
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'asin' must be a number.",
                 exec_context
             ))
@@ -687,7 +686,7 @@ class BuiltInFunction(BaseFunction):
             asin = math_asin(value.value)
         except ValueError:
             return RTResult().failure(RTArithmeticError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'asin' must be a number between -1 and 1.",
                 exec_context
             ))
@@ -704,7 +703,7 @@ class BuiltInFunction(BaseFunction):
         value = exec_context.symbol_table.get('value')
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'acos' must be a number.",
                 exec_context
             ))
@@ -712,7 +711,7 @@ class BuiltInFunction(BaseFunction):
             acos = math_acos(value.value)
         except ValueError:
             return RTResult().failure(RTArithmeticError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'acos' must be a number between -1 and 1.",
                 exec_context
             ))
@@ -729,7 +728,7 @@ class BuiltInFunction(BaseFunction):
         value = exec_context.symbol_table.get('value')
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'atan' must be a number.",
                 exec_context
             ))
@@ -747,7 +746,7 @@ class BuiltInFunction(BaseFunction):
         value: Value = exec_context.symbol_table.get('value')
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                value.pos_start, value.pos_end,
                 "first argument of built-in function 'abs' must be a number.",
                 exec_context
             ))
@@ -856,7 +855,7 @@ class BuiltInFunction(BaseFunction):
 
         if not isinstance(list_, List):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                list_.pos_start, list_.pos_end,
                 "first argument of built-in function 'len' must be a list.",
                 exec_ctx
             ))
@@ -885,7 +884,7 @@ class BuiltInFunction(BaseFunction):
 
         if not isinstance(file_name, String):
             return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
+                file_name.pos_start, file_name.pos_end,
                 "first argument of built-in function 'run' must be a str.",
                 exec_ctx
             ))
@@ -904,7 +903,7 @@ class BuiltInFunction(BaseFunction):
         except Exception as e:
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
-                f"failed to load script '{file_name}' due to internal error '{str(e)}'.",
+                f"failed to load script '{file_name}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
                 exec_ctx
             ))
 
@@ -918,5 +917,28 @@ class BuiltInFunction(BaseFunction):
     execute_run.arg_names = ["file_name"]
     execute_run.optional_args = []
     execute_run.have_to_respect_args_number = True
+
+    def execute_system_call(self, exec_ctx: Context):
+        """System call. e.g. system_call('ls') lists the directory on bash."""
+        cmd = exec_ctx.symbol_table.get("cmd")
+        if not isinstance(cmd, String):
+            return RTResult().failure(RunTimeError(
+                cmd.pos_start, cmd.pos_end,
+                f"first argument of builtin function 'system_call' must be a str.",
+                exec_ctx
+            ))
+        try:
+            to_return_value = os_system(str(cmd.value))
+            return RTResult().success(String(to_return_value))
+        except Exception as e:
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                f"failed to call '{cmd}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
+                exec_ctx
+            ))
+
+    execute_system_call.arg_names = ["cmd"]
+    execute_system_call.optional_args = []
+    execute_system_call.have_to_respect_args_number = True
 
     # ==================

@@ -25,7 +25,8 @@ MATHEMATICAL_FUNCTIONS = [
     "asin",
     "acos",
     "atan",
-    "math_root"
+    "math_root",
+    "abs"
 ]
 BUILTIN_FUNCTIONS = [
     "void",
@@ -53,6 +54,9 @@ BUILTIN_FUNCTIONS = [
     "float",
     "max",
     "min",
+    "system_call",
+    "run",
+    "len",
     *MATHEMATICAL_FUNCTIONS
 ]
 MATHEMATICAL_CONSTANTS = [

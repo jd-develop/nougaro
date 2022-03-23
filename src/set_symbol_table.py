@@ -8,6 +8,7 @@ from src.symbol_table import SymbolTable
 from src.values.basevalues import NoneValue
 from src.values.specific_values.number import *
 from src.values.specific_values.builtin_function import *
+from src.constants import VARS_CANNOT_MODIFY
 # built-in python imports
 # no imports
 
@@ -75,3 +76,11 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("rickroll", RICKROLL)
 
     symbol_table.set("exit", EXIT)
+    symbol_table.set("system_call", SYSTEM_CALL)
+    # test_protected_vars(symbol_table)
+
+
+def test_protected_vars(symbol_table: SymbolTable):
+    for symbol in symbol_table.symbols:
+        if symbol not in VARS_CANNOT_MODIFY:
+            print(f"missing {symbol} in VARS_CANNOT_MODIFY")

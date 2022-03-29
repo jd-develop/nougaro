@@ -367,7 +367,8 @@ class BuiltInFunction(BaseFunction):
                         if equal is not None:
                             if equal.value == TRUE.value:
                                 can_append = False
-                    if can_append: final_list.append(e)
+                    if can_append:
+                        final_list.append(e)
                 return RTResult().success(List(final_list))
 
         list1.elements.extend(list2.elements)
@@ -776,7 +777,7 @@ class BuiltInFunction(BaseFunction):
                 "first argument of built-in function 'abs' must be a number.",
                 exec_context
             ))
-        
+
         value_to_return = value.abs_()
 
         return RTResult().success(value_to_return)
@@ -887,6 +888,7 @@ class BuiltInFunction(BaseFunction):
             ))
 
         return RTResult().success(Number(len(list_.elements)))
+
     execute_len.arg_names = ['list']
     execute_len.optional_args = []
     execute_len.have_to_respect_args_number = True
@@ -1002,5 +1004,43 @@ class BuiltInFunction(BaseFunction):
     execute_upper.arg_names = ["value"]
     execute_upper.optional_args = []
     execute_upper.have_to_respect_args_number = True
+
+    def execute_nougaro(self, exec_ctx: Context):
+        """Open a random song of Claude Nougaro. If argument 'song' is filled, open this song (if in database)."""
+        # Params :
+        # * song
+        song = exec_ctx.symbol_table.get("song")
+        songs = {
+            "Toulouse": "https://www.youtube.com/watch?v=wehrXJTA3vI",
+            "Armstrong": "https://www.youtube.com/watch?v=Dkqsh0kkjFw",
+            "Bidonville": "https://www.youtube.com/watch?v=sh6jpbxjFKY",
+            "Tu verras": "https://www.youtube.com/watch?v=rK3r-AqlNjU",
+        }  # PR if you want to add more songs :)
+        if song is None:
+            import webbrowser
+            import random
+            webbrowser.open(random.choice(list(songs.values())), new=2)
+            return RTResult().success(NoneValue(False))
+        if not isinstance(song, String):
+            return RTResult().failure(RunTimeError(
+                song.pos_start, song.pos_end,
+                f"first argument of builtin function 'nougaro' must be a str.",
+                exec_ctx
+            ))
+        import webbrowser
+        try:
+            webbrowser.open(songs[song.value], new=2)
+            return RTResult().success(NoneValue(False))
+        except KeyError:
+            return RTResult().failure(RunTimeError(
+                song.pos_start, song.pos_end,
+                f"'{song.value}' is not a song in the actual database. Available songs: "
+                f"{', '.join(list(songs.keys()))}",
+                exec_ctx
+            ))
+
+    execute_nougaro.arg_names = []
+    execute_nougaro.optional_args = ["song"]
+    execute_nougaro.have_to_respect_args_number = True
 
     # ==================

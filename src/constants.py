@@ -59,6 +59,7 @@ BUILTIN_FUNCTIONS = [
     "len",
     'lower',
     'upper',
+    'nougaro',
     *MATHEMATICAL_FUNCTIONS
 ]
 MATHEMATICAL_CONSTANTS = [

@@ -7,10 +7,11 @@
 from src.symbol_table import SymbolTable
 from src.values.basevalues import NoneValue
 from src.values.specific_values.number import *
+from src.values.basevalues import String
 from src.values.specific_values.builtin_function import *
 from src.constants import VARS_CANNOT_MODIFY
 # built-in python imports
-# no imports
+import platform
 
 
 def set_symbol_table(symbol_table: SymbolTable):
@@ -79,6 +80,8 @@ def set_symbol_table(symbol_table: SymbolTable):
 
     symbol_table.set("exit", EXIT)
     symbol_table.set("system_call", SYSTEM_CALL)
+    symbol_table.set('os_name', String(platform.system()))
+    # platform.system() may be 'Linux', 'Windows', 'Darwin', 'Java', etc. according to Python doc
     # test_protected_vars(symbol_table)
 
 

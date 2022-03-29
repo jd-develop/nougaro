@@ -327,8 +327,11 @@ class BuiltInFunction(BaseFunction):
         # Params:
         # * list1
         # * list2
+        # Optional params:
+        # * delete_duplicates
         list1 = exec_context.symbol_table.get('list1')
         list2 = exec_context.symbol_table.get('list2')
+        delete_duplicates = exec_context.symbol_table.get('delete_duplicates')
 
         if not isinstance(list1, List):
             return RTResult().failure(RunTimeError(
@@ -344,11 +347,34 @@ class BuiltInFunction(BaseFunction):
                 exec_context
             ))
 
+        if delete_duplicates is not None:
+            if not isinstance(delete_duplicates, Number):
+                return RTResult().failure(RunTimeError(
+                    list2.pos_start, list2.pos_end,
+                    "third argument of built-in function 'extend' must be a number.",
+                    exec_context
+                ))
+            if delete_duplicates.value != FALSE.value:
+                list1_e = list1.elements
+                list2_e = list2.elements
+                final_list = list1_e
+                for e in list2_e:
+                    can_append = True
+                    for e1 in list1_e:
+                        equal, error = e.get_comparison_eq(e1)
+                        if error is not None:
+                            continue
+                        if equal is not None:
+                            if equal.value == TRUE.value:
+                                can_append = False
+                    if can_append: final_list.append(e)
+                return RTResult().success(List(final_list))
+
         list1.elements.extend(list2.elements)
         return RTResult().success(list1)
 
     execute_extend.arg_names = ['list1', 'list2']
-    execute_extend.optional_args = []
+    execute_extend.optional_args = ['delete_duplicates']
     execute_extend.have_to_respect_args_number = True
 
     def execute_get(self, exec_context: Context):

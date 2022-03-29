@@ -387,6 +387,8 @@ class List(Value):
                             continue
                         else:
                             return False
+                    elif isinstance(element, NoneValue) and isinstance(other.elements[index], NoneValue):
+                        continue
                     else:
                         return False
                 return True
@@ -394,7 +396,6 @@ class List(Value):
             return None
 
     def get_comparison_eq(self, other):
-        # does not work
         is_eq = self.is_eq(other)
         if is_eq is None:
             return None, self.can_not_compare(other)

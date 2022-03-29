@@ -18,6 +18,7 @@ var some_text = "Hello, world!"
 var a = var b = 3
 print(some_text); print(a * b)
 print(noug_version)
+print(os_name)
 print(None)
 
 # Strings

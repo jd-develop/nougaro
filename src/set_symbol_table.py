@@ -81,6 +81,8 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("exit", EXIT)
     symbol_table.set("system_call", SYSTEM_CALL)
     symbol_table.set('os_name', String(platform.system()))
+    symbol_table.set('os_release', String(platform.uname().release))
+    symbol_table.set('os_version', String(platform.uname().version))
     # platform.system() may be 'Linux', 'Windows', 'Darwin', 'Java', etc. according to Python doc
     # test_protected_vars(symbol_table)
 

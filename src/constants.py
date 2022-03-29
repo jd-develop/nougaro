@@ -73,6 +73,8 @@ VARS_CANNOT_MODIFY = [
     "None",
     'noug_version',
     'os_name',
+    'os_release',
+    'os_version',
     'answerToTheLifeTheUniverseAndEverything',
     *KEYWORDS,
     *BUILTIN_FUNCTIONS,

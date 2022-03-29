@@ -17,8 +17,8 @@ print(abs(-5))
 var some_text = "Hello, world!"
 var a = var b = 3
 print(some_text); print(a * b)
-print(noug_version)
-print(os_name)
+print("You use nougaro version " + noug_version)
+print("You use " + os_name + " " + os_release + " " + os_version)
 print(None)
 
 # Strings

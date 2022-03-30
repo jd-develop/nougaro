@@ -291,23 +291,38 @@ class Parser:
                     result.register_advancement()
                     self.advance()
                 else:
-                    arg_nodes.append(result.register(self.expr()))
-                    if result.error is not None:
-                        return result.failure(
-                            InvalidSyntaxError(
-                                self.current_token.pos_start, self.current_token.pos_end,
-                                "expected ')', 'var', 'if', 'for', 'while', 'def', int, float, identifier, '+', '-', "
-                                "'(', '[' or 'not'."
-                            )
-                        )
-
-                    while self.current_token.type == TT_COMMA:
+                    if self.current_token.type == TT_MUL:
                         result.register_advancement()
                         self.advance()
+                        list_node: ListNode = result.register(self.list_expr())
+                        if result.error is not None:
+                            return result.failure(
+                                InvalidSyntaxError(
+                                    self.current_token.pos_start, self.current_token.pos_end,
+                                    "expected a list after '*' in call arguments."
+                                )
+                            )
 
+                        for node in list_node.element_nodes:
+                            arg_nodes.append(node)
+                    else:
                         arg_nodes.append(result.register(self.expr()))
                         if result.error is not None:
-                            return result
+                            return result.failure(
+                                InvalidSyntaxError(
+                                    self.current_token.pos_start, self.current_token.pos_end,
+                                    "expected ')', '*', 'var', 'if', 'for', 'while', 'def', int, float, identifier, '+'"
+                                    ", '-', '(', '[' or 'not'."
+                                )
+                            )
+
+                        while self.current_token.type == TT_COMMA:
+                            result.register_advancement()
+                            self.advance()
+
+                            arg_nodes.append(result.register(self.expr()))
+                            if result.error is not None:
+                                return result
 
                     if self.current_token.type != TT_RPAREN:
                         return result.failure(

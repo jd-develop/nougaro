@@ -33,7 +33,7 @@ class BaseFunction(Value):
         if (len(args) > len(arg_names + optional_args)) and have_to_respect_args_number:
             return result.failure(
                 RunTimeError(
-                    self.pos_start, self.pos_end,
+                    args[len(arg_names + optional_args)].pos_start, args[-1].pos_end,
                     f"{len(args) - len(arg_names + optional_args)} too many args passed into '{self.name}'.",
                     self.context
                 )

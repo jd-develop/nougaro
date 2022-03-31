@@ -34,7 +34,7 @@ class BuiltInFunction(BaseFunction):
 
         result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
                                                      optional_args=method.optional_args,
-                                                     have_to_respect_args_number=method.have_to_respect_args_number))
+                                                     should_respect_args_number=method.should_respect_args_number))
         if result.should_return():
             return result
 
@@ -80,7 +80,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_void.arg_names = []
     execute_void.optional_args = []
-    execute_void.have_to_respect_args_number = False
+    execute_void.should_respect_args_number = False
 
     def execute_print(self, exec_context: Context):
         """Print 'value'"""
@@ -94,7 +94,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_print.arg_names = ["value"]
     execute_print.optional_args = []
-    execute_print.have_to_respect_args_number = True
+    execute_print.should_respect_args_number = True
 
     def execute_print_ret(self, exec_context: Context):
         """Print 'value' and returns 'value'"""
@@ -117,7 +117,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_print_ret.arg_names = ["value"]
     execute_print_ret.optional_args = []
-    execute_print_ret.have_to_respect_args_number = True
+    execute_print_ret.should_respect_args_number = True
 
     def execute_input(self, exec_context: Context):
         """Basic input (str)"""
@@ -134,7 +134,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_input.arg_names = []
     execute_input.optional_args = ['text_to_display']
-    execute_input.have_to_respect_args_number = True
+    execute_input.should_respect_args_number = True
 
     def execute_input_int(self, exec_context: Context):
         """Basic input (int). Repeat while entered value is not an int."""
@@ -158,7 +158,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_input_int.arg_names = []
     execute_input_int.optional_args = ['text_to_display']
-    execute_input_int.have_to_respect_args_number = True
+    execute_input_int.should_respect_args_number = True
 
     def execute_clear(self):
         """Clear the screen"""
@@ -168,7 +168,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_clear.arg_names = []
     execute_clear.optional_args = []
-    execute_clear.have_to_respect_args_number = False
+    execute_clear.should_respect_args_number = False
 
     def execute_is_int(self, exec_context: Context):
         """Check if 'value' is an integer"""
@@ -187,7 +187,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_is_int.arg_names = ['value']
     execute_is_int.optional_args = []
-    execute_is_int.have_to_respect_args_number = True
+    execute_is_int.should_respect_args_number = True
 
     def execute_is_float(self, exec_context: Context):
         """Check if 'value' is a float"""
@@ -206,7 +206,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_is_float.arg_names = ['value']
     execute_is_float.optional_args = []
-    execute_is_float.have_to_respect_args_number = True
+    execute_is_float.should_respect_args_number = True
 
     def execute_is_num(self, exec_context: Context):
         """Check if 'value' is an int or a float"""
@@ -218,7 +218,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_is_num.arg_names = ['value']
     execute_is_num.optional_args = []
-    execute_is_num.have_to_respect_args_number = True
+    execute_is_num.should_respect_args_number = True
 
     def execute_is_list(self, exec_context: Context):
         """Check if 'value' is a List"""
@@ -229,7 +229,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_is_list.arg_names = ['value']
     execute_is_list.optional_args = []
-    execute_is_list.have_to_respect_args_number = True
+    execute_is_list.should_respect_args_number = True
 
     def execute_is_str(self, exec_context: Context):
         """Check if 'value' is a String"""
@@ -240,7 +240,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_is_str.arg_names = ['value']
     execute_is_str.optional_args = []
-    execute_is_str.have_to_respect_args_number = True
+    execute_is_str.should_respect_args_number = True
 
     def execute_is_func(self, exec_context: Context):
         """Check if 'value' is a BaseFunction"""
@@ -251,7 +251,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_is_func.arg_names = ['value']
     execute_is_func.optional_args = []
-    execute_is_func.have_to_respect_args_number = True
+    execute_is_func.should_respect_args_number = True
 
     def execute_is_none(self, exec_context: Context):
         """Check if 'value' is a NoneValue"""
@@ -262,7 +262,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_is_none.arg_names = ['value']
     execute_is_none.optional_args = []
-    execute_is_none.have_to_respect_args_number = True
+    execute_is_none.should_respect_args_number = True
 
     def execute_append(self, exec_context: Context):
         """Append 'value' to 'list'"""
@@ -284,7 +284,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_append.arg_names = ['list', 'value']
     execute_append.optional_args = []
-    execute_append.have_to_respect_args_number = True
+    execute_append.should_respect_args_number = True
 
     def execute_pop(self, exec_context: Context):
         """Remove element at 'index' from 'list'"""
@@ -320,7 +320,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_pop.arg_names = ['list', 'index']
     execute_pop.optional_args = []
-    execute_pop.have_to_respect_args_number = True
+    execute_pop.should_respect_args_number = True
 
     def execute_extend(self, exec_context: Context):
         """Extend list 'list1' with the elements of 'list2'"""
@@ -376,7 +376,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_extend.arg_names = ['list1', 'list2']
     execute_extend.optional_args = ['delete_duplicates']
-    execute_extend.have_to_respect_args_number = True
+    execute_extend.should_respect_args_number = True
 
     def execute_get(self, exec_context: Context):
         # Params:
@@ -414,7 +414,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_get.arg_names = ['list', 'index']
     execute_get.optional_args = []
-    execute_get.have_to_respect_args_number = True
+    execute_get.should_respect_args_number = True
 
     def execute_max(self, exec_context: Context):
         """Calculates the max value of a list"""
@@ -477,7 +477,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_max.arg_names = ['list']
     execute_max.optional_args = ['ignore_not_num']
-    execute_max.have_to_respect_args_number = True
+    execute_max.should_respect_args_number = True
 
     def execute_min(self, exec_context: Context):
         """Calculates the min value of a list"""
@@ -540,7 +540,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_min.arg_names = ['list']
     execute_min.optional_args = ['ignore_not_num']
-    execute_min.have_to_respect_args_number = True
+    execute_min.should_respect_args_number = True
 
     def execute_sqrt(self, exec_context: Context):
         """Calculates square root of 'value'"""
@@ -566,7 +566,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_sqrt.arg_names = ['value']
     execute_sqrt.optional_args = []
-    execute_sqrt.have_to_respect_args_number = True
+    execute_sqrt.should_respect_args_number = True
 
     def execute_math_root(self, exec_context: Context):
         """Calculates ⁿ√value"""
@@ -606,7 +606,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_math_root.arg_names = ['value']
     execute_math_root.optional_args = ['n']
-    execute_math_root.have_to_respect_args_number = True
+    execute_math_root.should_respect_args_number = True
 
     def execute_degrees(self, exec_context: Context):
         """Converts 'value' (radians) to degrees"""
@@ -624,7 +624,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_degrees.arg_names = ['value']
     execute_degrees.optional_args = []
-    execute_degrees.have_to_respect_args_number = True
+    execute_degrees.should_respect_args_number = True
 
     def execute_radians(self, exec_context: Context):
         """Converts 'value' (degrees) to radians"""
@@ -642,7 +642,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_radians.arg_names = ['value']
     execute_radians.optional_args = []
-    execute_radians.have_to_respect_args_number = True
+    execute_radians.should_respect_args_number = True
 
     def execute_sin(self, exec_context: Context):
         """Calculates sin('value')"""
@@ -660,7 +660,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_sin.arg_names = ['value']
     execute_sin.optional_args = []
-    execute_sin.have_to_respect_args_number = True
+    execute_sin.should_respect_args_number = True
 
     def execute_cos(self, exec_context: Context):
         """Calculates cos('value')"""
@@ -678,7 +678,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_cos.arg_names = ['value']
     execute_cos.optional_args = []
-    execute_cos.have_to_respect_args_number = True
+    execute_cos.should_respect_args_number = True
 
     def execute_tan(self, exec_context: Context):
         """Calculates tan('value')"""
@@ -696,7 +696,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_tan.arg_names = ['value']
     execute_tan.optional_args = []
-    execute_tan.have_to_respect_args_number = True
+    execute_tan.should_respect_args_number = True
 
     def execute_asin(self, exec_context: Context):
         """Calculates asin('value')"""
@@ -721,7 +721,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_asin.arg_names = ['value']
     execute_asin.optional_args = []
-    execute_asin.have_to_respect_args_number = True
+    execute_asin.should_respect_args_number = True
 
     def execute_acos(self, exec_context: Context):
         """Calculates acos('value')"""
@@ -746,7 +746,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_acos.arg_names = ['value']
     execute_acos.optional_args = []
-    execute_acos.have_to_respect_args_number = True
+    execute_acos.should_respect_args_number = True
 
     def execute_atan(self, exec_context: Context):
         """Calculates atan('value')"""
@@ -764,7 +764,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_atan.arg_names = ['value']
     execute_atan.optional_args = []
-    execute_atan.have_to_respect_args_number = True
+    execute_atan.should_respect_args_number = True
 
     def execute_abs(self, exec_context: Context):
         """Exactly like python `abs()` (absolute value)"""
@@ -784,7 +784,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_abs.arg_names = ['value']
     execute_abs.optional_args = []
-    execute_abs.have_to_respect_args_number = True
+    execute_abs.should_respect_args_number = True
 
     def execute_exit(self, exec_context: Context):
         """Stops the Nougaro Interpreter"""
@@ -797,7 +797,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_exit.arg_names = []
     execute_exit.optional_args = ['code']
-    execute_exit.have_to_respect_args_number = True
+    execute_exit.should_respect_args_number = True
 
     def execute_type(self, exec_context: Context):
         """Get the type of 'value'"""
@@ -808,7 +808,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_type.arg_names = ['value']
     execute_type.optional_args = []
-    execute_type.have_to_respect_args_number = True
+    execute_type.should_respect_args_number = True
 
     def execute_str(self, exec_context: Context):
         """Python 'str()'"""
@@ -824,7 +824,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_str.arg_names = ['value']
     execute_str.optional_args = []
-    execute_str.have_to_respect_args_number = True
+    execute_str.should_respect_args_number = True
 
     def execute_int(self, exec_context: Context):
         """Python 'int()'"""
@@ -840,7 +840,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_int.arg_names = ['value']
     execute_int.optional_args = []
-    execute_int.have_to_respect_args_number = True
+    execute_int.should_respect_args_number = True
 
     def execute_float(self, exec_context: Context):
         """Python 'float()'"""
@@ -856,7 +856,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_float.arg_names = ['value']
     execute_float.optional_args = []
-    execute_float.have_to_respect_args_number = True
+    execute_float.should_respect_args_number = True
 
     def execute_list(self, exec_context: Context):
         """Python 'list()'"""
@@ -872,7 +872,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_list.arg_names = ['value']
     execute_list.optional_args = []
-    execute_list.have_to_respect_args_number = True
+    execute_list.should_respect_args_number = True
 
     def execute_len(self, exec_ctx: Context):
         """Returns the length of a list"""
@@ -891,7 +891,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_len.arg_names = ['list']
     execute_len.optional_args = []
-    execute_len.have_to_respect_args_number = True
+    execute_len.should_respect_args_number = True
 
     def execute_rickroll(self):
         """Hum... You haven't seen anything. Close the doc please. Right now."""
@@ -902,7 +902,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_rickroll.arg_names = []
     execute_rickroll.optional_args = []
-    execute_rickroll.have_to_respect_args_number = False
+    execute_rickroll.should_respect_args_number = False
 
     def execute_run(self, exec_ctx: Context, run):
         """Run code from another file. Param 'run' is the 'run' function in nougaro.py"""
@@ -944,7 +944,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_run.arg_names = ["file_name"]
     execute_run.optional_args = []
-    execute_run.have_to_respect_args_number = True
+    execute_run.should_respect_args_number = True
 
     def execute_system_call(self, exec_ctx: Context):
         """System call. e.g. system_call('ls') lists the directory on bash."""
@@ -969,7 +969,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_system_call.arg_names = ["cmd"]
     execute_system_call.optional_args = []
-    execute_system_call.have_to_respect_args_number = True
+    execute_system_call.should_respect_args_number = True
 
     def execute_lower(self, exec_ctx: Context):
         """Return lower-cased string. e.g. lower('NOUGARO') returns 'nougaro'."""
@@ -986,7 +986,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_lower.arg_names = ["value"]
     execute_lower.optional_args = []
-    execute_lower.have_to_respect_args_number = True
+    execute_lower.should_respect_args_number = True
 
     def execute_upper(self, exec_ctx: Context):
         """Return upper-cased string. e.g. upper('nougaro') returns 'NOUGARO'."""
@@ -1003,7 +1003,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_upper.arg_names = ["value"]
     execute_upper.optional_args = []
-    execute_upper.have_to_respect_args_number = True
+    execute_upper.should_respect_args_number = True
 
     def execute_nougaro(self, exec_ctx: Context):
         """Open a random song of Claude Nougaro. If argument 'song' is filled, open this song (if in database)."""
@@ -1041,6 +1041,6 @@ class BuiltInFunction(BaseFunction):
 
     execute_nougaro.arg_names = []
     execute_nougaro.optional_args = ["song"]
-    execute_nougaro.have_to_respect_args_number = True
+    execute_nougaro.should_respect_args_number = True
 
     # ==================

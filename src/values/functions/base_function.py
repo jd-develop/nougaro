@@ -25,21 +25,21 @@ class BaseFunction(Value):
         new_context.symbol_table = SymbolTable(new_context.parent.symbol_table)
         return new_context
 
-    def check_args(self, arg_names, args, optional_args: list = None, have_to_respect_args_number: bool = True):
+    def check_args(self, arg_names, args, optional_args: list = None, should_respect_args_number: bool = True):
         result = RTResult()
         if optional_args is None:
             optional_args = []
 
-        if (len(args) > len(arg_names + optional_args)) and have_to_respect_args_number:
+        if (len(args) > len(arg_names + optional_args)) and should_respect_args_number:
             return result.failure(
                 RunTimeError(
-                    args[len(arg_names + optional_args)].pos_start, args[-1].pos_end,
+                    args[len(arg_names + optional_args)].pos_start, args[-1].pos_end,  # The ^^^ are only under bad args
                     f"{len(args) - len(arg_names + optional_args)} too many args passed into '{self.name}'.",
                     self.context
                 )
             )
 
-        if len(args) < len(arg_names) and have_to_respect_args_number:
+        if len(args) < len(arg_names) and should_respect_args_number:
             return result.failure(
                 RunTimeError(
                     self.pos_start, self.pos_end,
@@ -52,11 +52,11 @@ class BaseFunction(Value):
 
     @staticmethod
     def populate_args(arg_names, args, exec_context: Context, optional_args: list = None,
-                      have_to_respect_args_number: bool = True):
+                      should_respect_args_number: bool = True):
         # We need the context for the symbol table :)
         if optional_args is None:
             optional_args = []
-        if have_to_respect_args_number:
+        if should_respect_args_number:
             for i in range(len(args)):
                 if i + 1 < len(arg_names) + 1:
                     arg_name = arg_names[i]
@@ -87,11 +87,11 @@ class BaseFunction(Value):
                     pass
 
     def check_and_populate_args(self, arg_names, args, exec_context: Context, optional_args: list = None,
-                                have_to_respect_args_number: bool = True):
+                                should_respect_args_number: bool = True):
         # We still need the context for the symbol table ;)
         result = RTResult()
-        result.register(self.check_args(arg_names, args, optional_args, have_to_respect_args_number))
+        result.register(self.check_args(arg_names, args, optional_args, should_respect_args_number))
         if result.should_return():
             return result
-        self.populate_args(arg_names, args, exec_context, optional_args, have_to_respect_args_number)
+        self.populate_args(arg_names, args, exec_context, optional_args, should_respect_args_number)
         return result.success(None)

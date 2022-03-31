@@ -26,7 +26,7 @@ class CustomBuiltInFuncMethod(Protocol):
     # This class was made to bypass a pycharm bug.
     arg_names: list[str]
     optional_args: list[str]
-    have_to_respect_args_number: bool
+    should_respect_args_number: bool
 
     def __call__(self, exec_context: Context = None) -> Any:
         ...

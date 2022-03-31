@@ -1,9 +1,10 @@
-# This file was made in nougaro alpha 0.2 version.
+# This file was made in nougaro alpha 0.3 version.
 
 # This is a comment
 # Basics :
 # Print
 print("Hello, world!")
+print()
 
 # Mathematical operators
 print(1+1)
@@ -100,6 +101,7 @@ print(list_ * [8, 9, 10])
 print(get(list_, -3))
 print(list_ / -3)
 print(list_(-3))
+print(get(*[list_, -3]))  # another syntax. *[list_, -3] returns list_, -3 in this case.
 
 print(max(list_, True))
 print(min(list_, True))

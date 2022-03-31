@@ -31,11 +31,11 @@ if 'shell' in args[0] or 'nougaro' in args[0]:  # shell.py, shell.exe, nougaro.e
 
 if len(args) != 0:  # there is a file to exec
     if not os.path.exists(args[0]):
-        print_in_red(f"[nougaro] file {args[0]} does not exist.")
+        print_in_red(f"[nougaro] file '{args[0]}' does not exist.")
         path = None
         exit(-1)
     elif args[0].startswith("<"):
-        print_in_red(f"[nougaro] file {args[0]} can not be used by Nougaro because this name is used internally.\n"
+        print_in_red(f"[nougaro] file '{args[0]}' can not be used by Nougaro because this name is used internally.\n"
                      f"[nougaro] This is not an unexpected error, you do not need to open an issue on the GitHub.\n"
                      f"[nougaro] Note that the Nougaro shell will open.")
         path = "<stdin>"

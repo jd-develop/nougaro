@@ -32,7 +32,7 @@ atom       : INT|FLOAT|STRING|(IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER)?*)
            : while_expr
            : func_def
 
-list_expr  : LSQUARE (expr (COMMA expr)*) RSQUARE
+list_expr  : LSQUARE ((expr|MUL list_expr) (COMMA (expr|MUL list_expr))?*)? RSQUARE
 
 if_expr    : KEYWORD:IF expr KEYWORD:THEN
              (statement if_expr_b|if_expr_c?)

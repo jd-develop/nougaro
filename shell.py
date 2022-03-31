@@ -14,14 +14,17 @@ import json
 import sys
 import os.path
 
+# message for PR-makers: if you have a better idea to how to do these things with CLI arguments, make a PR :)
 args = sys.argv
 # print(args)
 
-# message for PR-makers: if you have a better idea to how to do that, make a PR :)
-if args[0].startswith("python"):  # delete first arg if it is "python" or "python3", etc...
-    del args[0]
+# print(f"Arguments count: {len(sys.argv)}")
+# for i, arg in enumerate(sys.argv):
+#     print(f"Argument {i:>6}: {arg}")
 
-if args[0].startswith("nougaro") or args[0].endswith("shell.py"):
+# Uncomment 3 last lines to understand the following code.
+# Tested on Windows and in WSL. Tested after compiling with Nuitka on Windows.
+if 'shell' in args[0] or 'nougaro' in args[0]:  # shell.py, shell.exe, nougaro.exe, etc.
     del args[0]
 
 # print(args)

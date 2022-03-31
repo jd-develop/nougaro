@@ -84,39 +84,40 @@ class BuiltInFunction(BaseFunction):
 
     def execute_print(self, exec_context: Context):
         """Print 'value'"""
-        # Params:
+        # Optional params:
         # * value
-        try:
-            print(exec_context.symbol_table.get('value').to_str())
-        except Exception:
-            print(str(exec_context.symbol_table.get('value')))
+        value = exec_context.symbol_table.get('value')
+        if value is not None:
+            try:
+                print(value.to_str())
+            except Exception:
+                print(str(value))
+        else:
+            print()
         return RTResult().success(NoneValue(False))
 
-    execute_print.arg_names = ["value"]
-    execute_print.optional_args = []
+    execute_print.arg_names = []
+    execute_print.optional_args = ["value"]
     execute_print.should_respect_args_number = True
 
     def execute_print_ret(self, exec_context: Context):
         """Print 'value' and returns 'value'"""
-        # Params:
+        # Optional params:
         # * value
-        try:
-            print(exec_context.symbol_table.get('value').to_str())
-            return RTResult().success(
-                String(
-                    exec_context.symbol_table.get('value').to_str()
-                )
-            )
-        except Exception:
-            print(str(exec_context.symbol_table.get('value')))
-            return RTResult().success(
-                String(
-                    str(exec_context.symbol_table.get('value'))
-                )
-            )
+        value = exec_context.symbol_table.get('value')
+        if value is not None:
+            try:
+                print(value.to_str())
+                return RTResult().success(String(value.to_str()))
+            except Exception:
+                print(str(value))
+                return RTResult().success(String(str(value)))
+        else:
+            print()
+            return RTResult().success(String(''))
 
-    execute_print_ret.arg_names = ["value"]
-    execute_print_ret.optional_args = []
+    execute_print_ret.arg_names = []
+    execute_print_ret.optional_args = ['value']
     execute_print_ret.should_respect_args_number = True
 
     def execute_input(self, exec_context: Context):

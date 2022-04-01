@@ -106,3 +106,26 @@ class Random(BuiltInFunction):
     execute_random_random.arg_names = []
     execute_random_random.optional_args = []
     execute_random_random.should_respect_args_number = True
+
+    def execute_random_choice(self, exec_ctx: Context):
+        """Like python random.choice()"""
+        # Params:
+        # * list_
+        list_ = exec_ctx.symbol_table.get("list_")
+        if not isinstance(list_, List):
+            return RTResult().failure(RunTimeError(
+                list_.pos_start, list_.pos_end,
+                "first argument of built-in module function 'random_choice' must be a list.",
+                exec_ctx
+            ))
+        if len(list_.elements) == 0:
+            return RTResult().failure(RunTimeError(
+                list_.pos_start, list_.pos_end,
+                "list is empty.",
+                exec_ctx
+            ))
+        return RTResult().success(random.choice(list_.elements))
+
+    execute_random_choice.arg_names = ['list_']
+    execute_random_choice.optional_args = []
+    execute_random_choice.should_respect_args_number = True

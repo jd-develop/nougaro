@@ -584,6 +584,7 @@ class Interpreter:
             from lib_.random_ import Random
             context.symbol_table.set('random_randint', Random('randint'))
             context.symbol_table.set('random_random', Random('random'))
+            context.symbol_table.set('random_choice', Random('choice'))
 
         return result.success(NoneValue(False))
 

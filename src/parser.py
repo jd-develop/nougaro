@@ -367,9 +367,20 @@ class Parser:
             self.advance()
             return result.success(NumberNode(token))
         elif token.type == TT_STRING:
+            final_string = token.value
+            final_token = token.copy()
+
             result.register_advancement()
             self.advance()
-            return result.success(StringNode(token))
+
+            while self.current_token.type == TT_STRING:
+                final_string += self.current_token.value
+
+                result.register_advancement()
+                self.advance()
+
+            final_token.value = final_string
+            return result.success(StringNode(final_token))
         elif token.type == TT_IDENTIFIER:
             result.register_advancement()
             self.advance()

@@ -29,3 +29,6 @@ class Token:
 
     def matches(self, type_, value):
         return self.type == type_ and self.value == value
+
+    def copy(self):
+        return Token(self.type, self.value, self.pos_start, self.pos_end)

@@ -67,6 +67,9 @@ MATHEMATICAL_CONSTANTS = [
     "sqrt_pi",
     "math_e"
 ]
+MODULES = [
+    "random"
+]
 VARS_CANNOT_MODIFY = [
     "null",
     "True",
@@ -79,5 +82,6 @@ VARS_CANNOT_MODIFY = [
     'answerToTheLifeTheUniverseAndEverything',
     *KEYWORDS,
     *BUILTIN_FUNCTIONS,
-    *MATHEMATICAL_CONSTANTS
+    *MATHEMATICAL_CONSTANTS,
+    *MODULES
 ]

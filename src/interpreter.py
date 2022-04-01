@@ -9,7 +9,7 @@ from src.values.basevalues import Number, String, List, NoneValue, Value
 from src.values.specific_values.number import FALSE
 from src.values.functions.function import Function
 from src.values.functions.base_function import BaseFunction
-from src.constants import VARS_CANNOT_MODIFY
+from src.constants import VARS_CANNOT_MODIFY, MODULES
 from src.nodes import *
 from src.errors import NotDefinedError, RunTimeError, RTIndexError
 from src.token_constants import *
@@ -562,6 +562,29 @@ class Interpreter:
     @staticmethod
     def visit_BreakNode(node: BreakNode, context: Context):
         return RTResult().success_break()
+
+    @staticmethod
+    def visit_ImportNode(node: ImportNode, context: Context):
+        result = RTResult()
+        identifier: Token = node.identifier
+        name_to_import = identifier.value
+        is_module = False
+
+        if name_to_import in MODULES:
+            is_module = True
+
+        if not is_module:
+            return result.failure(
+                NotDefinedError(
+                    node.pos_start, node.pos_end, f"name '{name_to_import}' is not a module.", context
+                )
+            )
+
+        if name_to_import == 'random':
+            from lib_.random_ import Random
+            context.symbol_table.set('random_randint', Random('randint'))
+
+        return result.success(NoneValue(False))
 
     @staticmethod
     def visit_NoNode(node: NoNode, context: Context):

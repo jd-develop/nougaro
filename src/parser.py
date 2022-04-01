@@ -130,6 +130,25 @@ class Parser:
 
             return result.success(BreakNode(pos_start, self.current_token.pos_start.copy()))
 
+        if self.current_token.matches(TT_KEYWORD, 'import'):
+            result.register_advancement()
+            self.advance()
+
+            if self.current_token.type != TT_IDENTIFIER:
+                return result.failure(
+                    InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        "expected identifier after 'import'."
+                    )
+                )
+
+            identifier = self.current_token
+
+            result.register_advancement()
+            self.advance()
+
+            return result.success(ImportNode(identifier, pos_start, self.current_token.pos_start.copy()))
+
         expr = result.register(self.expr())
         if result.error is not None:
             return result.failure(InvalidSyntaxError(

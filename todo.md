@@ -5,4 +5,3 @@
 * add `var id => *`
 * add `var id =< *`
 * add `var id, id2 = *, *2` (like in python)
-* add a .noughistory in ~ (%userprofile%) and the usage of the arrow keys like every shell (bash, python...)

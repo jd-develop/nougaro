@@ -236,6 +236,17 @@ class ReturnNode:
         return f'(return:{self.node_to_return})'
 
 
+class ImportNode:
+    def __init__(self, identifier, pos_start, pos_end):
+        self.identifier = identifier
+
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+    def __repr__(self):
+        return f'(import:{self.identifier})'
+
+
 # SPECIAL NODES
 class NoNode:
     pass

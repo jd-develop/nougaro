@@ -84,7 +84,9 @@ KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
     'continue',
     # functions
     'def',
-    'return'
+    'return',
+    # modules
+    'import'
 ]
 
 TOKENS_TO_QUOTE = [

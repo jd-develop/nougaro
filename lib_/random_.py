@@ -97,3 +97,12 @@ class Random(BuiltInFunction):
     execute_random_randint.arg_names = ['a', 'b']
     execute_random_randint.optional_args = []
     execute_random_randint.should_respect_args_number = True
+
+    def execute_random_random(self, exec_ctx: Context):
+        """Like python random.random()"""
+        # No params.
+        return RTResult().success(Number(random.random()))
+
+    execute_random_random.arg_names = []
+    execute_random_random.optional_args = []
+    execute_random_random.should_respect_args_number = True

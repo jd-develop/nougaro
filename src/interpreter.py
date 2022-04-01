@@ -583,6 +583,7 @@ class Interpreter:
         if name_to_import == 'random':
             from lib_.random_ import Random
             context.symbol_table.set('random_randint', Random('randint'))
+            context.symbol_table.set('random_random', Random('random'))
 
         return result.success(NoneValue(False))
 

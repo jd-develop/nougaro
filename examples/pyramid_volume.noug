@@ -1,0 +1,11 @@
+# calculate the volume of a pyramid
+
+def vol_pyramid(side, height)
+	var area = side ^ 2
+	return (1/3) * area * height
+end
+
+var side_ = input_int("Enter the side of the pyramid: ")
+var height_ = input_int("Enter the height of the pyramid: ")
+
+print(vol_pyramid(side_, height_))

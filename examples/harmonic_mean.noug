@@ -1,0 +1,11 @@
+# harmonic mean between 2 numbers
+
+def mean(x, y) -> (x + y) / 2
+
+def harmonic_mean(x, y) -> 1 / mean(1/x, 1/y)
+
+print("Harmonic mean between two numbers")
+var x_ = input_int("Enter first number: ")
+var y_ = input_int("Enter second number: ")
+
+print(harmonic_mean(x_, y_))

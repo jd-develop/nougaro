@@ -1,4 +1,5 @@
-# dice
+# dice roll
+
 import random
 while True then
     var input_ = input("'exit' to exit, anything else to roll a dice: ")

@@ -203,7 +203,9 @@ class Parser:
             equals = EQUALS
 
             if self.current_token.type not in equals:
-                if self.current_token.type not in TOKENS_TO_QUOTE:
+                if self.current_token.type in [TT_EE, TT_GT, TT_LT, TT_GTE, TT_LTE]:
+                    error_msg = f"expected an assignation equal, but got a test equal ('{self.current_token.type}')."
+                elif self.current_token.type not in TOKENS_TO_QUOTE:
                     error_msg = f"expected an equal, but got {self.current_token.type}."
                 else:
                     error_msg = f"expected an equal, but got '{self.current_token.type}'."

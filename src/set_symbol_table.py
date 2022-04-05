@@ -23,10 +23,6 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("True", TRUE)
     symbol_table.set("False", FALSE)
     symbol_table.set("None", NoneValue(True))
-    # MATHS
-    symbol_table.set("math_pi", MATH_PI)
-    symbol_table.set("math_e", MATH_E)
-    symbol_table.set("sqrt_pi", MATH_SQRT_PI)
     # Built-in functions
     symbol_table.set("void", VOID)
     symbol_table.set("run", RUN)
@@ -60,18 +56,6 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("min", MIN)
     symbol_table.set("len", LEN)
 
-    # Mathematical functions
-    symbol_table.set("sqrt", SQRT)
-    symbol_table.set("math_root", MATH_ROOT)
-    symbol_table.set("radians", RADIANS)
-    symbol_table.set("degrees", DEGREES)
-    symbol_table.set("sin", SIN)
-    symbol_table.set("cos", COS)
-    symbol_table.set("tan", TAN)
-    symbol_table.set("asin", ASIN)
-    symbol_table.set("acos", ACOS)
-    symbol_table.set("atan", ATAN)
-    symbol_table.set("abs", ABS)
     # Hum...
     symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))
     symbol_table.set("numberOfHornsOnAnUnicorn", Number(1))

@@ -68,7 +68,8 @@ MATHEMATICAL_CONSTANTS = [
     "math_e"
 ]
 MODULES = [
-    "random"
+    "random",
+    "math"
 ]
 VARS_CANNOT_MODIFY = [
     "null",

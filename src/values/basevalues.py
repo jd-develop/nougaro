@@ -9,7 +9,7 @@ from src.values.value import Value
 from src.runtime_result import RTResult
 from src.errors import RunTimeError, RTArithmeticError, RTIndexError
 # built-in python imports
-from math import pi, e as euler, sqrt
+# no imports
 
 
 class String(Value):
@@ -302,9 +302,6 @@ class Number(Value):
 Number.NULL = Number(0)
 Number.FALSE = Number(0)
 Number.TRUE = Number(1)
-Number.MATH_PI = Number(pi)
-Number.MATH_E = Number(euler)
-Number.MATH_SQRT_PI = Number(sqrt(pi))
 
 
 class List(Value):

@@ -41,19 +41,6 @@ MAX = BuiltInFunction('max')
 MIN = BuiltInFunction('min')
 LEN = BuiltInFunction('len')
 
-# Maths
-SQRT = BuiltInFunction('sqrt')
-MATH_ROOT = BuiltInFunction('math_root')
-RADIANS = BuiltInFunction('radians')
-DEGREES = BuiltInFunction('degrees')
-SIN = BuiltInFunction('sin')
-COS = BuiltInFunction('cos')
-TAN = BuiltInFunction('tan')
-ASIN = BuiltInFunction('asin')
-ACOS = BuiltInFunction('acos')
-ATAN = BuiltInFunction('atan')
-ABS = BuiltInFunction('abs')
-
 EXIT = BuiltInFunction('exit')
 SYSTEM_CALL = BuiltInFunction('system_call')
 

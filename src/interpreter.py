@@ -585,6 +585,24 @@ class Interpreter:
             context.symbol_table.set('random_randint', Random('randint'))
             context.symbol_table.set('random_random', Random('random'))
             context.symbol_table.set('random_choice', Random('choice'))
+        elif name_to_import == 'math':
+            from lib_.math_ import Math, PI, E, SQRT_PI
+            # Mathematical constants
+            context.symbol_table.set("math_pi", PI)
+            context.symbol_table.set("math_e", E)
+            context.symbol_table.set("math_sqrt_pi", SQRT_PI)
+            # Mathematical functions
+            context.symbol_table.set("math_sqrt", Math("sqrt"))
+            context.symbol_table.set("math_root", Math("root"))
+            context.symbol_table.set("math_radians", Math("radians"))
+            context.symbol_table.set("math_degrees", Math("degrees"))
+            context.symbol_table.set("math_sin", Math("sin"))
+            context.symbol_table.set("math_cos", Math("cos"))
+            context.symbol_table.set("math_tan", Math("tan"))
+            context.symbol_table.set("math_asin", Math("asin"))
+            context.symbol_table.set("math_acos", Math("acos"))
+            context.symbol_table.set("math_atan", Math("atan"))
+            context.symbol_table.set("math_abs", Math("abs"))
 
         return result.success(NoneValue(False))
 

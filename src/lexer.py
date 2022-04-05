@@ -119,7 +119,7 @@ class Lexer:
                 # illegal char
                 pos_start = self.pos.copy()
                 char = self.current_char
-                return [], IllegalCharError(pos_start, self.pos, f"'{char}' is an illegal character.")
+                return [], IllegalCharError(pos_start, self.pos.advance(), f"'{char}' is an illegal character.")
 
         tokens.append(Token(TT_EOF, pos_start=self.pos))
         return tokens, None

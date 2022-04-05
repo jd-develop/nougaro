@@ -8,12 +8,13 @@
 from src.context import Context
 # built-in python imports
 from typing import Protocol, Any
+from colorama import Fore
 
 
 # ##########
 # COLORS
 # ##########
-def print_in_red(txt): print(u"\033[91m" + txt + u"\033[00m")
+def print_in_red(txt): print(Fore.RED + txt + Fore.RESET)
 
 
 # ##########

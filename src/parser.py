@@ -67,12 +67,12 @@ class Parser:
         if self.current_token.type == TT_EOF:
             return result.success(NoNode())
 
+        last_token_type = self.current_token.type
+
         statement = result.register(self.statement())
         if result.error is not None:
             return result
         statements.append(statement)
-
-        more_statements = True
 
         while True:
             newline_count = 0
@@ -80,19 +80,32 @@ class Parser:
                 result.register_advancement()
                 self.advance()
                 newline_count += 1
-            if newline_count == 0:
-                more_statements = False
 
             have_to_break = False
             for e in stop:
                 if isinstance(e, tuple):
-                    if not more_statements or self.current_token.matches(*e):
+                    if self.current_token.matches(*e):
                         have_to_break = True
                 else:
-                    if not more_statements or self.current_token.type == e:
+                    if self.current_token.type == e:
                         have_to_break = True
             if have_to_break:
                 break
+            else:
+                if newline_count == 0:
+                    if last_token_type == TT_IDENTIFIER and self.current_token.type in EQUALS:
+                        return result.failure(
+                            InvalidSyntaxError(
+                                self.current_token.pos_start, self.current_token.pos_end,
+                                "unexpected token. To declare a variable, use 'var' keyword."
+                            )
+                        )
+                    return result.failure(
+                        InvalidSyntaxError(
+                            self.current_token.pos_start, self.current_token.pos_end,
+                            "unexpected token."
+                        )
+                    )
 
             statement = result.register(self.statement())
             if result.error is not None:
@@ -187,8 +200,7 @@ class Parser:
             self.advance()
 
             equal = self.current_token
-            equals = [TT_EQ, TT_PLUSEQ, TT_MINUSEQ, TT_MULTEQ, TT_DIVEQ, TT_POWEQ, TT_FLOORDIVEQ, TT_PERCEQ, TT_OREQ,
-                      TT_ANDEQ, TT_XOREQ, TT_BITWISEANDEQ, TT_BITWISEOREQ, TT_BITWISEXOREQ]
+            equals = EQUALS
 
             if self.current_token.type not in equals:
                 if self.current_token.type not in TOKENS_TO_QUOTE:

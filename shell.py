@@ -44,7 +44,7 @@ if len(args) != 0:  # there is a file to exec
 else:  # there is no file
     path = "<stdin>"
 
-with open("version.json") as ver_json:
+with open("noug_version.json") as ver_json:
     ver_json_loaded = json.load(ver_json)
     version = ver_json_loaded.get("phase") + " " + ver_json_loaded.get("noug_version")
 

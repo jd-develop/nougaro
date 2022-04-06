@@ -31,6 +31,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("print_ret", PRINT_RET)
     symbol_table.set("input", INPUT)
     symbol_table.set("input_int", INPUT_INT)
+    symbol_table.set("input_num", INPUT_NUM)
     symbol_table.set("clear", CLEAR)
 
     symbol_table.set("is_int", IS_INT)
@@ -73,6 +74,11 @@ def set_symbol_table(symbol_table: SymbolTable):
 
 
 def test_protected_vars(symbol_table: SymbolTable):
+    error_count = 0
     for symbol in symbol_table.symbols:
         if symbol not in VARS_CANNOT_MODIFY:
-            print(f"missing {symbol} in VARS_CANNOT_MODIFY")
+            if symbol != "numberOfHornsOnAnUnicorn" and symbol != "theLoneliestNumber" and symbol != "rickroll":
+                print(f"missing {symbol} in VARS_CANNOT_MODIFY")
+                error_count += 1
+    if error_count == 0:
+        print("Basic SymbolTable do not contain unprotected vars ! :)")

@@ -15,25 +15,13 @@ import string
 DIGITS = '0123456789'
 LETTERS = string.ascii_letters
 LETTERS_DIGITS = LETTERS + DIGITS
-MATHEMATICAL_FUNCTIONS = [
-    "sqrt",
-    "degrees",
-    "radians",
-    "sin",
-    "cos",
-    "tan",
-    "asin",
-    "acos",
-    "atan",
-    "math_root",
-    "abs"
-]
 BUILTIN_FUNCTIONS = [
     "void",
     "print",
     "print_ret",
     "input",
     "input_int",
+    "input_num",
     "clear",
     "is_int",
     "is_float",
@@ -60,12 +48,6 @@ BUILTIN_FUNCTIONS = [
     'lower',
     'upper',
     'nougaro',
-    *MATHEMATICAL_FUNCTIONS
-]
-MATHEMATICAL_CONSTANTS = [
-    "math_pi",
-    "sqrt_pi",
-    "math_e"
 ]
 MODULES = [
     "random",
@@ -83,6 +65,5 @@ VARS_CANNOT_MODIFY = [
     'answerToTheLifeTheUniverseAndEverything',
     *KEYWORDS,
     *BUILTIN_FUNCTIONS,
-    *MATHEMATICAL_CONSTANTS,
     *MODULES
 ]

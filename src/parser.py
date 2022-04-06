@@ -107,6 +107,8 @@ class Parser:
                         )
                     )
 
+            last_token_type = self.current_token.type
+
             statement = result.register(self.statement())
             if result.error is not None:
                 return result

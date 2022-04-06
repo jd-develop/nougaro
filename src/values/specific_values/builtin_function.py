@@ -16,6 +16,7 @@ PRINT = BuiltInFunction('print')
 PRINT_RET = BuiltInFunction('print_ret')
 INPUT = BuiltInFunction('input')
 INPUT_INT = BuiltInFunction('input_int')
+INPUT_NUM = BuiltInFunction('input_num')
 CLEAR = BuiltInFunction('clear')
 
 IS_INT = BuiltInFunction('is_int')

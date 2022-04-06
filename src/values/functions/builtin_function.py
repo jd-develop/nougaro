@@ -141,8 +141,8 @@ class BuiltInFunction(BaseFunction):
         """Basic input (int). Repeat while entered value is not an int."""
         # Optional params:
         # * text_to_display
+        text_to_display = exec_context.symbol_table.get('text_to_display')
         while True:
-            text_to_display = exec_context.symbol_table.get('text_to_display')
             if text_to_display is None:
                 text = input()
             elif isinstance(text_to_display, String) or isinstance(text_to_display, Number):
@@ -160,6 +160,30 @@ class BuiltInFunction(BaseFunction):
     execute_input_int.arg_names = []
     execute_input_int.optional_args = ['text_to_display']
     execute_input_int.should_respect_args_number = True
+
+    def execute_input_num(self, exec_context: Context):
+        """Basic input (int or float). Repeat while entered value is not a num."""
+        # Optional params:
+        # * text_to_display
+        text_to_display = exec_context.symbol_table.get('text_to_display')
+        while True:
+            if text_to_display is None:
+                text = input()
+            elif isinstance(text_to_display, String) or isinstance(text_to_display, Number):
+                text = input(text_to_display.value)
+            else:
+                text = input()
+
+            try:
+                number = float(text)
+                break
+            except ValueError:
+                print(f"'{text}' must be an number. Try again :")
+        return RTResult().success(Number(number))
+
+    execute_input_num.arg_names = []
+    execute_input_num.optional_args = ['text_to_display']
+    execute_input_num.should_respect_args_number = True
 
     def execute_clear(self):
         """Clear the screen"""

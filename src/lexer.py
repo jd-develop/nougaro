@@ -47,7 +47,7 @@ class Lexer:
                     tokens.append(number)
                 else:
                     return [], error
-            elif self.current_char in LETTERS:
+            elif self.current_char in LETTERS + '_':
                 tokens.append(self.make_identifier())
             elif self.current_char == '"' or self.current_char == "'":
                 string_, error = self.make_string(self.current_char)

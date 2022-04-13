@@ -292,6 +292,12 @@ class Number(Value):
         else:
             return None, self.can_not_be_in(other)
 
+    def is_int(self):
+        return True if self.type_ == 'int' else False
+
+    def is_float(self):
+        return not self.is_int()
+
     def copy(self):
         copy = Number(self.value)
         copy.set_pos(self.pos_start, self.pos_end)
@@ -305,9 +311,9 @@ Number.TRUE = Number(1)
 
 
 class List(Value):
-    def __init__(self, elements):
+    def __init__(self, elements: list):
         super().__init__()
-        self.elements = elements
+        self.elements: list = elements
         self.type_ = 'list'
 
     def __repr__(self):
@@ -341,6 +347,13 @@ class List(Value):
             new_list = self.copy()
             new_list.elements.extend(other.elements)
             return new_list, None
+        elif isinstance(other, Number):
+            if other.is_int():
+                new_list = self.copy()
+                new_list.elements = new_list.elements * other.value
+                return new_list, None
+            else:
+                return None, self.illegal_operation(other)
         else:
             return None, self.illegal_operation(other)
 

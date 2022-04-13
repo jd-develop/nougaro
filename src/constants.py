@@ -32,6 +32,7 @@ BUILTIN_FUNCTIONS = [
     "is_none",
     "append",
     "pop",
+    "insert",
     "extend",
     "get",
     "exit",

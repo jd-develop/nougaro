@@ -347,6 +347,39 @@ class BuiltInFunction(BaseFunction):
     execute_pop.optional_args = []
     execute_pop.should_respect_args_number = True
 
+    def execute_insert(self, exec_context: Context):
+        """Remove element at 'index' from 'list'"""
+        # Params:
+        # * list
+        # * index
+        list_ = exec_context.symbol_table.get('list')
+        value = exec_context.symbol_table.get('value')
+        index = exec_context.symbol_table.get('index')
+
+        if not isinstance(list_, List):
+            return RTResult().failure(RunTimeError(
+                list_.pos_start, list_.pos_end,
+                "first argument of built-in function 'insert' must be a list.",
+                exec_context
+            ))
+
+        if index is None:
+            index = Number(len(list_.elements))
+
+        if not isinstance(index, Number):
+            return RTResult().failure(RunTimeError(
+                index.pos_start, index.pos_end,
+                "third argument of built-in function 'insert' must be a number.",
+                exec_context
+            ))
+
+        list_.elements.insert(index.value, value)
+        return RTResult().success(list_)
+
+    execute_insert.arg_names = ['list', 'value']
+    execute_insert.optional_args = ['index']
+    execute_insert.should_respect_args_number = True
+
     def execute_extend(self, exec_context: Context):
         """Extend list 'list1' with the elements of 'list2'"""
         # Params:

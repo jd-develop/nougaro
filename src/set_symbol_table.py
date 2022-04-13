@@ -51,6 +51,7 @@ def set_symbol_table(symbol_table: SymbolTable):
 
     symbol_table.set("append", APPEND)
     symbol_table.set("pop", POP)
+    symbol_table.set("insert", INSERT)
     symbol_table.set("extend", EXTEND)
     symbol_table.set("get", GET)
     symbol_table.set("max", MAX)
@@ -81,4 +82,4 @@ def test_protected_vars(symbol_table: SymbolTable):
                 print(f"missing {symbol} in VARS_CANNOT_MODIFY")
                 error_count += 1
     if error_count == 0:
-        print("Basic SymbolTable do not contain unprotected vars ! :)")
+        print("Good job! Basic SymbolTable does not contain unprotected vars! :)")

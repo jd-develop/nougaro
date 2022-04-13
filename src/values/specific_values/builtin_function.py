@@ -36,6 +36,7 @@ UPPER = BuiltInFunction('upper')
 
 APPEND = BuiltInFunction('append')
 POP = BuiltInFunction('pop')
+INSERT = BuiltInFunction('insert')
 EXTEND = BuiltInFunction('extend')
 GET = BuiltInFunction('get')
 MAX = BuiltInFunction('max')

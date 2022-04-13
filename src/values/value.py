@@ -115,6 +115,12 @@ class Value:
     def to_list_(self):
         return None, RTResult().failure(self.illegal_operation())
 
+    def is_int(self):
+        return False
+
+    def is_float(self):
+        return False
+
     def copy(self):
         print(self.context)
         print('NOUGARO INTERNAL ERROR : No copy method defined in Value.copy().\n'

@@ -1,6 +1,6 @@
 import random
 
-print("This program prints the frequency of the sums of two dices launched 1000 times.")
+print("This program prints the frequencies of the sums of two dices launched 1000 times.")
 
 def tdf(l)
 	var list_ = [0]*12
@@ -25,4 +25,4 @@ for x in tdf(1000) then
 	var sum += x
 end
 
-print("Frequency sum: " + str(sum))
+print("Sum of the frequencies: " + str(sum))

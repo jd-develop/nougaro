@@ -31,7 +31,7 @@ class String(Value):
             return None, self.illegal_operation(other)
 
     def multiplied_by(self, other):
-        if isinstance(other, Number) and other.type_ == 'int':
+        if isinstance(other, Number) and other.is_int():
             return String(self.value * other.value).set_context(self.context), None
         else:
             return None, self.illegal_operation(other)
@@ -121,8 +121,12 @@ class Number(Value):
     def multiplied_by(self, other):  # MULTIPLICATION
         if isinstance(other, Number):
             return Number(self.value * other.value).set_context(self.context), None
-        elif isinstance(other, String) and self.type_ == "int":
+        elif isinstance(other, String) and self.is_int():
             return String(self.value * other.value).set_context(self.context), None
+        elif isinstance(other, List) and self.is_int():
+            new_list = other.copy()
+            new_list.elements = new_list.elements * self.value
+            return new_list, None
         else:
             return None, self.illegal_operation(other)
 

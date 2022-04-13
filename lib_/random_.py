@@ -129,3 +129,10 @@ class Random(BuiltInFunction):
     execute_random_choice.arg_names = ['list_']
     execute_random_choice.optional_args = []
     execute_random_choice.should_respect_args_number = True
+
+
+WHAT_TO_IMPORT = {
+    "randint": Random("randint"),
+    "random": Random("random"),
+    "choice": Random("choice")
+}

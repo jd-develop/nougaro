@@ -580,29 +580,10 @@ class Interpreter:
                 )
             )
 
-        if name_to_import == 'random':
-            from lib_.random_ import Random
-            context.symbol_table.set('random_randint', Random('randint'))
-            context.symbol_table.set('random_random', Random('random'))
-            context.symbol_table.set('random_choice', Random('choice'))
-        elif name_to_import == 'math':
-            from lib_.math_ import Math, PI, E, SQRT_PI
-            # Mathematical constants
-            context.symbol_table.set("math_pi", PI)
-            context.symbol_table.set("math_e", E)
-            context.symbol_table.set("math_sqrt_pi", SQRT_PI)
-            # Mathematical functions
-            context.symbol_table.set("math_sqrt", Math("sqrt"))
-            context.symbol_table.set("math_root", Math("root"))
-            context.symbol_table.set("math_radians", Math("radians"))
-            context.symbol_table.set("math_degrees", Math("degrees"))
-            context.symbol_table.set("math_sin", Math("sin"))
-            context.symbol_table.set("math_cos", Math("cos"))
-            context.symbol_table.set("math_tan", Math("tan"))
-            context.symbol_table.set("math_asin", Math("asin"))
-            context.symbol_table.set("math_acos", Math("acos"))
-            context.symbol_table.set("math_atan", Math("atan"))
-            context.symbol_table.set("math_abs", Math("abs"))
+        from lib_.__TABLE_OF_MODULES__ import TABLE_OF_MODULES
+        what_to_import = TABLE_OF_MODULES[name_to_import]
+        for key in what_to_import.keys():
+            context.symbol_table.set(f"{name_to_import}_{key}", what_to_import[key])
 
         return result.success(NoneValue(False))
 

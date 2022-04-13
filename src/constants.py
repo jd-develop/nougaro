@@ -6,6 +6,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.token_constants import KEYWORDS
+from lib_.__TABLE_OF_MODULES__ import TABLE_OF_MODULES
 # built-in python imports
 import string
 
@@ -50,10 +51,7 @@ BUILTIN_FUNCTIONS = [
     'upper',
     'nougaro',
 ]
-MODULES = [
-    "random",
-    "math"
-]
+MODULES = {*TABLE_OF_MODULES.keys()}
 VARS_CANNOT_MODIFY = [
     "null",
     "True",

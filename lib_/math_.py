@@ -307,3 +307,24 @@ class Math(BuiltInFunction):
     execute_math_abs.arg_names = ['value']
     execute_math_abs.optional_args = []
     execute_math_abs.should_respect_args_number = True
+
+
+WHAT_TO_IMPORT = {
+    # Constants
+    "pi": PI,
+    "sqrt_pi": SQRT_PI,
+    "e": E,
+
+    # Functions
+    "sqrt": Math("sqrt"),
+    "root": Math("root"),
+    "radians": Math("radians"),
+    "degrees": Math("degrees"),
+    "sin": Math("sin"),
+    "cos": Math("cos"),
+    "tan": Math("tan"),
+    "asin": Math("asin"),
+    "acos": Math("acos"),
+    "atan": Math("atan"),
+    "abs": Math("abs"),
+}

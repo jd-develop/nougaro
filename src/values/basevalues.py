@@ -214,7 +214,7 @@ class Number(Value):
         else:
             return None, self.illegal_operation(other)
 
-    def excl_or(self, other):
+    def xor_(self, other):
         """ Exclusive or (xor) """
         if isinstance(other, Number):
             if self.value == 0 and other.value != 0:

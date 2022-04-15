@@ -101,7 +101,7 @@ class Interpreter:
         elif node.op_token.matches(TT_KEYWORD, 'or'):
             result, error = left.or_(right)
         elif node.op_token.matches(TT_KEYWORD, 'xor'):
-            result, error = left.excl_or(right)
+            result, error = left.xor_(right)
         elif node.op_token.type == TT_BITWISEAND:
             result, error = left.bitwise_and(right)
         elif node.op_token.type == TT_BITWISEOR:
@@ -268,7 +268,7 @@ class Interpreter:
                     elif equal == TT_OREQ:
                         final_value, error = var_actual_value.or_(value)
                     elif equal == TT_XOREQ:
-                        final_value, error = var_actual_value.excl_or(value)
+                        final_value, error = var_actual_value.xor_(value)
                     elif equal == TT_ANDEQ:
                         final_value, error = var_actual_value.and_(value)
                     elif equal == TT_BITWISEANDEQ:

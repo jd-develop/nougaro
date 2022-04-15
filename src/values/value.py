@@ -81,7 +81,7 @@ class Value:
     def not_(self):
         return None, self.illegal_operation()
 
-    def excl_or(self, other):
+    def xor_(self, other):
         """ Exclusive or """
         return None, self.illegal_operation(other)
 

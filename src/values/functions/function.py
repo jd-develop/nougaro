@@ -6,7 +6,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.values.functions.base_function import BaseFunction
-from src.values.basevalues import NoneValue
+from src.values.basevalues import NoneValue, String
 from src.runtime_result import RTResult
 # built-in python imports
 # no imports
@@ -23,10 +23,11 @@ class Function(BaseFunction):
     def __repr__(self):
         return f'<function {self.name}>'
 
-    def execute(self, args, interpreter_, run):
+    def execute(self, args, interpreter_, run, exec_from):
         result = RTResult()
         interpreter = interpreter_(run)
         exec_context = self.generate_new_context()
+        exec_context.symbol_table.set("__exec_from__", String(exec_from))
 
         result.register(self.check_and_populate_args(self.arg_names, args, exec_context))
         if result.should_return():

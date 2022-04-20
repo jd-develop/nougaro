@@ -23,9 +23,10 @@ class BuiltInFunction(BaseFunction):
     def __repr__(self):
         return f'<built-in function {self.name}>'
 
-    def execute(self, args, interpreter_, run):
+    def execute(self, args, interpreter_, run, exec_from):
         result = RTResult()
         exec_context = self.generate_new_context()
+        exec_context.symbol_table.set("__exec_from__", String(exec_from))
 
         method_name = f'execute_{self.name}'
         method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)
@@ -749,7 +750,7 @@ class BuiltInFunction(BaseFunction):
                 exec_ctx
             ))
 
-        value, error = run(file_name, script)
+        value, error = run(file_name, script, exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}")
 
         if error is not None:
             return RTResult().failure(error)

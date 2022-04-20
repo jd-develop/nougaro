@@ -19,9 +19,10 @@ class Random(BuiltInFunction):
     def __repr__(self):
         return f'<built-in function random_{self.name}>'
 
-    def execute(self, args, interpreter_, run):
+    def execute(self, args, interpreter_, run, exec_from):
         result = RTResult()
         exec_context = self.generate_new_context()
+        exec_context.symbol_table.set("__exec_from__", String(exec_from))
 
         method_name = f'execute_random_{self.name}'
         method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)

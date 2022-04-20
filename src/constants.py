@@ -58,6 +58,7 @@ VARS_CANNOT_MODIFY = [
     "False",
     "None",
     'noug_version',
+    '__exec_from__',
     'os_name',
     'os_release',
     'os_version',

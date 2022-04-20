@@ -97,7 +97,7 @@ class Value:
     def bitwise_not(self):
         return None, self.illegal_operation()
 
-    def execute(self, args, interpreter_, run):
+    def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
         return RTResult().failure(self.illegal_operation())
 
     def abs_(self):

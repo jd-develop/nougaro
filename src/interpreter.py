@@ -478,7 +478,13 @@ class Interpreter:
                 if result.should_return():
                     return result
 
-            return_value = result.register(value_to_call.execute(args, Interpreter, self.run))
+            try:
+                return_value = result.register(value_to_call.execute(args, Interpreter, self.run,
+                                                                     exec_from=f"{context.display_name} from"
+                                                                               f" {context.parent.display_name}"))
+            except Exception:
+                return_value = result.register(value_to_call.execute(args, Interpreter, self.run,
+                                                                     exec_from=f"{context.display_name}"))
             if result.should_return():
                 return result
             return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)

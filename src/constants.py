@@ -47,6 +47,7 @@ BUILTIN_FUNCTIONS = [
     "system_call",
     "run",
     "len",
+    'split',
     'lower',
     'upper',
     'nougaro',

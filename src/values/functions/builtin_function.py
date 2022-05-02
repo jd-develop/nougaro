@@ -23,10 +23,11 @@ class BuiltInFunction(BaseFunction):
     def __repr__(self):
         return f'<built-in function {self.name}>'
 
-    def execute(self, args, interpreter_, run, exec_from):
+    def execute(self, args, interpreter_, run, exec_from: str):
         result = RTResult()
         exec_context = self.generate_new_context()
         exec_context.symbol_table.set("__exec_from__", String(exec_from))
+        exec_context.symbol_table.set("__actual_context__", String(self.name))
 
         method_name = f'execute_{self.name}'
         method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)
@@ -601,6 +602,42 @@ class BuiltInFunction(BaseFunction):
     execute_min.optional_args = ['ignore_not_num']
     execute_min.should_respect_args_number = True
 
+    def execute_split(self, exec_context: Context):
+        """Splits a str into a list."""
+        # Optional params:
+        # * char
+        str_ = exec_context.symbol_table.get('str')
+        char = exec_context.symbol_table.get('char')
+        if not isinstance(str_, String):
+            return RTResult().failure(
+                RunTimeError(
+                    self.pos_start, self.pos_end,
+                    "first argument of builtin function 'split' must be a str.",
+                    exec_context
+                )
+            )
+        if char is None or isinstance(char, NoneValue):
+            char = String(' ')
+        if not isinstance(char, String):
+            return RTResult().failure(
+                RunTimeError(
+                    self.pos_start, self.pos_end,
+                    "second argument of builtin function 'split' must be a str or None.",
+                    exec_context
+                )
+            )
+        split_res = str_.value.split(char.value)
+        new_list = []
+        for e in split_res:
+            new_list.append(String(e))
+        final_list = List(new_list)
+
+        return RTResult().success(final_list)
+
+    execute_split.arg_names = ['str']
+    execute_split.optional_args = ['char']
+    execute_split.should_respect_args_number = True
+
     def execute_exit(self, exec_context: Context):
         """Stops the Nougaro Interpreter"""
         # Optional params:
@@ -750,7 +787,8 @@ class BuiltInFunction(BaseFunction):
                 exec_ctx
             ))
 
-        value, error = run(file_name, script, exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}")
+        value, error = run(file_name, script, exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
+                           actual_context=f"{exec_ctx.parent.display_name}")
 
         if error is not None:
             return RTResult().failure(error)

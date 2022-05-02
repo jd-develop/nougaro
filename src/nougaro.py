@@ -33,11 +33,12 @@ with open("noug_version.json") as ver_json:
 # ##########
 # RUN
 # ##########
-def run(file_name, text, version: str = version_, exec_from: str = "(shell)"):
+def run(file_name, text, version: str = version_, exec_from: str = "(shell)", actual_context: str = "<program>"):
     """Run the given code"""
     # set version in symbol table
     global_symbol_table.set("noug_version", String(version))
     global_symbol_table.set("__exec_from__", String(exec_from))
+    global_symbol_table.set("__actual_context__", String(actual_context))
 
     # make tokens
     lexer = Lexer(file_name, text)

@@ -28,6 +28,7 @@ class Math(BuiltInFunction):
         result = RTResult()
         exec_context = self.generate_new_context()
         exec_context.symbol_table.set("__exec_from__", String(exec_from))
+        exec_context.symbol_table.set("__actual_context__", String(self.name))
 
         method_name = f'execute_math_{self.name}'
         method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)

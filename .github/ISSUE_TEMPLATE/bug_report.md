@@ -25,9 +25,8 @@ If applicable, add screenshots to help explain your problem.
 
 **Your setup (please complete the following information):**
  - OS: [e.g. Ubuntu, Windows...]
- - OS version: [e.g. 21.10, 20.04 LTS, 10 20H2]
- - Browser [e.g. chrome, safari, firefox]
- - Nougaro version [e.g. prototype-v3]
+ - OS version: [e.g. 21.10, 22.04 LTS, 10 20H2]
+ - Nougaro version [e.g. 0.6-alpha]
 
 **Additional context**
 Add any other context about the problem here.

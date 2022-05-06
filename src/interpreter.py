@@ -277,9 +277,21 @@ class Interpreter:
                         final_value, error = var_actual_value.bitwise_or(value)
                     elif equal == TT_BITWISEXOREQ:
                         final_value, error = var_actual_value.bitwise_xor(value)
+                    elif equal == TT_EEEQ:
+                        final_value, error = var_actual_value.get_comparison_eq(value)
+                    elif equal == TT_LTEQ:
+                        final_value, error = var_actual_value.get_comparison_lt(value)
+                    elif equal == TT_GTEQ:
+                        final_value, error = var_actual_value.get_comparison_gt(value)
+                    elif equal == TT_LTEEQ:
+                        final_value, error = var_actual_value.get_comparison_lte(value)
+                    elif equal == TT_GTEEQ:
+                        final_value, error = var_actual_value.get_comparison_gte(value)
                     else:  # this is not supposed to happen
-                        print("Note: it was a problem in src.interpreter.Interpreter.visit_VarAssignNode. Please report"
-                              " this error at https://jd-develop.github.io/nougaro/bugreport.html with all infos.")
+                        print(f"Note: it was a problem in src.interpreter.Interpreter.visit_VarAssignNode. Please"
+                              f" report this error at https://jd-develop.github.io/nougaro/bugreport.html with all"
+                              f" infos.\n"
+                              f"For the dev: equal token '{equal}' is in EQUALS but not planned in visit_VarAssignNode")
                         error = None
                         final_value = value
 

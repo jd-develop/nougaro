@@ -1,4 +1,4 @@
-# This file was made in nougaro alpha 0.4 version.
+# This file was made in nougaro alpha 0.6 version.
 import math
 
 # This is a comment
@@ -22,6 +22,11 @@ print(some_text); print(a * b)
 print("You use nougaro version " + noug_version)
 print("You use " + os_name + " " + os_release + " " + os_version)
 print(None)
+print(var b === 3)
+print(var b <== 3)
+print(var b <<= 3)
+print(var b >== 3)
+print(var b >>= 3)
 
 # Strings
 print("this is a string quoted by \".")

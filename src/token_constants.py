@@ -35,6 +35,11 @@ TT_XOREQ = "^^^="             # ^^^=
 TT_BITWISEOREQ = "|="         # |=
 TT_BITWISEANDEQ = "&="        # &=
 TT_BITWISEXOREQ = "^^="       # ^^=
+TT_EEEQ = "==="               # ===
+TT_LTEEQ = "<=="              # <==
+TT_GTEEQ = ">=="              # >==
+TT_LTEQ = "<<="               # <<=
+TT_GTEQ = ">>="               # >>=
 
 TT_BITWISEOR = '|'            # |
 TT_BITWISEAND = '&'           # &
@@ -125,7 +130,12 @@ TOKENS_TO_QUOTE = [
     TT_LTE,
     TT_GTE,
     TT_COMMA,
-    TT_ARROW
+    TT_ARROW,
+    TT_EEEQ,
+    TT_LTEEQ,
+    TT_GTEEQ,
+    TT_LTEQ,
+    TT_GTEQ,
 ]
 
 EQUALS = [
@@ -142,5 +152,10 @@ EQUALS = [
     TT_XOREQ,
     TT_BITWISEANDEQ,
     TT_BITWISEOREQ,
-    TT_BITWISEXOREQ
+    TT_BITWISEXOREQ,
+    TT_EEEQ,
+    TT_LTEEQ,
+    TT_GTEEQ,
+    TT_LTEQ,
+    TT_GTEQ
 ]

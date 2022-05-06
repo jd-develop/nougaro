@@ -105,9 +105,15 @@ class Lexer:
             elif self.current_char == '=':
                 tokens.append(self.make_equals())
             elif self.current_char == '<':
-                tokens.append(self.make_less_than())
+                token, error = self.make_less_than()
+                if error is not None:
+                    return [], error
+                tokens.append(token)
             elif self.current_char == '>':
-                tokens.append(self.make_greater_than())
+                token, error = self.make_greater_than()
+                if error is not None:
+                    return [], error
+                tokens.append(token)
             elif self.current_char == '?':
                 tokens.append(Token(TT_INTERROGATIVE_PNT, pos_start=self.pos))
                 self.advance()
@@ -326,6 +332,9 @@ class Lexer:
         if self.current_char == '=':
             self.advance()
             token_type = TT_EE
+            if self.current_char == '=':
+                self.advance()
+                token_type = TT_EEEQ
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
@@ -337,8 +346,22 @@ class Lexer:
         if self.current_char == '=':
             self.advance()
             token_type = TT_LTE
+            if self.current_char == '=':
+                self.advance()
+                token_type = TT_LTEEQ
+        elif self.current_char == '<':
+            self.advance()
+            if self.current_char == '=':
+                self.advance()
+                token_type = TT_LTEQ
+            else:
+                return None, InvalidSyntaxError(
+                    pos_start,
+                    self.pos,
+                    f"expected '=' after '<<', got '{self.current_char}."
+                )
 
-        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 
     def make_greater_than(self):
         token_type = TT_GT
@@ -348,8 +371,22 @@ class Lexer:
         if self.current_char == '=':
             self.advance()
             token_type = TT_GTE
+            if self.current_char == '=':
+                self.advance()
+                token_type = TT_GTEEQ
+        elif self.current_char == '>':
+            self.advance()
+            if self.current_char == '=':
+                self.advance()
+                token_type = TT_GTEQ
+            else:
+                return None, InvalidSyntaxError(
+                    pos_start,
+                    self.pos,
+                    f"expected '=' after '>>', got '{self.current_char}."
+                )
 
-        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 
     def make_minus_or_arrow(self):
         token_type = TT_MINUS

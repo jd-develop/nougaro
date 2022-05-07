@@ -96,7 +96,8 @@ KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
     # modules
     'import',
     # files
-    'write'
+    'write',
+    'read',
 ]
 
 TOKENS_TO_QUOTE = [

@@ -9,7 +9,7 @@ from src.values.basevalues import NoneValue
 from src.values.specific_values.number import *
 from src.values.basevalues import String
 from src.values.specific_values.builtin_function import *
-from src.constants import VARS_CANNOT_MODIFY
+from src.constants import PROTECTED_VARS
 # built-in python imports
 import platform
 
@@ -79,7 +79,7 @@ def set_symbol_table(symbol_table: SymbolTable):
 def test_protected_vars(symbol_table: SymbolTable):
     error_count = 0
     for symbol in symbol_table.symbols:
-        if symbol not in VARS_CANNOT_MODIFY:
+        if symbol not in PROTECTED_VARS:
             if symbol != "numberOfHornsOnAnUnicorn" and symbol != "theLoneliestNumber" and symbol != "rickroll":
                 print(f"missing {symbol} in VARS_CANNOT_MODIFY")
                 error_count += 1

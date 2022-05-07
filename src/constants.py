@@ -53,7 +53,7 @@ BUILTIN_FUNCTIONS = [
     'nougaro',
 ]
 MODULES = {*TABLE_OF_MODULES.keys()}
-VARS_CANNOT_MODIFY = [
+PROTECTED_VARS = [
     "null",
     "True",
     "False",

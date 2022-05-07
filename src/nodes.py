@@ -43,7 +43,7 @@ class ListNode:
         self.pos_end = pos_end
 
     def __repr__(self):
-        return f'{str(self.element_nodes)}'
+        return f'(list:{str(self.element_nodes)})'
 
 
 # VAR NODES
@@ -260,6 +260,18 @@ class WriteNode:
 
     def __repr__(self):
         return f'(write:{self.expr_to_write}>>{self.file_name_expr})'
+
+
+class ReadNode:
+    def __init__(self, file_name_expr, identifier, pos_start, pos_end):
+        self.file_name_expr = file_name_expr
+        self.identifier = identifier
+
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+    def __repr__(self):
+        return f'(read:{self.file_name_expr}>>{self.identifier})'
 
 
 # SPECIAL NODES

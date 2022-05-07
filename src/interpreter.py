@@ -9,9 +9,9 @@ from src.values.basevalues import Number, String, List, NoneValue, Value
 from src.values.specific_values.number import FALSE
 from src.values.functions.function import Function
 from src.values.functions.base_function import BaseFunction
-from src.constants import VARS_CANNOT_MODIFY, MODULES
+from src.constants import PROTECTED_VARS, MODULES
 from src.nodes import *
-from src.errors import NotDefinedError, RunTimeError, RTIndexError, RTTypeError
+from src.errors import NotDefinedError, RunTimeError, RTIndexError, RTTypeError, RTFileNotFoundError
 from src.token_constants import *
 from src.runtime_result import RTResult
 from src.context import Context
@@ -244,7 +244,7 @@ class Interpreter:
         if result.should_return():
             return result
 
-        if var_name not in VARS_CANNOT_MODIFY:
+        if var_name not in PROTECTED_VARS:
             if equal == TT_EQ:
                 context.symbol_table.set(var_name, value)
                 final_value = value
@@ -318,7 +318,7 @@ class Interpreter:
             return result.failure(NotDefinedError(node.pos_start, node.pos_end, f"name '{var_name}' is not defined.",
                                                   context))
 
-        if var_name not in VARS_CANNOT_MODIFY:
+        if var_name not in PROTECTED_VARS:
             context.symbol_table.remove(var_name)
         else:
             return result.failure(RunTimeError(node.pos_start, node.pos_end,
@@ -465,7 +465,7 @@ class Interpreter:
         )
 
         if node.var_name_token is not None:
-            if func_name not in VARS_CANNOT_MODIFY:
+            if func_name not in PROTECTED_VARS:
                 context.symbol_table.set(func_name, func_value)
             else:
                 return result.failure(RunTimeError(node.pos_start, node.pos_end,
@@ -618,6 +618,8 @@ class Interpreter:
             open_mode = 'a'
 
         str_to_write = result.register(self.visit(expr_to_write, context))
+        if result.error is not None:
+            return result
         if not isinstance(str_to_write, String):
             return result.failure(
                 RTTypeError(
@@ -626,6 +628,8 @@ class Interpreter:
             )
 
         file_name = result.register(self.visit(file_name_expr, context))
+        if result.error is not None:
+            return result
         if not isinstance(file_name, String):
             return result.failure(
                 RTTypeError(
@@ -647,7 +651,7 @@ class Interpreter:
             return result.success(str_to_write)
 
         try:
-            with open(file_name_value, open_mode) as file:
+            with open(file_name_value, open_mode, encoding='UTF-8') as file:
                 file.write(str_to_write_value)
                 file.close()
         except Exception as e:
@@ -659,6 +663,54 @@ class Interpreter:
             )
 
         return result.success(str_to_write)
+
+    def visit_ReadNode(self, node: ReadNode, context: Context):
+        result = RTResult()
+        file_name_expr = node.file_name_expr
+        identifier = node.identifier
+
+        file_name = result.register(self.visit(file_name_expr, context))
+        if result.error is not None:
+            return result
+        if not isinstance(file_name, String):
+            return result.failure(
+                RTTypeError(
+                    file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", context
+                )
+            )
+        file_name_value = file_name.value
+
+        try:
+            with open(file_name_value, 'r+', encoding='UTF-8') as file:
+                file_str = file.read()
+                file.close()
+        except FileNotFoundError:
+            return result.failure(
+                RTFileNotFoundError(
+                    node.pos_start, node.pos_end, f"file '{file_name_value}' does not exist.", context
+                )
+            )
+        except Exception as e:
+            return result.failure(
+                RunTimeError(
+                    node.pos_start, node.pos_end, f"unable to write in file '{file_name_value}'. "
+                                                  f"More info : Python{e.__class__.__name__}: {e}", context
+                )
+            )
+
+        if identifier is not None:
+            if identifier.value not in PROTECTED_VARS:
+                context.symbol_table.set(identifier.value, String(file_str))
+            else:
+                return result.failure(
+                    RunTimeError(
+                        node.pos_start, node.pos_end,
+                        f"unable to create a variable with builtin name '{identifier.value}'.",
+                        context
+                    )
+                )
+
+        return result.success(String(file_str))
 
     @staticmethod
     def visit_NoNode(node: NoNode, context: Context):

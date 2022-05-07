@@ -236,6 +236,7 @@ class ReturnNode:
         return f'(return:{self.node_to_return})'
 
 
+# MODULE NODES
 class ImportNode:
     def __init__(self, identifier, pos_start, pos_end):
         self.identifier = identifier
@@ -245,6 +246,20 @@ class ImportNode:
 
     def __repr__(self):
         return f'(import:{self.identifier})'
+
+
+# FILE NODES
+class WriteNode:
+    def __init__(self, expr_to_write, file_name_expr, to_token, pos_start, pos_end):
+        self.expr_to_write = expr_to_write
+        self.file_name_expr = file_name_expr
+        self.to_token = to_token
+
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+    def __repr__(self):
+        return f'(write:{self.expr_to_write}>>{self.file_name_expr})'
 
 
 # SPECIAL NODES

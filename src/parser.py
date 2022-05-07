@@ -164,6 +164,33 @@ class Parser:
 
             return result.success(ImportNode(identifier, pos_start, self.current_token.pos_start.copy()))
 
+        if self.current_token.matches(TT_KEYWORD, 'write'):
+            result.register_advancement()
+            self.advance()
+
+            expr_to_write = result.register(self.expr())
+            if result.error is not None:
+                return result
+
+            if self.current_token.type not in [TT_TO, TT_TO_AND_OVERWRITE]:
+                return result.failure(
+                    InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        "'>>' or '!>>' is missing. The correct syntax is 'write () >> ()'."
+                    )
+                )
+            to_token = self.current_token.copy()
+
+            result.register_advancement()
+            self.advance()
+
+            file_name_expr = result.register(self.expr())
+            if result.error is not None:
+                return result
+
+            return result.success(WriteNode(expr_to_write, file_name_expr, to_token, pos_start,
+                                            self.current_token.pos_start.copy()))
+
         expr = result.register(self.expr())
         if result.error is not None:
             return result.failure(InvalidSyntaxError(

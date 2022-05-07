@@ -142,3 +142,7 @@ end
 var a = 1
 print(a)
 del a
+
+# write into a file
+write "Use '!>>' to overwrite :)" !>> "example_file"
+write "\nHello world!" >> "example_file"

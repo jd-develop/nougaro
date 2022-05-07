@@ -25,7 +25,7 @@ class Context:
                      'parent': self.parent,
                      'parent_entry_pos': self.parent_entry_pos,
                      'display_name': self.display_name,
-                     'NB': 'this is __repr__ from nougaro.Context (internal)'}
+                     'NB': 'this is __repr__ from src.context.Context (internal)'}
         return repr_dict
 
     def __repr__(self):

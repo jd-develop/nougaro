@@ -11,7 +11,7 @@ from src.values.functions.function import Function
 from src.values.functions.base_function import BaseFunction
 from src.constants import VARS_CANNOT_MODIFY, MODULES
 from src.nodes import *
-from src.errors import NotDefinedError, RunTimeError, RTIndexError
+from src.errors import NotDefinedError, RunTimeError, RTIndexError, RTTypeError
 from src.token_constants import *
 from src.runtime_result import RTResult
 from src.context import Context
@@ -604,6 +604,61 @@ class Interpreter:
             context.symbol_table.set(f"{name_to_import}_{key}", what_to_import[key])
 
         return result.success(NoneValue(False))
+
+    def visit_WriteNode(self, node: WriteNode, context: Context):
+        result = RTResult()
+        expr_to_write = node.expr_to_write
+        file_name_expr = node.file_name_expr
+        to_token = node.to_token
+        if to_token.type == TT_TO:
+            open_mode = 'a'
+        elif to_token.type == TT_TO_AND_OVERWRITE:
+            open_mode = 'w'
+        else:
+            open_mode = 'a'
+
+        str_to_write = result.register(self.visit(expr_to_write, context))
+        if not isinstance(str_to_write, String):
+            return result.failure(
+                RTTypeError(
+                    str_to_write.pos_start, str_to_write.pos_end, f"expected str, got {str_to_write.type_}.", context
+                )
+            )
+
+        file_name = result.register(self.visit(file_name_expr, context))
+        if not isinstance(file_name, String):
+            return result.failure(
+                RTTypeError(
+                    file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", context
+                )
+            )
+
+        str_to_write_value = str_to_write.value
+        file_name_value = file_name.value
+
+        if file_name_value == '<stdout>':
+            if open_mode == 'w':
+                return result.failure(
+                    RunTimeError(
+                        node.pos_start, node.pos_end, f"can not overwrite <stdout>.", context
+                    )
+                )
+            print(str_to_write_value)
+            return result.success(str_to_write)
+
+        try:
+            with open(file_name_value, open_mode) as file:
+                file.write(str_to_write_value)
+                file.close()
+        except Exception as e:
+            return result.failure(
+                RunTimeError(
+                    node.pos_start, node.pos_end, f"unable to write in file '{file_name_value}'. "
+                                                  f"More info : Python{e.__class__.__name__}: {e}", context
+                )
+            )
+
+        return result.success(str_to_write)
 
     @staticmethod
     def visit_NoNode(node: NoNode, context: Context):

@@ -320,9 +320,15 @@ class Lexer:
         if self.current_char == '=':
             self.advance()
             return Token(TT_NE, pos_start=pos_start, pos_end=self.pos), None
+        elif self.current_char == '>':
+            self.advance()
+            if self.current_char != '>':
+                return None, InvalidSyntaxError(pos_start, self.pos, "expected '!>>', but got '!>'.")
+            self.advance()
+            return Token(TT_TO_AND_OVERWRITE, pos_start=pos_start, pos_end=self.pos), None
 
         self.advance()
-        return None, InvalidSyntaxError(pos_start, self.pos, "expected '!=', but got '!'.")
+        return None, InvalidSyntaxError(pos_start, self.pos, "expected '!=' or '!>>', but got '!'.")
 
     def make_equals(self):
         token_type = TT_EQ
@@ -380,11 +386,7 @@ class Lexer:
                 self.advance()
                 token_type = TT_GTEQ
             else:
-                return None, InvalidSyntaxError(
-                    pos_start,
-                    self.pos,
-                    f"expected '=' after '>>', got '{self.current_char}."
-                )
+                token_type = TT_TO
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 

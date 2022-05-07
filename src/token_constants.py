@@ -21,6 +21,9 @@ TT_POW = '^'                  # ^
 TT_PERC = '%'                 # %
 TT_FLOORDIV = '//'            # //
 
+TT_TO = '>>'                  # >>
+TT_TO_AND_OVERWRITE = '!>>'   # !>>
+
 TT_EQ = '='                   # =
 TT_PLUSEQ = '+='              # +=
 TT_MINUSEQ = '-='             # -=
@@ -91,7 +94,9 @@ KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
     'def',
     'return',
     # modules
-    'import'
+    'import',
+    # files
+    'write'
 ]
 
 TOKENS_TO_QUOTE = [
@@ -136,6 +141,8 @@ TOKENS_TO_QUOTE = [
     TT_GTEEQ,
     TT_LTEQ,
     TT_GTEQ,
+    TT_TO,
+    TT_TO_AND_OVERWRITE
 ]
 
 EQUALS = [

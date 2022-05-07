@@ -420,9 +420,9 @@ class Interpreter:
             )
         else:
             return result.failure(
-                RunTimeError(node.list_node.pos_start, node.list_node.pos_end,
-                             f"expected a list after 'in', but found {list_.type_}.",
-                             context)
+                RTTypeError(node.list_node.pos_start, node.list_node.pos_end,
+                            f"expected a list after 'in', but found {list_.type_}.",
+                            context)
             )
 
     def visit_WhileNode(self, node: WhileNode, context: Context):

@@ -10,7 +10,7 @@ from src.context import Context
 from src.values.basevalues import *
 from src.values.specific_values.number import *
 from src.misc import CustomBuiltInFuncMethod
-from src.errors import RTFileNotFoundError
+from src.errors import RTFileNotFoundError, RTTypeError
 # built-in python imports
 from os import system as os_system, name as os_name
 
@@ -300,7 +300,7 @@ class BuiltInFunction(BaseFunction):
         value = exec_context.symbol_table.get('value')
 
         if not isinstance(list_, List):
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 list_.pos_start, list_.pos_end,
                 "first argument of built-in function 'append' must be a list.",
                 exec_context
@@ -322,14 +322,14 @@ class BuiltInFunction(BaseFunction):
         index = exec_context.symbol_table.get('index')
 
         if not isinstance(list_, List):
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 list_.pos_start, list_.pos_end,
                 "first argument of built-in function 'pop' must be a list.",
                 exec_context
             ))
 
         if not isinstance(index, Number):
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 index.pos_start, index.pos_end,
                 "second argument of built-in function 'pop' must be a number.",
                 exec_context
@@ -359,7 +359,7 @@ class BuiltInFunction(BaseFunction):
         index = exec_context.symbol_table.get('index')
 
         if not isinstance(list_, List):
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 list_.pos_start, list_.pos_end,
                 "first argument of built-in function 'insert' must be a list.",
                 exec_context
@@ -369,7 +369,7 @@ class BuiltInFunction(BaseFunction):
             index = Number(len(list_.elements))
 
         if not isinstance(index, Number):
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 index.pos_start, index.pos_end,
                 "third argument of built-in function 'insert' must be a number.",
                 exec_context
@@ -394,14 +394,14 @@ class BuiltInFunction(BaseFunction):
         delete_duplicates = exec_context.symbol_table.get('delete_duplicates')
 
         if not isinstance(list1, List):
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 list1.pos_start, list1.pos_end,
                 "first argument of built-in function 'extend' must be a list.",
                 exec_context
             ))
 
         if not isinstance(list2, List):
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 list2.pos_start, list2.pos_end,
                 "second argument of built-in function 'extend' must be a list.",
                 exec_context
@@ -409,7 +409,7 @@ class BuiltInFunction(BaseFunction):
 
         if delete_duplicates is not None:
             if not isinstance(delete_duplicates, Number):
-                return RTResult().failure(RunTimeError(
+                return RTResult().failure(RTTypeError(
                     list2.pos_start, list2.pos_end,
                     "third argument of built-in function 'extend' must be a number.",
                     exec_context
@@ -447,7 +447,7 @@ class BuiltInFunction(BaseFunction):
 
         if not isinstance(list_, List):
             return RTResult().failure(
-                RunTimeError(
+                RTTypeError(
                     list_.pos_start, list_.pos_end,
                     "first argument of built-in function 'get' must be a list.",
                     exec_context
@@ -456,7 +456,7 @@ class BuiltInFunction(BaseFunction):
 
         if not isinstance(index_, Number):
             return RTResult().failure(
-                RunTimeError(
+                RTTypeError(
                     index_.pos_start, index_.pos_end,
                     "second argument of built-in function 'get' must be an int.",
                     exec_context
@@ -485,7 +485,7 @@ class BuiltInFunction(BaseFunction):
         list_ = exec_context.symbol_table.get('list')
         if not isinstance(list_, List):
             return RTResult().failure(
-                RunTimeError(
+                RTTypeError(
                     list_.pos_start, list_.pos_end,
                     "first argument of builtin function 'max' must be a list.",
                     exec_context
@@ -496,7 +496,7 @@ class BuiltInFunction(BaseFunction):
             ignore_not_num = FALSE.set_pos(list_.pos_end, self.pos_end)
         if not isinstance(ignore_not_num, Number):
             return RTResult().failure(
-                RunTimeError(
+                RTTypeError(
                     ignore_not_num.pos_start, ignore_not_num.pos_end,
                     "second argument of builtin function 'max' must be a number.",
                     exec_context
@@ -510,7 +510,7 @@ class BuiltInFunction(BaseFunction):
             else:
                 if ignore_not_num.value == FALSE.value:
                     return RTResult().failure(
-                        RunTimeError(
+                        RTTypeError(
                             list_.pos_start, list_.pos_end,
                             "first argument of builtin function 'max' must be a list containing only numbers. "
                             "You can execute the function with True as the second argument to avoid this error.",
@@ -526,7 +526,7 @@ class BuiltInFunction(BaseFunction):
             else:
                 if ignore_not_num.value == FALSE.value:
                     return RTResult().failure(
-                        RunTimeError(
+                        RTTypeError(
                             self.pos_start, self.pos_end,
                             "first argument of builtin function 'max' must be a list containing only numbers. "
                             "You can execute the function with True as the second argument to avoid this error.",
@@ -548,7 +548,7 @@ class BuiltInFunction(BaseFunction):
         list_ = exec_context.symbol_table.get('list')
         if not isinstance(list_, List):
             return RTResult().failure(
-                RunTimeError(
+                RTTypeError(
                     list_.pos_start, list_.pos_end,
                     "first argument of builtin function 'min' must be a list.",
                     exec_context
@@ -559,7 +559,7 @@ class BuiltInFunction(BaseFunction):
             ignore_not_num = FALSE.set_pos(list_.pos_end, self.pos_end)
         if not isinstance(ignore_not_num, Number):
             return RTResult().failure(
-                RunTimeError(
+                RTTypeError(
                     ignore_not_num.pos_start, ignore_not_num.pos_end,
                     "second argument of builtin function 'min' must be a number.",
                     exec_context
@@ -573,7 +573,7 @@ class BuiltInFunction(BaseFunction):
             else:
                 if ignore_not_num.value == FALSE.value:
                     return RTResult().failure(
-                        RunTimeError(
+                        RTTypeError(
                             list_.pos_start, list_.pos_end,
                             "first argument of builtin function 'min' must be a list containing only numbers. "
                             "You can execute the function with True as the second argument to avoid this error.",
@@ -589,7 +589,7 @@ class BuiltInFunction(BaseFunction):
             else:
                 if ignore_not_num.value == FALSE.value:
                     return RTResult().failure(
-                        RunTimeError(
+                        RTTypeError(
                             self.pos_start, self.pos_end,
                             "first argument of builtin function 'min' must be a list containing only numbers. "
                             "You can execute the function with True as the second argument to avoid this error.",
@@ -610,7 +610,7 @@ class BuiltInFunction(BaseFunction):
         char = exec_context.symbol_table.get('char')
         if not isinstance(str_, String):
             return RTResult().failure(
-                RunTimeError(
+                RTTypeError(
                     self.pos_start, self.pos_end,
                     "first argument of builtin function 'split' must be a str.",
                     exec_context
@@ -620,7 +620,7 @@ class BuiltInFunction(BaseFunction):
             char = String(' ')
         if not isinstance(char, String):
             return RTResult().failure(
-                RunTimeError(
+                RTTypeError(
                     self.pos_start, self.pos_end,
                     "second argument of builtin function 'split' must be a str or None.",
                     exec_context
@@ -733,7 +733,7 @@ class BuiltInFunction(BaseFunction):
         list_ = exec_ctx.symbol_table.get('list')
 
         if not isinstance(list_, List):
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 list_.pos_start, list_.pos_end,
                 "first argument of built-in function 'len' must be a list.",
                 exec_ctx
@@ -763,7 +763,7 @@ class BuiltInFunction(BaseFunction):
         file_name = exec_ctx.symbol_table.get("file_name")
 
         if not isinstance(file_name, String):
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 file_name.pos_start, file_name.pos_end,
                 "first argument of built-in function 'run' must be a str.",
                 exec_ctx
@@ -805,7 +805,7 @@ class BuiltInFunction(BaseFunction):
         # * cmd
         cmd = exec_ctx.symbol_table.get("cmd")
         if not isinstance(cmd, String):
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 cmd.pos_start, cmd.pos_end,
                 f"first argument of builtin function 'system_call' must be a str.",
                 exec_ctx
@@ -830,7 +830,7 @@ class BuiltInFunction(BaseFunction):
         # * value
         value = exec_ctx.symbol_table.get("value")
         if not isinstance(value, String):
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
                 f"first argument of builtin function 'lower' must be a str.",
                 exec_ctx
@@ -847,7 +847,7 @@ class BuiltInFunction(BaseFunction):
         # * value
         value = exec_ctx.symbol_table.get("value")
         if not isinstance(value, String):
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
                 f"first argument of builtin function 'upper' must be a str.",
                 exec_ctx
@@ -875,7 +875,7 @@ class BuiltInFunction(BaseFunction):
             webbrowser.open(random.choice(list(songs.values())), new=2)
             return RTResult().success(NoneValue(False))
         if not isinstance(song, String):
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 song.pos_start, song.pos_end,
                 f"first argument of builtin function 'nougaro' must be a str.",
                 exec_ctx

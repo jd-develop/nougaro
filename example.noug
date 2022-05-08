@@ -144,8 +144,11 @@ print(a)
 del a
 
 # write into a file
-write "Use '!>>' to overwrite :)" !>> "example_file"
-write "\nHello world!" >> "example_file"  # use \n to make a new line.
+var file = 'example_file'
+
+write "Use '!>>' to overwrite :)" !>> file
+write "\nHello world!" >> file  # use \n to make a new line.
+write "Wow, that is at line 6" >> file 6
 
 # read files
-print(read "example_file")
+print(read file)

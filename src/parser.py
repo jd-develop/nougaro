@@ -270,7 +270,7 @@ class Parser:
                         "'>>' or '!>>' is missing. The correct syntax is 'write () >> ()'."
                     )
                 )
-            to_token = self.current_token.copy()
+            to_token = self.current_token
 
             result.register_advancement()
             self.advance()
@@ -279,7 +279,15 @@ class Parser:
             if result.error is not None:
                 return result
 
-            return result.success(WriteNode(expr_to_write, file_name_expr, to_token, pos_start,
+            if self.current_token.type == TT_INT:
+                line_number = self.current_token.value
+
+                result.register_advancement()
+                self.advance()
+            else:
+                line_number = 'last'
+
+            return result.success(WriteNode(expr_to_write, file_name_expr, to_token, line_number, pos_start,
                                             self.current_token.pos_start.copy()))
 
         if self.current_token.matches(TT_KEYWORD, 'read'):
@@ -309,7 +317,15 @@ class Parser:
                 result.register_advancement()
                 self.advance()
 
-            return result.success(ReadNode(file_name_expr, identifier, pos_start,
+            if self.current_token.type == TT_INT:
+                line_number = self.current_token.value
+
+                result.register_advancement()
+                self.advance()
+            else:
+                line_number = 'all'
+
+            return result.success(ReadNode(file_name_expr, identifier, line_number, pos_start,
                                            self.current_token.pos_start.copy()))
 
         node = result.register(self.bin_op(self.comp_expr, (

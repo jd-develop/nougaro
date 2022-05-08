@@ -56,7 +56,6 @@ def run(file_name, text, version: str = version_, exec_from: str = "(shell)", ac
 
     # run the code (interpreter)
     interpreter = src.interpreter.Interpreter(run)
-    interpreter.__init__(run)
     context = Context('<program>')
     context.symbol_table = global_symbol_table
     result = interpreter.visit(ast.node, context)

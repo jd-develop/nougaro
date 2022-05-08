@@ -145,7 +145,7 @@ del a
 
 # write into a file
 write "Use '!>>' to overwrite :)" !>> "example_file"
-write "\nHello world!" >> "example_file"
+write "\nHello world!" >> "example_file"  # use \n to make a new line.
 
 # read files
 print(read "example_file")

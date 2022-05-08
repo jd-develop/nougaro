@@ -250,28 +250,30 @@ class ImportNode:
 
 # FILE NODES
 class WriteNode:
-    def __init__(self, expr_to_write, file_name_expr, to_token, pos_start, pos_end):
+    def __init__(self, expr_to_write, file_name_expr, to_token, line_number, pos_start, pos_end):
         self.expr_to_write = expr_to_write
         self.file_name_expr = file_name_expr
         self.to_token = to_token
+        self.line_number = line_number
 
         self.pos_start = pos_start
         self.pos_end = pos_end
 
     def __repr__(self):
-        return f'(write:{self.expr_to_write}>>{self.file_name_expr})'
+        return f'(write:{self.expr_to_write}{self.to_token.type}{self.file_name_expr} at line {self.line_number})'
 
 
 class ReadNode:
-    def __init__(self, file_name_expr, identifier, pos_start, pos_end):
+    def __init__(self, file_name_expr, identifier, line_number, pos_start, pos_end):
         self.file_name_expr = file_name_expr
         self.identifier = identifier
+        self.line_number = line_number
 
         self.pos_start = pos_start
         self.pos_end = pos_end
 
     def __repr__(self):
-        return f'(read:{self.file_name_expr}>>{self.identifier})'
+        return f'(read:{self.file_name_expr}>>{self.identifier} at line {self.line_number})'
 
 
 # SPECIAL NODES

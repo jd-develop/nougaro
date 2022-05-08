@@ -610,12 +610,13 @@ class Interpreter:
         expr_to_write = node.expr_to_write
         file_name_expr = node.file_name_expr
         to_token = node.to_token
+        line_number = node.line_number
         if to_token.type == TT_TO:
-            open_mode = 'a'
+            open_mode = 'a+'
         elif to_token.type == TT_TO_AND_OVERWRITE:
-            open_mode = 'w'
+            open_mode = 'w+'
         else:
-            open_mode = 'a'
+            open_mode = 'a+'
 
         str_to_write = result.register(self.visit(expr_to_write, context))
         if result.error is not None:
@@ -651,9 +652,47 @@ class Interpreter:
             return result.success(str_to_write)
 
         try:
-            with open(file_name_value, open_mode, encoding='UTF-8') as file:
-                file.write(str_to_write_value)
-                file.close()
+            if line_number == 'last':
+                with open(file_name_value, open_mode, encoding='UTF-8') as file:
+                    file.write(str_to_write_value)
+                    file.close()
+            else:
+                with open(file_name_value, 'r+', encoding='UTF-8') as file:
+                    file_data = file.readlines()
+                    file.close()
+                if line_number > len(file_data):
+                    with open(file_name_value, 'a+', encoding='UTF-8') as file:
+                        file.write('\n' * (line_number - len(file_data)))
+                        file.write(str_to_write_value)
+                        file.close()
+                else:
+                    if open_mode == 'a+':
+                        if line_number == 0:
+                            file_data.insert(0, str_to_write_value + '\n')
+                        elif line_number > 0:
+                            file_data[line_number - 1] = file_data[line_number - 1].replace('\n', '')
+                            file_data[line_number - 1] += str_to_write_value + '\n'
+                        else:
+                            return result.failure(
+                                RTIndexError(
+                                    node.pos_start, node.pos_end, "line number can not be negative.", context
+                                )
+                            )
+                    else:  # open_mode == 'w+'
+                        if line_number == 0:
+                            file_data.insert(0, str_to_write_value + '\n')
+                        elif line_number > 0:
+                            file_data[line_number - 1] = str_to_write_value + '\n'
+                        else:
+                            return result.failure(
+                                RTIndexError(
+                                    node.pos_start, node.pos_end, "line number can not be negative.", context
+                                )
+                            )
+
+                    with open(file_name_value, 'w+', encoding='UTF-8') as file:
+                        file.writelines(file_data)
+                        file.close()
         except Exception as e:
             return result.failure(
                 RunTimeError(
@@ -668,6 +707,7 @@ class Interpreter:
         result = RTResult()
         file_name_expr = node.file_name_expr
         identifier = node.identifier
+        line_number = node.line_number
 
         file_name = result.register(self.visit(file_name_expr, context))
         if result.error is not None:
@@ -681,9 +721,22 @@ class Interpreter:
         file_name_value = file_name.value
 
         try:
-            with open(file_name_value, 'r+', encoding='UTF-8') as file:
-                file_str = file.read()
-                file.close()
+            if line_number == 'all':
+                with open(file_name_value, 'r+', encoding='UTF-8') as file:
+                    file_str = file.read()
+                    file.close()
+            else:
+                with open(file_name_value, 'r+', encoding='UTF-8') as file:
+                    file_data = file.readlines()
+                    file.close()
+                    if 0 < line_number <= len(file_data):
+                        file_str = file_data[line_number - 1]
+                    else:
+                        return result.failure(
+                            RTIndexError(
+                                node.pos_start, node.pos_end, f"{line_number}.", context
+                            )
+                        )
         except FileNotFoundError:
             return result.failure(
                 RTFileNotFoundError(

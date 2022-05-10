@@ -89,6 +89,7 @@ KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
     'step',
     'while',
     'do',
+    'loop',
     'break',
     'continue',
     # functions

@@ -462,6 +462,8 @@ class Interpreter:
         if result.should_return():
             return result
 
+        elements.append(value)
+
         while True:
             condition = result.register(self.visit(node.condition_node, context))
             if result.should_return():

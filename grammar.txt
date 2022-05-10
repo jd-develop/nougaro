@@ -58,7 +58,7 @@ for_expr   : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr (KEYWORD:STEP expr)?
 while_expr : KEYWORD:WHILE expr KEYWORD:THEN
              statement | (NEWLINE statements KEYWORD:END)
 
-do_expr    : KEYWORD:DO (statement | (NEWLINE statements NEWLINE)) KEYWORD:THEN KEYWORD:DO KEYWORD:WHILE expr
+do_expr    : KEYWORD:DO (statement | (NEWLINE statements NEWLINE)) KEYWORD:THEN KEYWORD:LOOP KEYWORD:WHILE expr
 
 func_def   : KEYWORD:DEF IDENTIFIER?
              LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN

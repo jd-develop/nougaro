@@ -957,10 +957,10 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        if not self.current_token.matches(TT_KEYWORD, 'do'):
+        if not self.current_token.matches(TT_KEYWORD, 'loop'):
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'do'."
+                "expected 'loop'."
             ))
 
         result.register_advancement()

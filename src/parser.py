@@ -870,7 +870,7 @@ class Parser:
 
             return result.success(ForNode(var_name, start_value, end_value, step_value, body, True))
 
-        body = result.register(self.expr())
+        body = result.register(self.statement())
         if result.error is not None:
             return result
 

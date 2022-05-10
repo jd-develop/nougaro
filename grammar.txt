@@ -33,6 +33,7 @@ atom       : INT|FLOAT|STRING (STRING)?*|(IDENTIFIER (INTERROGATIVE_PNT IDENTIFI
            : if_expr
            : for_expr
            : while_expr
+           : do_expr
            : func_def
 
 list_expr  : LSQUARE ((expr|MUL list_expr) (COMMA (expr|MUL list_expr))?*)? RSQUARE
@@ -56,6 +57,8 @@ for_expr   : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr (KEYWORD:STEP expr)?
 
 while_expr : KEYWORD:WHILE expr KEYWORD:THEN
              statement | (NEWLINE statements KEYWORD:END)
+
+do_expr    : KEYWORD:DO (statement | (NEWLINE statements NEWLINE)) KEYWORD:THEN KEYWORD:DO KEYWORD:WHILE expr
 
 func_def   : KEYWORD:DEF IDENTIFIER?
              LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN

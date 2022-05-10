@@ -138,6 +138,13 @@ for i in list_ then
 end
 # it prints all the elements of list_
 
+var _ = 0
+do
+    print(_)
+	if _ == 9 then; var _ += 2; continue; end
+	var _ += 1
+then do while _ != 20
+
 # variable deletion
 var a = 1
 print(a)
@@ -149,6 +156,8 @@ var file = 'example_file'
 write "Use '!>>' to overwrite :)" !>> file
 write "\nHello world!" >> file  # use \n to make a new line.
 write "Wow, that is at line 6" >> file 6
+print("Write into a file does not prints anything - except in shell mode.")
+print("Or you can do `print(write 'str' >> 'file')` ^^")
 
 # read files
 print(read file)

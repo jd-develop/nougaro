@@ -534,6 +534,11 @@ class Parser:
             if result.error is not None:
                 return result
             return result.success(while_expr)
+        elif token.matches(TT_KEYWORD, 'do'):
+            do_expr = result.register(self.do_expr())
+            if result.error is not None:
+                return result
+            return result.success(do_expr)
         elif token.matches(TT_KEYWORD, 'def'):
             func_def = result.register(self.func_def())
             if result.error is not None:
@@ -916,6 +921,68 @@ class Parser:
             return result
 
         return result.success(WhileNode(condition, body, False))
+
+    def do_expr(self):
+        result = ParseResult()
+
+        if not self.current_token.matches(TT_KEYWORD, 'do'):
+            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
+                                                     "expected 'do'."))
+
+        result.register_advancement()
+        self.advance()
+
+        if self.current_token.type == TT_NEWLINE:
+            result.register_advancement()
+            self.advance()
+
+            body = result.register(self.statements(stop=[(TT_KEYWORD, 'then')]))
+            if result.error is not None:
+                return result
+
+            should_return_none = True
+        else:
+            body = result.register(self.statement())
+            if result.error is not None:
+                return result
+
+            should_return_none = False
+
+        if not self.current_token.matches(TT_KEYWORD, 'then'):
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected 'then'."
+            ))
+
+        result.register_advancement()
+        self.advance()
+
+        if not self.current_token.matches(TT_KEYWORD, 'do'):
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected 'do'."
+            ))
+
+        result.register_advancement()
+        self.advance()
+
+        if not self.current_token.matches(TT_KEYWORD, 'while'):
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected 'while'."
+            ))
+
+        result.register_advancement()
+        self.advance()
+
+        condition = result.register(self.expr())
+        if result.error is not None:
+            return result
+
+        result.register_advancement()
+        self.advance()
+
+        return result.success(DoWhileNode(body, condition, should_return_none))
 
     def func_def(self):
         result = ParseResult()

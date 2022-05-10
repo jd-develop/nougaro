@@ -454,6 +454,39 @@ class Interpreter:
             List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
         )
 
+    def visit_DoWhileNode(self, node: DoWhileNode, context: Context):
+        result = RTResult()
+        elements = []
+
+        value = result.register(self.visit(node.body_node, context))
+        if result.should_return():
+            return result
+
+        while True:
+            condition = result.register(self.visit(node.condition_node, context))
+            if result.should_return():
+                return result
+
+            if not condition.is_true():
+                break
+
+            value = result.register(self.visit(node.body_node, context))
+            if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
+                return result
+
+            if result.loop_should_continue:
+                continue  # will continue the 'while True' -> the interpreted 'while' loop is continued
+
+            if result.loop_should_break:
+                break  # will break the 'while True' -> the interpreted 'while' loop is break
+
+            elements.append(value)
+
+        return result.success(
+            NoneValue(False) if node.should_return_none else
+            List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+        )
+
     @staticmethod
     def visit_FuncDefNode(node: FuncDefNode, context: Context):
         result = RTResult()

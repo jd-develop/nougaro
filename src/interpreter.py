@@ -629,7 +629,7 @@ class Interpreter:
         if not is_module:
             return result.failure(
                 NotDefinedError(
-                    node.pos_start, node.pos_end, f"name '{name_to_import}' is not a module.", context
+                    identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", context
                 )
             )
 

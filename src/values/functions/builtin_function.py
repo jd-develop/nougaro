@@ -13,6 +13,7 @@ from src.misc import CustomBuiltInFuncMethod
 from src.errors import RTFileNotFoundError, RTTypeError
 # built-in python imports
 from os import system as os_system, name as os_name
+import random
 
 
 class BuiltInFunction(BaseFunction):
@@ -23,7 +24,7 @@ class BuiltInFunction(BaseFunction):
     def __repr__(self):
         return f'<built-in function {self.name}>'
 
-    def execute(self, args, interpreter_, run, exec_from: str):
+    def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
         result = RTResult()
         exec_context = self.generate_new_context()
         exec_context.symbol_table.set("__exec_from__", String(exec_from))
@@ -476,6 +477,49 @@ class BuiltInFunction(BaseFunction):
     execute_get.optional_args = []
     execute_get.should_respect_args_number = True
 
+    def execute_replace(self, exec_context: Context):
+        """Replace an element in a list by another"""
+        # Params:
+        # * list
+        # * index
+        # * value
+        list_ = exec_context.symbol_table.get("list")
+        index_ = exec_context.symbol_table.get('index')
+        value = exec_context.symbol_table.get('value')
+
+        if not isinstance(list_, List):
+            return RTResult().failure(
+                RTTypeError(
+                    list_.pos_start, list_.pos_end,
+                    "first argument of built-in function 'get' must be a list.",
+                    exec_context
+                )
+            )
+
+        if not isinstance(index_, Number):
+            return RTResult().failure(
+                RTTypeError(
+                    index_.pos_start, index_.pos_end,
+                    "second argument of built-in function 'get' must be an int.",
+                    exec_context
+                )
+            )
+
+        try:
+            list_.elements[index_.value] = value
+        except IndexError:
+            return RTResult().failure(RTIndexError(
+                list_.pos_start, index_.pos_end,
+                f'list index {index_.value} out of range.',
+                exec_context
+            ))
+
+        return RTResult().success(list_)
+
+    execute_replace.arg_names = ['list', 'index', 'value']
+    execute_replace.optional_args = []
+    execute_replace.should_respect_args_number = True
+
     def execute_max(self, exec_context: Context):
         """Calculates the max value of a list"""
         # Params:
@@ -871,15 +915,19 @@ class BuiltInFunction(BaseFunction):
         }  # PR if you want to add more songs :)
         if song is None:
             import webbrowser
-            import random
-            webbrowser.open(random.choice(list(songs.values())), new=2)
-            return RTResult().success(NoneValue(False))
+            song = random.choice(list(songs.keys()))
+            webbrowser.open(songs[song], new=2)
+            return RTResult().success(String(song))
         if not isinstance(song, String):
             return RTResult().failure(RTTypeError(
                 song.pos_start, song.pos_end,
                 f"first argument of builtin function 'nougaro' must be a str.",
                 exec_ctx
             ))
+
+        if song.value == "help":
+            return RTResult().success(String(f"The available songs are: {', '.join(list(songs.keys()))}"))
+
         import webbrowser
         try:
             webbrowser.open(songs[song.value], new=2)

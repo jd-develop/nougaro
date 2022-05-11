@@ -24,7 +24,7 @@ class Math(BuiltInFunction):
     def __repr__(self):
         return f'<built-in function math_{self.name}>'
 
-    def execute(self, args, interpreter_, run, exec_from):
+    def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
         result = RTResult()
         exec_context = self.generate_new_context()
         exec_context.symbol_table.set("__exec_from__", String(exec_from))

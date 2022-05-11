@@ -59,7 +59,11 @@ def main():
             if str(text) == "" or text is None:
                 result, error = None, None
             else:
-                result, error = nougaro.run('<stdin>', text, version)
+                try:
+                    result, error = nougaro.run('<stdin>', text, version)
+                except KeyboardInterrupt:
+                    print_in_red("KeyboardInterrupt")
+                    continue
 
             if error is not None:
                 print_in_red(error.as_string())
@@ -84,7 +88,12 @@ def main():
         if file_content == "" or file_content is None:
             result, error = None, None
         else:
-            result, error = nougaro.run('<stdin>', file_content, version)
+            try:
+                result, error = nougaro.run('<stdin>', file_content, version)
+            except KeyboardInterrupt:
+                result, error = None, None
+                print_in_red("KeyboardInterrupt")
+                exit()
         if error is not None:
             print_in_red(error.as_string())
 

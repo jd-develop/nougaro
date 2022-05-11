@@ -23,7 +23,7 @@ class Function(BaseFunction):
     def __repr__(self):
         return f'<function {self.name}>'
 
-    def execute(self, args, interpreter_, run, exec_from: str):
+    def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
         result = RTResult()
         interpreter = interpreter_(run)
         exec_context = self.generate_new_context()

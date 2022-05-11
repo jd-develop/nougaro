@@ -36,6 +36,7 @@ BUILTIN_FUNCTIONS = [
     "insert",
     "extend",
     "get",
+    "replace",
     "exit",
     "type",
     "str",

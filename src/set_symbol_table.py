@@ -52,6 +52,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("insert", INSERT)
     symbol_table.set("extend", EXTEND)
     symbol_table.set("get", GET)
+    symbol_table.set("replace", REPLACE)
     symbol_table.set("max", MAX)
     symbol_table.set("min", MIN)
     symbol_table.set("len", LEN)

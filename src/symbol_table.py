@@ -36,3 +36,6 @@ class SymbolTable:
 
     def remove(self, name):
         del self.symbols[name]
+
+    def exists(self, name):
+        return name in self.symbols

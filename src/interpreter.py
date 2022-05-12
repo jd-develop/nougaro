@@ -221,11 +221,19 @@ class Interpreter:
                         )
                     )
                 else:
-                    return result.failure(
-                        NotDefinedError(
-                            node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined.", context
+                    if context.symbol_table.exists(f'__{var_name.value}__'):
+                        return result.failure(
+                            NotDefinedError(
+                                node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined, "
+                                                              f"but '__{var_name.value}__' is.", context
+                            )
                         )
-                    )
+                    else:
+                        return result.failure(
+                            NotDefinedError(
+                                node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined.", context
+                            )
+                        )
             else:
                 return result.failure(
                     NotDefinedError(
@@ -300,9 +308,19 @@ class Interpreter:
                         return result.failure(error)
                     context.symbol_table.set(var_name, final_value)
                 else:
-                    return result.failure(NotDefinedError(node.pos_start, node.pos_end,
-                                                          f"name '{var_name}' is not defined yet.",
-                                                          value.context))
+                    if context.symbol_table.exists(f'__{var_name.value}__'):
+                        return result.failure(
+                            NotDefinedError(
+                                node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined yet, "
+                                                              f"but '__{var_name.value}__' is.", context
+                            )
+                        )
+                    else:
+                        return result.failure(
+                            NotDefinedError(
+                                node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined yet.", context
+                            )
+                        )
         else:
             return result.failure(RunTimeError(node.pos_start, node.pos_end,
                                                f"can not create a variable with builtin name '{var_name}'.",
@@ -627,11 +645,19 @@ class Interpreter:
             is_module = True
 
         if not is_module:
-            return result.failure(
-                NotDefinedError(
-                    identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", context
+            if f'__{name_to_import}__' in MODULES:
+                return result.failure(
+                    NotDefinedError(
+                        node.pos_start, node.pos_end, f"name '{name_to_import}' is not a module, "
+                                                      f"but '__{name_to_import}__' is.", context
+                    )
                 )
-            )
+            else:
+                return result.failure(
+                    NotDefinedError(
+                        node.pos_start, node.pos_end, f"name '{name_to_import}' is not a module.", context
+                    )
+                )
 
         from lib_.__TABLE_OF_MODULES__ import TABLE_OF_MODULES
         what_to_import = TABLE_OF_MODULES[name_to_import]

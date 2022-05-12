@@ -36,7 +36,7 @@ with open("noug_version.json") as ver_json:
 def run(file_name, text, version: str = version_, exec_from: str = "(shell)", actual_context: str = "<program>"):
     """Run the given code"""
     # set version in symbol table
-    global_symbol_table.set("noug_version", String(version))
+    global_symbol_table.set("__noug_version__", String(version))
     global_symbol_table.set("__exec_from__", String(exec_from))
     global_symbol_table.set("__actual_context__", String(actual_context))
 
@@ -60,6 +60,5 @@ def run(file_name, text, version: str = version_, exec_from: str = "(shell)", ac
     context.symbol_table = global_symbol_table
     result = interpreter.visit(ast.node, context)
     # print(context)
-    # pprint.pprint(global_symbol_table)
 
     return result.value, result.error

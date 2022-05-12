@@ -12,6 +12,7 @@ from src.values.specific_values.builtin_function import *
 from src.constants import PROTECTED_VARS
 # built-in python imports
 import platform
+import pprint
 
 
 def set_symbol_table(symbol_table: SymbolTable):
@@ -70,11 +71,13 @@ def set_symbol_table(symbol_table: SymbolTable):
 
     symbol_table.set("exit", EXIT)
     symbol_table.set("system_call", SYSTEM_CALL)
-    symbol_table.set('os_name', String(platform.system()))
-    symbol_table.set('os_release', String(platform.uname().release))
-    symbol_table.set('os_version', String(platform.uname().version))
+    symbol_table.set('__os_name__', String(platform.system()))
+    symbol_table.set('__os_release__', String(platform.uname().release))
+    symbol_table.set('__os_version__', String(platform.uname().version))
     # platform.system() may be 'Linux', 'Windows', 'Darwin', 'Java', etc. according to Python doc
     # test_protected_vars(symbol_table)
+
+    symbol_table.set('__symbol_table__', String(pprint.pformat(symbol_table.symbols)))
 
 
 def test_protected_vars(symbol_table: SymbolTable):

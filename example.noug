@@ -19,8 +19,8 @@ print(math_abs(-5))
 var some_text = "Hello, world!"
 var a = var b = 3
 print(some_text); print(a * b)
-print("You use nougaro version " + noug_version)
-print("You use " + os_name + " " + os_release + " " + os_version)
+print("You use nougaro version " + __noug_version__)
+print("You use " + __os_name__ + " " + __os_release__ + " " + __os_version__)
 print(None)
 print(var b === 3)
 print(var b <== 3)

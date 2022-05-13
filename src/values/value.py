@@ -18,6 +18,7 @@ class Value:
         self.set_pos()
         self.set_context()
         self.type_ = "BaseValue"
+        self.attributes = {}
 
     def set_pos(self, pos_start=None, pos_end=None):
         self.pos_start = pos_start
@@ -123,10 +124,10 @@ class Value:
 
     def copy(self):
         print(self.context)
-        print('NOUGARO INTERNAL ERROR : No copy method defined in Value.copy().\n'
+        print('NOUGARO INTERNAL ERROR : No \'copy\' method defined in Value.\n'
               'Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with the information below'
               )
-        raise Exception('No copy method defined in Value.copy().')
+        raise Exception('No \'copy\' method defined in Value.')
 
     @staticmethod
     def is_true():
@@ -151,3 +152,12 @@ class Value:
             self.pos_start, other.pos_end, f'{other.type_} is not iterable or can not contain {self.type_}.',
             self.context
         )
+
+    def set_attr(self, attribute: str, value):
+        self.attributes[attribute] = value
+
+    def del_attr(self, attribute: str):
+        self.attributes.pop(attribute)
+
+    def get_attr(self, attribute: str):
+        return self.attributes[attribute]

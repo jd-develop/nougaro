@@ -17,6 +17,9 @@ class String(Value):
         super().__init__()
         self.value = value
         self.type_ = "str"
+        self.attributes = {
+            # "type": String("str")  # recursion error x)
+        }
 
     def __repr__(self):
         return f'"{self.value}"'

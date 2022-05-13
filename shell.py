@@ -55,7 +55,12 @@ def main():
         print(f"Welcome to Nougaro {version}! Contribute : https://github.com/jd-develop/nougaro/")
 
         while True:
-            text = input("nougaro> ")
+            try:
+                text = input("nougaro> ")
+            except KeyboardInterrupt:
+                print("\nTo exit nougaro shell, use 'exit()'.")
+                continue
+
             if str(text) == "" or text is None:
                 result, error = None, None
             else:

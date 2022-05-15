@@ -18,6 +18,12 @@ def print_in_red(txt): print(Fore.RED + txt + Fore.RESET)
 
 
 # ##########
+# TOOL
+# ##########
+def is_num(value: Any): return isinstance(value, int) or isinstance(value, float)
+
+
+# ##########
 # CUSTOM BUILTIN FUNC METHOD
 # ##########
 class CustomBuiltInFuncMethod(Protocol):

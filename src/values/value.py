@@ -123,11 +123,7 @@ class Value:
         return False
 
     def copy(self):
-        print(self.context)
-        print('NOUGARO INTERNAL ERROR : No \'copy\' method defined in Value.\n'
-              'Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with the information below'
-              )
-        raise Exception('No \'copy\' method defined in Value.')
+        return Value()
 
     @staticmethod
     def is_true():

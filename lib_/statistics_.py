@@ -93,8 +93,8 @@ class Statistics(BaseBuiltInFunction):
 
         try:
             mean_ = statistics.mean(data_)
-        except statistics.StatisticsError as e:
-            if str(e) == "mean requires at least one data point":
+        except statistics.StatisticsError as exception:
+            if str(exception) == "mean requires at least one data point":
                 return RTResult().failure(RTStatisticsError(
                     data.pos_start, data.pos_end,
                     "first argument of built-in module function 'statistics_mean' must not be empty.",
@@ -102,7 +102,7 @@ class Statistics(BaseBuiltInFunction):
                 ))
             else:
                 return RTResult().failure(RTStatisticsError(
-                    self.pos_start, self.pos_end, str(e) + '.', exec_ctx
+                    self.pos_start, self.pos_end, str(exception) + '.', exec_ctx
                 ))
 
         return RTResult().success(Number(mean_))
@@ -111,7 +111,173 @@ class Statistics(BaseBuiltInFunction):
     execute_statistics_mean.optional_args = []
     execute_statistics_mean.should_respect_args_number = True
 
+    def execute_statistics_geometric_mean(self, exec_ctx: Context):
+        """Like python statistics.geometric_mean()"""
+        # Params:
+        # * data
+        data = exec_ctx.symbol_table.get('data')
+        if not isinstance(data, List):
+            return RTResult().failure(RTTypeError(
+                data.pos_start, data.pos_end,
+                "first argument of built-in module function 'statistics_geometric_mean' must be a list of numbers.",
+                exec_ctx
+            ))
+
+        data_ = []
+        for e in data.elements:
+            if not isinstance(e, Number):
+                return RTResult().failure(RTTypeError(
+                    e.pos_start, e.pos_end,
+                    f"first argument of built-in module function 'statistics_geometric_mean' must be a list of numbers,"
+                    f" not {e.type_}.",
+                    exec_ctx
+                ))
+            data_.append(e.value)
+
+        try:
+            geometric_mean_ = statistics.geometric_mean(data_)
+        except statistics.StatisticsError as exception:
+            is_empty_python_exceptions = [
+                "mean requires at least one data point",
+                "fmean requires at least one data point",
+                "geometric mean requires a non-empty dataset containing positive numbers"
+            ]
+            if str(exception) in is_empty_python_exceptions:
+                return RTResult().failure(RTStatisticsError(
+                    data.pos_start, data.pos_end,
+                    "first argument of built-in module function 'statistics_geometric_mean' must not be empty.",
+                    exec_ctx
+                ))
+            else:
+                return RTResult().failure(RunTimeError(
+                    self.pos_start, self.pos_end,
+                    f"python statistics.geometric_mean() crashed with this error: "
+                    f"{exception.__class__.__name__}: {exception}. PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: "
+                    f"https://jd-develop.github.ioo/nougaro/bugreport.html !",
+                    exec_ctx
+                ))
+        except Exception as exception:
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                f"python statistics.geometric_mean() crashed with this error: "
+                f"{exception.__class__.__name__}: {exception}. PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: "
+                f"https://jd-develop.github.ioo/nougaro/bugreport.html !",
+                exec_ctx
+            ))
+
+        return RTResult().success(Number(geometric_mean_))
+
+    execute_statistics_geometric_mean.arg_names = ['data']
+    execute_statistics_geometric_mean.optional_args = []
+    execute_statistics_geometric_mean.should_respect_args_number = True
+
+    def execute_statistics_harmonic_mean(self, exec_ctx: Context):
+        """Like python statistics.harmonic_mean()"""
+        # Params:
+        # * data
+        data = exec_ctx.symbol_table.get('data')
+        if not isinstance(data, List):
+            return RTResult().failure(RTTypeError(
+                data.pos_start, data.pos_end,
+                "first argument of built-in module function 'statistics_harmonic_mean' must be a list of numbers.",
+                exec_ctx
+            ))
+
+        weights = exec_ctx.symbol_table.get('weights')
+        if weights is not None and not isinstance(weights, List):
+            return RTResult().failure(RTTypeError(
+                data.pos_start, data.pos_end,
+                "second argument of built-in module function 'statistics_harmonic_mean' must be a list of numbers.",
+                exec_ctx
+            ))
+
+        if weights is not None and len(weights.elements) != len(data.elements):
+            return RTResult().failure(RTIndexError(
+                data.pos_start, weights.pos_end,
+                "the two arguments of built-in module function 'statistics_harmonic_mean' must have the same length.",
+                exec_ctx
+            ))
+
+        data_ = []
+        for e in data.elements:
+            if not isinstance(e, Number):
+                return RTResult().failure(RTTypeError(
+                    e.pos_start, e.pos_end,
+                    f"first argument of built-in module function 'statistics_harmonic_mean' must be a list of positive"
+                    f" numbers, not {e.type_}.",
+                    exec_ctx
+                ))
+            if e.value < 0:
+                return RTResult().failure(RTTypeError(
+                    e.pos_start, e.pos_end,
+                    "first argument of built-in module function 'statistics_harmonic_mean' must be a list of "
+                    "positives numbers.",
+                    exec_ctx
+                ))
+            data_.append(e.value)
+
+        if weights is not None:
+            weights_ = []
+            for e in weights.elements:
+                if not isinstance(e, Number):
+                    return RTResult().failure(RTTypeError(
+                        e.pos_start, e.pos_end,
+                        f"first argument of built-in module function 'statistics_harmonic_mean' must be a list of "
+                        f"positive numbers, not {e.type_}.",
+                        exec_ctx
+                    ))
+                if e.value < 0:
+                    return RTResult().failure(RTTypeError(
+                        e.pos_start, e.pos_end,
+                        "first argument of built-in module function 'statistics_harmonic_mean' must be a list of "
+                        "positives numbers.",
+                        exec_ctx
+                    ))
+                weights_.append(e.value)
+        else:
+            weights_ = None
+
+        try:
+            if weights_ is None:
+                harmonic_mean_ = statistics.harmonic_mean(data_)
+            else:
+                harmonic_mean_ = statistics.harmonic_mean(data_, weights=weights_)
+        except statistics.StatisticsError as exception:
+            is_empty_python_exceptions = [
+                "harmonic_mean requires at least one data point",
+            ]
+            if str(exception) in is_empty_python_exceptions:
+                return RTResult().failure(RTStatisticsError(
+                    data.pos_start, data.pos_end,
+                    "first argument of built-in module function 'statistics_harmonic_mean' must not be empty.",
+                    exec_ctx
+                ))
+            else:
+                return RTResult().failure(RunTimeError(
+                    self.pos_start, self.pos_end,
+                    f"python statistics.harmonic_mean() crashed with this error: "
+                    f"{exception.__class__.__name__}: {exception}. PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: "
+                    f"https://jd-develop.github.ioo/nougaro/bugreport.html !",
+                    exec_ctx
+                ))
+        except Exception as exception:
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                f"python statistics.harmonic_mean() crashed with this error: "
+                f"{exception.__class__.__name__}: {exception}. PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: "
+                f"https://jd-develop.github.ioo/nougaro/bugreport.html !",
+                exec_ctx
+            ))
+
+        return RTResult().success(Number(harmonic_mean_))
+
+    execute_statistics_harmonic_mean.arg_names = ['data']
+    execute_statistics_harmonic_mean.optional_args = ['weights']
+    execute_statistics_harmonic_mean.should_respect_args_number = True
+
 
 WHAT_TO_IMPORT = {
     "mean": Statistics("mean"),
+    "geometric_mean": Statistics("geometric_mean"),
+    "harmonic_mean": Statistics("harmonic_mean"),
 }

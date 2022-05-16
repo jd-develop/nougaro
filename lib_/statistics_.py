@@ -275,9 +275,52 @@ class Statistics(BaseBuiltInFunction):
     execute_statistics_harmonic_mean.optional_args = ['weights']
     execute_statistics_harmonic_mean.should_respect_args_number = True
 
+    def execute_statistics_median(self, exec_ctx: Context):
+        """Like python statistics.median()"""
+        # Params:
+        # * data
+        data = exec_ctx.symbol_table.get('data')
+        if not isinstance(data, List):
+            return RTResult().failure(RTTypeError(
+                data.pos_start, data.pos_end,
+                "first argument of built-in module function 'statistics_median' must be a list of numbers.",
+                exec_ctx
+            ))
+
+        data_ = []
+        for e in data.elements:
+            if not isinstance(e, Number):
+                return RTResult().failure(RTTypeError(
+                    e.pos_start, e.pos_end,
+                    f"first argument of built-in module function 'statistics_median' must be a list of numbers, not "
+                    f"{e.type_}.", exec_ctx
+                ))
+            data_.append(e.value)
+
+        try:
+            median_ = statistics.median(data_)
+        except statistics.StatisticsError as exception:
+            if str(exception) == "no median for empty data":
+                return RTResult().failure(RTStatisticsError(
+                    data.pos_start, data.pos_end,
+                    "first argument of built-in module function 'statistics_median' must not be empty.",
+                    exec_ctx
+                ))
+            else:
+                return RTResult().failure(RTStatisticsError(
+                    self.pos_start, self.pos_end, str(exception) + '.', exec_ctx
+                ))
+
+        return RTResult().success(Number(median_))
+
+    execute_statistics_median.arg_names = ['data']
+    execute_statistics_median.optional_args = []
+    execute_statistics_median.should_respect_args_number = True
+
 
 WHAT_TO_IMPORT = {
     "mean": Statistics("mean"),
     "geometric_mean": Statistics("geometric_mean"),
     "harmonic_mean": Statistics("harmonic_mean"),
+    "median": Statistics("median"),
 }

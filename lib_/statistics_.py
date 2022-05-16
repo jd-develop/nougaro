@@ -120,7 +120,8 @@ class Statistics(BaseBuiltInFunction):
         if not isinstance(data, List):
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
-                "first argument of built-in module function 'statistics_geometric_mean' must be a list of numbers.",
+                "first argument of built-in module function 'statistics_geometric_mean' must be a list of positive "
+                "numbers.",
                 exec_ctx
             ))
 
@@ -129,8 +130,8 @@ class Statistics(BaseBuiltInFunction):
             if not isinstance(e, Number):
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
-                    f"first argument of built-in module function 'statistics_geometric_mean' must be a list of numbers,"
-                    f" not {e.type_}.",
+                    f"first argument of built-in module function 'statistics_geometric_mean' must be a list of "
+                    f"positive numbers, not {e.type_}.",
                     exec_ctx
                 ))
             data_.append(e.value)
@@ -146,7 +147,8 @@ class Statistics(BaseBuiltInFunction):
             if str(exception) in is_empty_python_exceptions:
                 return RTResult().failure(RTStatisticsError(
                     data.pos_start, data.pos_end,
-                    "first argument of built-in module function 'statistics_geometric_mean' must not be empty.",
+                    "first argument of built-in module function 'statistics_geometric_mean' must be a non-empty list "
+                    "that only contains positive numbers.",
                     exec_ctx
                 ))
             else:

@@ -1,5 +1,6 @@
 # This file was made in nougaro alpha 0.7 version.
 import math
+import statistics
 
 # This is a comment
 # Basics :
@@ -109,8 +110,9 @@ print(list_ / -3)
 print(list_(-3))
 print(get(*[list_, -3]))  # another syntax. *[list_, -3] returns list_, -3 in this case.
 
-print(max(list_, True))
-print(min(list_, True))
+print("max of the list is " + str(max(list_, True)))
+print("min of the list is " + str(min(list_, True)))
+print("scope of the list is " + str(statistics_scope([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])))  # 10-1 = 9 :)
 
 void()  # Does ABSOLUTELY nothing... (in fact, returns None...)
 

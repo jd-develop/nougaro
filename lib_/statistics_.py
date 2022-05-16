@@ -154,7 +154,7 @@ class Statistics(BaseBuiltInFunction):
                     self.pos_start, self.pos_end,
                     f"python statistics.geometric_mean() crashed with this error: "
                     f"{exception.__class__.__name__}: {exception}. PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: "
-                    f"https://jd-develop.github.ioo/nougaro/bugreport.html !",
+                    f"https://jd-develop.github.io/nougaro/bugreport.html !",
                     exec_ctx
                 ))
         except Exception as exception:
@@ -162,7 +162,7 @@ class Statistics(BaseBuiltInFunction):
                 self.pos_start, self.pos_end,
                 f"python statistics.geometric_mean() crashed with this error: "
                 f"{exception.__class__.__name__}: {exception}. PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: "
-                f"https://jd-develop.github.ioo/nougaro/bugreport.html !",
+                f"https://jd-develop.github.io/nougaro/bugreport.html !",
                 exec_ctx
             ))
 
@@ -260,7 +260,7 @@ class Statistics(BaseBuiltInFunction):
                     self.pos_start, self.pos_end,
                     f"python statistics.harmonic_mean() crashed with this error: "
                     f"{exception.__class__.__name__}: {exception}. PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: "
-                    f"https://jd-develop.github.ioo/nougaro/bugreport.html !",
+                    f"https://jd-develop.github.io/nougaro/bugreport.html !",
                     exec_ctx
                 ))
         except Exception as exception:
@@ -268,7 +268,7 @@ class Statistics(BaseBuiltInFunction):
                 self.pos_start, self.pos_end,
                 f"python statistics.harmonic_mean() crashed with this error: "
                 f"{exception.__class__.__name__}: {exception}. PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: "
-                f"https://jd-develop.github.ioo/nougaro/bugreport.html !",
+                f"https://jd-develop.github.io/nougaro/bugreport.html !",
                 exec_ctx
             ))
 
@@ -402,7 +402,7 @@ class Statistics(BaseBuiltInFunction):
 
         if not isinstance(n, Number):
             return RTResult().failure(RTTypeError(
-                data.pos_start, data.pos_end,
+                n.pos_start, n.pos_end,
                 "second argument of built-in module function 'statistics_quantiles' must be a number.",
                 exec_ctx
             ))
@@ -547,7 +547,7 @@ class Statistics(BaseBuiltInFunction):
         if isinstance(data, List):
             data_ = []
             for e in data.elements:
-                if not (isinstance(e, List) or isinstance(e, Number) or isinstance(e, String)):
+                if not (isinstance(e, Number) or isinstance(e, String)):
                     return RTResult().failure(RTTypeError(
                         e.pos_start, e.pos_end,
                         f"first argument of built-in module function 'statistics_multimode' must be a list that does"
@@ -557,8 +557,10 @@ class Statistics(BaseBuiltInFunction):
                 data_.append(e.value)
         elif isinstance(data, String):
             data_ = data.value
-        else:  # i.d.k. why I put a 'else', but it's funny to put an Easter Egg to people that read the code :)
-            raise Exception("How the f*** did this error happened? This is not possible!")
+        else:
+            # i.d.k. why I put a 'else', but it's funny to put an Easter Egg to people that read the code :)
+            # -Jean Dubois
+            raise NotImplementedError("How the f*** did this error happened? This is not possible!")
 
         multimode = statistics.multimode(data_)
         multimode_ = []

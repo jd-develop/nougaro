@@ -11,7 +11,7 @@ from src.values.functions.builtin_function import *
 import random
 
 
-class Random(BuiltInFunction):
+class Random(BaseBuiltInFunction):
     """ Module Random """
     def __init__(self, name):
         super().__init__(name)
@@ -47,10 +47,10 @@ class Random(BuiltInFunction):
 
     def no_visit_method(self, exec_context: Context):
         print(exec_context)
-        print(f"NOUGARO INTERNAL ERROR : No execute_random_{self.name} method defined in lib.random_.\n"
+        print(f"NOUGARO INTERNAL ERROR : No execute_random_{self.name} method defined in lib_.random_.\n"
               f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with all informations "
               f"above.")
-        raise Exception(f'No execute_random_{self.name} method defined in lib.random_.')
+        raise Exception(f'No execute_random_{self.name} method defined in lib_.random_.')
 
     def copy(self):
         copy = Random(self.name)

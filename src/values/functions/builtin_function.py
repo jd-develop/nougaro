@@ -16,13 +16,36 @@ from os import system as os_system, name as os_name
 import random
 
 
-class BuiltInFunction(BaseFunction):
+class BaseBuiltInFunction(BaseFunction):
     def __init__(self, name):
         super().__init__(name)
         self.type_ = 'built-in func'
 
     def __repr__(self):
         return f'<built-in function {self.name}>'
+
+    def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
+        return RTResult().success(NoneValue(False))
+
+    def no_visit_method(self, exec_context: Context):
+        print(exec_context)
+        print(f"NOUGARO INTERNAL ERROR : No execute_{self.name} method defined in "
+              f"src.values.functions.builtin_function.BaseBuiltInFunction.\n"
+              f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with all informations "
+              f"above.")
+        raise Exception(f'No execute_{self.name} method defined in '
+                        f'src.values.functions.builtin_function.BaseBuiltInFunction.')
+
+    def copy(self):
+        copy = BaseBuiltInFunction(self.name)
+        copy.set_context(self.context)
+        copy.set_pos(self.pos_start, self.pos_end)
+        return copy
+
+
+class BuiltInFunction(BaseBuiltInFunction):
+    def __init__(self, name):
+        super().__init__(name)
 
     def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
         result = RTResult()

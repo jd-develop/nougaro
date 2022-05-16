@@ -31,7 +31,7 @@ class Error:
             string_line = string_line[1:]
         result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n \t' + \
                  string_line + '\n ' + \
-                 f'{self.error_name} : {self.details}'
+                 f'{self.error_name}: {self.details}'
         return result
 
 

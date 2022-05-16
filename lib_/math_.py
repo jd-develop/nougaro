@@ -16,7 +16,7 @@ SQRT_PI = Number(math_sqrt(pi))
 E = Number(e)
 
 
-class Math(BuiltInFunction):
+class Math(BaseBuiltInFunction):
     """ Module Math """
     def __init__(self, name):
         super().__init__(name)
@@ -52,10 +52,10 @@ class Math(BuiltInFunction):
 
     def no_visit_method(self, exec_context: Context):
         print(exec_context)
-        print(f"NOUGARO INTERNAL ERROR : No execute_math_{self.name} method defined in lib.math_.\n"
+        print(f"NOUGARO INTERNAL ERROR : No execute_math_{self.name} method defined in lib_.math_.\n"
               f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with all informations "
               f"above.")
-        raise Exception(f'No execute_math_{self.name} method defined in lib.math_.')
+        raise Exception(f'No execute_math_{self.name} method defined in lib_.math_.')
 
     def copy(self):
         copy = Math(self.name)

@@ -74,14 +74,14 @@ class Math(BaseBuiltInFunction):
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'sqrt' must be a number.",
+                "first argument of built-in module function 'math_sqrt' must be a number.",
                 exec_context
             ))
 
         if not value.value >= 0:
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'sqrt' must be greater than (or equal to) 0.",
+                "first argument of built-in module function 'math_sqrt' must be greater than (or equal to) 0.",
                 exec_context
             ))
 
@@ -102,14 +102,14 @@ class Math(BaseBuiltInFunction):
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'math_root' must be a number.",
+                "first argument of built-in module function 'math_math_root' must be a number.",
                 exec_context
             ))
 
         if value.value < 0:
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'math_root' must be greater than (or equal to) 0.",
+                "first argument of built-in module function 'math_math_root' must be greater than (or equal to) 0.",
                 exec_context
             ))
 
@@ -120,7 +120,7 @@ class Math(BaseBuiltInFunction):
         if not isinstance(n, Number):
             return RTResult().failure(RunTimeError(
                 n.pos_start, n.pos_end,
-                "second argument of built-in function 'math_root' must be a number.",
+                "second argument of built-in module function 'math_math_root' must be a number.",
                 exec_context
             ))
 
@@ -140,7 +140,7 @@ class Math(BaseBuiltInFunction):
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'degrees' must be a number (angle in radians).",
+                "first argument of built-in module function 'math_degrees' must be a number (angle in radians).",
                 exec_context
             ))
         degrees = math_degrees(value.value)
@@ -158,7 +158,7 @@ class Math(BaseBuiltInFunction):
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'radians' must be a number (angle in degrees).",
+                "first argument of built-in module function 'math_radians' must be a number (angle in degrees).",
                 exec_context
             ))
         radians = math_radians(value.value)
@@ -176,7 +176,7 @@ class Math(BaseBuiltInFunction):
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'sin' must be a number (angle in radians).",
+                "first argument of built-in module function 'math_sin' must be a number (angle in radians).",
                 exec_context
             ))
         sin = math_sin(value.value)
@@ -194,7 +194,7 @@ class Math(BaseBuiltInFunction):
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'cos' must be a number (angle in radians).",
+                "first argument of built-in module function 'math_cos' must be a number (angle in radians).",
                 exec_context
             ))
         cos = math_cos(value.value)
@@ -212,7 +212,7 @@ class Math(BaseBuiltInFunction):
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'tan' must be a number (angle in radians).",
+                "first argument of built-in module function 'math_tan' must be a number (angle in radians).",
                 exec_context
             ))
         tan = math_tan(value.value)
@@ -230,7 +230,7 @@ class Math(BaseBuiltInFunction):
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'asin' must be a number.",
+                "first argument of built-in module function 'math_asin' must be a number.",
                 exec_context
             ))
         try:
@@ -238,7 +238,7 @@ class Math(BaseBuiltInFunction):
         except ValueError:
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'asin' must be a number between -1 and 1.",
+                "first argument of built-in module function 'math_asin' must be a number between -1 and 1.",
                 exec_context
             ))
         return RTResult().success(Number(asin))
@@ -255,7 +255,7 @@ class Math(BaseBuiltInFunction):
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'acos' must be a number.",
+                "first argument of built-in module function 'math_acos' must be a number.",
                 exec_context
             ))
         try:
@@ -263,7 +263,7 @@ class Math(BaseBuiltInFunction):
         except ValueError:
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'acos' must be a number between -1 and 1.",
+                "first argument of built-in module function 'math_acos' must be a number between -1 and 1.",
                 exec_context
             ))
         return RTResult().success(Number(acos))
@@ -280,7 +280,7 @@ class Math(BaseBuiltInFunction):
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'atan' must be a number.",
+                "first argument of built-in module function 'math_atan' must be a number.",
                 exec_context
             ))
         atan = math_atan(value.value)
@@ -298,7 +298,7 @@ class Math(BaseBuiltInFunction):
         if not isinstance(value, Number):
             return RTResult().failure(RunTimeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in function 'abs' must be a number.",
+                "first argument of built-in module function 'math_abs' must be a number.",
                 exec_context
             ))
 

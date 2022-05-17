@@ -108,7 +108,10 @@ class Time(BaseBuiltInFunction):
     execute_time_sleep_milliseconds.should_respect_args_number = True
 
 
+TIMEZONE = Number(time.timezone)
+
 WHAT_TO_IMPORT = {
     "sleep": Time("sleep"),
-    "sleep_milliseconds": Time("sleep_milliseconds")
+    "sleep_milliseconds": Time("sleep_milliseconds"),
+    "timezone": TIMEZONE
 }

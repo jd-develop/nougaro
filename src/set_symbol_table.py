@@ -5,9 +5,8 @@
 # IMPORTS
 # nougaro modules imports
 from src.symbol_table import SymbolTable
-from src.values.basevalues import NoneValue
 from src.values.specific_values.number import *
-from src.values.basevalues import String
+from src.values.basevalues import String, Value, NoneValue
 from src.values.specific_values.builtin_function import *
 from src.constants import PROTECTED_VARS
 # built-in python imports
@@ -76,6 +75,8 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set('__os_version__', String(platform.uname().version))
     # platform.system() may be 'Linux', 'Windows', 'Darwin', 'Java', etc. according to Python doc
     # test_protected_vars(symbol_table)
+
+    symbol_table.set('__base_value__', Value())
 
     symbol_table.set('__symbol_table__', String(pprint.pformat(symbol_table.symbols)))
 

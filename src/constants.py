@@ -65,6 +65,7 @@ PROTECTED_VARS = [
     '__os_name__',
     '__os_release__',
     '__os_version__',
+    '__base_value__',
     'answerToTheLifeTheUniverseAndEverything',
     *KEYWORDS,
     *BUILTIN_FUNCTIONS,

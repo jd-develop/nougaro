@@ -20,6 +20,9 @@ class Value:
         self.type_ = "BaseValue"
         self.attributes = {}
 
+    def __repr__(self):
+        return "BaseValue"
+
     def set_pos(self, pos_start=None, pos_end=None):
         self.pos_start = pos_start
         self.pos_end = pos_end

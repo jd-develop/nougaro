@@ -136,5 +136,5 @@ class Random(BaseBuiltInFunction):
 WHAT_TO_IMPORT = {
     "randint": Random("randint"),
     "random": Random("random"),
-    "choice": Random("choice")
+    "choice": Random("choice"),
 }

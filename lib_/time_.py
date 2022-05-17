@@ -113,5 +113,5 @@ TIMEZONE = Number(time.timezone)
 WHAT_TO_IMPORT = {
     "sleep": Time("sleep"),
     "sleep_milliseconds": Time("sleep_milliseconds"),
-    "timezone": TIMEZONE
+    "timezone": TIMEZONE,
 }

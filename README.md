@@ -2,7 +2,9 @@
 ## English description
  A programming language. Interpreter written in Python.
  
-Execute the shell with `python3 shell.py`. Open files with `python3 shell.py (filename.extension)`
+ Execute the shell with `python3 shell.py`. Open files with `python3 shell.py (filename.extension)`
+
+ The code is compiled for Windows. Check it out in the [releases](https://github.com/jd-develop/nougaro/releases/) tab!
  
  Minimum : python 3.9
  
@@ -12,6 +14,8 @@ Execute the shell with `python3 shell.py`. Open files with `python3 shell.py (fi
  Un langage de programmation. Interpréteur écrit en Python.
  
  Executez le shell avec `python3 shell.py`. Ouvrez des fichiers avec `python3 shell.py (filename.extension)`
+ 
+ Le code est compilé pour Windows. Disponible dans l'onglet [releases](https://github.com/jd-develop/nougaro/releases/) !
  
  Minimum : python 3.9
  

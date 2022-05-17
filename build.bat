@@ -18,4 +18,4 @@ rmdir /s /q src\values\functions\__pycache__
 rmdir /s /q src\values\specific_values\__pycache__
 rmdir /s /q lib_\__pycache__
 set /p NOUGVERSION="Nougaro version: "
-python -m nuitka --standalone --windows-product-name=Nougaro --windows-product-version=%NOUGVERSION% shell.py
+python -m nuitka --standalone --windows-company-name=Nougaro --windows-product-name=Nougaro --windows-product-version=%NOUGVERSION% shell.py

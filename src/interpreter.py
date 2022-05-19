@@ -15,8 +15,9 @@ from src.errors import NotDefinedError, RunTimeError, RTIndexError, RTTypeError,
 from src.token_constants import *
 from src.runtime_result import RTResult
 from src.context import Context
+from src.misc import CustomInterpreterVisitMethod
 # built-in python imports
-# no imports
+from inspect import signature
 
 
 # ##########
@@ -28,9 +29,13 @@ class Interpreter:
 
     def visit(self, node, ctx):
         method_name = f'visit_{type(node).__name__}'
-        method = getattr(self, method_name, self.no_visit_method)
+        method: CustomInterpreterVisitMethod = getattr(self, method_name, self.no_visit_method)
 
-        return method(node, context)
+        signature_ = signature(method)
+        if len(signature_.parameters) <= 1:  # def method(self) is 1 param, def staticmethod() is 0 param
+            return method()
+
+        return method(node, ctx)
 
     @staticmethod
     def no_visit_method(node, ctx: Context):
@@ -654,11 +659,11 @@ class Interpreter:
         return result.success_return(value)
 
     @staticmethod
-    def visit_ContinueNode(node: ContinueNode, ctx: Context):
+    def visit_ContinueNode():
         return RTResult().success_continue()
 
     @staticmethod
-    def visit_BreakNode(node: BreakNode, ctx: Context):
+    def visit_BreakNode():
         return RTResult().success_break()
 
     @staticmethod
@@ -854,5 +859,5 @@ class Interpreter:
         return result.success(String(file_str))
 
     @staticmethod
-    def visit_NoNode(node: NoNode, ctx: Context):
+    def visit_NoNode():
         return RTResult().success(NoneValue(False))

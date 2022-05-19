@@ -37,3 +37,15 @@ class CustomBuiltInFuncMethod(Protocol):
 
     def __call__(self, exec_context: Context = None) -> Any:
         ...
+
+
+# ##########
+# CUSTOM INTERPRETER VISIT METHOD
+# ##########
+class CustomInterpreterVisitMethod(Protocol):
+    """
+        Just a class for typing the methods `visit_{name}` in Interpreter
+    """
+    # This class was made to bypass a pycharm bug.
+    def __call__(self, exec_context: Context = None, node=None) -> Any:
+        ...

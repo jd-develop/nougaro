@@ -6,7 +6,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.tokens import Token
-from src.token_constants import TT_EQ
+from src.token_constants import TT_EQ, TT_STRING
 # built-in python imports
 # no imports
 
@@ -127,6 +127,19 @@ class IfNode:
 
         self.pos_start = self.cases[0][0].pos_start
         self.pos_end = (self.else_case or self.cases[len(self.cases) - 1])[0].pos_end
+
+
+class AssertNode:
+    def __init__(self, assertion, pos_start, pos_end, errmsg=None):
+        self.assertion = assertion
+        self.errmsg = errmsg
+
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+        if self.errmsg is None:
+            self.errmsg = StringNode(Token(TT_STRING, value='',
+                                           pos_start=self.pos_start.copy(), pos_end=self.pos_end.copy()))
 
 
 # LOOP NODES

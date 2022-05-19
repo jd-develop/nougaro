@@ -30,8 +30,8 @@ class Error:
             # Add chars after the space in the string after the "while string_line[0] in" to delete them.
             string_line = string_line[1:]
         result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n \t' + \
-                 string_line + '\n ' + \
-                 f'{self.error_name}: {self.details}'
+                 string_line + '\n '
+        result += f'{self.error_name}: {self.details}' if self.details != '' else f'{self.error_name}'
         return result
 
 
@@ -57,7 +57,8 @@ class RunTimeError(Error):
             # Add chars after the space in the string after the "while string_line[0] in" to delete them.
             string_line = string_line[1:]
         result = self.generate_traceback()
-        result += '\n \t' + string_line + '\n ' + f'{self.error_name} : {self.details}'
+        result += '\n \t' + string_line + '\n '
+        result += f'{self.error_name}: {self.details}' if self.details != '' else f'{self.error_name}'
         return result
 
     def generate_traceback(self):
@@ -105,4 +106,10 @@ class RTFileNotFoundError(RunTimeError):
     def __init__(self, pos_start, pos_end, file_name, context: Context):
         super().__init__(pos_start, pos_end, f"file '{file_name}' does not exist.", context, rt_error=False,
                          error_name="FileNotFoundError")
+        self.context = context
+
+
+class RTAssertionError(RunTimeError):
+    def __init__(self, pos_start, pos_end, errmsg, context: Context):
+        super().__init__(pos_start, pos_end, errmsg, context, rt_error=False, error_name="AssertionError")
         self.context = context

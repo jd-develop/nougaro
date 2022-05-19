@@ -100,6 +100,8 @@ KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
     # files
     'write',
     'read',
+    # assertion
+    'assert',
 ]
 
 TOKENS_TO_QUOTE = [

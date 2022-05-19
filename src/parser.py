@@ -328,6 +328,29 @@ class Parser:
             return result.success(ReadNode(file_name_expr, identifier, line_number, pos_start,
                                            self.current_token.pos_start.copy()))
 
+        if self.current_token.matches(TT_KEYWORD, "assert"):
+            result.register_advancement()
+            self.advance()
+
+            assertion = result.register(self.expr())
+            if result.error is not None:
+                return result
+
+            if self.current_token.type == TT_COMMA:
+                # register an error message to print if the assertion is false.
+                # if there is no comma, there is no error message
+                result.register_advancement()
+                self.advance()
+
+                errmsg = result.register(self.expr())
+                if result.error is not None:
+                    return result
+
+                return result.success(AssertNode(assertion, pos_start, self.current_token.pos_start.copy(),
+                                                 errmsg=errmsg))
+
+            return result.success(AssertNode(assertion, pos_start, self.current_token.pos_start.copy()))
+
         node = result.register(self.bin_op(self.comp_expr, (
             (TT_KEYWORD, "and"), (TT_KEYWORD, "or"), (TT_KEYWORD, 'xor'), TT_BITWISEAND, TT_BITWISEOR, TT_BITWISEXOR)))
 

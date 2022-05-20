@@ -40,6 +40,10 @@ print("You can add \\ backslashes and \" \' quotes")
 print("You can add up and multiply strings: " + 3*some_text)
 print()
 
+# assert
+assert True
+# assert False, "you can also put an error message"  # Uncomment this line to see what happens
+
 # Tests
 var name = input("Whats your name? ")
 if name == "Jean Dubois" then

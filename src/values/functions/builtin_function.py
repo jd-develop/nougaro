@@ -31,7 +31,7 @@ class BaseBuiltInFunction(BaseFunction):
         print(exec_context)
         print(f"NOUGARO INTERNAL ERROR : No execute_{self.name} method defined in "
               f"src.values.functions.builtin_function.BaseBuiltInFunction.\n"
-              f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with all informations "
+              f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all informations "
               f"above.")
         raise Exception(f'No execute_{self.name} method defined in '
                         f'src.values.functions.builtin_function.BaseBuiltInFunction.')
@@ -83,7 +83,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         print(exec_context)
         print(f"NOUGARO INTERNAL ERROR : No execute_{self.name} method defined in "
               f"src.values.functions.builtin_function.BuiltInFunction.\n"
-              f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with all informations "
+              f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all informations "
               f"above.")
         raise Exception(f'No execute_{self.name} method defined in '
                         f'src.values.functions.builtin_function.BuiltInFunction.')

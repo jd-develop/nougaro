@@ -41,7 +41,7 @@ class Interpreter:
     def no_visit_method(node, ctx: Context):
         print(ctx)
         print(f"NOUGARO INTERNAL ERROR : No visit_{type(node).__name__} method defined in nougaro.Interpreter.\n"
-              f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with all informations "
+              f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all informations "
               f"above.")
         raise Exception(f'No visit_{type(node).__name__} method defined in nougaro.Interpreter.')
 
@@ -117,7 +117,7 @@ class Interpreter:
             print(ctx)
             print("NOUGARO INTERNAL ERROR : Result is not defined after executing "
                   "src.interpreter.Interpreter.visit_BinOpNode because of an invalid token.\n"
-                  "Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with the information "
+                  "Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the information "
                   "below")
             raise Exception("Result is not defined after executing src.interpreter.Interpreter.visit_BinOpNode")
 
@@ -172,7 +172,7 @@ class Interpreter:
                         f"NOUGARO INTERNAL ERROR : Result is not defined after executing "
                         f"src.interpreter.Interpreter.visit_BinOpCompNode because of an invalid token.\n"
                         f"Note for devs : the actual invalid token is {op_token.type}.\n"
-                        f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with the "
+                        f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
                         f"information below")
                     raise Exception("Result is not defined after executing "
                                     "src.interpreter.Interpreter.visit_BinOpCompNode")

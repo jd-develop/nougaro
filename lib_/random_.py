@@ -48,7 +48,7 @@ class Random(BaseBuiltInFunction):
     def no_visit_method(self, exec_context: Context):
         print(exec_context)
         print(f"NOUGARO INTERNAL ERROR : No execute_random_{self.name} method defined in lib_.random_.\n"
-              f"Please report this bug at https://jd-develop.github.io/nougaro/redirect1.html with all informations "
+              f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all informations "
               f"above.")
         raise Exception(f'No execute_random_{self.name} method defined in lib_.random_.')
 

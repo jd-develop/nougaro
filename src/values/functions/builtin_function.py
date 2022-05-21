@@ -549,6 +549,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         # Optional params:
         # * ignore_not_num (default False)
+
+        # first we get the list
         list_ = exec_context.symbol_table.get('list')
         if not isinstance(list_, List):
             return RTResult().failure(
@@ -558,9 +560,11 @@ class BuiltInFunction(BaseBuiltInFunction):
                     exec_context
                 )
             )
+
+        # then we get "ignore_not_num"
         ignore_not_num = exec_context.symbol_table.get('ignore_not_num')
         if ignore_not_num is None:
-            ignore_not_num = FALSE.set_pos(list_.pos_end, self.pos_end)
+            ignore_not_num = FALSE
         if not isinstance(ignore_not_num, Number):
             return RTResult().failure(
                 RTTypeError(
@@ -569,38 +573,27 @@ class BuiltInFunction(BaseBuiltInFunction):
                     exec_context
                 )
             )
-        max_ = None
-        for element in list_.elements:
-            if isinstance(element, Number):
-                max_ = element
-                break
-            else:
-                if ignore_not_num.value == FALSE.value:
-                    return RTResult().failure(
-                        RTTypeError(
-                            list_.pos_start, list_.pos_end,
-                            "first argument of builtin function 'max' must be a list containing only numbers. "
-                            "You can execute the function with True as the second argument to avoid this error.",
-                            exec_context
-                        )
+
+        # then we check if the list is good
+        if ignore_not_num.value == FALSE.value:
+            if any(not isinstance(e, Number) for e in list_.elements):
+                return RTResult().failure(
+                    RTTypeError(
+                        list_.pos_start, list_.pos_end,
+                        "first argument of builtin function 'max' must be a list containing only numbers. "
+                        "You can execute the function with True as the second argument to avoid this error.",
+                        exec_context
                     )
-        if max_ is None:
+                )
+
+        # we transform our list
+        list_ = [e.value for e in list_.elements if isinstance(e, Number)]
+
+        if len(list_) == 0:
             return RTResult().success(NoneValue())
-        for element in list_.elements:
-            if isinstance(element, Number):
-                if element.value > max_.value:
-                    max_ = element
-            else:
-                if ignore_not_num.value == FALSE.value:
-                    return RTResult().failure(
-                        RTTypeError(
-                            self.pos_start, self.pos_end,
-                            "first argument of builtin function 'max' must be a list containing only numbers. "
-                            "You can execute the function with True as the second argument to avoid this error.",
-                            exec_context
-                        )
-                    )
-        return RTResult().success(max_)
+
+        max_ = max(list_)
+        return RTResult().success(Number(max_))
 
     execute_max.arg_names = ['list']
     execute_max.optional_args = ['ignore_not_num']
@@ -612,6 +605,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         # Optional params:
         # * ignore_not_num (default False)
+
+        # first we get the list
         list_ = exec_context.symbol_table.get('list')
         if not isinstance(list_, List):
             return RTResult().failure(
@@ -621,9 +616,11 @@ class BuiltInFunction(BaseBuiltInFunction):
                     exec_context
                 )
             )
+
+        # then we get "ignore_not_num"
         ignore_not_num = exec_context.symbol_table.get('ignore_not_num')
         if ignore_not_num is None:
-            ignore_not_num = FALSE.set_pos(list_.pos_end, self.pos_end)
+            ignore_not_num = FALSE
         if not isinstance(ignore_not_num, Number):
             return RTResult().failure(
                 RTTypeError(
@@ -632,38 +629,27 @@ class BuiltInFunction(BaseBuiltInFunction):
                     exec_context
                 )
             )
-        min_ = None
-        for element in list_.elements:
-            if isinstance(element, Number):
-                min_ = element
-                break
-            else:
-                if ignore_not_num.value == FALSE.value:
-                    return RTResult().failure(
-                        RTTypeError(
-                            list_.pos_start, list_.pos_end,
-                            "first argument of builtin function 'min' must be a list containing only numbers. "
-                            "You can execute the function with True as the second argument to avoid this error.",
-                            exec_context
-                        )
+
+        # then we check if the list is good
+        if ignore_not_num.value == FALSE.value:
+            if any(not isinstance(e, Number) for e in list_.elements):
+                return RTResult().failure(
+                    RTTypeError(
+                        list_.pos_start, list_.pos_end,
+                        "first argument of builtin function 'min' must be a list containing only numbers. "
+                        "You can execute the function with True as the second argument to avoid this error.",
+                        exec_context
                     )
-        if min_ is None:
+                )
+
+        # we transform our list
+        list_ = [e.value for e in list_.elements if isinstance(e, Number)]
+
+        if len(list_) == 0:
             return RTResult().success(NoneValue())
-        for element in list_.elements:
-            if isinstance(element, Number):
-                if element.value < min_.value:
-                    min_ = element
-            else:
-                if ignore_not_num.value == FALSE.value:
-                    return RTResult().failure(
-                        RTTypeError(
-                            self.pos_start, self.pos_end,
-                            "first argument of builtin function 'min' must be a list containing only numbers. "
-                            "You can execute the function with True as the second argument to avoid this error.",
-                            exec_context
-                        )
-                    )
-        return RTResult().success(min_)
+
+        max_ = min(list_)
+        return RTResult().success(Number(max_))
 
     execute_min.arg_names = ['list']
     execute_min.optional_args = ['ignore_not_num']

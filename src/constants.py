@@ -47,6 +47,7 @@ BUILTIN_FUNCTIONS = [
     "min",
     "system_call",
     "run",
+    "example",
     "len",
     'split',
     'lower',

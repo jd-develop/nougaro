@@ -67,6 +67,10 @@ print(True xor False)
 print(not True)
 print()
 
+# example functions
+example('ppap')
+print()
+
 # Functions
 def fib(n)
     # calculates all the numbers of the fibonacci list less than n

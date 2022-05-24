@@ -39,6 +39,16 @@ class CustomBuiltInFuncMethod(Protocol):
         ...
 
 
+class CustomBuiltInFuncMethodWithRunParam(CustomBuiltInFuncMethod):
+    """
+        Just a class for typing the methods `execute_{name}` with `run` parameter in BuiltInFunction
+    """
+    # This class was made to bypass a pycharm bug.
+
+    def __call__(self, exec_context: Context = None, run=None) -> Any:
+        ...
+
+
 # ##########
 # CUSTOM INTERPRETER VISIT METHOD
 # ##########

@@ -39,3 +39,8 @@ class SymbolTable:
 
     def exists(self, name):
         return name in self.symbols
+
+    def copy(self):
+        new_symbol_table = SymbolTable(self.parent)
+        new_symbol_table.symbols = self.symbols.copy()
+        return new_symbol_table

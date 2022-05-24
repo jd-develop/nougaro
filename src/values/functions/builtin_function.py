@@ -9,7 +9,7 @@ from src.values.functions.base_function import BaseFunction
 from src.context import Context
 from src.values.basevalues import *
 from src.values.specific_values.number import *
-from src.misc import CustomBuiltInFuncMethod
+from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam
 from src.errors import RTFileNotFoundError, RTTypeError
 # built-in python imports
 from os import system as os_system, name as os_name
@@ -62,8 +62,9 @@ class BuiltInFunction(BaseBuiltInFunction):
         if result.should_return():
             return result
 
-        if method_name == 'execute_run':
-            return_value = result.register(self.execute_run(exec_context, run))
+        if method_name in ['execute_run', 'execute_example']:
+            method: CustomBuiltInFuncMethodWithRunParam
+            return_value = result.register(method(exec_context, run))
             if result.should_return():
                 return result
             return result.success(return_value)
@@ -851,6 +852,49 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_run.arg_names = ["file_name"]
     execute_run.optional_args = []
     execute_run.should_respect_args_number = True
+
+    def execute_example(self, exec_ctx: Context, run):
+        """Run code from an example file. Param 'run' is the 'run' function in nougaro.py"""
+        # Params :
+        # * example_name
+        example_name = exec_ctx.symbol_table.get("example_name")
+
+        if not isinstance(example_name, String):
+            return RTResult().failure(RTTypeError(
+                example_name.pos_start, example_name.pos_end,
+                "first argument of built-in function 'example' must be a str.",
+                exec_ctx
+            ))
+
+        file_name = "examples/" + example_name.value + ".noug"
+
+        try:
+            with open(file_name, 'r', encoding='UTF-8') as file:
+                script = file.read()
+        except FileNotFoundError:
+            return RTResult().failure(RTFileNotFoundError(
+                self.pos_start, self.pos_end,
+                file_name,
+                exec_ctx
+            ))
+        except Exception as e:
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                f"failed to load script '{file_name}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
+                exec_ctx
+            ))
+
+        value, error = run(file_name, script, exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
+                           actual_context=f"{exec_ctx.parent.display_name}")
+
+        if error is not None:
+            return RTResult().failure(error)
+
+        return RTResult().success(NoneValue(False))
+
+    execute_example.arg_names = ["example_name"]
+    execute_example.optional_args = []
+    execute_example.should_respect_args_number = True
 
     def execute_system_call(self, exec_ctx: Context):
         """System call. e.g. system_call('ls') lists the directory on bash."""

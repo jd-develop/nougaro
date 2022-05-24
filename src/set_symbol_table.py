@@ -26,6 +26,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     # Built-in functions
     symbol_table.set("void", VOID)
     symbol_table.set("run", RUN)
+    symbol_table.set("example", EXAMPLE)
 
     symbol_table.set("print", PRINT)
     symbol_table.set("print_ret", PRINT_RET)

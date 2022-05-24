@@ -11,6 +11,7 @@ from src.values.functions.builtin_function import BuiltInFunction
 
 VOID = BuiltInFunction('void')
 RUN = BuiltInFunction('run')
+EXAMPLE = BuiltInFunction('example')
 
 PRINT = BuiltInFunction('print')
 PRINT_RET = BuiltInFunction('print_ret')

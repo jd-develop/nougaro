@@ -33,3 +33,8 @@ class Context:
 
     def __str__(self) -> str:
         return str(self.__repr__())
+
+    def copy(self):
+        new_ctx = Context(self.display_name, self.parent, self.parent_entry_pos)
+        new_ctx.symbol_table = self.symbol_table.copy()
+        return new_ctx

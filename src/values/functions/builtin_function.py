@@ -14,6 +14,7 @@ from src.errors import RTFileNotFoundError, RTTypeError
 # built-in python imports
 from os import system as os_system, name as os_name
 import random
+import sys
 
 
 class BaseBuiltInFunction(BaseFunction):
@@ -698,8 +699,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * code
         code = exec_context.symbol_table.get('code')
         if isinstance(code, Number) or isinstance(code, String):
-            exit(code.value)
-        exit()
+            sys.exit(code.value)
+        sys.exit()
 
     execute_exit.arg_names = []
     execute_exit.optional_args = ['code']

@@ -1,0 +1,6 @@
+# pen pineapple apple pen
+
+var pen = "pen "
+var pineapple = "pine" + (var apple = "apple ")
+
+print(pen + pineapple + apple + pen + "!")

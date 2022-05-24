@@ -1002,9 +1002,6 @@ class Parser:
         if result.error is not None:
             return result
 
-        result.register_advancement()
-        self.advance()
-
         return result.success(DoWhileNode(body, condition, should_return_none))
 
     def func_def(self):

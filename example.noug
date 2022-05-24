@@ -92,7 +92,7 @@ print()
 
 var a = def()->print("Hello, world!")
 a()
-print())
+print()
 
 # builtin functions and lists
 var a = print_ret("this string is printed and returned into a")

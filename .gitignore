@@ -120,3 +120,4 @@ dmypy.json
 # local files
 tests.noug
 example_file
+sandbox/

@@ -66,3 +66,5 @@ SYSTEM_CALL = BuiltInFunction('system_call')
 
 RICKROLL = BuiltInFunction('rickroll')
 NOUGARO = BuiltInFunction('nougaro')
+
+GPL = BuiltInFunction('__gpl__')

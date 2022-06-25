@@ -96,6 +96,21 @@ def set_symbol_table(symbol_table: SymbolTable):
 
     symbol_table.set('__symbol_table__', String(pprint.pformat(symbol_table.symbols)))
 
+    # GPL
+    symbol_table.set('__disclaimer_of_warranty__',
+                     String(
+                         "GNU GPL 3.0, 15, Disclaimer of Warranty :\n\n"
+                         "  THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY\n"
+                         "APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT\n"
+                         "HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY\n"
+                         "OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,\n"
+                         "THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\n"
+                         "PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM\n"
+                         "IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF\n"
+                         "ALL NECESSARY SERVICING, REPAIR OR CORRECTION."
+                     ))
+    symbol_table.set("__gpl__", GPL)
+
 
 def test_protected_vars(symbol_table: SymbolTable):
     error_count = 0

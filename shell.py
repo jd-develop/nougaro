@@ -68,6 +68,12 @@ def main():
 
     if path == "<stdin>":
         print(f"Welcome to Nougaro {version}! Contribute : https://github.com/jd-develop/nougaro/")
+        print("Nougaro  Copyright (C) 2021-2022  Jean Dubois\n"
+              "This program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.\n"
+              "This is free software, and you are welcome to redistribute it\n"
+              "under certain conditions.\n"
+              "Type __gpl__() to open GPL in your favorite text editor and get more details\n"
+              "(type __gpl__(1) to print GPL in this terminal).\n")
 
         while True:
             try:

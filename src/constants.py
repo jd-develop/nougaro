@@ -67,6 +67,7 @@ BUILTIN_FUNCTIONS = [
     'lower',
     'upper',
     'nougaro',
+    '__gpl__',
 ]
 MODULES = {*TABLE_OF_MODULES.keys()}
 PROTECTED_VARS = [
@@ -81,6 +82,7 @@ PROTECTED_VARS = [
     '__os_release__',
     '__os_version__',
     '__base_value__',
+    '__disclaimer_of_warranty__',
     'answerToTheLifeTheUniverseAndEverything',
     *KEYWORDS,
     *BUILTIN_FUNCTIONS,

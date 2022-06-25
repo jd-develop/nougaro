@@ -27,6 +27,7 @@ from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunPara
 from src.errors import RTFileNotFoundError, RTTypeError
 # built-in python imports
 from os import system as os_system, name as os_name
+import os.path
 import random
 import sys
 
@@ -71,9 +72,13 @@ class BuiltInFunction(BaseBuiltInFunction):
         method_name = f'execute_{self.name}'
         method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)
 
-        result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
-                                                     optional_args=method.optional_args,
-                                                     should_respect_args_number=method.should_respect_args_number))
+        try:
+            result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
+                                                         optional_args=method.optional_args,
+                                                         should_respect_args_number=method.should_respect_args_number))
+        except Exception:  # it is self.no_visit_method :)
+            method(exec_context)
+
         if result.should_return():
             return result
 
@@ -972,7 +977,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
     def execute_nougaro(self, exec_ctx: Context):
         """Open a random song of Claude Nougaro. If argument 'song' is filled, open this song (if in database)."""
-        # Params :
+        # Optional params :
         # * song
         song = exec_ctx.symbol_table.get("song")
         songs = {
@@ -1011,5 +1016,59 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_nougaro.arg_names = []
     execute_nougaro.optional_args = ["song"]
     execute_nougaro.should_respect_args_number = True
+
+    def execute___gpl__(self, exec_ctx: Context):
+        """Open or print the GNU GPL 3.0."""
+        # Optional params :
+        # * print_in_term
+
+        print_in_term = exec_ctx.symbol_table.get("print_in_term")
+        if print_in_term is None:
+            print_in_term = Number(0)
+
+        if not isinstance(print_in_term, Number):
+            return RTResult().failure(RTTypeError(
+                print_in_term.pos_start, print_in_term.pos_end,
+                f"first argument of builtin function '__gpl__' must be an int.",
+                exec_ctx
+            ))
+
+        if not os.path.exists("LICENSE"):
+            print("A problem occurred while opening or printing the license.\n"
+                  "You can read the license online by following this link :\n"
+                  "https://www.gnu.org/licenses/gpl-3.0.txt")
+            return RTResult().success(NoneValue(False))
+
+        if print_in_term.is_true():
+            with open("LICENSE", 'r+') as license_file:
+                print(license_file.read())
+                license_file.close()
+                return RTResult().success(NoneValue(False))
+        else:
+            import platform
+            system = platform.system()
+            if system == "Darwin":  # macOS
+                import subprocess
+
+                subprocess.call(('open', "LICENSE"))
+            elif system == 'Windows':  # Windows
+                print("Make sure to select a *text editor/reader* in the list that will pop :)")
+                os.startfile(os.path.realpath("LICENSE"))
+            elif system == "Linux":  # Linux
+                import subprocess
+
+                subprocess.call(('xdg-open', "LICENSE"))
+            else:
+                print(f"<built-in function __gpl__> said:\n"
+                      f"Sorry, your OS is not recognized. (platform.system() is '{system}')\n"
+                      f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html\n"
+                      f"In your report, please copy this error message.\n"
+                      f"However, you can read the license online by following this link:\n"
+                      f"https://www.gnu.org/licenses/gpl-3.0.txt")
+            return RTResult().success(NoneValue(False))
+
+    execute___gpl__.arg_names = []
+    execute___gpl__.optional_args = ["print_in_term"]
+    execute___gpl__.should_respect_args_number = True
 
     # ==================

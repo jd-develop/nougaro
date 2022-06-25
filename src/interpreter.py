@@ -344,8 +344,8 @@ class Interpreter:
                         )
         else:
             return result.failure(RunTimeError(node.pos_start, node.pos_end,
-                                               f"can not create a variable with builtin name '{var_name}'.",
-                                               value.ctx))
+                                               f"can not create or edit a variable with builtin name '{var_name}'.",
+                                               ctx))
         return result.success(final_value)
 
     @staticmethod

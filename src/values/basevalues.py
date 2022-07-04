@@ -60,8 +60,14 @@ class String(Value):
         return self, None
 
     def to_int_(self):
+        value_to_convert = self.value
+        if value_to_convert in ["null", "False"]:
+            value_to_convert = "0"
+        elif value_to_convert in ["True"]:
+            value_to_convert = "1"
+
         try:
-            return Number(int(float(self.value))).set_context(self.context), None
+            return Number(int(float(value_to_convert))).set_context(self.context), None
         except ValueError:
             return None, RTResult().failure(RunTimeError(self.pos_start, self.pos_end,
                                                          f"str '{self.value}' can not be converted to int.",

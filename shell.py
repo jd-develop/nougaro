@@ -28,6 +28,7 @@ from src.values.basevalues import List, NoneValue
 import json
 import sys
 import os.path
+import platform
 
 
 def main():
@@ -67,21 +68,17 @@ def main():
         version = ver_json_loaded.get("phase") + " " + ver_json_loaded.get("noug_version")
 
     if path == "<stdin>":
-        print(f"Welcome to Nougaro {version}! Contribute : https://github.com/jd-develop/nougaro/")
-        print("Nougaro  Copyright (C) 2021-2022  Jean Dubois\n"
-              "This program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.\n"
-              "This is free software, and you are welcome to redistribute it\n"
-              "under certain conditions.\n"
-              "Type __gpl__() to open GPL in your favorite text editor and get more details\n"
-              "(type __gpl__(1) to print GPL in this terminal).\n")
+        print(f"Welcome to Nougaro {version} on {platform.system()}! Contribute : https://github.com/jd-develop/nougaro/")
+        print("This program is under GPL license. For details, type __gpl__() or __gpl__(1) to stay in terminal.\n"
+              "This program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.\n")
 
         while True:
             try:
                 text = input("nougaro> ")
             except KeyboardInterrupt:
-                print("\nTo exit nougaro shell, use 'exit()'.")
-                continue
-
+                print_in_red("KeyboardInterrupt")
+                break
+                
             if str(text) == "" or text is None:
                 result, error = None, None
             else:

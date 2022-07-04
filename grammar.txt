@@ -23,6 +23,7 @@ arith_expr : term ((PLUS|MINUS) term)*
 term       : factor ((MUL|DIV|PERC|FLOORDIV) factor)*
 
 factor     : (PLUS|MINUS) factor
+           : power
 
 power      : call (POW factor)*
 

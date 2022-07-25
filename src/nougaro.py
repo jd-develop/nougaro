@@ -29,6 +29,7 @@ from src.symbol_table import SymbolTable
 from src.set_symbol_table import set_symbol_table
 from src.errors import *
 from src.values.basevalues import String
+
 # built-in python imports
 import json
 
@@ -36,11 +37,12 @@ import json
 # ##########
 # SYMBOL TABLE
 # ##########
+# we create a symbol table, then we define base things a symbol table needs
 global_symbol_table = SymbolTable()
 set_symbol_table(global_symbol_table)  # This function is in src.set_symbol_table
 
 
-with open("noug_version.json") as ver_json:
+with open("noug_version.json") as ver_json:  # we get the nougaro version from noug_version.json
     ver_json_loaded = json.load(ver_json)
     version_ = ver_json_loaded.get("phase") + " " + ver_json_loaded.get("noug_version")
 
@@ -48,32 +50,37 @@ with open("noug_version.json") as ver_json:
 # ##########
 # RUN
 # ##########
-def run(file_name, text, version: str = version_, exec_from: str = "(shell)", actual_context: str = "<program>"):
-    """Run the given code"""
-    # set version in symbol table
+def run(file_name: str, text: str, version: str = version_, exec_from: str = "(shell)",
+        actual_context: str = "<program>"):
+    """Run the given code.
+    The code is given through the `text` argument."""
+    # we set version and context in the symbol table
     global_symbol_table.set("__noug_version__", String(version))
     global_symbol_table.set("__exec_from__", String(exec_from))
     global_symbol_table.set("__actual_context__", String(actual_context))
 
-    # make tokens
+    # we make tokens with the Lexer
     lexer = Lexer(file_name, text)
     tokens, error = lexer.make_tokens()
-    if error is not None:
+    if error is not None:  # if there is any error, we just stop
         return None, error
-    # print(tokens)
+    # print(tokens)  # uncomment this line to print the tokens
 
-    # make the abstract syntax tree (parser)
+    # make the abstract syntax tree (AST) with the parser
     parser = Parser(tokens)
     ast = parser.parse()
-    if ast.error is not None:
+    if ast.error is not None:  # if there is any error, we just stop
         return None, ast.error
-    # print(ast)
+    # print(ast)  # uncomment this line to print the AST
 
     # run the code (interpreter)
     interpreter = src.interpreter.Interpreter(run)
-    context = Context('<program>')
+    context = Context('<program>')  # create the context of the interpreter
+    # don't forget to change the context symbol table to the global symbol table
     context.symbol_table = global_symbol_table
-    result = interpreter.visit(ast.node, context)
-    # print(context)
+    result = interpreter.visit(ast.node, context)  # visit the main node of the AST with the created context
+    # print(context)  # uncomment this line to print the context of the interpreter
 
+    # finally, return the value and the error given by the interpreter
+    # errors are managed by the shell.py file that calls this `run` function
     return result.value, result.error

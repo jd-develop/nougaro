@@ -15,6 +15,10 @@ rem
 rem You should have received a copy of the GNU General Public License
 rem along with this program.  If not, see https://www.gnu.org/licenses/.
 
+rem This file is used for build Nougaro for Windows using Nuitka (requires pip and python dir in environnement variables)
+
+echo WARNING : please execute this script ONLY in a safe environnement, like in another directory.
+echo You can exit this script safely without building anything by pressing CTRL+C or by closing this window :)
 pause
 
 rem We update pip and nuitka

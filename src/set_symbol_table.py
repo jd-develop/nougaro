@@ -27,6 +27,7 @@ from src.constants import PROTECTED_VARS
 # built-in python imports
 import platform
 import pprint
+import sys
 
 
 def set_symbol_table(symbol_table: SymbolTable):
@@ -89,7 +90,11 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set('__os_name__', String(platform.system()))
     symbol_table.set('__os_release__', String(platform.uname().release))
     symbol_table.set('__os_version__', String(platform.uname().version))
-    # platform.system() may be 'Linux', 'Windows', 'Darwin', 'Java', etc. according to Python doc
+    symbol_table.set('__python_version__',
+                     String(
+                         str(sys.version_info[0]) + "." + str(sys.version_info[1]) + "." + str(sys.version_info[2])
+                     ))
+    # platform.system() may be 'Linux', 'Windows', 'Darwin', 'Java', etc. according to Python doc for
     # test_protected_vars(symbol_table)
 
     symbol_table.set('__base_value__', Value())
@@ -117,7 +122,7 @@ def test_protected_vars(symbol_table: SymbolTable):
     for symbol in symbol_table.symbols:
         if symbol not in PROTECTED_VARS:
             if symbol != "numberOfHornsOnAnUnicorn" and symbol != "theLoneliestNumber" and symbol != "rickroll":
-                print(f"missing {symbol} in VARS_CANNOT_MODIFY")
+                print(f"missing {symbol} in PROTECTED_VARS")
                 error_count += 1
     if error_count == 0:
         print("Good job! Basic SymbolTable does not contain unprotected vars! :)")

@@ -76,6 +76,7 @@ PROTECTED_VARS = [
     "False",
     "None",
     '__noug_version__',
+    '__python_version__',
     '__exec_from__',
     '__symbol_table__',
     '__os_name__',

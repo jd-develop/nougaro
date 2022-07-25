@@ -1156,8 +1156,8 @@ class Parser:
         ))
 
     def bin_op(self, func_a, ops, func_b=None, left_has_priority: bool = True):
-        # param left_has_priority is used to know if we have to write (for exemple) ((int:3, ==, int:3), ==, int:3)
-        # or (int:3, ==, int:3, ==, int:3)
+        # param left_has_priority is used to know if we have to parse (for exemple) 3==3==3 into
+        # ((int:3, ==, int:3), ==, int:3) or (int:3, ==, int:3, ==, int:3)
         if func_b is None:
             func_b = func_a
         result = ParseResult()

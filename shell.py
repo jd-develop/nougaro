@@ -48,31 +48,33 @@ def main():
     # print(args)
 
     if len(args) != 0:  # there is a file to exec
-        if not os.path.exists(args[0]):
+        if not os.path.exists(args[0]):  # we check if the file exist, if not we quit with an error message
             print_in_red(f"[nougaro] file '{args[0]}' does not exist.")
-            path = None
-            exit(-1)
-        elif args[0].startswith("<"):
+            sys.exit(-1)  # DO NOT USE exit() OR quit() PYTHON BUILTINS !!!
+        elif args[0] in ["<stdin>", "<stdout>"]:
+            # these names can not be files : <stdin> is the shell input and <stdout> is his output
             print_in_red(f"[nougaro] file '{args[0]}' can not be used by Nougaro because this name is used internally."
                          f"\n"
                          f"[nougaro] This is not an unexpected error, you do not need to open an issue on the GitHub.\n"
                          f"[nougaro] Note that the Nougaro shell will open.")
-            path = "<stdin>"
-        else:
+            path = "<stdin>"  # this opens the shell
+        else:  # valid file :)
             path = args[0]
-    else:  # there is no file
+    else:  # there is no file given, so we have to open the shell
         path = "<stdin>"
 
-    with open("noug_version.json") as ver_json:
+    with open("noug_version.json") as ver_json:  # we load the nougaro version stored in noug_version.json
         ver_json_loaded = json.load(ver_json)
         version = ver_json_loaded.get("phase") + " " + ver_json_loaded.get("noug_version")
 
-    if path == "<stdin>":
-        print(f"Welcome to Nougaro {version} on {platform.system()}! Contribute : https://github.com/jd-develop/nougaro/")
+    if path == "<stdin>":  # we open the shell
+        # this text is always printed when we start the shell
+        print(f"Welcome to Nougaro {version} on {platform.system()}! "
+              f"Contribute : https://github.com/jd-develop/nougaro/")
         print("This program is under GPL license. For details, type __gpl__() or __gpl__(1) to stay in terminal.\n"
               "This program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.\n")
 
-        while True:
+        while True:  # the shell loop (like game loop in a video game but, obviously, Nougaro isn't a video game)
             try:
                 text = input("nougaro> ")
             except KeyboardInterrupt:
@@ -114,9 +116,8 @@ def main():
             try:
                 result, error = nougaro.run('<stdin>', file_content, version)
             except KeyboardInterrupt:
-                result, error = None, None
                 print_in_red("KeyboardInterrupt")
-                exit()
+                sys.exit()
         if error is not None:
             print_in_red(error.as_string())
 

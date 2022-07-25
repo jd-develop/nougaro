@@ -38,7 +38,7 @@ print()
 var some_text = "Hello, world!"
 var a = var b = 3
 print(some_text); print(a * b)
-print("You use nougaro version " + __noug_version__)
+print("You use nougaro version " + __noug_version__ + ", interpreted with Python " + __python_version__)
 print("You use " + __os_name__ + " " + __os_release__ + " " + __os_version__)
 print(None)
 print(var b === 3)

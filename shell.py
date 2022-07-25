@@ -75,52 +75,68 @@ def main():
               "This program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.\n")
 
         while True:  # the shell loop (like game loop in a video game but, obviously, Nougaro isn't a video game)
-            try:
+            try:  # we ask for an input to be interpreted
                 text = input("nougaro> ")
-            except KeyboardInterrupt:
+            except KeyboardInterrupt:  # if CTRL+C, exit the shell
                 print_in_red("KeyboardInterrupt")
-                break
+                break  # breaks the `while True` loop to the end of the file
                 
-            if str(text) == "" or text is None:
+            if str(text) == "" or text is None:  # nothing was entered: we don't do anything
                 result, error = None, None
-            else:
-                try:
+            else:  # there's an input
+                try:  # we try to run it
                     result, error = nougaro.run('<stdin>', text, version)
-                except KeyboardInterrupt:
+                except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
                     print_in_red("KeyboardInterrupt")
-                    continue
+                    continue  # continue the `while True` loop
 
-            if error is not None:
+            if error is not None:  # there is an error, we print it in RED because OMG AN ERROR
                 print_in_red(error.as_string())
-            elif result is not None:
-                if isinstance(result, List):
-                    if len(result.elements) == 1:
-                        if not isinstance(result.elements[0], NoneValue):
+            elif result is not None:  # there is no error, but there is a result
+                if isinstance(result, List):  # the result is always a nougaro List value
+                    if len(result.elements) == 1:  # there is one single result, let's print it without the "[]".
+                        if not isinstance(result.elements[0], NoneValue):  # result is not a Nougaro NoneValue
                             print(result.elements[0])
-                        else:
-                            if result.elements[0].should_print:
+                        else:  # result is a Nougaro NoneValue
+                            if result.elements[0].should_print:  # if the NoneValue should be printed, let's print it!
                                 print(result.elements[0])
-                    else:
-                        print(result)
-                else:
+                    else:  # there is multiple results, when there is multi-line statements (like `print(a);var a+=1`)
+                        # this code is to know what the list contains
+                        # if the list contains only NoneValues that shouldn't be printed, we don't print it
+                        # in any other case, we do.
+                        should_print = False
+                        for e in result.elements:
+                            if not isinstance(e, NoneValue):
+                                should_print = True
+                                # no need to continue looping : it takes a long time, and it's useless because we have
+                                # to print anything, so we break this
+                                break
+                            else:
+                                if e.should_print:
+                                    should_print = True
+                                    break  # same here
+                        if should_print:  # if we should print, we print
+                            print(result)
+                else:  # the result is not a Nougaro List. If you know when that happens, tell me, please.
                     continue
-            else:
+            else:  # there is no error nor result. If you know when that happens, tell me, please.
                 continue
-    else:
+    else:  # we don't open the shell because we have to run a file.
+        # why using the "with" structure ?
         file = open(path, encoding="UTF-8")
         file_content = str(file.read())
         file.close()
-        if file_content == "" or file_content is None:
+        if file_content == "" or file_content is None:  # no need to run this empty file
             result, error = None, None
-        else:
+        else:  # the file isn't empty, let's run it !
             try:
                 result, error = nougaro.run('<stdin>', file_content, version)
-            except KeyboardInterrupt:
+            except KeyboardInterrupt:  # if CTRL+C, just exit the Nougaro shell
                 print_in_red("KeyboardInterrupt")
                 sys.exit()
-        if error is not None:
+        if error is not None:  # there is an error, so before exiting we have to say "OH NO IT'S BROKEN"
             print_in_red(error.as_string())
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # ond day, someone told me that it was good to do that
     main()

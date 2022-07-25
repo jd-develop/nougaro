@@ -26,7 +26,7 @@ import lib_.time_
 # built-in python imports
 # no imports
 
-TABLE_OF_MODULES = {
+TABLE_OF_MODULES = {  # all the modules with all their public functions and constants
     "math": lib_.math_.WHAT_TO_IMPORT,
     "random": lib_.random_.WHAT_TO_IMPORT,
     "statistics": lib_.statistics_.WHAT_TO_IMPORT,

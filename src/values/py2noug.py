@@ -32,7 +32,7 @@ def py2noug(value: Any):
     elif is_num(value):
         return Number(value)
     elif isinstance(value, list) or isinstance(value, tuple):
-        list_ = list(value)
+        list_ = list(value)  # we want a list instead of a tuple
         return List(list_)
     else:
-        return Value()
+        return Value()  # we just return a base value if there is no equivalent...

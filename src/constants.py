@@ -69,8 +69,8 @@ BUILTIN_FUNCTIONS = [
     'nougaro',
     '__gpl__',
 ]
-MODULES = {*TABLE_OF_MODULES.keys()}
-PROTECTED_VARS = [
+MODULES = [*TABLE_OF_MODULES.keys()]  # all the modules names are stored in lib_.table_of_modules.TABLE_OF_MODULES
+PROTECTED_VARS = [  # finally, the list with all the names that can't be defined by the user
     "null",
     "True",
     "False",
@@ -85,7 +85,7 @@ PROTECTED_VARS = [
     '__base_value__',
     '__disclaimer_of_warranty__',
     'answerToTheLifeTheUniverseAndEverything',
-    *KEYWORDS,
-    *BUILTIN_FUNCTIONS,
-    *MODULES
+    *KEYWORDS,  # all the keywords
+    *BUILTIN_FUNCTIONS,  # all the builtin function names
+    *MODULES  # all the module names
 ]

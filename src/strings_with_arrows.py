@@ -18,16 +18,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 def string_with_arrows(text: str, pos_start, pos_end) -> str:
-    """
+    """Generate a string with arrows under it.
         In this example, text will be 'var 1a = 123'
         If you execute this line with nougaro, it crashes with an :
             InvalidSyntaxError : expected identifier, but got int.
 
-        It generates this view of the line with arrows (^) under the line :
+        It generates this preview of the line with arrows (^) under the problematic characters :
             var 1a = 123
                 ^
 
-        The pos_start is the 1 token pos_start, same for pos end.
+        Here, pos_start is the '1' token pos_start, same for pos end.
 
     :param text: base text
     :param pos_start: position start

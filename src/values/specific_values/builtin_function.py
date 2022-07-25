@@ -23,6 +23,8 @@ from src.values.functions.builtin_function import BuiltInFunction
 # built-in python imports
 # no imports
 
+
+# this is the list of all the builtin functions
 VOID = BuiltInFunction('void')
 RUN = BuiltInFunction('run')
 EXAMPLE = BuiltInFunction('example')

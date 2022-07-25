@@ -28,17 +28,20 @@ from colorama import Fore
 # ##########
 # COLORS
 # ##########
+# prints text in red. TODO : Sometimes it doesn't work (like in CMD), but this is not my priority.
 def print_in_red(txt): print(Fore.RED + txt + Fore.RESET)
 
 
 # ##########
-# TOOL
+# TOOLS
 # ##########
+# returns True if the value is an int or a float
 def is_num(value: Any): return isinstance(value, int) or isinstance(value, float)
 
 
 # ##########
-# CUSTOM BUILTIN FUNC METHOD
+# CUSTOM BUILTIN FUNC METHODS
+# thanks to lancelote (https://github.com/lancelote) that works at JetBrains for these tricks
 # ##########
 class CustomBuiltInFuncMethod(Protocol):
     """

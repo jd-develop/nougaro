@@ -23,6 +23,8 @@ from src.values.basevalues import Number
 # built-in python imports
 # no imports
 
+# this is the list of all pre-defined numbers
+# some of them are in lib.math (like PI, E or SQRT_PI)
 NULL = Number(0)
 FALSE = Number(0)
 TRUE = Number(1)

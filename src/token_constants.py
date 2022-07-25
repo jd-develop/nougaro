@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Token definitions
-# no imports
+# NO IMPORTS
 
+# list of all the tokens
 TT_NEWLINE = 'new line'       # new line
 
 TT_INT = 'int'                # integer, corresponds to python int
@@ -82,7 +82,7 @@ TT_INTERROGATIVE_PNT = '?'    # ?
 
 TT_EOF = 'end of file'        # end of file
 
-KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
+KEYWORDS = [                  # List of all the keywords (TT_KEYWORD)
     # basic keywords
     'var',
     'del',
@@ -119,7 +119,7 @@ KEYWORDS = [                  # List of all keyword (TT_KEYWORD)
     'assert',
 ]
 
-TOKENS_TO_QUOTE = [
+TOKENS_TO_QUOTE = [  # list of all the tokens that needs "'" when there are printed (e.g. in an error)
     TT_PLUS,
     TT_MINUS,
     TT_MUL,
@@ -165,7 +165,7 @@ TOKENS_TO_QUOTE = [
     TT_TO_AND_OVERWRITE
 ]
 
-EQUALS = [
+EQUALS = [  # all the equal tokens ('=', '+=', ...) but not the equal tokens for tests ('==', '!=', ...)
     TT_EQ,
     TT_PLUSEQ,
     TT_MINUSEQ,

@@ -22,33 +22,40 @@ import time
 # This is a comment
 # Basics :
 # Print
-print("Hello, world!")
-print()
+print("Hello, world!")  # it prints the text then puts a back line
+print()  # this prints a blank line with a back line at the end
 
 # Mathematical operators
 print(1+1)
 print(3-4)
 print(2*3)
 print(6/2)
-print(3^2)
-print(math_abs(-5))
+print(3^2)  # this is the power
+print(math_abs(-5))  # the absolute value
 print()
 
 # Variables
-var some_text = "Hello, world!"
-var a = var b = 3
-print(some_text); print(a * b)
+var some_text = "Hello, world!"  # no need to put the variable type
+var a = var b = 3  # you can use variable definitions in other expressions
+
+print(some_text); print(a * b)  # the ';' is like a back line
+
+# the following two lines are an example in the doc (Built-in variables)
 print("You use nougaro version " + __noug_version__ + ", interpreted with Python " + __python_version__)
 print("You use " + __os_name__ + " " + __os_release__ + " " + __os_version__)
-print(None)
-print(var b === 3)
-print(var b <== 3)
-print(var b <<= 3)
-print(var b >== 3)
-print(var b >>= 3)
+
+print(None)  # like Python's 'None'
+
+print(var b === 3)  # like `var b = (b==3)`
+print(var b <== 3)  # like `var b = (b<=3)`
+print(var b <<= 3)  # like `var b = (b<3)`
+print(var b >== 3)  # like `var b = (b>=3)`
+print(var b >>= 3)  # like `var b = (b>3)`
+
 print()
 
 # Strings
+# examples of using the backslash
 print("this is a string quoted by \".")
 print("You can put\nbacklines and\n\ttabs.")
 print("You can add \\ backslashes and \" \' quotes")
@@ -58,9 +65,10 @@ print()
 
 # assert
 assert True
-# assert False, "you can also put an error message"  # Uncomment this line to see what happens
+# assert False  # it makes the program crash. Uncomment the line to see what happens :)
+# assert False, "you can also put an error message"  # Uncomment this line to see what happens ;)
 
-# Tests
+# Input and tests
 var name = input("Whats your name? ")
 if name == "Jean Dubois" then
     print("You are the creator of this language! Amazing!")
@@ -79,12 +87,12 @@ print()
 
 print(True and False)
 print(True or False)
-print(True xor False)
+print(True xor False)  # exclusive or
 print(not True)
 print()
 
 # example functions
-example('ppap')
+example('ppap')  # all the examples are in the 'examples' folder
 print()
 
 # Functions
@@ -110,12 +118,12 @@ end
 print(fib(input_int("Enter number: ")))
 print()
 
-var a = def()->print("Hello, world!")
+var a = def()->print("Hello, world!")  # you are not obliged to give a name to your function
 a()
 print()
 
 # builtin functions and lists
-var a = print_ret("this string is printed and returned into a")
+var a = print_ret("this string is printed and assigned into a")
 print("type(a) is " + type(a))  # str
 print("is_str(a) is " + str(is_str(a)))  # True
 print("is_list(a) is " + str(is_list(a)))  # False
@@ -131,22 +139,22 @@ print()
 
 var list_ = [1, 2, 3, "4", '5', '6']
 
-print(append(list_, 7))
-print(var list_ += 7)
+print(append(list_, 7))  # append elements to a list.
+print(list_ = 7)  # another way to do it
 print()
 
-print(pop(list_, -1))
-print(var list_ -= -1)
+print(pop(list_, -1))  # pop elements to a list
+print(list_ - -1)  # another way to do it
 print()
 
-print(extend(list_, [8, 9, 10]))
-print(list_ * [8, 9, 10])
+print(extend(list_, [8, 9, 10]))  # add all the elements of a list to another list
+print(list_ * [8, 9, 10])  # another way to do it
 print()
 
-print(get(list_, -3))
-print(list_ / -3)
-print(list_(-3))
-print(get(*[list_, -3]))  # another syntax. *[list_, -3] returns list_, -3 in this case.
+print(get(list_, -3))  # get the -3rd element of a list
+print(list_ / -3)  # another way to do it
+print(list_(-3))  # the BEST way to do it
+print(get(*[list_, -3]))  # the WORST way to do it. *[list_, -3] returns list_, -3 in this case.
 print()
 
 print("max of the list is " + str(max(list_, True)))
@@ -196,6 +204,7 @@ print()
 var a = 1
 print(a)
 del a
+# print(a)  # uncomment this line to see what happens ;)
 print()
 
 # write into a file
@@ -209,11 +218,13 @@ print("Or you can do `print(write 'str' >> 'file')` ^^")
 print()
 
 # read files
-print(read file)
+print(read file)  # it reads the file as a string. When it's printed, it prints also the back lines.
 print()
 
 # time sleep
 print("wait a second...")
-time_sleep(1)
-print("thank you :)")
+time_sleep(1)  # literally a second
+print("thank you :)")  # you're welcome ^^
 print()
+
+# wow... i finished commenting this file.

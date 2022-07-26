@@ -37,5 +37,5 @@
     * ✅ ~~`token_constants.py`~~
     * `tokens.py`
   * ✅ ~~`build.bat`~~
-  * `example.noug`
+  * ✅ ~~`example.noug`~~
   * ✅ ~~`shell.py`~~

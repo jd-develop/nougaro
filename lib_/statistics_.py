@@ -68,6 +68,7 @@ class Statistics(BaseBuiltInFunction):
         return result.success(return_value)
 
     def no_visit_method(self, exec_context: Context):
+        """Method called when the func name given through self.name is not defined"""
         print(exec_context)
         print(f"NOUGARO INTERNAL ERROR : No execute_statistics_{self.name} method defined in lib_.statistics_.\n"
               f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all informations "
@@ -75,6 +76,7 @@ class Statistics(BaseBuiltInFunction):
         raise Exception(f'No execute_statistics_{self.name} method defined in lib_.statistics_.')
 
     def copy(self):
+        """Return a copy of self"""
         copy = Statistics(self.name)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
@@ -589,7 +591,8 @@ class Statistics(BaseBuiltInFunction):
     execute_statistics_multimode.should_respect_args_number = True
 
 
-WHAT_TO_IMPORT = {
+WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported
+    # functions
     "mean": Statistics("mean"),
     "geometric_mean": Statistics("geometric_mean"),
     "harmonic_mean": Statistics("harmonic_mean"),

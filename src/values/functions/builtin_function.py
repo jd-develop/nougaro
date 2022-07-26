@@ -44,6 +44,7 @@ class BaseBuiltInFunction(BaseFunction):
         return RTResult().success(NoneValue(False))
 
     def no_visit_method(self, exec_context: Context):
+        """Method called when the func name given through self.name is not defined"""
         print(exec_context)
         print(f"NOUGARO INTERNAL ERROR : No execute_{self.name} method defined in "
               f"src.values.functions.builtin_function.BaseBuiltInFunction.\n"
@@ -53,6 +54,7 @@ class BaseBuiltInFunction(BaseFunction):
                         f'src.values.functions.builtin_function.BaseBuiltInFunction.')
 
     def copy(self):
+        """Return a copy of self"""
         copy = BaseBuiltInFunction(self.name)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
@@ -101,6 +103,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         return result.success(return_value)
 
     def no_visit_method(self, exec_context: Context):
+        """Method called when the func name given through self.name is not defined"""
         print(exec_context)
         print(f"NOUGARO INTERNAL ERROR : No execute_{self.name} method defined in "
               f"src.values.functions.builtin_function.BuiltInFunction.\n"
@@ -110,6 +113,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                         f'src.values.functions.builtin_function.BuiltInFunction.')
 
     def copy(self):
+        """Return a copy of self"""
         copy = BuiltInFunction(self.name)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)

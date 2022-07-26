@@ -60,6 +60,7 @@ class Random(BaseBuiltInFunction):
         return result.success(return_value)
 
     def no_visit_method(self, exec_context: Context):
+        """Method called when the func name given through self.name is not defined"""
         print(exec_context)
         print(f"NOUGARO INTERNAL ERROR : No execute_random_{self.name} method defined in lib_.random_.\n"
               f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all informations "
@@ -67,6 +68,7 @@ class Random(BaseBuiltInFunction):
         raise Exception(f'No execute_random_{self.name} method defined in lib_.random_.')
 
     def copy(self):
+        """Return a copy of self"""
         copy = Random(self.name)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
@@ -147,7 +149,8 @@ class Random(BaseBuiltInFunction):
     execute_random_choice.should_respect_args_number = True
 
 
-WHAT_TO_IMPORT = {
+WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported
+    # functions
     "randint": Random("randint"),
     "random": Random("random"),
     "choice": Random("choice"),

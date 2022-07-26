@@ -60,6 +60,7 @@ class Time(BaseBuiltInFunction):
         return result.success(return_value)
 
     def no_visit_method(self, exec_context: Context):
+        """Method called when the func name given through self.name is not defined"""
         print(exec_context)
         print(f"NOUGARO INTERNAL ERROR : No execute_time_{self.name} method defined in lib_.time_.\n"
               f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all informations "
@@ -67,6 +68,7 @@ class Time(BaseBuiltInFunction):
         raise Exception(f'No execute_time_{self.name} method defined in lib_.time_.')
 
     def copy(self):
+        """Return a copy of self"""
         copy = Time(self.name)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
@@ -124,8 +126,10 @@ class Time(BaseBuiltInFunction):
 
 TIMEZONE = Number(time.timezone)
 
-WHAT_TO_IMPORT = {
+WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported
+    # functions
     "sleep": Time("sleep"),
     "sleep_milliseconds": Time("sleep_milliseconds"),
+    # constants
     "timezone": TIMEZONE,
 }

@@ -56,6 +56,7 @@ class Function(BaseFunction):
         return result.success(return_value)
 
     def copy(self):
+        """Return a copy of self"""
         copy = Function(self.name, self.body_node, self.arg_names, self.should_auto_return)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)

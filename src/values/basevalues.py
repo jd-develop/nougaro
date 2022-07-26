@@ -111,6 +111,7 @@ class String(Value):
             return None, self.can_not_be_in(other)
 
     def copy(self):
+        """Return a copy of self"""
         copy = String(self.value)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
@@ -326,6 +327,7 @@ class Number(Value):
         return not self.is_int()
 
     def copy(self):
+        """Return a copy of self"""
         copy = Number(self.value)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
@@ -459,6 +461,7 @@ class List(Value):
             return None, self.can_not_be_in(other)
 
     def copy(self):
+        """Return a copy of self"""
         copy = List(self.elements)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
@@ -516,6 +519,7 @@ class NoneValue(Value):
             return None, self.can_not_be_in(other)
 
     def copy(self):
+        """Return a copy of self"""
         copy = NoneValue(self.should_print)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)

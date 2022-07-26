@@ -5,7 +5,7 @@
 * comment these files :
   * `lib_`
     * ✅ ~~`__TABLE_OF_MODULES__.py`~~
-    * `math_.py`
+    * ✅ ~~`math_.py`~~
     * `random_.py`
     * `statistics_.py`
     * `time_.py`
@@ -15,8 +15,6 @@
         * `base_function.py`
         * `builtin_function.py`
       * ✅ ~~`specific_values`~~
-        * ✅ ~~`builtin_function.py`~~
-        * ✅ ~~`number.py`~~
       * `basevalues.py`
       * ✅ ~~`py2noug.py`~~
       * `value.py`

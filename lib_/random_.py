@@ -17,16 +17,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+""" Random module
+
+    Random is a module that provides pseudo-random functions.
+"""
+
 # IMPORTS
 # nougaro modules imports
 from src.values.functions.builtin_function import *
-# Comment about the above line : Context, RTResult and values are imported in builtin_function.py
+# Comment about the above line : Context, RTResult, errors and values are imported in builtin_function.py
 # built-in python imports
 import random
 
 
 class Random(BaseBuiltInFunction):
-    """ Module Random """
+    """ Random Module """
     def __init__(self, name):
         super().__init__(name)
 
@@ -34,29 +39,39 @@ class Random(BaseBuiltInFunction):
         return f'<built-in function random_{self.name}>'
 
     def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
+        # execute a function of the 'random' module
+        # create the result
         result = RTResult()
+
+        # generate the context and change the symbol table for the context
         exec_context = self.generate_new_context()
         exec_context.symbol_table.set("__exec_from__", String(exec_from))
         exec_context.symbol_table.set("__actual_context__", String(self.name))
 
+        # get the method name and the method
         method_name = f'execute_random_{self.name}'
         method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)
 
+        # populate arguments
         result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
                                                      optional_args=method.optional_args,
                                                      should_respect_args_number=method.should_respect_args_number))
+
+        # if there is any error
         if result.should_return():
             return result
 
         try:
+            # we try to execute the function
             return_value = result.register(method(exec_context))
-        except TypeError:
+        except TypeError:  # there is no `exec_context` parameter
             try:
                 return_value = result.register(method())
             except TypeError:  # it only executes when coding
                 return_value = result.register(method(exec_context))
-        if result.should_return():
+        if result.should_return():  # check for any error
             return result
+        # if all is OK, return what we should return
         return result.success(return_value)
 
     def no_visit_method(self, exec_context: Context):
@@ -78,37 +93,47 @@ class Random(BaseBuiltInFunction):
     # FUNCTIONS
     # =========
     def execute_random_randint(self, exec_ctx: Context):
-        """Like python random.randint()"""
+        """Pick a random integer number in [a, b] mathematical range. a SHOULD BE lesser than b"""
         # Params:
         # * a
         # * b
+        # we get 'a' and 'b' values
         a = exec_ctx.symbol_table.get("a")
         b = exec_ctx.symbol_table.get("b")
-        if not isinstance(a, Number):
+        if not isinstance(a, Number):  # we check if 'a' is a number
             return RTResult().failure(RunTimeError(
                 a.pos_start, a.pos_end,
                 "first argument of built-in module function 'random_randint' must be an int.",
                 exec_ctx
             ))
-        if a.type_ != 'int':
+        if a.type_ != 'int':  # we check if 'a' is an int
             return RTResult().failure(RunTimeError(
                 a.pos_start, a.pos_end,
                 "first argument of built-in module function 'random_randint' must be an int.",
                 exec_ctx
             ))
 
-        if not isinstance(b, Number):
+        if not isinstance(b, Number):  # we check if 'b' is a number
             return RTResult().failure(RunTimeError(
                 b.pos_start, b.pos_end,
                 "second argument of built-in module function 'random_randint' must be an int.",
                 exec_ctx
             ))
-        if b.type_ != 'int':
+        if b.type_ != 'int':  # we check if 'b' is an int
             return RTResult().failure(RunTimeError(
                 b.pos_start, b.pos_end,
                 "second argument of built-in module function 'random_randint' must be an int.",
                 exec_ctx
             ))
+
+        if a.value > b.value:  # e.g. randint(4, -3) : it does not make ANY sense x)
+            return RTResult().failure(RunTimeError(
+                a.pos_start, b.pos_end,
+                "first argument of built-in module function 'random_randint' MUST be less than or equal to its second"
+                " argument.",
+                exec_ctx
+            ))
+
         random_number = random.randint(a.value, b.value)
         return RTResult().success(Number(random_number))
 
@@ -117,7 +142,7 @@ class Random(BaseBuiltInFunction):
     execute_random_randint.should_respect_args_number = True
 
     def execute_random_random(self):
-        """Like python random.random()"""
+        """Pick randomly a 16-digits float between 0 included and 1 included"""
         # No params.
         return RTResult().success(Number(random.random()))
 
@@ -126,23 +151,23 @@ class Random(BaseBuiltInFunction):
     execute_random_random.should_respect_args_number = True
 
     def execute_random_choice(self, exec_ctx: Context):
-        """Like python random.choice()"""
+        """Return a random element of a list"""
         # Params:
         # * list_
-        list_ = exec_ctx.symbol_table.get("list_")
-        if not isinstance(list_, List):
+        list_ = exec_ctx.symbol_table.get("list_")  # we get the 'list' argument
+        if not isinstance(list_, List):  # we check if it is a list
             return RTResult().failure(RunTimeError(
                 list_.pos_start, list_.pos_end,
                 "first argument of built-in module function 'random_choice' must be a list.",
                 exec_ctx
             ))
-        if len(list_.elements) == 0:
+        if len(list_.elements) == 0:  # if the list is empty, we raise an error
             return RTResult().failure(RunTimeError(
                 list_.pos_start, list_.pos_end,
                 "list is empty.",
                 exec_ctx
             ))
-        return RTResult().success(random.choice(list_.elements))
+        return RTResult().success(random.choice(list_.elements))  # then we return a random element of the list
 
     execute_random_choice.arg_names = ['list_']
     execute_random_choice.optional_args = []

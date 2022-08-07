@@ -17,9 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+""" Math module
+
+    Math is a module that contains mathematical stuff, such as functions and constants, that is very useful to do math
+    things.
+"""
+
 # IMPORTS
 # nougaro modules imports
-from src.values.functions.builtin_function import *  # Context, RTResult and values are imported in builtin_function.py
+from src.values.functions.builtin_function import *
+# Above line : Context, RTResult, errors and values are imported in builtin_function.py
 # built-in python imports
 from math import sqrt as math_sqrt, degrees as math_degrees, radians as math_radians, sin as math_sin, cos as math_cos
 from math import tan as math_tan, asin as math_asin, acos as math_acos, atan as math_atan, e, pi
@@ -31,7 +38,7 @@ E = Number(e)
 
 
 class Math(BaseBuiltInFunction):
-    """ Module Math """
+    """ Math Module """
     def __init__(self, name):
         super().__init__(name)
 

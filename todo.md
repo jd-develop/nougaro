@@ -6,7 +6,7 @@
   * `lib_`
     * ✅ ~~`__TABLE_OF_MODULES__.py`~~
     * ✅ ~~`math_.py`~~
-    * `random_.py`
+    * ✅ ~~`random_.py`~~
     * `statistics_.py`
     * `time_.py`
   * `src`

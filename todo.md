@@ -3,12 +3,7 @@
 * add attributes
 
 * comment these files :
-  * `lib_`
-    * ✅ ~~`__TABLE_OF_MODULES__.py`~~
-    * ✅ ~~`math_.py`~~
-    * ✅ ~~`random_.py`~~
-    * `statistics_.py`
-    * `time_.py`
+  * ✅ ~~`lib_`~~
   * `src`
     * `values`
       * `functions`

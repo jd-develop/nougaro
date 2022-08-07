@@ -17,6 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+""" Statistics module
+
+    Statistics is a module that provides tools to make statistics.
+"""
+
 # IMPORTS
 # nougaro modules imports
 from src.values.py2noug import py2noug
@@ -28,6 +33,7 @@ import statistics
 
 
 class RTStatisticsError(src.errors.RunTimeError):
+    """StatisticsError is an error that can be triggered ONLY via functions in this module."""
     def __init__(self, pos_start, pos_end, details, context: Context):
         super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="StatisticsError")
         self.context = context
@@ -42,29 +48,39 @@ class Statistics(BaseBuiltInFunction):
         return f'<built-in function statistics_{self.name}>'
 
     def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
+        # execute a function of the 'statistics' module
+        # create the result
         result = RTResult()
+
+        # generate the context and change the symbol table for the context
         exec_context = self.generate_new_context()
         exec_context.symbol_table.set("__exec_from__", String(exec_from))
         exec_context.symbol_table.set("__actual_context__", String(self.name))
 
+        # get the method name and the method
         method_name = f'execute_statistics_{self.name}'
         method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)
 
+        # populate arguments
         result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
                                                      optional_args=method.optional_args,
                                                      should_respect_args_number=method.should_respect_args_number))
+
+        # if there is any error
         if result.should_return():
             return result
 
         try:
+            # we try to execute the function
             return_value = result.register(method(exec_context))
-        except TypeError:
+        except TypeError:  # there is no `exec_context` parameter
             try:
                 return_value = result.register(method())
             except TypeError:  # it only executes when coding
                 return_value = result.register(method(exec_context))
-        if result.should_return():
+        if result.should_return():  # check for any error
             return result
+        # if all is OK, return what we should return
         return result.success(return_value)
 
     def no_visit_method(self, exec_context: Context):
@@ -86,11 +102,11 @@ class Statistics(BaseBuiltInFunction):
     # FUNCTIONS
     # =========
     def execute_statistics_mean(self, exec_ctx: Context):
-        """Like python statistics.mean()"""
+        """Returns the mean of a statistical series"""
         # Params:
         # * data
-        data = exec_ctx.symbol_table.get('data')
-        if not isinstance(data, List):
+        data = exec_ctx.symbol_table.get('data')  # we get the data
+        if not isinstance(data, List):  # we check if the data is under the form of a list
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_mean' must be a list of numbers.",
@@ -99,7 +115,7 @@ class Statistics(BaseBuiltInFunction):
 
         data_ = []
         for e in data.elements:
-            if not isinstance(e, Number):
+            if not isinstance(e, Number):  # the data must contain only numbers
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_mean' must be a list of numbers, not "
@@ -108,19 +124,19 @@ class Statistics(BaseBuiltInFunction):
                 ))
             data_.append(e.value)
 
+        if len(data_) == 0:  # data must not be empty
+            return RTResult().failure(RTStatisticsError(
+                data.pos_start, data.pos_end,
+                "first argument of built-in module function 'statistics_mean' must not be empty.",
+                exec_ctx
+            ))
+
         try:
-            mean_ = statistics.mean(data_)
+            mean_ = statistics.mean(data_)  # we try to calculate the mean of our list
         except statistics.StatisticsError as exception:
-            if str(exception) == "mean requires at least one data point":
-                return RTResult().failure(RTStatisticsError(
-                    data.pos_start, data.pos_end,
-                    "first argument of built-in module function 'statistics_mean' must not be empty.",
-                    exec_ctx
-                ))
-            else:
-                return RTResult().failure(RTStatisticsError(
-                    self.pos_start, self.pos_end, str(exception) + '.', exec_ctx
-                ))
+            return RTResult().failure(RTStatisticsError(
+                self.pos_start, self.pos_end, str(exception) + '.', exec_ctx
+            ))
 
         return RTResult().success(Number(mean_))
 
@@ -129,11 +145,11 @@ class Statistics(BaseBuiltInFunction):
     execute_statistics_mean.should_respect_args_number = True
 
     def execute_statistics_geometric_mean(self, exec_ctx: Context):
-        """Like python statistics.geometric_mean()"""
+        """Returns the geometric mean of a statistical series"""
         # Params:
         # * data
-        data = exec_ctx.symbol_table.get('data')
-        if not isinstance(data, List):
+        data = exec_ctx.symbol_table.get('data')  # we get the data
+        if not isinstance(data, List):  # the data must be a list
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_geometric_mean' must be a list of positive "
@@ -150,37 +166,30 @@ class Statistics(BaseBuiltInFunction):
                     f"positive numbers, not {e.type_}.",
                     exec_ctx
                 ))
+            if e.value < 0:
+                return RTResult().failure(RTTypeError(
+                    e.pos_start, e.pos_end,
+                    f"first argument of built-in module function 'statistics_geometric_mean' must be a list of "
+                    f"positive numbers.",
+                    exec_ctx
+                ))
             data_.append(e.value)
 
+        if len(data_) == 0:  # data must not be empty
+            return RTResult().failure(RTStatisticsError(
+                data.pos_start, data.pos_end,
+                "first argument of built-in module function 'statistics_geometric_mean' must not be empty.",
+                exec_ctx
+            ))
+
         try:
-            geometric_mean_ = statistics.geometric_mean(data_)
-        except statistics.StatisticsError as exception:
-            is_empty_python_exceptions = [
-                "mean requires at least one data point",
-                "fmean requires at least one data point",
-                "geometric mean requires a non-empty dataset containing positive numbers"
-            ]
-            if str(exception) in is_empty_python_exceptions:
-                return RTResult().failure(RTStatisticsError(
-                    data.pos_start, data.pos_end,
-                    "first argument of built-in module function 'statistics_geometric_mean' must be a non-empty list "
-                    "that only contains positive numbers.",
-                    exec_ctx
-                ))
-            else:
-                return RTResult().failure(RunTimeError(
-                    self.pos_start, self.pos_end,
-                    f"python statistics.geometric_mean() crashed with this error: "
-                    f"{exception.__class__.__name__}: {exception}. PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: "
-                    f"https://jd-develop.github.io/nougaro/bugreport.html !",
-                    exec_ctx
-                ))
+            geometric_mean_ = statistics.geometric_mean(data_)  # we try to calculate the geometric mean
         except Exception as exception:
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f"python statistics.geometric_mean() crashed with this error: "
-                f"{exception.__class__.__name__}: {exception}. PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: "
-                f"https://jd-develop.github.io/nougaro/bugreport.html !",
+                f"{exception.__class__.__name__}: {exception}.\n"
+                f"PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: https://jd-develop.github.io/nougaro/bugreport.html !",
                 exec_ctx
             ))
 
@@ -191,21 +200,21 @@ class Statistics(BaseBuiltInFunction):
     execute_statistics_geometric_mean.should_respect_args_number = True
 
     def execute_statistics_harmonic_mean(self, exec_ctx: Context):
-        """Like python statistics.harmonic_mean()"""
+        """Returns the harmonic mean of a statistical series"""
         # Params:
         # * data
         # Optional params:
         # * weights
-        data = exec_ctx.symbol_table.get('data')
-        if not isinstance(data, List):
+        data = exec_ctx.symbol_table.get('data')  # we get the data
+        if not isinstance(data, List):  # the data must be a list
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_harmonic_mean' must be a list of numbers.",
                 exec_ctx
             ))
 
-        weights = exec_ctx.symbol_table.get('weights')
-        if weights is not None and not isinstance(weights, List):
+        weights = exec_ctx.symbol_table.get('weights')  # we get the list of weights
+        if weights is not None and not isinstance(weights, List):  # if the weights list is defined but not a list
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "second argument of built-in module function 'statistics_harmonic_mean' must be a list of numbers.",
@@ -213,6 +222,7 @@ class Statistics(BaseBuiltInFunction):
             ))
 
         if weights is not None and len(weights.elements) != len(data.elements):
+            # if the weights list is defined but doesn't match with the data
             return RTResult().failure(RTIndexError(
                 data.pos_start, weights.pos_end,
                 "the two arguments of built-in module function 'statistics_harmonic_mean' must have the same length.",
@@ -221,14 +231,14 @@ class Statistics(BaseBuiltInFunction):
 
         data_ = []
         for e in data.elements:
-            if not isinstance(e, Number):
+            if not isinstance(e, Number):  # the data must contain only numbers
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_harmonic_mean' must be a list of positive"
                     f" numbers, not {e.type_}.",
                     exec_ctx
                 ))
-            if e.value < 0:
+            if e.value < 0:  # the data must contain only positive numbers
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
                     "first argument of built-in module function 'statistics_harmonic_mean' must be a list of "
@@ -237,17 +247,24 @@ class Statistics(BaseBuiltInFunction):
                 ))
             data_.append(e.value)
 
-        if weights is not None:
+        if len(data_) == 0:  # data must not be empty
+            return RTResult().failure(RTStatisticsError(
+                data.pos_start, data.pos_end,
+                "first argument of built-in module function 'statistics_harmonic_mean' must not be empty.",
+                exec_ctx
+            ))
+
+        if weights is not None:  # if there is weights
             weights_ = []
             for e in weights.elements:
-                if not isinstance(e, Number):
+                if not isinstance(e, Number):  # a weight must be a positive number
                     return RTResult().failure(RTTypeError(
                         e.pos_start, e.pos_end,
                         f"first argument of built-in module function 'statistics_harmonic_mean' must be a list of "
                         f"positive numbers, not {e.type_}.",
                         exec_ctx
                     ))
-                if e.value < 0:
+                if e.value < 0:  # a weight must be a positive number
                     return RTResult().failure(RTTypeError(
                         e.pos_start, e.pos_end,
                         "first argument of built-in module function 'statistics_harmonic_mean' must be a list of "
@@ -255,38 +272,20 @@ class Statistics(BaseBuiltInFunction):
                         exec_ctx
                     ))
                 weights_.append(e.value)
-        else:
+        else:  # weights list is not defined, so all the weights are 1
             weights_ = None
 
-        try:
-            if weights_ is None:
+        try:  # we try to calculate the harmonic mean
+            if weights_ is None:  # weights aren't defined
                 harmonic_mean_ = statistics.harmonic_mean(data_)
-            else:
+            else:  # they are
                 harmonic_mean_ = statistics.harmonic_mean(data_, weights=weights_)
-        except statistics.StatisticsError as exception:
-            is_empty_python_exceptions = [
-                "harmonic_mean requires at least one data point",
-            ]
-            if str(exception) in is_empty_python_exceptions:
-                return RTResult().failure(RTStatisticsError(
-                    data.pos_start, data.pos_end,
-                    "first argument of built-in module function 'statistics_harmonic_mean' must not be empty.",
-                    exec_ctx
-                ))
-            else:
-                return RTResult().failure(RunTimeError(
-                    self.pos_start, self.pos_end,
-                    f"python statistics.harmonic_mean() crashed with this error: "
-                    f"{exception.__class__.__name__}: {exception}. PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: "
-                    f"https://jd-develop.github.io/nougaro/bugreport.html !",
-                    exec_ctx
-                ))
         except Exception as exception:
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f"python statistics.harmonic_mean() crashed with this error: "
-                f"{exception.__class__.__name__}: {exception}. PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: "
-                f"https://jd-develop.github.io/nougaro/bugreport.html !",
+                f"{exception.__class__.__name__}: {exception}.\n"
+                f"PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: https://jd-develop.github.io/nougaro/bugreport.html !",
                 exec_ctx
             ))
 
@@ -297,11 +296,11 @@ class Statistics(BaseBuiltInFunction):
     execute_statistics_harmonic_mean.should_respect_args_number = True
 
     def execute_statistics_median(self, exec_ctx: Context):
-        """Like python statistics.median()"""
+        """Calculates the median of a statistical series"""
         # Params:
         # * data
-        data = exec_ctx.symbol_table.get('data')
-        if not isinstance(data, List):
+        data = exec_ctx.symbol_table.get('data')  # we get the data
+        if not isinstance(data, List):  # data must be a list
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_median' must be a list of numbers.",
@@ -310,7 +309,7 @@ class Statistics(BaseBuiltInFunction):
 
         data_ = []
         for e in data.elements:
-            if not isinstance(e, Number):
+            if not isinstance(e, Number):  # data must contain only numbers
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_median' must be a list of numbers, not "
@@ -318,19 +317,19 @@ class Statistics(BaseBuiltInFunction):
                 ))
             data_.append(e.value)
 
-        try:
+        if len(data_) == 0:  # data must not be empty
+            return RTResult().failure(RTStatisticsError(
+                data.pos_start, data.pos_end,
+                "first argument of built-in module function 'statistics_median' must not be empty.",
+                exec_ctx
+            ))
+
+        try:  # we try to calculate the median
             median_ = statistics.median(data_)
         except statistics.StatisticsError as exception:
-            if str(exception) == "no median for empty data":
-                return RTResult().failure(RTStatisticsError(
-                    data.pos_start, data.pos_end,
-                    "first argument of built-in module function 'statistics_median' must not be empty.",
-                    exec_ctx
-                ))
-            else:
-                return RTResult().failure(RTStatisticsError(
-                    self.pos_start, self.pos_end, str(exception) + '.', exec_ctx
-                ))
+            return RTResult().failure(RTStatisticsError(
+                self.pos_start, self.pos_end, str(exception) + '.', exec_ctx
+            ))
 
         return RTResult().success(Number(median_))
 
@@ -377,7 +376,7 @@ class Statistics(BaseBuiltInFunction):
     # position is that fewer options make for easier choices and that
     # external packages can be used for anything more advanced.
 
-    # REMEMBER THAT THIS IS THE DISCLAIMER BEFORE THE DECLARATION OF PYTHON statistics.quantiles FUNCTION :)
+    # THAT WAS THE DISCLAIMER BEFORE THE DECLARATION OF PYTHON statistics.quantiles FUNCTION :)
 
     def execute_statistics_quantiles(self, exec_ctx: Context):
         """Like python statistics.quantiles()
@@ -406,44 +405,44 @@ class Statistics(BaseBuiltInFunction):
 
         # By default n=4 and method='exclusive'
 
-        data = exec_ctx.symbol_table.get('data')
-        if not isinstance(data, List):
+        data = exec_ctx.symbol_table.get('data')  # we get the data
+        if not isinstance(data, List):  # the data must be a list
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_quantiles' must be a list of numbers.",
                 exec_ctx
             ))
 
-        n = exec_ctx.symbol_table.get('n')
-        if n is None:
+        n = exec_ctx.symbol_table.get('n')  # we get 'n' (the number of quantiles we want)
+        if n is None:  # if it's not defined, we want quartiles by default
             n = Number(4)
 
-        if not isinstance(n, Number):
+        if not isinstance(n, Number):  # 'n' must be a number
             return RTResult().failure(RTTypeError(
                 n.pos_start, n.pos_end,
                 "second argument of built-in module function 'statistics_quantiles' must be a number.",
                 exec_ctx
             ))
 
-        if n.value < 1:
+        if n.value < 1:  # 'n' must be at least 1
             return RTResult().failure(RTStatisticsError(
                 n.pos_start, n.pos_end,
                 "second argument of built-in module function 'statistics_quantiles' must be at least 1.",
                 exec_ctx
             ))
 
-        method = exec_ctx.symbol_table.get('method')
+        method = exec_ctx.symbol_table.get('method')  # we get the method we use
         if method is None:
-            method = String('exclusive')
+            method = String('exclusive')  # if the method is not defined we use the exclusive method
 
-        if not isinstance(method, String):
+        if not isinstance(method, String):  # the method must be a string
             return RTResult().failure(RTTypeError(
                 method.pos_start, method.pos_end,
                 "third argument of built-in module function 'statistics_quantiles' must be a str.",
                 exec_ctx
             ))
 
-        if method.value not in ['exclusive', 'inclusive']:
+        if method.value not in ['exclusive', 'inclusive']:  # the method should be "incluseve" or "exclusive"
             return RTResult().failure(RTStatisticsError(
                 method.pos_start, method.pos_end,
                 f"unknown method: {method.value}.",
@@ -452,7 +451,7 @@ class Statistics(BaseBuiltInFunction):
 
         data_ = []
         for e in data.elements:
-            if not isinstance(e, Number):
+            if not isinstance(e, Number):  # the data must contain only numbers
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_quantiles' must be a list of numbers, not "
@@ -460,19 +459,19 @@ class Statistics(BaseBuiltInFunction):
                 ))
             data_.append(e.value)
 
-        try:
+        if len(data_) in [0, 1]:
+            return RTResult().failure(RTStatisticsError(
+                data.pos_start, data.pos_end,
+                "first argument of built-in module function 'statistics_median' must have at least two elements.",
+                exec_ctx
+            ))
+
+        try:  # we try to calculate quantiles
             quantiles_ = statistics.quantiles(data_, n=n.value, method=method.value)
         except statistics.StatisticsError as exception:
-            if str(exception) == "must have at least two data points":
-                return RTResult().failure(RTStatisticsError(
-                    data.pos_start, data.pos_end,
-                    "first argument of built-in module function 'statistics_median' must have at least two elements.",
-                    exec_ctx
-                ))
-            else:
-                return RTResult().failure(RTStatisticsError(
-                    self.pos_start, self.pos_end, str(exception) + '.', exec_ctx
-                ))
+            return RTResult().failure(RTStatisticsError(
+                self.pos_start, self.pos_end, str(exception) + '.', exec_ctx
+            ))
 
         return RTResult().success(List(quantiles_))
 
@@ -481,11 +480,11 @@ class Statistics(BaseBuiltInFunction):
     execute_statistics_quantiles.should_respect_args_number = True
     
     def execute_statistics_scope(self, exec_ctx: Context):
-        """The scope of a list, i.e. the difference between the max and the min value."""
+        """Returns the scope of a list, i.e. the difference between the max and the min value."""
         # Params:
         # * data
-        data = exec_ctx.symbol_table.get('data')
-        if not isinstance(data, List):
+        data = exec_ctx.symbol_table.get('data')  # we get the data
+        if not isinstance(data, List):  # data must be a list
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_scope' must be a list of numbers.",
@@ -494,7 +493,7 @@ class Statistics(BaseBuiltInFunction):
 
         data_ = []
         for e in data.elements:
-            if not isinstance(e, Number):
+            if not isinstance(e, Number):  # data must contain only numbers
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_scope' must be a list of numbers, not "
@@ -502,13 +501,13 @@ class Statistics(BaseBuiltInFunction):
                 ))
             data_.append(e.value)
 
-        if len(data_) < 1:
+        if len(data_) < 1:  # data must not be empty
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_scope' must not be empty.", exec_ctx
             ))
 
-        scope = max(data_) - min(data_)
+        scope = max(data_) - min(data_)  # we calculate the scope
         return RTResult().success(Number(scope))
 
     execute_statistics_scope.arg_names = ['data']
@@ -519,8 +518,8 @@ class Statistics(BaseBuiltInFunction):
         """The mode of a list, i.e. the most common value."""
         # Params:
         # * data
-        data = exec_ctx.symbol_table.get('data')
-        if not isinstance(data, List):
+        data = exec_ctx.symbol_table.get('data')  # we get the data
+        if not isinstance(data, List):  # the data must be a list
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_mode' must be a list of numbers.",
@@ -529,7 +528,7 @@ class Statistics(BaseBuiltInFunction):
 
         data_ = []
         for e in data.elements:
-            if not isinstance(e, Number):
+            if not isinstance(e, Number):  # the data must contain only numbers
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_mode' must be a list of numbers, not "
@@ -537,13 +536,13 @@ class Statistics(BaseBuiltInFunction):
                 ))
             data_.append(e.value)
 
-        if len(data_) < 1:
+        if len(data_) < 1:  # the data must not be empty
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_mode' must not be empty.", exec_ctx
             ))
 
-        mode = statistics.mode(data_)
+        mode = statistics.mode(data_)  # we calculate the mode
         return RTResult().success(Number(mode))
 
     execute_statistics_mode.arg_names = ['data']
@@ -554,8 +553,8 @@ class Statistics(BaseBuiltInFunction):
         """The list of the modes of a list/str, i.e. the most common values."""
         # Params:
         # * data
-        data = exec_ctx.symbol_table.get('data')
-        if not (isinstance(data, List) or isinstance(data, String)):
+        data = exec_ctx.symbol_table.get('data')  # we get the data
+        if not (isinstance(data, List) or isinstance(data, String)):  # we check if the data is a list or a str
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_multimode' must be a list or a str.",
@@ -565,25 +564,25 @@ class Statistics(BaseBuiltInFunction):
         if isinstance(data, List):
             data_ = []
             for e in data.elements:
-                if not (isinstance(e, Number) or isinstance(e, String)):
+                if not (isinstance(e, Number) or isinstance(e, String)):  # data must contain only str and nums
                     return RTResult().failure(RTTypeError(
                         e.pos_start, e.pos_end,
                         f"first argument of built-in module function 'statistics_multimode' must be a list that does"
-                        f" not contains {e.type_}or a str.",
+                        f" not contains {e.type_}, or a str.",
                         exec_ctx
                     ))
                 data_.append(e.value)
         elif isinstance(data, String):
             data_ = data.value
         else:
-            # i.d.k. why I put a 'else', but it's funny to put an Easter Egg to people that read the code :)
+            # i.d.k. why I put an 'else', but it's funny to put an Easter Egg to people that read the code :)
             # -Jean Dubois
             raise NotImplementedError("How the f*** did this error happened? This is not possible!")
 
-        multimode = statistics.multimode(data_)
+        multimode = statistics.multimode(data_)  # we calculate the multimode
         multimode_ = []
         for e in multimode:
-            multimode_.append(py2noug(e))
+            multimode_.append(py2noug(e))  # it converts from python types to nougaro values
         return RTResult().success(List(multimode_))
 
     execute_statistics_multimode.arg_names = ['data']

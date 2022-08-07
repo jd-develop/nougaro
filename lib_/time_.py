@@ -17,6 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+""" Time module
+
+    Time module provides time-related function and constants, such as timezone or actual time.
+"""
+
 # IMPORTS
 # nougaro modules imports
 from src.values.functions.builtin_function import *
@@ -24,9 +29,12 @@ from src.values.functions.builtin_function import *
 # built-in python imports
 import time
 
+# CONSTANTS
+TIMEZONE = Number(time.timezone)
+
 
 class Time(BaseBuiltInFunction):
-    """Module Time"""
+    """Time Module"""
     def __init__(self, name):
         super().__init__(name)
 
@@ -34,29 +42,39 @@ class Time(BaseBuiltInFunction):
         return f'<built-in function time_{self.name}>'
 
     def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
+        # execute a function of the 'time' module
+        # create the result
         result = RTResult()
+
+        # generate the context and change the symbol table for the context
         exec_context = self.generate_new_context()
         exec_context.symbol_table.set("__exec_from__", String(exec_from))
         exec_context.symbol_table.set("__actual_context__", String(self.name))
 
+        # get the method name and the method
         method_name = f'execute_time_{self.name}'
         method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)
 
+        # populate arguments
         result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
                                                      optional_args=method.optional_args,
                                                      should_respect_args_number=method.should_respect_args_number))
+
+        # if there is any error
         if result.should_return():
             return result
 
         try:
+            # we try to execute the function
             return_value = result.register(method(exec_context))
-        except TypeError:
+        except TypeError:  # there is no `exec_context` parameter
             try:
                 return_value = result.register(method())
             except TypeError:  # it only executes when coding
                 return_value = result.register(method(exec_context))
-        if result.should_return():
+        if result.should_return():  # check for any error
             return result
+        # if all is OK, return what we should return
         return result.success(return_value)
 
     def no_visit_method(self, exec_context: Context):
@@ -81,15 +99,15 @@ class Time(BaseBuiltInFunction):
         """Like python time.sleep()"""
         # Params:
         # * seconds
-        seconds = exec_ctx.symbol_table.get('seconds')
-        if not isinstance(seconds, Number):
+        seconds = exec_ctx.symbol_table.get('seconds')  # we get the number of seconds we have to sleep
+        if not isinstance(seconds, Number):  # we check if it is a number
             return RTResult().failure(RunTimeError(
                 seconds.pos_start, seconds.pos_end,
                 f"first argument of built-in module function 'time_sleep' must be a number, not {seconds.type_}.",
                 exec_ctx
             ))
 
-        time.sleep(seconds.value)
+        time.sleep(seconds.value)  # we sleep
         return RTResult().success(NoneValue(False))
 
     execute_time_sleep.arg_names = ['seconds']
@@ -100,8 +118,8 @@ class Time(BaseBuiltInFunction):
         """Like python time.sleep() but the value is in milliseconds"""
         # Params:
         # * milliseconds
-        milliseconds = exec_ctx.symbol_table.get('milliseconds')
-        if not isinstance(milliseconds, Number):
+        milliseconds = exec_ctx.symbol_table.get('milliseconds')  # we get the number of milliseconds we have to sleep
+        if not isinstance(milliseconds, Number):  # we check if it is a number
             return RTResult().failure(RunTimeError(
                 milliseconds.pos_start, milliseconds.pos_end,
                 f"first argument of built-in module function 'time_sleep_milliseconds' must be an integer, not"
@@ -109,22 +127,20 @@ class Time(BaseBuiltInFunction):
                 exec_ctx
             ))
 
-        if milliseconds.is_float():
+        if milliseconds.is_float():  # we do not want a float
             return RTResult().failure(RunTimeError(
                 milliseconds.pos_start, milliseconds.pos_end,
                 "first argument of built-in module function 'time_sleep_milliseconds' must be an integer, not float.",
                 exec_ctx
             ))
 
-        time.sleep(milliseconds.value / 1000)
+        time.sleep(milliseconds.value / 1000)  # ms/1000 = sec
         return RTResult().success(NoneValue(False))
 
     execute_time_sleep_milliseconds.arg_names = ['milliseconds']
     execute_time_sleep_milliseconds.optional_args = []
     execute_time_sleep_milliseconds.should_respect_args_number = True
 
-
-TIMEZONE = Number(time.timezone)
 
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported
     # functions

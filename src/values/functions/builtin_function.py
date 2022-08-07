@@ -805,21 +805,24 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_list.should_respect_args_number = True
 
     def execute_len(self, exec_ctx: Context):
-        """Returns the length of a list"""
+        """Returns the length of a list or a str"""
         # Params :
         # * list
-        list_ = exec_ctx.symbol_table.get('list')
+        value_ = exec_ctx.symbol_table.get('value')
 
-        if not isinstance(list_, List):
+        if not isinstance(value_, List) and not isinstance(value_, String):
             return RTResult().failure(RTTypeError(
-                list_.pos_start, list_.pos_end,
-                "first argument of built-in function 'len' must be a list.",
+                value_.pos_start, value_.pos_end,
+                "first argument of built-in function 'len' must be a list or a str.",
                 exec_ctx
             ))
 
-        return RTResult().success(Number(len(list_.elements)))
+        if isinstance(value_, List):
+            return RTResult().success(Number(len(value_.elements)))
+        else:
+            return RTResult().success(Number(len(value_.value)))
 
-    execute_len.arg_names = ['list']
+    execute_len.arg_names = ['value']
     execute_len.optional_args = []
     execute_len.should_respect_args_number = True
 

@@ -51,7 +51,7 @@ class Function(BaseFunction):
         exec_context.symbol_table.set("__actual_context__", String(self.name))
 
         # populate argument and check for errors
-        result.register(self.check_and_populate_args(self.arg_names, args, exec_context))
+        result.register(self.check_and_populate_args(self.param_names, args, exec_context))
         if result.should_return():
             return result
 
@@ -74,7 +74,7 @@ class Function(BaseFunction):
 
     def copy(self):
         """Return a copy of self"""
-        copy = Function(self.name, self.body_node, self.arg_names, self.should_auto_return)
+        copy = Function(self.name, self.body_node, self.param_names, self.should_auto_return)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
         return copy

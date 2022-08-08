@@ -38,20 +38,37 @@ class Function(BaseFunction):
         return f'<function {self.name}>'
 
     def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
+        # execute a function of the 'math' module
+        # create the result
         result = RTResult()
+
+        # create an interpreter to run the code inside the function
         interpreter = interpreter_(run)
+
+        # generate the context and update symbol table
         exec_context = self.generate_new_context()
         exec_context.symbol_table.set("__exec_from__", String(exec_from))
         exec_context.symbol_table.set("__actual_context__", String(self.name))
 
+        # populate argument and check for errors
         result.register(self.check_and_populate_args(self.arg_names, args, exec_context))
         if result.should_return():
             return result
 
+        # run the interpreter to the body node and check for errors
         value = result.register(interpreter.visit(self.body_node, exec_context))
         if result.should_return() and result.function_return_value is None:
             return result
 
+        # I took a moment to understand the following line, so I put a long comment to explain it
+        # * should_auto_return is for the syntax `def foo()->bar`
+        # * function_return_value is the value after the `return` statement.
+        # So, here:
+        # * if this is a one-line function: return_value is the value inside the function
+        # * if this is a multi-line function with a `return` statement, we have `None or (value) or (NoneValue)`: Python
+        #   takes the value
+        # * if this is a multi-line function without a `return` statement, we have `None or None or (NoneValue)`: Python
+        #   takes the NoneValue
         return_value = (value if self.should_auto_return else None) or result.function_return_value or NoneValue(False)
         return result.success(return_value)
 

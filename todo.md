@@ -9,6 +9,7 @@
       * `functions`
         * `base_function.py`
         * `builtin_function.py`
+        * ✅ ~~`function.py`~~
       * ✅ ~~`specific_values`~~
       * `basevalues.py`
       * ✅ ~~`py2noug.py`~~

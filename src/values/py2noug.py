@@ -34,5 +34,7 @@ def py2noug(value: Any):
     elif isinstance(value, list) or isinstance(value, tuple):
         list_ = list(value)  # we want a list instead of a tuple
         return List(list_)
+    elif value is None:
+        return NoneValue()
     else:
         return Value()  # we just return a base value if there is no equivalent...

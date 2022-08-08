@@ -76,7 +76,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         try:
             result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
-                                                         optional_args=method.optional_args,
+                                                         optional_params=method.optional_args,
                                                          should_respect_args_number=method.should_respect_args_number))
         except Exception:  # it is self.no_visit_method :)
             method(exec_context)

@@ -6,10 +6,7 @@
   * ✅ ~~`lib_`~~
   * `src`
     * `values`
-      * `functions`
-        * `base_function.py`
-        * `builtin_function.py`
-        * ✅ ~~`function.py`~~
+      * ✅ ~~`functions`~~
       * ✅ ~~`specific_values`~~
       * `basevalues.py`
       * ✅ ~~`py2noug.py`~~

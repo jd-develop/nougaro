@@ -60,8 +60,8 @@ class Math(BaseBuiltInFunction):
         method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)
 
         # populate arguments
-        result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
-                                                     optional_params=method.optional_args,
+        result.register(self.check_and_populate_args(method.param_names, args, exec_context,
+                                                     optional_params=method.optional_params,
                                                      should_respect_args_number=method.should_respect_args_number))
 
         # if there is any error
@@ -122,8 +122,8 @@ class Math(BaseBuiltInFunction):
         sqrt_ = math_sqrt(value.value)  # we calculate the square root
         return RTResult().success(Number(sqrt_))
 
-    execute_math_sqrt.arg_names = ['value']
-    execute_math_sqrt.optional_args = []
+    execute_math_sqrt.param_names = ['value']
+    execute_math_sqrt.optional_params = []
     execute_math_sqrt.should_respect_args_number = True
 
     def execute_math_root(self, exec_context: Context):
@@ -163,8 +163,8 @@ class Math(BaseBuiltInFunction):
 
         return RTResult().success(value_to_return)
 
-    execute_math_root.arg_names = ['value']
-    execute_math_root.optional_args = ['n']
+    execute_math_root.param_names = ['value']
+    execute_math_root.optional_params = ['n']
     execute_math_root.should_respect_args_number = True
 
     def execute_math_degrees(self, exec_context: Context):
@@ -181,8 +181,8 @@ class Math(BaseBuiltInFunction):
         degrees = math_degrees(value.value)
         return RTResult().success(Number(degrees))
 
-    execute_math_degrees.arg_names = ['value']
-    execute_math_degrees.optional_args = []
+    execute_math_degrees.param_names = ['value']
+    execute_math_degrees.optional_params = []
     execute_math_degrees.should_respect_args_number = True
 
     def execute_math_radians(self, exec_context: Context):
@@ -199,8 +199,8 @@ class Math(BaseBuiltInFunction):
         radians = math_radians(value.value)
         return RTResult().success(Number(radians))
 
-    execute_math_radians.arg_names = ['value']
-    execute_math_radians.optional_args = []
+    execute_math_radians.param_names = ['value']
+    execute_math_radians.optional_params = []
     execute_math_radians.should_respect_args_number = True
 
     def execute_math_sin(self, exec_context: Context):
@@ -217,8 +217,8 @@ class Math(BaseBuiltInFunction):
         sin = math_sin(value.value)
         return RTResult().success(Number(sin))
 
-    execute_math_sin.arg_names = ['value']
-    execute_math_sin.optional_args = []
+    execute_math_sin.param_names = ['value']
+    execute_math_sin.optional_params = []
     execute_math_sin.should_respect_args_number = True
 
     def execute_math_cos(self, exec_context: Context):
@@ -235,8 +235,8 @@ class Math(BaseBuiltInFunction):
         cos = math_cos(value.value)
         return RTResult().success(Number(cos))
 
-    execute_math_cos.arg_names = ['value']
-    execute_math_cos.optional_args = []
+    execute_math_cos.param_names = ['value']
+    execute_math_cos.optional_params = []
     execute_math_cos.should_respect_args_number = True
 
     def execute_math_tan(self, exec_context: Context):
@@ -253,8 +253,8 @@ class Math(BaseBuiltInFunction):
         tan = math_tan(value.value)
         return RTResult().success(Number(tan))
 
-    execute_math_tan.arg_names = ['value']
-    execute_math_tan.optional_args = []
+    execute_math_tan.param_names = ['value']
+    execute_math_tan.optional_params = []
     execute_math_tan.should_respect_args_number = True
 
     def execute_math_asin(self, exec_context: Context):
@@ -278,8 +278,8 @@ class Math(BaseBuiltInFunction):
             ))
         return RTResult().success(Number(asin))
 
-    execute_math_asin.arg_names = ['value']
-    execute_math_asin.optional_args = []
+    execute_math_asin.param_names = ['value']
+    execute_math_asin.optional_params = []
     execute_math_asin.should_respect_args_number = True
 
     def execute_math_acos(self, exec_context: Context):
@@ -303,8 +303,8 @@ class Math(BaseBuiltInFunction):
             ))
         return RTResult().success(Number(acos))
 
-    execute_math_acos.arg_names = ['value']
-    execute_math_acos.optional_args = []
+    execute_math_acos.param_names = ['value']
+    execute_math_acos.optional_params = []
     execute_math_acos.should_respect_args_number = True
 
     def execute_math_atan(self, exec_context: Context):
@@ -321,8 +321,8 @@ class Math(BaseBuiltInFunction):
         atan = math_atan(value.value)
         return RTResult().success(Number(atan))
 
-    execute_math_atan.arg_names = ['value']
-    execute_math_atan.optional_args = []
+    execute_math_atan.param_names = ['value']
+    execute_math_atan.optional_params = []
     execute_math_atan.should_respect_args_number = True
 
     def execute_math_abs(self, exec_context: Context):
@@ -341,8 +341,8 @@ class Math(BaseBuiltInFunction):
 
         return RTResult().success(value_to_return)
 
-    execute_math_abs.arg_names = ['value']
-    execute_math_abs.optional_args = []
+    execute_math_abs.param_names = ['value']
+    execute_math_abs.optional_params = []
     execute_math_abs.should_respect_args_number = True
 
 

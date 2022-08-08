@@ -48,8 +48,8 @@ class CustomBuiltInFuncMethod(Protocol):
         Just a class for typing the methods `execute_{name}` in BuiltInFunction
     """
     # This class was made to bypass a pycharm bug.
-    arg_names: list[str]
-    optional_args: list[str]
+    param_names: list[str]
+    optional_params: list[str]
     should_respect_args_number: bool
 
     def __call__(self, exec_context: Context = None) -> Any:

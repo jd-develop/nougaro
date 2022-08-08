@@ -27,10 +27,10 @@ from src.runtime_result import RTResult
 
 
 class Function(BaseFunction):
-    def __init__(self, name, body_node, arg_names, should_auto_return):
+    def __init__(self, name, body_node, param_names, should_auto_return):
         super().__init__(name)
         self.body_node = body_node
-        self.arg_names = arg_names
+        self.param_names = param_names
         self.should_auto_return = should_auto_return
         self.type_ = "func"
 

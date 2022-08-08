@@ -75,8 +75,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)
 
         try:
-            result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
-                                                         optional_params=method.optional_args,
+            result.register(self.check_and_populate_args(method.param_names, args, exec_context,
+                                                         optional_params=method.optional_params,
                                                          should_respect_args_number=method.should_respect_args_number))
         except Exception:  # it is self.no_visit_method :)
             method(exec_context)
@@ -129,8 +129,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         result = RTResult()
         return result.success(NoneValue(False))
 
-    execute_void.arg_names = []
-    execute_void.optional_args = []
+    execute_void.param_names = []
+    execute_void.optional_params = []
     execute_void.should_respect_args_number = False
 
     def execute_print(self, exec_context: Context):
@@ -147,8 +147,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             print()
         return RTResult().success(NoneValue(False))
 
-    execute_print.arg_names = []
-    execute_print.optional_args = ["value"]
+    execute_print.param_names = []
+    execute_print.optional_params = ["value"]
     execute_print.should_respect_args_number = True
 
     def execute_print_ret(self, exec_context: Context):
@@ -167,8 +167,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             print()
             return RTResult().success(String(''))
 
-    execute_print_ret.arg_names = []
-    execute_print_ret.optional_args = ['value']
+    execute_print_ret.param_names = []
+    execute_print_ret.optional_params = ['value']
     execute_print_ret.should_respect_args_number = True
 
     def execute_input(self, exec_context: Context):
@@ -184,8 +184,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             text = input()
         return RTResult().success(String(text))
 
-    execute_input.arg_names = []
-    execute_input.optional_args = ['text_to_display']
+    execute_input.param_names = []
+    execute_input.optional_params = ['text_to_display']
     execute_input.should_respect_args_number = True
 
     def execute_input_int(self, exec_context: Context):
@@ -208,8 +208,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                 print(f"'{text}' must be an integer. Try again :")
         return RTResult().success(Number(number))
 
-    execute_input_int.arg_names = []
-    execute_input_int.optional_args = ['text_to_display']
+    execute_input_int.param_names = []
+    execute_input_int.optional_params = ['text_to_display']
     execute_input_int.should_respect_args_number = True
 
     def execute_input_num(self, exec_context: Context):
@@ -232,8 +232,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                 print(f"'{text}' must be an number. Try again :")
         return RTResult().success(Number(number))
 
-    execute_input_num.arg_names = []
-    execute_input_num.optional_args = ['text_to_display']
+    execute_input_num.param_names = []
+    execute_input_num.optional_params = ['text_to_display']
     execute_input_num.should_respect_args_number = True
 
     def execute_clear(self):
@@ -242,8 +242,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         os_system('cls' if (os_name.lower() == "nt" or os_name.lower().startswith("windows")) else 'clear')
         return RTResult().success(NoneValue(False))
 
-    execute_clear.arg_names = []
-    execute_clear.optional_args = []
+    execute_clear.param_names = []
+    execute_clear.optional_params = []
     execute_clear.should_respect_args_number = False
 
     def execute_is_int(self, exec_context: Context):
@@ -261,8 +261,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             is_int = False
         return RTResult().success(TRUE if is_int else FALSE)
 
-    execute_is_int.arg_names = ['value']
-    execute_is_int.optional_args = []
+    execute_is_int.param_names = ['value']
+    execute_is_int.optional_params = []
     execute_is_int.should_respect_args_number = True
 
     def execute_is_float(self, exec_context: Context):
@@ -280,8 +280,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             is_float = False
         return RTResult().success(TRUE if is_float else FALSE)
 
-    execute_is_float.arg_names = ['value']
-    execute_is_float.optional_args = []
+    execute_is_float.param_names = ['value']
+    execute_is_float.optional_params = []
     execute_is_float.should_respect_args_number = True
 
     def execute_is_num(self, exec_context: Context):
@@ -292,8 +292,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         is_number = isinstance(value, Number)
         return RTResult().success(TRUE if is_number else FALSE)
 
-    execute_is_num.arg_names = ['value']
-    execute_is_num.optional_args = []
+    execute_is_num.param_names = ['value']
+    execute_is_num.optional_params = []
     execute_is_num.should_respect_args_number = True
 
     def execute_is_list(self, exec_context: Context):
@@ -303,8 +303,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         is_list = isinstance(exec_context.symbol_table.get('value'), List)
         return RTResult().success(TRUE if is_list else FALSE)
 
-    execute_is_list.arg_names = ['value']
-    execute_is_list.optional_args = []
+    execute_is_list.param_names = ['value']
+    execute_is_list.optional_params = []
     execute_is_list.should_respect_args_number = True
 
     def execute_is_str(self, exec_context: Context):
@@ -314,8 +314,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         is_str = isinstance(exec_context.symbol_table.get('value'), String)
         return RTResult().success(TRUE if is_str else FALSE)
 
-    execute_is_str.arg_names = ['value']
-    execute_is_str.optional_args = []
+    execute_is_str.param_names = ['value']
+    execute_is_str.optional_params = []
     execute_is_str.should_respect_args_number = True
 
     def execute_is_func(self, exec_context: Context):
@@ -325,8 +325,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         is_func = isinstance(exec_context.symbol_table.get('value'), BaseFunction)
         return RTResult().success(TRUE if is_func else FALSE)
 
-    execute_is_func.arg_names = ['value']
-    execute_is_func.optional_args = []
+    execute_is_func.param_names = ['value']
+    execute_is_func.optional_params = []
     execute_is_func.should_respect_args_number = True
 
     def execute_is_none(self, exec_context: Context):
@@ -336,8 +336,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         is_none = isinstance(exec_context.symbol_table.get('value'), NoneValue)
         return RTResult().success(TRUE if is_none else FALSE)
 
-    execute_is_none.arg_names = ['value']
-    execute_is_none.optional_args = []
+    execute_is_none.param_names = ['value']
+    execute_is_none.optional_params = []
     execute_is_none.should_respect_args_number = True
 
     def execute_append(self, exec_context: Context):
@@ -358,8 +358,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         list_.elements.append(value)
         return RTResult().success(list_)
 
-    execute_append.arg_names = ['list', 'value']
-    execute_append.optional_args = []
+    execute_append.param_names = ['list', 'value']
+    execute_append.optional_params = []
     execute_append.should_respect_args_number = True
 
     def execute_pop(self, exec_context: Context):
@@ -394,8 +394,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
         return RTResult().success(list_)
 
-    execute_pop.arg_names = ['list', 'index']
-    execute_pop.optional_args = []
+    execute_pop.param_names = ['list', 'index']
+    execute_pop.optional_params = []
     execute_pop.should_respect_args_number = True
 
     def execute_insert(self, exec_context: Context):
@@ -427,8 +427,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         list_.elements.insert(index.value, value)
         return RTResult().success(list_)
 
-    execute_insert.arg_names = ['list', 'value']
-    execute_insert.optional_args = ['index']
+    execute_insert.param_names = ['list', 'value']
+    execute_insert.optional_params = ['index']
     execute_insert.should_respect_args_number = True
 
     def execute_extend(self, exec_context: Context):
@@ -483,8 +483,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         list1.elements.extend(list2.elements)
         return RTResult().success(list1)
 
-    execute_extend.arg_names = ['list1', 'list2']
-    execute_extend.optional_args = ['delete_duplicates']
+    execute_extend.param_names = ['list1', 'list2']
+    execute_extend.optional_params = ['delete_duplicates']
     execute_extend.should_respect_args_number = True
 
     def execute_get(self, exec_context: Context):
@@ -521,8 +521,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_context
             ))
 
-    execute_get.arg_names = ['list', 'index']
-    execute_get.optional_args = []
+    execute_get.param_names = ['list', 'index']
+    execute_get.optional_params = []
     execute_get.should_respect_args_number = True
 
     def execute_replace(self, exec_context: Context):
@@ -564,8 +564,8 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         return RTResult().success(list_)
 
-    execute_replace.arg_names = ['list', 'index', 'value']
-    execute_replace.optional_args = []
+    execute_replace.param_names = ['list', 'index', 'value']
+    execute_replace.optional_params = []
     execute_replace.should_respect_args_number = True
 
     def execute_max(self, exec_context: Context):
@@ -620,8 +620,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         max_ = max(list_)
         return RTResult().success(Number(max_))
 
-    execute_max.arg_names = ['list']
-    execute_max.optional_args = ['ignore_not_num']
+    execute_max.param_names = ['list']
+    execute_max.optional_params = ['ignore_not_num']
     execute_max.should_respect_args_number = True
 
     def execute_min(self, exec_context: Context):
@@ -676,8 +676,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         max_ = min(list_)
         return RTResult().success(Number(max_))
 
-    execute_min.arg_names = ['list']
-    execute_min.optional_args = ['ignore_not_num']
+    execute_min.param_names = ['list']
+    execute_min.optional_params = ['ignore_not_num']
     execute_min.should_respect_args_number = True
 
     def execute_split(self, exec_context: Context):
@@ -712,8 +712,8 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         return RTResult().success(final_list)
 
-    execute_split.arg_names = ['str']
-    execute_split.optional_args = ['char']
+    execute_split.param_names = ['str']
+    execute_split.optional_params = ['char']
     execute_split.should_respect_args_number = True
 
     def execute_exit(self, exec_context: Context):
@@ -725,8 +725,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             sys.exit(code.value)
         sys.exit()
 
-    execute_exit.arg_names = []
-    execute_exit.optional_args = ['code']
+    execute_exit.param_names = []
+    execute_exit.optional_params = ['code']
     execute_exit.should_respect_args_number = True
 
     def execute_type(self, exec_context: Context):
@@ -736,8 +736,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         value_to_get_type = exec_context.symbol_table.get('value')
         return RTResult().success(String(value_to_get_type.type_))
 
-    execute_type.arg_names = ['value']
-    execute_type.optional_args = []
+    execute_type.param_names = ['value']
+    execute_type.optional_params = []
     execute_type.should_respect_args_number = True
 
     def execute_str(self, exec_context: Context):
@@ -752,8 +752,8 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         return result.success(str_value)
 
-    execute_str.arg_names = ['value']
-    execute_str.optional_args = []
+    execute_str.param_names = ['value']
+    execute_str.optional_params = []
     execute_str.should_respect_args_number = True
 
     def execute_int(self, exec_context: Context):
@@ -768,8 +768,8 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         return result.success(int_value)
 
-    execute_int.arg_names = ['value']
-    execute_int.optional_args = []
+    execute_int.param_names = ['value']
+    execute_int.optional_params = []
     execute_int.should_respect_args_number = True
 
     def execute_float(self, exec_context: Context):
@@ -784,8 +784,8 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         return result.success(float_value)
 
-    execute_float.arg_names = ['value']
-    execute_float.optional_args = []
+    execute_float.param_names = ['value']
+    execute_float.optional_params = []
     execute_float.should_respect_args_number = True
 
     def execute_list(self, exec_context: Context):
@@ -800,8 +800,8 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         return result.success(list_value)
 
-    execute_list.arg_names = ['value']
-    execute_list.optional_args = []
+    execute_list.param_names = ['value']
+    execute_list.optional_params = []
     execute_list.should_respect_args_number = True
 
     def execute_len(self, exec_ctx: Context):
@@ -822,8 +822,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         else:
             return RTResult().success(Number(len(value_.value)))
 
-    execute_len.arg_names = ['value']
-    execute_len.optional_args = []
+    execute_len.param_names = ['value']
+    execute_len.optional_params = []
     execute_len.should_respect_args_number = True
 
     def execute_rickroll(self):
@@ -833,8 +833,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         webbrowser.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", new=2)
         return RTResult().success(String("I think you've been rickrolled..."))
 
-    execute_rickroll.arg_names = []
-    execute_rickroll.optional_args = []
+    execute_rickroll.param_names = []
+    execute_rickroll.optional_params = []
     execute_rickroll.should_respect_args_number = False
 
     def execute_run(self, exec_ctx: Context, run):
@@ -876,8 +876,8 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         return RTResult().success(NoneValue(False))
 
-    execute_run.arg_names = ["file_name"]
-    execute_run.optional_args = []
+    execute_run.param_names = ["file_name"]
+    execute_run.optional_params = []
     execute_run.should_respect_args_number = True
 
     def execute_example(self, exec_ctx: Context, run):
@@ -919,8 +919,8 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         return RTResult().success(NoneValue(False))
 
-    execute_example.arg_names = ["example_name"]
-    execute_example.optional_args = []
+    execute_example.param_names = ["example_name"]
+    execute_example.optional_params = []
     execute_example.should_respect_args_number = True
 
     def execute_system_call(self, exec_ctx: Context):
@@ -944,8 +944,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_ctx
             ))
 
-    execute_system_call.arg_names = ["cmd"]
-    execute_system_call.optional_args = []
+    execute_system_call.param_names = ["cmd"]
+    execute_system_call.optional_params = []
     execute_system_call.should_respect_args_number = True
 
     def execute_lower(self, exec_ctx: Context):
@@ -961,8 +961,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
         return RTResult().success(String(value.value.lower()))
 
-    execute_lower.arg_names = ["value"]
-    execute_lower.optional_args = []
+    execute_lower.param_names = ["value"]
+    execute_lower.optional_params = []
     execute_lower.should_respect_args_number = True
 
     def execute_upper(self, exec_ctx: Context):
@@ -978,8 +978,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
         return RTResult().success(String(value.value.upper()))
 
-    execute_upper.arg_names = ["value"]
-    execute_upper.optional_args = []
+    execute_upper.param_names = ["value"]
+    execute_upper.optional_params = []
     execute_upper.should_respect_args_number = True
 
     def execute_nougaro(self, exec_ctx: Context):
@@ -1020,8 +1020,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_ctx
             ))
 
-    execute_nougaro.arg_names = []
-    execute_nougaro.optional_args = ["song"]
+    execute_nougaro.param_names = []
+    execute_nougaro.optional_params = ["song"]
     execute_nougaro.should_respect_args_number = True
 
     def execute___gpl__(self, exec_ctx: Context):
@@ -1074,8 +1074,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                       f"https://www.gnu.org/licenses/gpl-3.0.txt")
             return RTResult().success(NoneValue(False))
 
-    execute___gpl__.arg_names = []
-    execute___gpl__.optional_args = ["print_in_term"]
+    execute___gpl__.param_names = []
+    execute___gpl__.optional_params = ["print_in_term"]
     execute___gpl__.should_respect_args_number = True
 
     # ==================

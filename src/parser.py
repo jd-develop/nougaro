@@ -1055,10 +1055,10 @@ class Parser:
 
         result.register_advancement()
         self.advance()
-        arg_name_tokens = []
+        param_names_tokens = []
 
         if self.current_token.type == TT_IDENTIFIER:
-            arg_name_tokens.append(self.current_token)
+            param_names_tokens.append(self.current_token)
             result.register_advancement()
             self.advance()
 
@@ -1084,7 +1084,7 @@ class Parser:
                                                f"NB : use keyword as identifier is illegal.")
                         )
 
-                arg_name_tokens.append(self.current_token)
+                param_names_tokens.append(self.current_token)
                 result.register_advancement()
                 self.advance()
 
@@ -1117,7 +1117,7 @@ class Parser:
 
             return result.success(FuncDefNode(
                 var_name_token,
-                arg_name_tokens,
+                param_names_tokens,
                 body,
                 True
             ))
@@ -1150,7 +1150,7 @@ class Parser:
 
         return result.success(FuncDefNode(
             var_name_token,
-            arg_name_tokens,
+            param_names_tokens,
             body,
             False
         ))

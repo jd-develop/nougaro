@@ -558,8 +558,8 @@ class Interpreter:
         result = RTResult()
         func_name = node.var_name_token.value if node.var_name_token is not None else None
         body_node = node.body_node
-        arg_names = [arg_name.value for arg_name in node.arg_name_tokens]
-        func_value = Function(func_name, body_node, arg_names, node.should_auto_return).set_context(ctx).set_pos(
+        param_names = [param_name.value for param_name in node.param_names_tokens]
+        func_value = Function(func_name, body_node, param_names, node.should_auto_return).set_context(ctx).set_pos(
             node.pos_start, node.pos_end
         )
 

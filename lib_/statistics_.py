@@ -62,8 +62,8 @@ class Statistics(BaseBuiltInFunction):
         method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)
 
         # populate arguments
-        result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
-                                                     optional_params=method.optional_args,
+        result.register(self.check_and_populate_args(method.param_names, args, exec_context,
+                                                     optional_params=method.optional_params,
                                                      should_respect_args_number=method.should_respect_args_number))
 
         # if there is any error
@@ -140,8 +140,8 @@ class Statistics(BaseBuiltInFunction):
 
         return RTResult().success(Number(mean_))
 
-    execute_statistics_mean.arg_names = ['data']
-    execute_statistics_mean.optional_args = []
+    execute_statistics_mean.param_names = ['data']
+    execute_statistics_mean.optional_params = []
     execute_statistics_mean.should_respect_args_number = True
 
     def execute_statistics_geometric_mean(self, exec_ctx: Context):
@@ -195,8 +195,8 @@ class Statistics(BaseBuiltInFunction):
 
         return RTResult().success(Number(geometric_mean_))
 
-    execute_statistics_geometric_mean.arg_names = ['data']
-    execute_statistics_geometric_mean.optional_args = []
+    execute_statistics_geometric_mean.param_names = ['data']
+    execute_statistics_geometric_mean.optional_params = []
     execute_statistics_geometric_mean.should_respect_args_number = True
 
     def execute_statistics_harmonic_mean(self, exec_ctx: Context):
@@ -291,8 +291,8 @@ class Statistics(BaseBuiltInFunction):
 
         return RTResult().success(Number(harmonic_mean_))
 
-    execute_statistics_harmonic_mean.arg_names = ['data']
-    execute_statistics_harmonic_mean.optional_args = ['weights']
+    execute_statistics_harmonic_mean.param_names = ['data']
+    execute_statistics_harmonic_mean.optional_params = ['weights']
     execute_statistics_harmonic_mean.should_respect_args_number = True
 
     def execute_statistics_median(self, exec_ctx: Context):
@@ -333,8 +333,8 @@ class Statistics(BaseBuiltInFunction):
 
         return RTResult().success(Number(median_))
 
-    execute_statistics_median.arg_names = ['data']
-    execute_statistics_median.optional_args = []
+    execute_statistics_median.param_names = ['data']
+    execute_statistics_median.optional_params = []
     execute_statistics_median.should_respect_args_number = True
 
     # HERE THE DISCLAIMER BEFORE THE DECLARATION OF PYTHON statistics.quantiles FUNCTION:
@@ -442,7 +442,7 @@ class Statistics(BaseBuiltInFunction):
                 exec_ctx
             ))
 
-        if method.value not in ['exclusive', 'inclusive']:  # the method should be "incluseve" or "exclusive"
+        if method.value not in ['exclusive', 'inclusive']:  # the method should be "inclusive" or "exclusive"
             return RTResult().failure(RTStatisticsError(
                 method.pos_start, method.pos_end,
                 f"unknown method: {method.value}.",
@@ -475,8 +475,8 @@ class Statistics(BaseBuiltInFunction):
 
         return RTResult().success(List(quantiles_))
 
-    execute_statistics_quantiles.arg_names = ['data']
-    execute_statistics_quantiles.optional_args = []
+    execute_statistics_quantiles.param_names = ['data']
+    execute_statistics_quantiles.optional_params = []
     execute_statistics_quantiles.should_respect_args_number = True
     
     def execute_statistics_scope(self, exec_ctx: Context):
@@ -510,8 +510,8 @@ class Statistics(BaseBuiltInFunction):
         scope = max(data_) - min(data_)  # we calculate the scope
         return RTResult().success(Number(scope))
 
-    execute_statistics_scope.arg_names = ['data']
-    execute_statistics_scope.optional_args = []
+    execute_statistics_scope.param_names = ['data']
+    execute_statistics_scope.optional_params = []
     execute_statistics_scope.should_respect_args_number = True
 
     def execute_statistics_mode(self, exec_ctx: Context):
@@ -545,8 +545,8 @@ class Statistics(BaseBuiltInFunction):
         mode = statistics.mode(data_)  # we calculate the mode
         return RTResult().success(Number(mode))
 
-    execute_statistics_mode.arg_names = ['data']
-    execute_statistics_mode.optional_args = []
+    execute_statistics_mode.param_names = ['data']
+    execute_statistics_mode.optional_params = []
     execute_statistics_mode.should_respect_args_number = True
 
     def execute_statistics_multimode(self, exec_ctx: Context):
@@ -585,8 +585,8 @@ class Statistics(BaseBuiltInFunction):
             multimode_.append(py2noug(e))  # it converts from python types to nougaro values
         return RTResult().success(List(multimode_))
 
-    execute_statistics_multimode.arg_names = ['data']
-    execute_statistics_multimode.optional_args = []
+    execute_statistics_multimode.param_names = ['data']
+    execute_statistics_multimode.optional_params = []
     execute_statistics_multimode.should_respect_args_number = True
 
 

@@ -56,8 +56,8 @@ class Time(BaseBuiltInFunction):
         method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)
 
         # populate arguments
-        result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
-                                                     optional_params=method.optional_args,
+        result.register(self.check_and_populate_args(method.param_names, args, exec_context,
+                                                     optional_params=method.optional_params,
                                                      should_respect_args_number=method.should_respect_args_number))
 
         # if there is any error
@@ -110,8 +110,8 @@ class Time(BaseBuiltInFunction):
         time.sleep(seconds.value)  # we sleep
         return RTResult().success(NoneValue(False))
 
-    execute_time_sleep.arg_names = ['seconds']
-    execute_time_sleep.optional_args = []
+    execute_time_sleep.param_names = ['seconds']
+    execute_time_sleep.optional_params = []
     execute_time_sleep.should_respect_args_number = True
 
     def execute_time_sleep_milliseconds(self, exec_ctx: Context):
@@ -137,8 +137,8 @@ class Time(BaseBuiltInFunction):
         time.sleep(milliseconds.value / 1000)  # ms/1000 = sec
         return RTResult().success(NoneValue(False))
 
-    execute_time_sleep_milliseconds.arg_names = ['milliseconds']
-    execute_time_sleep_milliseconds.optional_args = []
+    execute_time_sleep_milliseconds.param_names = ['milliseconds']
+    execute_time_sleep_milliseconds.optional_params = []
     execute_time_sleep_milliseconds.should_respect_args_number = True
 
 

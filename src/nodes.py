@@ -233,23 +233,23 @@ class ContinueNode:
 
 # FUNCTION NODES
 class FuncDefNode:
-    def __init__(self, var_name_token: Token, arg_name_tokens: list[Token], body_node, should_auto_return):
+    def __init__(self, var_name_token: Token, param_names_tokens: list[Token], body_node, should_auto_return):
         self.var_name_token = var_name_token
-        self.arg_name_tokens = arg_name_tokens
+        self.param_names_tokens = param_names_tokens
         self.body_node = body_node
         self.should_auto_return = should_auto_return
 
         if self.var_name_token is not None:
             self.pos_start = self.var_name_token.pos_start
-        elif len(self.arg_name_tokens) > 0:
-            self.pos_start = self.arg_name_tokens[0].pos_start
+        elif len(self.param_names_tokens) > 0:
+            self.pos_start = self.param_names_tokens[0].pos_start
         else:
             self.pos_start = self.body_node.pos_start
 
         self.pos_end = self.body_node.pos_end
 
     def __repr__(self):
-        return f'(funcdef:{self.var_name_token} args:{self.arg_name_tokens})'
+        return f'(funcdef:{self.var_name_token} args:{self.param_names_tokens})'
 
 
 class CallNode:

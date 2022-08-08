@@ -53,8 +53,8 @@ class Random(BaseBuiltInFunction):
         method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)
 
         # populate arguments
-        result.register(self.check_and_populate_args(method.arg_names, args, exec_context,
-                                                     optional_params=method.optional_args,
+        result.register(self.check_and_populate_args(method.param_names, args, exec_context,
+                                                     optional_params=method.optional_params,
                                                      should_respect_args_number=method.should_respect_args_number))
 
         # if there is any error
@@ -137,8 +137,8 @@ class Random(BaseBuiltInFunction):
         random_number = random.randint(a.value, b.value)
         return RTResult().success(Number(random_number))
 
-    execute_random_randint.arg_names = ['a', 'b']
-    execute_random_randint.optional_args = []
+    execute_random_randint.param_names = ['a', 'b']
+    execute_random_randint.optional_params = []
     execute_random_randint.should_respect_args_number = True
 
     def execute_random_random(self):
@@ -146,8 +146,8 @@ class Random(BaseBuiltInFunction):
         # No params.
         return RTResult().success(Number(random.random()))
 
-    execute_random_random.arg_names = []
-    execute_random_random.optional_args = []
+    execute_random_random.param_names = []
+    execute_random_random.optional_params = []
     execute_random_random.should_respect_args_number = True
 
     def execute_random_choice(self, exec_ctx: Context):
@@ -169,8 +169,8 @@ class Random(BaseBuiltInFunction):
             ))
         return RTResult().success(random.choice(list_.elements))  # then we return a random element of the list
 
-    execute_random_choice.arg_names = ['list_']
-    execute_random_choice.optional_args = []
+    execute_random_choice.param_names = ['list_']
+    execute_random_choice.optional_params = []
     execute_random_choice.should_respect_args_number = True
 
 

@@ -1117,7 +1117,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                       f"Sorry, your OS is not recognized. (platform.system() is '{system}')\n"
                       f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html\n"
                       f"In your report, please copy this error message.\n"
-                      f"Nevertheless, you can read the license online by following this link:\n"
+                      f"To read the license, you can use __gpl__(False) or read it online."
+                      f"To read the license online, follow this link:\n"
                       f"https://www.gnu.org/licenses/gpl-3.0.txt")
             return RTResult().success(NoneValue(False))
 

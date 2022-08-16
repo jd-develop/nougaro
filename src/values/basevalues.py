@@ -26,12 +26,15 @@ from src.errors import RunTimeError, RTArithmeticError, RTIndexError
 # no imports
 
 
+# IMPORTANT NOTE : THE DOC FOR ALL THE FUNCTIONS IN THIS FILE ARE IN value.py :)
+
+
 class String(Value):
     def __init__(self, value):
         super().__init__()
         self.value = value
         self.type_ = "str"
-        self.attributes = {
+        self.attributes = {  # as I said in values.py, THIS IS A MESSY DRAFT
             # "type": String("str")  # recursion error x)
         }
 
@@ -39,6 +42,7 @@ class String(Value):
         return f'"{self.value}"'
 
     def to_str(self):
+        """Returns self.value, as a python str"""
         return self.value
 
     def added_to(self, other):
@@ -57,7 +61,7 @@ class String(Value):
         return len(self.value) > 0
 
     def to_str_(self):
-        return self, None
+        return self.copy(), None
 
     def to_int_(self):
         value_to_convert = self.value
@@ -349,6 +353,7 @@ class List(Value):
         return f'[{", ".join([x.__str__() for x in self.elements])}]'
 
     def __getitem__(self, item):
+        """If there is foo[bar] in the python code and that foo is a Nougaro List, it works ^^ !!"""
         return self.elements.__getitem__(item)
 
     def added_to(self, other):
@@ -403,7 +408,7 @@ class List(Value):
         return String(str(self.elements)).set_context(self.context), None
 
     def to_list_(self):
-        return self, None
+        return self.copy(), None
 
     def is_eq(self, other):
         if isinstance(other, List):

@@ -5,12 +5,7 @@
 * comment these files :
   * ✅ ~~`lib_`~~
   * `src`
-    * `values`
-      * ✅ ~~`functions`~~
-      * ✅ ~~`specific_values`~~
-      * `basevalues.py`
-      * ✅ ~~`py2noug.py`~~
-      * ✅ ~~`value.py`~~
+    * ✅ ~~`values`~~
     * ✅ ~~`constants.py`~~
     * `context.py`
     * `errors.py`

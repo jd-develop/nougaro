@@ -1106,7 +1106,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
                 subprocess.call(('open', "LICENSE"))
             elif system == 'Windows':  # Windows
-                print("Make sure to select a *text editor/reader* in the list that will pop :)")
+                print("Make sure to select a *text editor/reader* (like notepad or n++) in the list that will pop :)")
                 os.startfile(os.path.realpath("LICENSE"))
             elif system == "Linux":  # Linux
                 import subprocess

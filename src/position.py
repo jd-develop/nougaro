@@ -24,6 +24,7 @@
 # POSITION
 # ##########
 class Position:
+    """Contain file name, index in file, line number and colon"""
     def __init__(self, index, line_number, colon, file_name, file_txt):
         self.index = index
         self.line_number = line_number
@@ -32,6 +33,7 @@ class Position:
         self.file_txt = file_txt
 
     def advance(self, current_char=None):
+        """Add 1 to the index, automatically make back lines."""
         self.index += 1
         self.colon += 1
 
@@ -45,4 +47,5 @@ class Position:
         return f"Position at index {self.index} line {self.line_number} colon {self.colon}, in file {self.file_name}."
 
     def copy(self):
+        """Return a copy of self"""
         return Position(self.index, self.line_number, self.colon, self.file_name, self.file_txt)

@@ -23,16 +23,19 @@
 # TOKENS
 # ##########
 class Token:
+    """Token class.
+    A token have a type (keyboard, int, str, statement,..) and sometimes a value ("foo", 123, break)"""
     def __init__(self, type_, value=None, pos_start=None, pos_end=None):
-        self.type = type_
-        self.value = value
+        self.type = type_  # type
+        self.value = value  # value
+        self.pos_start = self.pos_end = None
 
-        if pos_start is not None:
+        if pos_start is not None:  # if there is a pos start given
             self.pos_start = pos_start.copy()
-            self.pos_end = pos_start.copy()
+            self.pos_end = pos_start.copy()  # the pos end is pos_start + 1
             self.pos_end.advance()
         if pos_end is not None:
-            self.pos_end = pos_end.copy()
+            self.pos_end = pos_end.copy()  # if there is a pos_end, the pos_end is no longer pos_start+1
 
     def __repr__(self) -> str:
         if self.value:
@@ -42,7 +45,9 @@ class Token:
         return f'{self.type}'
 
     def matches(self, type_, value):
+        """Check if the token have the given type and the given value"""
         return self.type == type_ and self.value == value
 
     def copy(self):
+        """Returns a copy of self"""
         return Token(self.type, self.value, self.pos_start, self.pos_end)

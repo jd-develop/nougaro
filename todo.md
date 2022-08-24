@@ -8,7 +8,7 @@
     * ✅ ~~`values`~~
     * ✅ ~~`constants.py`~~
     * `context.py`
-    * `errors.py`
+    * ✅ ~~`errors.py`~~
     * `interpreter.py`
     * `lexer.py`
     * ✅ ~~`misc.py`~~

@@ -23,13 +23,14 @@
 # RUNTIME RESULT
 # ##########
 class RTResult:
+    """Result of a node interpretation"""
     def __init__(self):
-        self.value = None
-        self.function_return_value = None
-        self.error = None
+        self.value = None  # result value
+        self.function_return_value = None  # for FunctionNode : the value that the function returns
+        self.error = None  # any error that can have been encountered while interpreting
 
-        self.loop_should_continue = False
-        self.loop_should_break = False
+        self.loop_should_continue = False  # there is a 'continue' statement
+        self.loop_should_break = False  # there is a 'break' statement
 
         self.reset()
 
@@ -43,6 +44,8 @@ class RTResult:
         self.loop_should_break = False
 
     def register(self, result):
+        """Register another result in this result"""
+        # we copy the attrs of other result into the self attrs
         if result.error is not None:
             self.error = result.error
         else:
@@ -50,34 +53,35 @@ class RTResult:
         self.function_return_value = result.function_return_value
         self.loop_should_continue = result.loop_should_continue
         self.loop_should_break = result.loop_should_break
-        return result.value
+        return result.value  # we return the other result value
 
-    def success(self, value):
+    def success(self, value):  # success, we clean up our attrs, we write the new value, and we return self
         self.reset()
         self.value = value
         return self
 
-    def success_return(self, value):
+    def success_return(self, value):  # same as self.success for self.function_return_value
         self.reset()
         self.function_return_value = value
         return self
 
-    def success_continue(self):
+    def success_continue(self):  # same as self.success for self.loop_should_continue
         self.reset()
         self.loop_should_continue = True
         return self
 
-    def success_break(self):
+    def success_break(self):  # same as self.success for self.loop_should_break
         self.reset()
         self.loop_should_break = True
         return self
 
-    def failure(self, error):
+    def failure(self, error):  # same as self.success for self.error
         self.reset()
         self.error = error
         return self
 
-    def should_return(self):
+    def should_return(self):  # if we should stop the interpretation because of an error, or a statement
+        #                       (return, break, continue)
         return (
             self.error or
             self.function_return_value or

@@ -14,7 +14,7 @@
     * ✅ ~~`misc.py`~~
     * `nodes.py`
     * ✅ ~~`nougaro.py`~~
-    * `parse_result.py`
+    * ✅ ~~`parse_result.py`~~
     * `parser.py`
     * ✅ ~~`position.py`~~
     * ✅ ~~`runtime_result.py`~~

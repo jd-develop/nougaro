@@ -18,7 +18,7 @@
     * `parser.py`
     * `position.py`
     * `runtime_result.py`
-    * `set_symbol_table.py`
+    * ✅ ~~`set_symbol_table.py`~~
     * ✅ ~~`strings_with_arrows.py`~~
     * ✅ ~~`token_constants.py`~~
     * `tokens.py`

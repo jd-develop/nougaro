@@ -39,6 +39,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("True", TRUE)
     symbol_table.set("False", FALSE)
     symbol_table.set("None", NoneValue(True))
+
     # Built-in functions
     symbol_table.set("void", VOID)
     symbol_table.set("run", RUN)
@@ -85,6 +86,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("rickroll", RICKROLL)
     symbol_table.set("nougaro", NOUGARO)
 
+    # Technical
     symbol_table.set("exit", EXIT)
     symbol_table.set("system_call", SYSTEM_CALL)
     symbol_table.set('__os_name__', String(platform.system()))
@@ -94,12 +96,8 @@ def set_symbol_table(symbol_table: SymbolTable):
                      String(
                          str(sys.version_info[0]) + "." + str(sys.version_info[1]) + "." + str(sys.version_info[2])
                      ))
-    # platform.system() may be 'Linux', 'Windows', 'Darwin', 'Java', etc. according to Python doc for
-    # test_protected_vars(symbol_table)
-
+    # platform.system() may be 'Linux', 'Windows', 'Darwin', 'Java', etc. according to Python doc
     symbol_table.set('__base_value__', Value())
-
-    symbol_table.set('__symbol_table__', String(pprint.pformat(symbol_table.symbols)))
 
     # GPL
     symbol_table.set('__disclaimer_of_warranty__',
@@ -116,8 +114,12 @@ def set_symbol_table(symbol_table: SymbolTable):
                      ))
     symbol_table.set("__gpl__", GPL)
 
+    symbol_table.set('__symbol_table__', String(pprint.pformat(symbol_table.symbols)))
+    # test_protected_vars(symbol_table)
+
 
 def test_protected_vars(symbol_table: SymbolTable):
+    """Test if all the variables in the symbol table are protected in writing or not. Used while coding."""
     error_count = 0
     for symbol in symbol_table.symbols:
         if symbol not in PROTECTED_VARS:

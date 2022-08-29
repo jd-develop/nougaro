@@ -70,3 +70,5 @@ RICKROLL = BuiltInFunction('rickroll')
 NOUGARO = BuiltInFunction('nougaro')
 
 GPL = BuiltInFunction('__gpl__')
+
+IS_KEYWORD = BuiltInFunction('__is_keyword__')

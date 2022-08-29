@@ -84,6 +84,7 @@ PROTECTED_VARS = [  # finally, the list with all the names that can't be defined
     '__os_version__',
     '__base_value__',
     '__disclaimer_of_warranty__',
+    '__is_keyword__',
     'answerToTheLifeTheUniverseAndEverything',
     *KEYWORDS,  # all the keywords
     *BUILTIN_FUNCTIONS,  # all the builtin function names

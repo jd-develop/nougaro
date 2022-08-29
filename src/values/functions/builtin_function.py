@@ -23,7 +23,7 @@ from src.values.functions.base_function import BaseFunction
 from src.context import Context
 from src.values.basevalues import *
 from src.values.specific_values.number import *
-from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam
+from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam, is_keyword
 from src.errors import RTFileNotFoundError, RTTypeError
 # built-in python imports
 from os import system as os_system, name as os_name
@@ -1125,5 +1125,26 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute___gpl__.param_names = []
     execute___gpl__.optional_params = ["print_in_term"]
     execute___gpl__.should_respect_args_number = True
+
+    def execute___is_keyword__(self, exec_ctx: Context):
+        """Check if the word is a nougaro keyword."""
+        # Params :
+        # * word
+
+        # we get the word
+        word = exec_ctx.symbol_table.get("word")
+        if not isinstance(word, String):  # we check if it is a string
+            return RTResult().failure(RTTypeError(
+                word.pos_start, word.pos_end,
+                f"first argument of builtin function '__is_keyword__' must be a str.",
+                exec_ctx
+            ))
+        result = RTResult()
+        # then we return if this is a keyword or not.
+        return result.success(TRUE) if is_keyword(word.value) else result.success(FALSE)
+
+    execute___is_keyword__.param_names = ["word"]
+    execute___is_keyword__.optional_params = []
+    execute___is_keyword__.should_respect_args_number = True
 
     # ==================

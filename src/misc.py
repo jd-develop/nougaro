@@ -35,8 +35,14 @@ def print_in_red(txt): print(Fore.RED + txt + Fore.RESET)
 # ##########
 # TOOLS
 # ##########
-# returns True if the value is an int or a float
+# returns True if the value is a python int or float
 def is_num(value: Any): return isinstance(value, int) or isinstance(value, float)
+
+
+def is_keyword(word: str):
+    """Return true if the str is a valid nougaro keyword, such as 'import' or 'if'."""
+    from src.token_constants import KEYWORDS
+    return word in KEYWORDS
 
 
 # ##########

@@ -664,10 +664,10 @@ class Parser:
         cases, else_cases = all_cases
         return result.success(IfNode(cases, else_cases))
 
-    def if_expr_b(self):
+    def if_expr_b(self):  # elif
         return self.if_expr_cases("elif")
 
-    def if_expr_c(self):
+    def if_expr_c(self):  # else
         result = ParseResult()
         else_case = None
 
@@ -700,7 +700,7 @@ class Parser:
 
         return result.success(else_case)
 
-    def if_expr_b_or_c(self):
+    def if_expr_b_or_c(self):  # elif elif elif (...) else or just else
         result = ParseResult()
         cases, else_case = [], None
 
@@ -716,7 +716,7 @@ class Parser:
 
         return result.success((cases, else_case))
 
-    def if_expr_cases(self, case_keyword):
+    def if_expr_cases(self, case_keyword):  # how to explain this function ? IDK
         result = ParseResult()
         cases = []
         else_case = None

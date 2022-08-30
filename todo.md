@@ -1,4 +1,4 @@
-# To-do list :
+# Todo list :
 * add `var id, id2 = *, *2` (like in python)
 * add attributes
 

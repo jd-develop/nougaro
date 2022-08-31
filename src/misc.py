@@ -41,7 +41,7 @@ def is_num(value: Any): return isinstance(value, int) or isinstance(value, float
 
 def is_keyword(word: str):
     """Return true if the str is a valid nougaro keyword, such as 'import' or 'if'."""
-    from src.token_constants import KEYWORDS
+    from src.token_types import KEYWORDS
     return word in KEYWORDS
 
 

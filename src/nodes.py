@@ -35,7 +35,7 @@ class Node:
 
 # VALUE NODES
 class NumberNode(Node):
-    """Node for numbers (both int and float). However, the tok type can be TT_INT or TT_FLOAT"""
+    """Node for numbers (both int and float). The tok type can be TT_INT or TT_FLOAT"""
     def __init__(self, token: Token):
         self.token: Token = token
         self.pos_start = self.token.pos_start
@@ -158,9 +158,9 @@ class BinOpCompNode(Node):
 
 class UnaryOpNode(Node):
     """Node for Unary operator (such as `not 1` or `~12`)
-        op_token is the operator token. In the examples below, it is respectively Token(TT_KEYWORD, 'not') and\
+        op_token is the operator token. In these examples, it is respectively Token(TT_KEYWORD, 'not') and\
                                                                                                 Token(TT_BITWISENOT)
-        node is the node after the operator. In the examples below, these are both NumberNode, the first with the number
+        node is the node after the operator. In these examples, these are both NumberNode, the first with the number
                                              tok Token(TT_INT, 1) and the second with Token(TT_INT, 12)
 
 
@@ -200,7 +200,7 @@ class IfNode(Node):
 
 class AssertNode(Node):
     """Node for the 'assert' structure, such as `assert False, "blah blah blah that is an error message"`
-    In the example below, assertion is a VarAccessNode (identifier: False), and errmsg is a StringNode.
+    In this example, assertion is a VarAccessNode (identifier: False), and errmsg is a StringNode.
     errmsg can be None, like in `assert False`.
     """
     def __init__(self, assertion: Node, pos_start, pos_end, errmsg: Node = None):
@@ -217,24 +217,48 @@ class AssertNode(Node):
 
 # LOOP NODES
 class ForNode(Node):
-    def __init__(self, var_name_token, start_value_node, end_value_node, step_value_node, body_node,
-                 should_return_none: bool):
+    """Node for 'for a = b to c (step d) then' structure.
+    In this example :
+        var_name_tok is Token(TT_IDENTIFIER, 'a')
+        start_value_node is a VarAccessNode (identifier: b)
+        end_value_node is a VarAccessNode (identifier: c)
+        step_value_node is None or a VarAccessNode (identifier: d)
+        body_node is the node after the 'then'
+        should_return_none is a bool
+    """
+    def __init__(
+            self,
+            var_name_token: Token,
+            start_value_node: Node,
+            end_value_node: Node,
+            step_value_node: Node,
+            body_node: Node,
+            should_return_none: bool
+    ):
         # by default step_value_node is None
         self.var_name_token: Token = var_name_token
-        self.start_value_node = start_value_node
-        self.end_value_node = end_value_node
-        self.step_value_node = step_value_node
-        self.body_node = body_node
-        self.should_return_none = should_return_none
+        self.start_value_node: Node = start_value_node
+        self.end_value_node: Node = end_value_node
+        self.step_value_node: Node = step_value_node
+        self.body_node: Node = body_node
+        self.should_return_none: bool = should_return_none
 
         self.pos_start = self.var_name_token.pos_start
         self.pos_end = self.body_node.pos_end
 
 
 class ForNodeList(Node):
-    def __init__(self, var_name_token, body_node, list_node: ListNode, should_return_none: bool):
+    """Node for 'for a in b then' structure, where b is a list/iterable.
+    In this example :
+        var_name_tok is Token(TT_IDENTIFIER, 'a')
+        body_node is the node after the 'then'
+        list_node is a VarAccessNode (identifier: b)
+        should_return_none is a bool
+    """
+    def __init__(self, var_name_token: Token, body_node: Node, list_node: Union[Node, ListNode],
+                 should_return_none: bool):
         # if list = [1, 2, 3]
-        # for var in list == for var = 1 to 3 (step 1)
+        # for var in list is same as for var = 1 to 3 (step 1)
 
         self.var_name_token: Token = var_name_token
         self.body_node = body_node
@@ -247,10 +271,16 @@ class ForNodeList(Node):
 
 
 class WhileNode(Node):
-    def __init__(self, condition_node, body_node, should_return_none: bool):
-        self.condition_node = condition_node
-        self.body_node = body_node
-        self.should_return_none = should_return_none
+    """Node for 'while' structure.
+    Example: while True then foo()
+    Here, condition_node is a VarAccessNode (identifier: True)
+          body_node is a CallNode (identifier: foo, no args)*
+    should_return_none is a bool
+    """
+    def __init__(self, condition_node: Node, body_node: Node, should_return_none: bool):
+        self.condition_node: Node = condition_node
+        self.body_node: Node = body_node
+        self.should_return_none: Node = should_return_none
 
         self.pos_start = self.condition_node.pos_start
         self.pos_end = self.body_node.pos_end
@@ -260,6 +290,12 @@ class WhileNode(Node):
 
 
 class DoWhileNode(Node):
+    """Node for 'do then loop while' structure.
+    Example: do foo() then loop while True
+    Here, body_node is a CallNode (identifier: foo, no args)
+          condition_node is a VarAccessNode (identifier: True)
+    should_return_none is a bool
+    """
     def __init__(self, body_node, condition_node, should_return_none: bool):
         self.body_node = body_node
         self.condition_node = condition_node
@@ -269,10 +305,11 @@ class DoWhileNode(Node):
         self.pos_end = self.body_node.pos_end
 
     def __repr__(self):
-        return f'(do:{self.body_node} then do while:{self.condition_node})'
+        return f'(do:{self.body_node} then loop while:{self.condition_node})'
 
 
 class BreakNode(Node):
+    """Node for `break` statement"""
     def __init__(self, pos_start, pos_end):
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -282,6 +319,7 @@ class BreakNode(Node):
 
 
 class ContinueNode(Node):
+    """Node for `continue` statement"""
     def __init__(self, pos_start, pos_end):
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -292,17 +330,27 @@ class ContinueNode(Node):
 
 # FUNCTION NODES
 class FuncDefNode(Node):
-    def __init__(self, var_name_token: Token, param_names_tokens: list[Token], body_node, should_auto_return):
-        self.var_name_token = var_name_token
-        self.param_names_tokens = param_names_tokens
-        self.body_node = body_node
-        self.should_auto_return = should_auto_return
+    """Node for function definition.
+    Example: `def a(bar) -> foo(bar)`
+        Here, var_name_token is Token(TT_IDENTIFIER, 'a')
+              param_names_tokens is [Token(TT_IDENTIFIER, 'bar')]
+              body_node is CallNode (identifier: foo, args: bar)
+    should_auto_return is bool (it happens in one-line functions)
+    If, in the function definition, the name is not defined (like in `def()->void()`), var_name_token is None
+    """
+    def __init__(self, var_name_token: Token, param_names_tokens: list[Token], body_node: Node,
+                 should_auto_return: bool):
+        self.var_name_token: Token = var_name_token
+        self.param_names_tokens: list[Token] = param_names_tokens
+        self.body_node: Node = body_node
+        self.should_auto_return: bool = should_auto_return
 
-        if self.var_name_token is not None:
+        if self.var_name_token is not None:  # a name is given: we take its pos_start as our pos_start
             self.pos_start = self.var_name_token.pos_start
-        elif len(self.param_names_tokens) > 0:
+        elif len(self.param_names_tokens) > 0:  # there is no name given, but there is parameters. We take the first's
+            #                                     pos_start as our pos_start.
             self.pos_start = self.param_names_tokens[0].pos_start
-        else:
+        else:  # there is no name nor parameters given, we take the body's pos_start as our pos_start.
             self.pos_start = self.body_node.pos_start
 
         self.pos_end = self.body_node.pos_end
@@ -312,15 +360,20 @@ class FuncDefNode(Node):
 
 
 class CallNode(Node):
-    def __init__(self, node_to_call, arg_nodes: list):
-        self.node_to_call = node_to_call
-        self.arg_nodes = arg_nodes
+    """Node for call structure (like `foo(bar, 1)`)
+    Here: node_to_call is a VarAccessNode (identifier: foo)
+          arg_nodes is [VarAccessNode (identifier: bar), NumberNode (num: 1)]
+    If there is no arguments given, arg_nodes is empty.
+    """
+    def __init__(self, node_to_call: Node, arg_nodes: list):
+        self.node_to_call: Node = node_to_call
+        self.arg_nodes: list = arg_nodes
 
         self.pos_start = self.node_to_call.pos_start
 
-        if len(self.arg_nodes) > 0:
-            self.pos_end = self.arg_nodes[len(self.arg_nodes) - 1].pos_end
-        else:
+        if len(self.arg_nodes) > 0:  # if there are parameters, we take the last one's pos_end as our pos_end.
+            self.pos_end = self.arg_nodes[-1].pos_end
+        else:  # if there is no parameter, we take the node_to_call's pos_end as our pos_end.
             self.pos_end = self.node_to_call.pos_end
 
     def __repr__(self):
@@ -328,8 +381,11 @@ class CallNode(Node):
 
 
 class ReturnNode(Node):
-    def __init__(self, node_to_return, pos_start, pos_end):
-        self.node_to_return = node_to_return
+    """Node for `return` structure.
+    node_to_return is the node after the 'return' keyword. It may be None
+    """
+    def __init__(self, node_to_return: Node, pos_start, pos_end):
+        self.node_to_return: Node = node_to_return
 
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -340,8 +396,11 @@ class ReturnNode(Node):
 
 # MODULE NODES
 class ImportNode(Node):
-    def __init__(self, identifier, pos_start, pos_end):
-        self.identifier = identifier
+    """Node for `import` structure.
+    identifier is the name of the module to import. It is a token. Example: Token(TT_IDENTIFIER, 'math')
+    """
+    def __init__(self, identifier: Token, pos_start, pos_end):
+        self.identifier: Token = identifier
 
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -352,11 +411,27 @@ class ImportNode(Node):
 
 # FILE NODES
 class WriteNode(Node):
-    def __init__(self, expr_to_write, file_name_expr, to_token, line_number, pos_start, pos_end):
-        self.expr_to_write = expr_to_write
-        self.file_name_expr = file_name_expr
-        self.to_token = to_token
-        self.line_number = line_number
+    """Node for `write` structure.
+    Example: `write "some text" >> "path/to/file.ext" 6`
+        Here, expr_to_write is a StingNode (value: "some text")
+              file_name_expr is a StringNode (value: "path/to/file.ext")
+              to_token is Token(TT_TO)
+              line_number is a python int (value: 6)
+    Example: `write text !>> path`
+        Here, expr_to_write is a VarAccessNode (identifier: text)
+              file_name_expr is a VarAccessNode (identifier: path)
+              to_token is Token(TT_TO_AND_OVERWRITE)
+              line_number is a python str (value: "last")
+
+    Note that when interpreting, if to_token type is TT_TO_AND_OVERWRITE, it overwrites one line if a line number is
+        given, and all the file if it isn't the case.
+    """
+    def __init__(self, expr_to_write: Node, file_name_expr: Node, to_token: Token, line_number: Union[str, int],
+                 pos_start, pos_end):
+        self.expr_to_write: Node = expr_to_write
+        self.file_name_expr: Node = file_name_expr
+        self.to_token: Token = to_token
+        self.line_number: Union[str, int] = line_number
 
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -366,10 +441,29 @@ class WriteNode(Node):
 
 
 class ReadNode(Node):
-    def __init__(self, file_name_expr, identifier, line_number, pos_start, pos_end):
-        self.file_name_expr = file_name_expr
-        self.identifier = identifier
-        self.line_number = line_number
+    """Node for `read` structure.
+    Example: `read path`
+        Here, file_name_expr is a VarAccessNode (identifier: path)
+              identifier is None
+              line_number is Python str "all"
+    Example: `read "path/to/file" >> foo
+        Here, file_name_expr is a StringNode (value: "path/to/file")
+              identifier is Token(TT_IDENTIFIER, 'foo')
+              line_number is Python str "all"
+    Example: `read "path/to/file" 6`
+        Here, file_name_expr is a StringNode (value: "path/to/file")
+              identifier is None
+              line_number is Python int 6
+    Example: `read path >> foo 6`
+        Here, file_name_expr is a VarAccessNode (identifier: path)
+              identifier is Token(TT_IDENTIFIER, 'foo')
+              line_number is Python int 6
+
+    """
+    def __init__(self, file_name_expr: Node, identifier: Token, line_number: Union[int, str], pos_start, pos_end):
+        self.file_name_expr: Node = file_name_expr
+        self.identifier: Node = identifier
+        self.line_number: Union[int, str] = line_number
 
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -380,4 +474,5 @@ class ReadNode(Node):
 
 # SPECIAL NODES
 class NoNode(Node):
+    """If the file to execute is empty or filled by back lines, this node is the only node of the node list."""
     ...

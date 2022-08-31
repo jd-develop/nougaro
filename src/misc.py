@@ -41,11 +41,8 @@ def is_num(value: Any): return isinstance(value, int) or isinstance(value, float
 
 def does_tok_type_exist(tok_type: str):  # indev
     """Return true if the token type exists (e.g. 'TT_EQ' exists, but 'TT_FOO' does not)"""
-    import src.token_types
-    if not tok_type.startswith("TT_"):
-        return False
-    ...
-# is_tok_exist("TT_ABC")
+    from src.token_types import TT
+    return tok_type in TT
 
 
 def is_keyword(word: str):

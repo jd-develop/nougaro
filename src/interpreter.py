@@ -26,7 +26,7 @@ from src.values.functions.base_function import BaseFunction
 from src.constants import PROTECTED_VARS, MODULES
 from src.nodes import *
 from src.errors import NotDefinedError, RunTimeError, RTIndexError, RTTypeError, RTFileNotFoundError, RTAssertionError
-from src.token_types import *
+from src.token_types import TT
 from src.runtime_result import RTResult
 from src.context import Context
 from src.misc import CustomInterpreterVisitMethod
@@ -37,6 +37,7 @@ from inspect import signature
 # ##########
 # INTERPRETER
 # ##########
+# noinspection PyPep8Naming
 class Interpreter:
     def __init__(self, run):
         self.run = run
@@ -89,43 +90,43 @@ class Interpreter:
         if res.error is not None:
             return res
 
-        if node.op_token.type == TT_PLUS:
+        if node.op_token.type == TT["PLUS"]:
             result, error = left.added_to(right)
-        elif node.op_token.type == TT_MINUS:
+        elif node.op_token.type == TT["MINUS"]:
             result, error = left.subbed_by(right)
-        elif node.op_token.type == TT_MUL:
+        elif node.op_token.type == TT["MUL"]:
             result, error = left.multiplied_by(right)
-        elif node.op_token.type == TT_DIV:
+        elif node.op_token.type == TT["DIV"]:
             result, error = left.dived_by(right)
-        elif node.op_token.type == TT_PERC:
+        elif node.op_token.type == TT["PERC"]:
             result, error = left.modded_by(right)
-        elif node.op_token.type == TT_FLOORDIV:
+        elif node.op_token.type == TT["FLOORDIV"]:
             result, error = left.floor_dived_by(right)
-        elif node.op_token.type == TT_POW:
+        elif node.op_token.type == TT["POW"]:
             result, error = left.powered_by(right)
-        elif node.op_token.type == TT_EE:
+        elif node.op_token.type == TT["EE"]:
             result, error = left.get_comparison_eq(right)
-        elif node.op_token.type == TT_NE:
+        elif node.op_token.type == TT["NE"]:
             result, error = left.get_comparison_ne(right)
-        elif node.op_token.type == TT_LT:
+        elif node.op_token.type == TT["LT"]:
             result, error = left.get_comparison_lt(right)
-        elif node.op_token.type == TT_GT:
+        elif node.op_token.type == TT["GT"]:
             result, error = left.get_comparison_gt(right)
-        elif node.op_token.type == TT_LTE:
+        elif node.op_token.type == TT["LTE"]:
             result, error = left.get_comparison_lte(right)
-        elif node.op_token.type == TT_GTE:
+        elif node.op_token.type == TT["GTE"]:
             result, error = left.get_comparison_gte(right)
-        elif node.op_token.matches(TT_KEYWORD, 'and'):
+        elif node.op_token.matches(TT["KEYWORD"], 'and'):
             result, error = left.and_(right)
-        elif node.op_token.matches(TT_KEYWORD, 'or'):
+        elif node.op_token.matches(TT["KEYWORD"], 'or'):
             result, error = left.or_(right)
-        elif node.op_token.matches(TT_KEYWORD, 'xor'):
+        elif node.op_token.matches(TT["KEYWORD"], 'xor'):
             result, error = left.xor_(right)
-        elif node.op_token.type == TT_BITWISEAND:
+        elif node.op_token.type == TT["BITWISEAND"]:
             result, error = left.bitwise_and(right)
-        elif node.op_token.type == TT_BITWISEOR:
+        elif node.op_token.type == TT["BITWISEOR"]:
             result, error = left.bitwise_or(right)
-        elif node.op_token.type == TT_BITWISEXOR:
+        elif node.op_token.type == TT["BITWISEXOR"]:
             result, error = left.bitwise_xor(right)
         else:
             print(ctx)
@@ -166,19 +167,19 @@ class Interpreter:
                     right = visited_nodes_and_tokens_list[index + 2]
                 except IndexError:
                     break
-                if op_token.type == TT_EE:
+                if op_token.type == TT["EE"]:
                     test_result, error = element.get_comparison_eq(right)
-                elif op_token.type == TT_NE:
+                elif op_token.type == TT["NE"]:
                     test_result, error = element.get_comparison_ne(right)
-                elif op_token.type == TT_LT:
+                elif op_token.type == TT["LT"]:
                     test_result, error = element.get_comparison_lt(right)
-                elif op_token.type == TT_GT:
+                elif op_token.type == TT["GT"]:
                     test_result, error = element.get_comparison_gt(right)
-                elif op_token.type == TT_LTE:
+                elif op_token.type == TT["LTE"]:
                     test_result, error = element.get_comparison_lte(right)
-                elif op_token.type == TT_GTE:
+                elif op_token.type == TT["GTE"]:
                     test_result, error = element.get_comparison_gte(right)
-                elif op_token.matches(TT_KEYWORD, 'in'):
+                elif op_token.matches(TT["KEYWORD"], 'in'):
                     test_result, error = element.is_in(right)
                 else:
                     print(ctx)
@@ -206,11 +207,11 @@ class Interpreter:
 
         error = None
 
-        if node.op_token.type == TT_MINUS:
+        if node.op_token.type == TT["MINUS"]:
             number, error = number.multiplied_by(Number(-1))
-        elif node.op_token.matches(TT_KEYWORD, 'not'):
+        elif node.op_token.matches(TT["KEYWORD"], 'not'):
             number, error = number.not_()
-        elif node.op_token.type == TT_BITWISENOT:
+        elif node.op_token.type == TT["BITWISENOT"]:
             number, error = number.bitwise_not()
 
         if error is not None:
@@ -274,47 +275,47 @@ class Interpreter:
             return result
 
         if var_name not in PROTECTED_VARS:
-            if equal == TT_EQ:
+            if equal == TT["EQ"]:
                 ctx.symbol_table.set(var_name, value)
                 final_value = value
             else:
                 if var_name in ctx.symbol_table.symbols:
                     var_actual_value: Value = ctx.symbol_table.get(var_name)
-                    if equal == TT_PLUSEQ:
+                    if equal == TT["PLUSEQ"]:
                         final_value, error = var_actual_value.added_to(value)
-                    elif equal == TT_MINUSEQ:
+                    elif equal == TT["MINUSEQ"]:
                         final_value, error = var_actual_value.subbed_by(value)
-                    elif equal == TT_MULTEQ:
+                    elif equal == TT["MULTEQ"]:
                         final_value, error = var_actual_value.multiplied_by(value)
-                    elif equal == TT_DIVEQ:
+                    elif equal == TT["DIVEQ"]:
                         final_value, error = var_actual_value.dived_by(value)
-                    elif equal == TT_POWEQ:
+                    elif equal == TT["POWEQ"]:
                         final_value, error = var_actual_value.powered_by(value)
-                    elif equal == TT_FLOORDIVEQ:
+                    elif equal == TT["FLOORDIVEQ"]:
                         final_value, error = var_actual_value.floor_dived_by(value)
-                    elif equal == TT_PERCEQ:
+                    elif equal == TT["PERCEQ"]:
                         final_value, error = var_actual_value.modded_by(value)
-                    elif equal == TT_OREQ:
+                    elif equal == TT["OREQ"]:
                         final_value, error = var_actual_value.or_(value)
-                    elif equal == TT_XOREQ:
+                    elif equal == TT["XOREQ"]:
                         final_value, error = var_actual_value.xor_(value)
-                    elif equal == TT_ANDEQ:
+                    elif equal == TT["ANDEQ"]:
                         final_value, error = var_actual_value.and_(value)
-                    elif equal == TT_BITWISEANDEQ:
+                    elif equal == TT["BITWISEANDEQ"]:
                         final_value, error = var_actual_value.bitwise_and(value)
-                    elif equal == TT_BITWISEOREQ:
+                    elif equal == TT["BITWISEOREQ"]:
                         final_value, error = var_actual_value.bitwise_or(value)
-                    elif equal == TT_BITWISEXOREQ:
+                    elif equal == TT["BITWISEXOREQ"]:
                         final_value, error = var_actual_value.bitwise_xor(value)
-                    elif equal == TT_EEEQ:
+                    elif equal == TT["EEEQ"]:
                         final_value, error = var_actual_value.get_comparison_eq(value)
-                    elif equal == TT_LTEQ:
+                    elif equal == TT["LTEQ"]:
                         final_value, error = var_actual_value.get_comparison_lt(value)
-                    elif equal == TT_GTEQ:
+                    elif equal == TT["GTEQ"]:
                         final_value, error = var_actual_value.get_comparison_gt(value)
-                    elif equal == TT_LTEEQ:
+                    elif equal == TT["LTEEQ"]:
                         final_value, error = var_actual_value.get_comparison_lte(value)
-                    elif equal == TT_GTEEQ:
+                    elif equal == TT["GTEEQ"]:
                         final_value, error = var_actual_value.get_comparison_gte(value)
                     else:  # this is not supposed to happen
                         print(f"Note: it was a problem in src.interpreter.Interpreter.visit_VarAssignNode. Please"
@@ -386,7 +387,7 @@ class Interpreter:
             return result.success(NoneValue(False) if should_return_none else else_value)
 
         return result.success(NoneValue(False))
-    
+
     def visit_AssertNode(self, node: AssertNode, ctx: Context):
         result = RTResult()
         assertion = result.register(self.visit(node.assertion, ctx))
@@ -718,9 +719,9 @@ class Interpreter:
         file_name_expr = node.file_name_expr
         to_token = node.to_token
         line_number = node.line_number
-        if to_token.type == TT_TO:
+        if to_token.type == TT["TO"]:
             open_mode = 'a+'
-        elif to_token.type == TT_TO_AND_OVERWRITE:
+        elif to_token.type == TT["TO_AND_OVERWRITE"]:
             open_mode = 'w+'
         else:
             open_mode = 'a+'

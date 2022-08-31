@@ -52,7 +52,7 @@ class Lexer:
             elif self.current_char == '#':  # for comments
                 self.skip_comment()
             elif self.current_char in ';\n':  # semicolons and new lines
-                tokens.append(Token(TT_NEWLINE, pos_start=self.pos))
+                tokens.append(Token(TT["NEWLINE"], pos_start=self.pos))
                 self.advance()
 
             elif self.current_char in DIGITS:
@@ -96,19 +96,19 @@ class Lexer:
                     return [], error
                 tokens.append(token)
             elif self.current_char == "~":
-                tokens.append(Token(TT_BITWISENOT, pos_start=self.pos))
+                tokens.append(Token(TT["BITWISENOT"], pos_start=self.pos))
                 self.advance()
             elif self.current_char == '(':
-                tokens.append(Token(TT_LPAREN, pos_start=self.pos))
+                tokens.append(Token(TT["LPAREN"], pos_start=self.pos))
                 self.advance()
             elif self.current_char == ')':
-                tokens.append(Token(TT_RPAREN, pos_start=self.pos))
+                tokens.append(Token(TT["RPAREN"], pos_start=self.pos))
                 self.advance()
             elif self.current_char == '[':
-                tokens.append(Token(TT_LSQUARE, pos_start=self.pos))
+                tokens.append(Token(TT["LSQUARE"], pos_start=self.pos))
                 self.advance()
             elif self.current_char == ']':
-                tokens.append(Token(TT_RSQUARE, pos_start=self.pos))
+                tokens.append(Token(TT["RSQUARE"], pos_start=self.pos))
                 self.advance()
 
             elif self.current_char == '!':
@@ -129,11 +129,11 @@ class Lexer:
                     return [], error
                 tokens.append(token)
             elif self.current_char == '?':
-                tokens.append(Token(TT_INTERROGATIVE_PNT, pos_start=self.pos))
+                tokens.append(Token(TT["INTERROGATIVE_PNT"], pos_start=self.pos))
                 self.advance()
 
             elif self.current_char == ',':
-                tokens.append(Token(TT_COMMA, pos_start=self.pos))
+                tokens.append(Token(TT["COMMA"], pos_start=self.pos))
                 self.advance()
             else:
                 # illegal char
@@ -141,106 +141,106 @@ class Lexer:
                 char = self.current_char
                 return [], IllegalCharError(pos_start, self.pos.advance(), f"'{char}' is an illegal character.")
 
-        tokens.append(Token(TT_EOF, pos_start=self.pos))
+        tokens.append(Token(TT["EOF"], pos_start=self.pos))
         return tokens, None
 
     def make_plus(self):
-        token_type = TT_PLUS
+        token_type = TT["PLUS"]
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '=':
             self.advance()
-            token_type = TT_PLUSEQ
+            token_type = TT["PLUSEQ"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_minus(self):
-        token_type = TT_MINUS
+        token_type = TT["MINUS"]
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '=':
             self.advance()
-            token_type = TT_MINUSEQ
+            token_type = TT["MINUSEQ"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_mul(self):
-        token_type = TT_MUL
+        token_type = TT["MUL"]
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '=':
             self.advance()
-            token_type = TT_MULTEQ
+            token_type = TT["MULTEQ"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_div(self):
-        token_type = TT_DIV
+        token_type = TT["DIV"]
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '/':
             self.advance()
-            token_type = TT_FLOORDIV
+            token_type = TT["FLOORDIV"]
             if self.current_char == '=':
                 self.advance()
-                token_type = TT_FLOORDIVEQ
+                token_type = TT["FLOORDIVEQ"]
         elif self.current_char == '=':
             self.advance()
-            token_type = TT_DIVEQ
+            token_type = TT["DIVEQ"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_pow(self):
-        token_type = TT_POW
+        token_type = TT["POW"]
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '=':  # ^=
             self.advance()
-            token_type = TT_POWEQ
+            token_type = TT["POWEQ"]
         elif self.current_char == '^':  # ^^
             self.advance()
-            token_type = TT_BITWISEXOR
+            token_type = TT["BITWISEXOR"]
             if self.current_char == '=':  # ^^=
                 self.advance()
-                token_type = TT_BITWISEXOREQ
+                token_type = TT["BITWISEXOREQ"]
             elif self.current_char == '^':  # ^^^
                 self.advance()
                 if self.current_char != "=":  # ^^^=
                     return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '^^^'.")
-                token_type = TT_XOREQ
+                token_type = TT["XOREQ"]
                 self.advance()
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 
     def make_perc(self):
-        token_type = TT_PERC
+        token_type = TT["PERC"]
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '=':
             self.advance()
-            token_type = TT_PERCEQ
+            token_type = TT["PERCEQ"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_or(self):
         pos_start = self.pos.copy()
         self.advance()
-        token_type = TT_BITWISEOR
+        token_type = TT["BITWISEOR"]
 
         if self.current_char == '=':
-            token_type = TT_BITWISEOREQ
+            token_type = TT["BITWISEOREQ"]
             self.advance()
         elif self.current_char == '|':
             self.advance()
             if self.current_char != "=":
                 return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '||'.")
-            token_type = TT_OREQ
+            token_type = TT["OREQ"]
             self.advance()
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
@@ -248,16 +248,16 @@ class Lexer:
     def make_and(self):
         pos_start = self.pos.copy()
         self.advance()
-        token_type = TT_BITWISEAND
+        token_type = TT["BITWISEAND"]
 
         if self.current_char == '=':
-            token_type = TT_BITWISEANDEQ
+            token_type = TT["BITWISEANDEQ"]
             self.advance()
         elif self.current_char == '&':
             self.advance()
             if self.current_char != "=":
                 return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '&&'.")
-            token_type = TT_ANDEQ
+            token_type = TT["ANDEQ"]
             self.advance()
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
@@ -294,7 +294,7 @@ class Lexer:
             self.advance()
 
         self.advance()
-        return Token(TT_STRING, string_, pos_start, self.pos), None
+        return Token(TT["STRING"], string_, pos_start, self.pos), None
 
     def make_identifier(self):
         id_str = ''
@@ -304,7 +304,7 @@ class Lexer:
             id_str += self.current_char
             self.advance()
 
-        token_type = TT_KEYWORD if id_str in KEYWORDS else TT_IDENTIFIER
+        token_type = TT["KEYWORD"] if id_str in KEYWORDS else TT["IDENTIFIER"]
         return Token(token_type, id_str, pos_start, self.pos)
 
     def make_number(self):
@@ -323,9 +323,9 @@ class Lexer:
             self.advance()
 
         if dot_count == 0:
-            return Token(TT_INT, int(num_str), pos_start, self.pos.copy()), None
+            return Token(TT["INT"], int(num_str), pos_start, self.pos.copy()), None
         else:
-            return Token(TT_FLOAT, float(num_str), pos_start, self.pos.copy()), None
+            return Token(TT["FLOAT"], float(num_str), pos_start, self.pos.copy()), None
 
     def make_not_equals(self):
         pos_start = self.pos.copy()
@@ -333,47 +333,47 @@ class Lexer:
 
         if self.current_char == '=':
             self.advance()
-            return Token(TT_NE, pos_start=pos_start, pos_end=self.pos), None
+            return Token(TT["NE"], pos_start=pos_start, pos_end=self.pos), None
         elif self.current_char == '>':
             self.advance()
             if self.current_char != '>':
                 return None, InvalidSyntaxError(pos_start, self.pos, "expected '!>>', but got '!>'.")
             self.advance()
-            return Token(TT_TO_AND_OVERWRITE, pos_start=pos_start, pos_end=self.pos), None
+            return Token(TT["TO_AND_OVERWRITE"], pos_start=pos_start, pos_end=self.pos), None
 
         self.advance()
         return None, InvalidSyntaxError(pos_start, self.pos, "expected '!=' or '!>>', but got '!'.")
 
     def make_equals(self):
-        token_type = TT_EQ
+        token_type = TT["EQ"]
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '=':
             self.advance()
-            token_type = TT_EE
+            token_type = TT["EE"]
             if self.current_char == '=':
                 self.advance()
-                token_type = TT_EEEQ
+                token_type = TT["EEEQ"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_less_than(self):
-        token_type = TT_LT
+        token_type = TT["LT"]
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '=':
             self.advance()
-            token_type = TT_LTE
+            token_type = TT["LTE"]
             if self.current_char == '=':
                 self.advance()
-                token_type = TT_LTEEQ
+                token_type = TT["LTEEQ"]
         elif self.current_char == '<':
             self.advance()
             if self.current_char == '=':
                 self.advance()
-                token_type = TT_LTEQ
+                token_type = TT["LTEQ"]
             else:
                 return None, InvalidSyntaxError(
                     pos_start,
@@ -384,37 +384,37 @@ class Lexer:
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 
     def make_greater_than(self):
-        token_type = TT_GT
+        token_type = TT["GT"]
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '=':
             self.advance()
-            token_type = TT_GTE
+            token_type = TT["GTE"]
             if self.current_char == '=':
                 self.advance()
-                token_type = TT_GTEEQ
+                token_type = TT["GTEEQ"]
         elif self.current_char == '>':
             self.advance()
             if self.current_char == '=':
                 self.advance()
-                token_type = TT_GTEQ
+                token_type = TT["GTEQ"]
             else:
-                token_type = TT_TO
+                token_type = TT["TO"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 
     def make_minus_or_arrow(self):
-        token_type = TT_MINUS
+        token_type = TT["MINUS"]
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '>':
             self.advance()
-            token_type = TT_ARROW
+            token_type = TT["ARROW"]
         elif self.current_char == '=':
             self.advance()
-            token_type = TT_MINUSEQ
+            token_type = TT["MINUSEQ"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 

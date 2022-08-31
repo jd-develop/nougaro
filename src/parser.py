@@ -43,7 +43,7 @@ class Parser:
 
     def parse(self):
         result = self.statements()
-        if result.error is not None and self.current_token.type != TT_EOF:
+        if result.error is not None and self.current_token.type != TT["EOF"]:
             return result.failure(
                 InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
                                    "expected '+', '-', '*', '/', '//', '%', 'and', 'or' or 'xor'.")
@@ -69,16 +69,16 @@ class Parser:
 
     def statements(self, stop: list[Union[tuple[str, Any], str]] = None) -> ParseResult:
         if stop is None:
-            stop = [TT_EOF]
+            stop = [TT["EOF"]]
         result = ParseResult()
         statements = []
         pos_start = self.current_token.pos_start.copy()
 
-        while self.current_token.type == TT_NEWLINE:
+        while self.current_token.type == TT["NEWLINE"]:
             result.register_advancement()
             self.advance()
 
-        if self.current_token.type == TT_EOF:
+        if self.current_token.type == TT["EOF"]:
             return result.success(NoNode())
 
         last_token_type = self.current_token.type
@@ -90,7 +90,7 @@ class Parser:
 
         while True:
             newline_count = 0
-            while self.current_token.type == TT_NEWLINE:
+            while self.current_token.type == TT["NEWLINE"]:
                 result.register_advancement()
                 self.advance()
                 newline_count += 1
@@ -107,7 +107,7 @@ class Parser:
                 break
             else:
                 if newline_count == 0:
-                    if last_token_type == TT_IDENTIFIER and self.current_token.type in EQUALS:
+                    if last_token_type == TT["IDENTIFIER"] and self.current_token.type in EQUALS:
                         return result.failure(
                             InvalidSyntaxError(
                                 self.current_token.pos_start, self.current_token.pos_end,
@@ -138,7 +138,7 @@ class Parser:
         result = ParseResult()
         pos_start = self.current_token.pos_start.copy()
 
-        if self.current_token.matches(TT_KEYWORD, 'return'):
+        if self.current_token.matches(TT["KEYWORD"], 'return'):
             result.register_advancement()
             self.advance()
 
@@ -147,23 +147,23 @@ class Parser:
                 self.reverse(result.to_reverse_count)
             return result.success(ReturnNode(expr, pos_start, self.current_token.pos_start.copy()))
 
-        if self.current_token.matches(TT_KEYWORD, 'continue'):
+        if self.current_token.matches(TT["KEYWORD"], 'continue'):
             result.register_advancement()
             self.advance()
 
             return result.success(ContinueNode(pos_start, self.current_token.pos_start.copy()))
 
-        if self.current_token.matches(TT_KEYWORD, 'break'):
+        if self.current_token.matches(TT["KEYWORD"], 'break'):
             result.register_advancement()
             self.advance()
 
             return result.success(BreakNode(pos_start, self.current_token.pos_start.copy()))
 
-        if self.current_token.matches(TT_KEYWORD, 'import'):
+        if self.current_token.matches(TT["KEYWORD"], 'import'):
             result.register_advancement()
             self.advance()
 
-            if self.current_token.type != TT_IDENTIFIER:
+            if self.current_token.type != TT["IDENTIFIER"]:
                 return result.failure(
                     InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
@@ -191,12 +191,12 @@ class Parser:
     def expr(self):
         result = ParseResult()
         pos_start = self.current_token.pos_start.copy()
-        if self.current_token.matches(TT_KEYWORD, 'var'):
+        if self.current_token.matches(TT["KEYWORD"], 'var'):
             result.register_advancement()
             self.advance()
 
-            if self.current_token.type != TT_IDENTIFIER:
-                if self.current_token.type != TT_KEYWORD:
+            if self.current_token.type != TT["IDENTIFIER"]:
+                if self.current_token.type != TT["KEYWORD"]:
                     if self.current_token.type not in TOKENS_TO_QUOTE:
                         error_msg = f"expected identifier, but got {self.current_token.type}."
                     else:
@@ -220,7 +220,7 @@ class Parser:
             equals = EQUALS
 
             if self.current_token.type not in equals:
-                if self.current_token.type in [TT_EE, TT_GT, TT_LT, TT_GTE, TT_LTE]:
+                if self.current_token.type in [TT["EE"], TT["GT"], TT["LT"], TT["GTE"], TT["LTE"]]:
                     error_msg = f"expected an assignation equal, but got a test equal ('{self.current_token.type}')."
                 elif self.current_token.type not in TOKENS_TO_QUOTE:
                     error_msg = f"expected an equal, but got {self.current_token.type}."
@@ -240,12 +240,12 @@ class Parser:
                 return result
             return result.success(VarAssignNode(var_name, expr, equal))
 
-        if self.current_token.matches(TT_KEYWORD, 'del'):
+        if self.current_token.matches(TT["KEYWORD"], 'del'):
             result.register_advancement()
             self.advance()
 
-            if self.current_token.type != TT_IDENTIFIER:
-                if self.current_token.type != TT_KEYWORD:
+            if self.current_token.type != TT["IDENTIFIER"]:
+                if self.current_token.type != TT["KEYWORD"]:
                     if self.current_token.type not in TOKENS_TO_QUOTE:
                         error_msg = f"expected identifier, but got {self.current_token.type}."
                     else:
@@ -269,7 +269,7 @@ class Parser:
                 return result
             return result.success(VarDeleteNode(var_name))
 
-        if self.current_token.matches(TT_KEYWORD, 'write'):
+        if self.current_token.matches(TT["KEYWORD"], 'write'):
             result.register_advancement()
             self.advance()
 
@@ -277,7 +277,7 @@ class Parser:
             if result.error is not None:
                 return result
 
-            if self.current_token.type not in [TT_TO, TT_TO_AND_OVERWRITE]:
+            if self.current_token.type not in [TT["TO"], TT["TO_AND_OVERWRITE"]]:
                 return result.failure(
                     InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
@@ -293,7 +293,7 @@ class Parser:
             if result.error is not None:
                 return result
 
-            if self.current_token.type == TT_INT:
+            if self.current_token.type == TT["INT"]:
                 line_number = self.current_token.value
 
                 result.register_advancement()
@@ -304,7 +304,7 @@ class Parser:
             return result.success(WriteNode(expr_to_write, file_name_expr, to_token, line_number, pos_start,
                                             self.current_token.pos_start.copy()))
 
-        if self.current_token.matches(TT_KEYWORD, 'read'):
+        if self.current_token.matches(TT["KEYWORD"], 'read'):
             result.register_advancement()
             self.advance()
 
@@ -314,11 +314,11 @@ class Parser:
 
             identifier = None
 
-            if self.current_token.type == TT_TO:
+            if self.current_token.type == TT["TO"]:
                 result.register_advancement()
                 self.advance()
 
-                if self.current_token.type != TT_IDENTIFIER:
+                if self.current_token.type != TT["IDENTIFIER"]:
                     return result.failure(
                         InvalidSyntaxError(
                             self.current_token.pos_start, self.current_token.pos_end,
@@ -331,7 +331,7 @@ class Parser:
                 result.register_advancement()
                 self.advance()
 
-            if self.current_token.type == TT_INT:
+            if self.current_token.type == TT["INT"]:
                 line_number = self.current_token.value
 
                 result.register_advancement()
@@ -342,7 +342,7 @@ class Parser:
             return result.success(ReadNode(file_name_expr, identifier, line_number, pos_start,
                                            self.current_token.pos_start.copy()))
 
-        if self.current_token.matches(TT_KEYWORD, "assert"):
+        if self.current_token.matches(TT["KEYWORD"], "assert"):
             result.register_advancement()
             self.advance()
 
@@ -350,7 +350,7 @@ class Parser:
             if result.error is not None:
                 return result
 
-            if self.current_token.type == TT_COMMA:
+            if self.current_token.type == TT["COMMA"]:
                 # register an error message to print if the assertion is false.
                 # if there is no comma, there is no error message
                 result.register_advancement()
@@ -366,7 +366,13 @@ class Parser:
             return result.success(AssertNode(assertion, pos_start, self.current_token.pos_start.copy()))
 
         node = result.register(self.bin_op(self.comp_expr, (
-            (TT_KEYWORD, "and"), (TT_KEYWORD, "or"), (TT_KEYWORD, 'xor'), TT_BITWISEAND, TT_BITWISEOR, TT_BITWISEXOR)))
+            (TT["KEYWORD"], "and"),
+            (TT["KEYWORD"], "or"),
+            (TT["KEYWORD"], 'xor'),
+            TT["BITWISEAND"],
+            TT["BITWISEOR"],
+            TT["BITWISEXOR"]
+        )))
 
         if result.error is not None:
             return result.failure(InvalidSyntaxError(
@@ -379,7 +385,7 @@ class Parser:
 
     def comp_expr(self):
         result = ParseResult()
-        if self.current_token.matches(TT_KEYWORD, 'not') or self.current_token.type == TT_BITWISENOT:
+        if self.current_token.matches(TT["KEYWORD"], 'not') or self.current_token.type == TT["BITWISENOT"]:
             op_token = self.current_token
             result.register_advancement()
             self.advance()
@@ -389,25 +395,33 @@ class Parser:
                 return result
             return result.success(UnaryOpNode(op_token, node))
 
-        node = result.register(self.bin_op(self.arith_expr, (TT_EE, TT_NE, TT_LT, TT_GT, TT_LTE, TT_GTE,
-                                                             (TT_KEYWORD, "in")),
-                                           left_has_priority=False))
+        node = result.register(
+            self.bin_op(self.arith_expr, (
+                TT["EE"],
+                TT["NE"],
+                TT["LT"],
+                TT["GT"],
+                TT["LTE"],
+                TT["GTE"],
+                (TT["KEYWORD"], "in")
+            ), left_has_priority=False)
+        )
         if result.error is not None:
             return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
                                                      "expected int, float, identifier, '+', '-', '(', '[' or 'not'."))
         return result.success(node)
 
     def arith_expr(self):
-        return self.bin_op(self.term, (TT_PLUS, TT_MINUS))
+        return self.bin_op(self.term, (TT["PLUS"], TT["MINUS"]))
 
     def term(self):
-        return self.bin_op(self.factor, (TT_MUL, TT_DIV, TT_PERC, TT_FLOORDIV))
+        return self.bin_op(self.factor, (TT["MUL"], TT["DIV"], TT["PERC"], TT["FLOORDIV"]))
 
     def factor(self):
         result = ParseResult()
         token = self.current_token
 
-        if token.type in (TT_PLUS, TT_MINUS):
+        if token.type in (TT["PLUS"], TT["MINUS"]):
             result.register_advancement()
             self.advance()
             factor = result.register(self.factor())
@@ -418,7 +432,7 @@ class Parser:
         return self.power()
 
     def power(self):
-        return self.bin_op(self.call, (TT_POW,), self.factor)
+        return self.bin_op(self.call, (TT["POW"], ), self.factor)  # do not remove the comma after 'TT["POW"]' !!
 
     def call(self):
         result = ParseResult()
@@ -426,19 +440,19 @@ class Parser:
         if result.error is not None:
             return result
 
-        if self.current_token.type == TT_LPAREN:
+        if self.current_token.type == TT["LPAREN"]:
             call_node = atom
 
-            while self.current_token.type == TT_LPAREN:
+            while self.current_token.type == TT["LPAREN"]:
                 result.register_advancement()
                 self.advance()
                 arg_nodes = []
 
-                if self.current_token.type == TT_RPAREN:
+                if self.current_token.type == TT["RPAREN"]:
                     result.register_advancement()
                     self.advance()
                 else:
-                    if self.current_token.type == TT_MUL:
+                    if self.current_token.type == TT["MUL"]:
                         result.register_advancement()
                         self.advance()
                         list_node: ListNode = result.register(self.list_expr())
@@ -463,7 +477,7 @@ class Parser:
                                 )
                             )
 
-                        while self.current_token.type == TT_COMMA:
+                        while self.current_token.type == TT["COMMA"]:
                             result.register_advancement()
                             self.advance()
 
@@ -471,7 +485,7 @@ class Parser:
                             if result.error is not None:
                                 return result
 
-                    if self.current_token.type != TT_RPAREN:
+                    if self.current_token.type != TT["RPAREN"]:
                         return result.failure(
                             InvalidSyntaxError(
                                 self.current_token.pos_start, self.current_token.pos_end,
@@ -490,18 +504,18 @@ class Parser:
         result = ParseResult()
         token = self.current_token
 
-        if token.type in (TT_INT, TT_FLOAT):
+        if token.type in (TT["INT"], TT["FLOAT"]):
             result.register_advancement()
             self.advance()
             return result.success(NumberNode(token))
-        elif token.type == TT_STRING:
+        elif token.type == TT["STRING"]:
             final_string = token.value
             final_token = token.copy()
 
             result.register_advancement()
             self.advance()
 
-            while self.current_token.type == TT_STRING:
+            while self.current_token.type == TT["STRING"]:
                 final_string += self.current_token.value
 
                 result.register_advancement()
@@ -509,15 +523,15 @@ class Parser:
 
             final_token.value = final_string
             return result.success(StringNode(final_token))
-        elif token.type == TT_IDENTIFIER:
+        elif token.type == TT["IDENTIFIER"]:
             result.register_advancement()
             self.advance()
 
             choices = [token]
-            while self.current_token.type == TT_INTERROGATIVE_PNT:
+            while self.current_token.type == TT["INTERROGATIVE_PNT"]:
                 result.register_advancement()
                 self.advance()
-                if self.current_token.type != TT_IDENTIFIER:
+                if self.current_token.type != TT["IDENTIFIER"]:
                     if self.current_token.type in TOKENS_TO_QUOTE:
                         return result.failure(
                             InvalidSyntaxError(
@@ -537,13 +551,13 @@ class Parser:
                 self.advance()
 
             return result.success(VarAccessNode(choices))
-        elif token.type == TT_LPAREN:
+        elif token.type == TT["LPAREN"]:
             result.register_advancement()
             self.advance()
             expr = result.register(self.expr())
             if result.error is not None:
                 return result
-            if self.current_token.type == TT_RPAREN:
+            if self.current_token.type == TT["RPAREN"]:
                 result.register_advancement()
                 self.advance()
                 return result.success(expr)
@@ -551,32 +565,32 @@ class Parser:
                 return result.failure(
                     InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, "expected ')'.")
                 )
-        elif token.type == TT_LSQUARE:
+        elif token.type == TT["LSQUARE"]:
             list_expr = result.register(self.list_expr())
             if result.error is not None:
                 return result
             return result.success(list_expr)
-        elif token.matches(TT_KEYWORD, 'if'):
+        elif token.matches(TT["KEYWORD"], 'if'):
             if_expr = result.register(self.if_expr())
             if result.error is not None:
                 return result
             return result.success(if_expr)
-        elif token.matches(TT_KEYWORD, 'for'):
+        elif token.matches(TT["KEYWORD"], 'for'):
             for_expr = result.register(self.for_expr())
             if result.error is not None:
                 return result
             return result.success(for_expr)
-        elif token.matches(TT_KEYWORD, 'while'):
+        elif token.matches(TT["KEYWORD"], 'while'):
             while_expr = result.register(self.while_expr())
             if result.error is not None:
                 return result
             return result.success(while_expr)
-        elif token.matches(TT_KEYWORD, 'do'):
+        elif token.matches(TT["KEYWORD"], 'do'):
             do_expr = result.register(self.do_expr())
             if result.error is not None:
                 return result
             return result.success(do_expr)
-        elif token.matches(TT_KEYWORD, 'def'):
+        elif token.matches(TT["KEYWORD"], 'def'):
             func_def = result.register(self.func_def())
             if result.error is not None:
                 return result
@@ -592,7 +606,7 @@ class Parser:
         element_nodes = []
         pos_start = self.current_token.pos_start.copy()
 
-        if self.current_token.type != TT_LSQUARE:
+        if self.current_token.type != TT["LSQUARE"]:
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
                 "expected '['."
@@ -601,11 +615,11 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        if self.current_token.type == TT_RSQUARE:
+        if self.current_token.type == TT["RSQUARE"]:
             result.register_advancement()
             self.advance()
         else:
-            if self.current_token.type == TT_MUL:
+            if self.current_token.type == TT["MUL"]:
                 result.register_advancement()
                 self.advance()
                 list_node: ListNode = result.register(self.list_expr())
@@ -624,11 +638,11 @@ class Parser:
                         )
                     )
 
-            while self.current_token.type == TT_COMMA:
+            while self.current_token.type == TT["COMMA"]:
                 result.register_advancement()
                 self.advance()
 
-                if self.current_token.type == TT_MUL:
+                if self.current_token.type == TT["MUL"]:
                     result.register_advancement()
                     self.advance()
                     list_node: ListNode = result.register(self.list_expr())
@@ -641,7 +655,7 @@ class Parser:
                     if result.error is not None:
                         return result
 
-            if self.current_token.type != TT_RSQUARE:
+            if self.current_token.type != TT["RSQUARE"]:
                 return result.failure(
                     InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
@@ -671,20 +685,20 @@ class Parser:
         result = ParseResult()
         else_case = None
 
-        if self.current_token.matches(TT_KEYWORD, 'else'):
+        if self.current_token.matches(TT["KEYWORD"], 'else'):
             result.register_advancement()
             self.advance()
 
-            if self.current_token.type == TT_NEWLINE:
+            if self.current_token.type == TT["NEWLINE"]:
                 result.register_advancement()
                 self.advance()
 
-                statements = result.register(self.statements(stop=[(TT_KEYWORD, 'end')]))
+                statements = result.register(self.statements(stop=[(TT["KEYWORD"], 'end')]))
                 if result.error is not None:
                     return result
                 else_case = (statements, True)
 
-                if self.current_token.matches(TT_KEYWORD, 'end'):
+                if self.current_token.matches(TT["KEYWORD"], 'end'):
                     result.register_advancement()
                     self.advance()
                 else:
@@ -704,7 +718,7 @@ class Parser:
         result = ParseResult()
         cases, else_case = [], None
 
-        if self.current_token.matches(TT_KEYWORD, 'elif'):
+        if self.current_token.matches(TT["KEYWORD"], 'elif'):
             all_cases = result.register(self.if_expr_b())
             if result.error is not None:
                 return result
@@ -721,7 +735,7 @@ class Parser:
         cases = []
         else_case = None
 
-        if not self.current_token.matches(TT_KEYWORD, case_keyword):
+        if not self.current_token.matches(TT["KEYWORD"], case_keyword):
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
                 f"expected '{case_keyword}'."
@@ -734,7 +748,7 @@ class Parser:
         if result.error is not None:
             return result
 
-        if not self.current_token.matches(TT_KEYWORD, 'then'):
+        if not self.current_token.matches(TT["KEYWORD"], 'then'):
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end, "expected 'then'."
             ))
@@ -742,17 +756,17 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        if self.current_token.type == TT_NEWLINE:
+        if self.current_token.type == TT["NEWLINE"]:
             result.register_advancement()
             self.advance()
 
-            statements = result.register(self.statements(stop=[(TT_KEYWORD, 'elif'), (TT_KEYWORD, 'else'),
-                                                               (TT_KEYWORD, 'end')]))
+            statements = result.register(self.statements(stop=[(TT["KEYWORD"], 'elif'), (TT["KEYWORD"], 'else'),
+                                                               (TT["KEYWORD"], 'end')]))
             if result.error is not None:
                 return result
             cases.append((condition, statements, True))
 
-            if self.current_token.matches(TT_KEYWORD, 'end'):
+            if self.current_token.matches(TT["KEYWORD"], 'end'):
                 result.register_advancement()
                 self.advance()
             else:
@@ -777,15 +791,15 @@ class Parser:
 
     def for_expr(self):
         result = ParseResult()
-        if not self.current_token.matches(TT_KEYWORD, 'for'):
+        if not self.current_token.matches(TT["KEYWORD"], 'for'):
             return result.error(InvalidSyntaxError, self.current_token.pos_start, self.current_token.pos_end,
                                 "expected 'for'.")
 
         result.register_advancement()
         self.advance()
 
-        if self.current_token.type != TT_IDENTIFIER:
-            if self.current_token.type != TT_KEYWORD:
+        if self.current_token.type != TT["IDENTIFIER"]:
+            if self.current_token.type != TT["KEYWORD"]:
                 if self.current_token.type not in TOKENS_TO_QUOTE:
                     error_msg = f"expected identifier, but got {self.current_token.type}."
                 else:
@@ -803,7 +817,7 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        if self.current_token.matches(TT_KEYWORD, 'in'):
+        if self.current_token.matches(TT["KEYWORD"], 'in'):
             result.register_advancement()
             self.advance()
 
@@ -811,22 +825,22 @@ class Parser:
             if result.error is not None:
                 return result
 
-            if not self.current_token.matches(TT_KEYWORD, 'then'):
+            if not self.current_token.matches(TT["KEYWORD"], 'then'):
                 return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
                                                          "expected 'then'."))
 
             result.register_advancement()
             self.advance()
 
-            if self.current_token.type == TT_NEWLINE:
+            if self.current_token.type == TT["NEWLINE"]:
                 result.register_advancement()
                 self.advance()
 
-                body = result.register(self.statements(stop=[(TT_KEYWORD, 'end')]))
+                body = result.register(self.statements(stop=[(TT["KEYWORD"], 'end')]))
                 if result.error is not None:
                     return result
 
-                if not self.current_token.matches(TT_KEYWORD, 'end'):
+                if not self.current_token.matches(TT["KEYWORD"], 'end'):
                     return result.failure(InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
                         "expected 'end'."
@@ -842,7 +856,7 @@ class Parser:
                 return result
 
             return result.success(ForNodeList(var_name, body, list_, False))
-        elif self.current_token.type != TT_EQ:
+        elif self.current_token.type != TT["EQ"]:
             if self.current_token.type not in TOKENS_TO_QUOTE:
                 error_msg = f"expected 'in' or '=', but got {self.current_token.type}."
             else:
@@ -860,7 +874,7 @@ class Parser:
         if result.error is not None:
             return result
 
-        if not self.current_token.matches(TT_KEYWORD, 'to'):
+        if not self.current_token.matches(TT["KEYWORD"], 'to'):
             return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
                                                      f"expected 'to'."))
 
@@ -871,7 +885,7 @@ class Parser:
         if result.error is not None:
             return result
 
-        if self.current_token.matches(TT_KEYWORD, 'step'):
+        if self.current_token.matches(TT["KEYWORD"], 'step'):
             result.register_advancement()
             self.advance()
 
@@ -881,22 +895,22 @@ class Parser:
         else:
             step_value = None
 
-        if not self.current_token.matches(TT_KEYWORD, 'then'):
+        if not self.current_token.matches(TT["KEYWORD"], 'then'):
             return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
                                                      "expected 'then'."))
 
         result.register_advancement()
         self.advance()
 
-        if self.current_token.type == TT_NEWLINE:
+        if self.current_token.type == TT["NEWLINE"]:
             result.register_advancement()
             self.advance()
 
-            body = result.register(self.statements(stop=[(TT_KEYWORD, 'end')]))
+            body = result.register(self.statements(stop=[(TT["KEYWORD"], 'end')]))
             if result.error is not None:
                 return result
 
-            if not self.current_token.matches(TT_KEYWORD, 'end'):
+            if not self.current_token.matches(TT["KEYWORD"], 'end'):
                 return result.failure(InvalidSyntaxError(
                     self.current_token.pos_start, self.current_token.pos_end,
                     "expected 'end'."
@@ -916,7 +930,7 @@ class Parser:
     def while_expr(self):
         result = ParseResult()
 
-        if not self.current_token.matches(TT_KEYWORD, 'while'):
+        if not self.current_token.matches(TT["KEYWORD"], 'while'):
             return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
                                                      "expected 'while'."))
 
@@ -927,22 +941,22 @@ class Parser:
         if result.error is not None:
             return result
 
-        if not self.current_token.matches(TT_KEYWORD, 'then'):
+        if not self.current_token.matches(TT["KEYWORD"], 'then'):
             return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
                                                      "expected 'then'."))
 
         result.register_advancement()
         self.advance()
 
-        if self.current_token.type == TT_NEWLINE:
+        if self.current_token.type == TT["NEWLINE"]:
             result.register_advancement()
             self.advance()
 
-            body = result.register(self.statements(stop=[(TT_KEYWORD, 'end')]))
+            body = result.register(self.statements(stop=[(TT["KEYWORD"], 'end')]))
             if result.error is not None:
                 return result
 
-            if not self.current_token.matches(TT_KEYWORD, 'end'):
+            if not self.current_token.matches(TT["KEYWORD"], 'end'):
                 return result.failure(InvalidSyntaxError(
                     self.current_token.pos_start, self.current_token.pos_end,
                     "expected 'end'."
@@ -962,18 +976,18 @@ class Parser:
     def do_expr(self):
         result = ParseResult()
 
-        if not self.current_token.matches(TT_KEYWORD, 'do'):
+        if not self.current_token.matches(TT["KEYWORD"], 'do'):
             return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
                                                      "expected 'do'."))
 
         result.register_advancement()
         self.advance()
 
-        if self.current_token.type == TT_NEWLINE:
+        if self.current_token.type == TT["NEWLINE"]:
             result.register_advancement()
             self.advance()
 
-            body = result.register(self.statements(stop=[(TT_KEYWORD, 'then')]))
+            body = result.register(self.statements(stop=[(TT["KEYWORD"], 'then')]))
             if result.error is not None:
                 return result
 
@@ -985,7 +999,7 @@ class Parser:
 
             should_return_none = False
 
-        if not self.current_token.matches(TT_KEYWORD, 'then'):
+        if not self.current_token.matches(TT["KEYWORD"], 'then'):
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
                 "expected 'then'."
@@ -994,7 +1008,7 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        if not self.current_token.matches(TT_KEYWORD, 'loop'):
+        if not self.current_token.matches(TT["KEYWORD"], 'loop'):
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
                 "expected 'loop'."
@@ -1003,7 +1017,7 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        if not self.current_token.matches(TT_KEYWORD, 'while'):
+        if not self.current_token.matches(TT["KEYWORD"], 'while'):
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
                 "expected 'while'."
@@ -1021,7 +1035,7 @@ class Parser:
     def func_def(self):
         result = ParseResult()
 
-        if not self.current_token.matches(TT_KEYWORD, 'def'):
+        if not self.current_token.matches(TT["KEYWORD"], 'def'):
             return result.failure(
                 InvalidSyntaxError(
                     self.current_token.pos_start, self.current_token.pos_end,
@@ -1032,11 +1046,11 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        if self.current_token.type == TT_IDENTIFIER:
+        if self.current_token.type == TT["IDENTIFIER"]:
             var_name_token = self.current_token
             result.register_advancement()
             self.advance()
-            if self.current_token.type != TT_LPAREN:
+            if self.current_token.type != TT["LPAREN"]:
                 return result.failure(
                     InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
@@ -1045,7 +1059,7 @@ class Parser:
                 )
         else:
             var_name_token = None
-            if self.current_token.type != TT_LPAREN:
+            if self.current_token.type != TT["LPAREN"]:
                 return result.failure(
                     InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
@@ -1057,17 +1071,17 @@ class Parser:
         self.advance()
         param_names_tokens = []
 
-        if self.current_token.type == TT_IDENTIFIER:
+        if self.current_token.type == TT["IDENTIFIER"]:
             param_names_tokens.append(self.current_token)
             result.register_advancement()
             self.advance()
 
-            while self.current_token.type == TT_COMMA:
+            while self.current_token.type == TT["COMMA"]:
                 result.register_advancement()
                 self.advance()
 
-                if self.current_token.type != TT_IDENTIFIER:
-                    if self.current_token.type != TT_KEYWORD:
+                if self.current_token.type != TT["IDENTIFIER"]:
+                    if self.current_token.type != TT["KEYWORD"]:
                         if self.current_token.type not in TOKENS_TO_QUOTE:
                             error_msg = f"expected identifier after comma, but got {self.current_token.type}."
                         else:
@@ -1088,7 +1102,7 @@ class Parser:
                 result.register_advancement()
                 self.advance()
 
-            if self.current_token.type != TT_RPAREN:
+            if self.current_token.type != TT["RPAREN"]:
                 return result.failure(
                     InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
@@ -1096,7 +1110,7 @@ class Parser:
                     )
                 )
         else:
-            if self.current_token.type != TT_RPAREN:
+            if self.current_token.type != TT["RPAREN"]:
                 return result.failure(
                     InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
@@ -1107,7 +1121,7 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        if self.current_token.type == TT_ARROW:
+        if self.current_token.type == TT["ARROW"]:
             result.register_advancement()
             self.advance()
 
@@ -1122,7 +1136,7 @@ class Parser:
                 True
             ))
 
-        if self.current_token.type != TT_NEWLINE:
+        if self.current_token.type != TT["NEWLINE"]:
             return result.failure(
                 InvalidSyntaxError(
                     self.current_token.pos_start, self.current_token.pos_end,
@@ -1133,11 +1147,11 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        body = result.register(self.statements(stop=[(TT_KEYWORD, 'end')]))
+        body = result.register(self.statements(stop=[(TT["KEYWORD"], 'end')]))
         if result.error is not None:
             return result
 
-        if not self.current_token.matches(TT_KEYWORD, 'end'):
+        if not self.current_token.matches(TT["KEYWORD"], 'end'):
             return result.failure(
                 InvalidSyntaxError(
                     self.current_token.pos_start, self.current_token.pos_end,

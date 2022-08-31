@@ -21,70 +21,72 @@
 
 """File for token types list. For Token class, please refer to ./token.py"""
 
-# list of all the tokens
-TT_NEWLINE = 'new line'       # new line
+# dict of all the token types
+TT = {
+    "NEWLINE": 'new line',       # new line
+    
+    "INT": 'int',                # integer, corresponds to python int
+    "FLOAT": 'float',            # float number, corresponds to python float
+    "STRING": 'str',             # string type, corresponds to python str
+    "IDENTIFIER": 'identifier',  # Identifier of a var name
+    "KEYWORD": 'keyword',        # Keyword, like "var"
+    
+    "PLUS": '+',                 # +
+    "MINUS": '-',                # -
+    "MUL": '*',                  # *
+    "DIV": '/',                  # /
+    "POW": '^',                  # ^
+    "PERC": '%',                 # %
+    "FLOORDIV": '//',            # //
+    
+    "TO": '>>',                  # >>
+    "TO_AND_OVERWRITE": '!>>',   # !>>
+    
+    "EQ": '=',                   # =
+    "PLUSEQ": '+=',              # +=
+    "MINUSEQ": '-=',             # -=
+    "MULTEQ": '*=',              # *=
+    "DIVEQ": '/=',               # /=
+    "POWEQ": '^=',               # ^=
+    "PERCEQ": '%=',              # %=
+    "FLOORDIVEQ": '//=',         # //=
+    "OREQ": "||=",               # ||=
+    "ANDEQ": "&&=",              # &&=
+    "XOREQ": "^^^=",             # ^^^=
+    "BITWISEOREQ": "|=",         # |=
+    "BITWISEANDEQ": "&=",        # &=
+    "BITWISEXOREQ": "^^=",       # ^^=
+    "EEEQ": "===",               # ===
+    "LTEEQ": "<==",              # <==
+    "GTEEQ": ">==",              # >==
+    "LTEQ": "<<=",               # <<=
+    "GTEQ": ">>=",               # >>=
+    
+    "BITWISEOR": '|',            # |
+    "BITWISEAND": '&',           # &
+    "BITWISEXOR": '^^',          # ^^
+    "BITWISENOT": '~',           # ~
+    
+    "EE": '==',                  # ==
+    "NE": '!=',                  # !=
+    "LT": '<',                   # <
+    "GT": '>',                   # >
+    "LTE": '<=',                 # <=
+    "GTE": '>=',                 # >=
+    
+    "RPAREN": ')',               # )
+    "LPAREN": '(',               # (
+    "RSQUARE": ']',              # ]
+    "LSQUARE": '[',              # [
+    
+    "COMMA": ',',                # ,
+    "ARROW": '->',               # ->
+    "INTERROGATIVE_PNT": '?',    # ?
+    
+    "EOF": 'end of file',        # end of file
+}
 
-TT_INT = 'int'                # integer, corresponds to python int
-TT_FLOAT = 'float'            # float number, corresponds to python float
-TT_STRING = 'str'             # string type, corresponds to python str
-TT_IDENTIFIER = 'identifier'  # Identifier of a var name
-TT_KEYWORD = 'keyword'        # Keyword, like "var"
-
-TT_PLUS = '+'                 # +
-TT_MINUS = '-'                # -
-TT_MUL = '*'                  # *
-TT_DIV = '/'                  # /
-TT_POW = '^'                  # ^
-TT_PERC = '%'                 # %
-TT_FLOORDIV = '//'            # //
-
-TT_TO = '>>'                  # >>
-TT_TO_AND_OVERWRITE = '!>>'   # !>>
-
-TT_EQ = '='                   # =
-TT_PLUSEQ = '+='              # +=
-TT_MINUSEQ = '-='             # -=
-TT_MULTEQ = '*='              # *=
-TT_DIVEQ = '/='               # /=
-TT_POWEQ = '^='               # ^=
-TT_PERCEQ = '%='              # %=
-TT_FLOORDIVEQ = '//='         # //=
-TT_OREQ = "||="               # ||=
-TT_ANDEQ = "&&="              # &&=
-TT_XOREQ = "^^^="             # ^^^=
-TT_BITWISEOREQ = "|="         # |=
-TT_BITWISEANDEQ = "&="        # &=
-TT_BITWISEXOREQ = "^^="       # ^^=
-TT_EEEQ = "==="               # ===
-TT_LTEEQ = "<=="              # <==
-TT_GTEEQ = ">=="              # >==
-TT_LTEQ = "<<="               # <<=
-TT_GTEQ = ">>="               # >>=
-
-TT_BITWISEOR = '|'            # |
-TT_BITWISEAND = '&'           # &
-TT_BITWISEXOR = '^^'          # ^^
-TT_BITWISENOT = '~'           # ~
-
-TT_EE = '=='                  # ==
-TT_NE = '!='                  # !=
-TT_LT = '<'                   # <
-TT_GT = '>'                   # >
-TT_LTE = '<='                 # <=
-TT_GTE = '>='                 # >=
-
-TT_RPAREN = ')'               # )
-TT_LPAREN = '('               # (
-TT_RSQUARE = ']'              # ]
-TT_LSQUARE = '['              # [
-
-TT_COMMA = ','                # ,
-TT_ARROW = '->'               # ->
-TT_INTERROGATIVE_PNT = '?'    # ?
-
-TT_EOF = 'end of file'        # end of file
-
-KEYWORDS = [                  # List of all the keywords (TT_KEYWORD)
+KEYWORDS = [                        # List of all the keywords (TT["KEYWORD)
     # basic keywords
     'var',
     'del',
@@ -122,69 +124,69 @@ KEYWORDS = [                  # List of all the keywords (TT_KEYWORD)
 ]
 
 TOKENS_TO_QUOTE = [  # list of all the tokens that needs "'" when there are printed (e.g. in an error)
-    TT_PLUS,
-    TT_MINUS,
-    TT_MUL,
-    TT_DIV,
-    TT_POW,
-    TT_PERC,
-    TT_FLOORDIV,
-    TT_EQ,
-    TT_PLUSEQ,
-    TT_MINUSEQ,
-    TT_MULTEQ,
-    TT_DIVEQ,
-    TT_POWEQ,
-    TT_PERCEQ,
-    TT_FLOORDIVEQ,
-    TT_ANDEQ,
-    TT_OREQ,
-    TT_XOREQ,
-    TT_BITWISEOREQ,
-    TT_BITWISEANDEQ,
-    TT_BITWISEXOREQ,
-    TT_BITWISEAND,
-    TT_BITWISEOR,
-    TT_BITWISEXOR,
-    TT_RPAREN,
-    TT_LPAREN,
-    TT_RSQUARE,
-    TT_LSQUARE,
-    TT_EE,
-    TT_NE,
-    TT_LT,
-    TT_GT,
-    TT_LTE,
-    TT_GTE,
-    TT_COMMA,
-    TT_ARROW,
-    TT_EEEQ,
-    TT_LTEEQ,
-    TT_GTEEQ,
-    TT_LTEQ,
-    TT_GTEQ,
-    TT_TO,
-    TT_TO_AND_OVERWRITE
+    TT["PLUS"],
+    TT["MINUS"],
+    TT["MUL"],
+    TT["DIV"],
+    TT["POW"],
+    TT["PERC"],
+    TT["FLOORDIV"],
+    TT["EQ"],
+    TT["PLUSEQ"],
+    TT["MINUSEQ"],
+    TT["MULTEQ"],
+    TT["DIVEQ"],
+    TT["POWEQ"],
+    TT["PERCEQ"],
+    TT["FLOORDIVEQ"],
+    TT["ANDEQ"],
+    TT["OREQ"],
+    TT["XOREQ"],
+    TT["BITWISEOREQ"],
+    TT["BITWISEANDEQ"],
+    TT["BITWISEXOREQ"],
+    TT["BITWISEAND"],
+    TT["BITWISEOR"],
+    TT["BITWISEXOR"],
+    TT["RPAREN"],
+    TT["LPAREN"],
+    TT["RSQUARE"],
+    TT["LSQUARE"],
+    TT["EE"],
+    TT["NE"],
+    TT["LT"],
+    TT["GT"],
+    TT["LTE"],
+    TT["GTE"],
+    TT["COMMA"],
+    TT["ARROW"],
+    TT["EEEQ"],
+    TT["LTEEQ"],
+    TT["GTEEQ"],
+    TT["LTEQ"],
+    TT["GTEQ"],
+    TT["TO"],
+    TT["TO_AND_OVERWRITE"]
 ]
 
 EQUALS = [  # all the equal tokens ('=', '+=', ...) but not the equal tokens for tests ('==', '!=', ...)
-    TT_EQ,
-    TT_PLUSEQ,
-    TT_MINUSEQ,
-    TT_MULTEQ,
-    TT_DIVEQ,
-    TT_POWEQ,
-    TT_FLOORDIVEQ,
-    TT_PERCEQ,
-    TT_OREQ,
-    TT_ANDEQ,
-    TT_XOREQ,
-    TT_BITWISEANDEQ,
-    TT_BITWISEOREQ,
-    TT_BITWISEXOREQ,
-    TT_EEEQ,
-    TT_LTEEQ,
-    TT_GTEEQ,
-    TT_LTEQ,
-    TT_GTEQ
+    TT["EQ"],
+    TT["PLUSEQ"],
+    TT["MINUSEQ"],
+    TT["MULTEQ"],
+    TT["DIVEQ"],
+    TT["POWEQ"],
+    TT["FLOORDIVEQ"],
+    TT["PERCEQ"],
+    TT["OREQ"],
+    TT["ANDEQ"],
+    TT["XOREQ"],
+    TT["BITWISEANDEQ"],
+    TT["BITWISEOREQ"],
+    TT["BITWISEXOREQ"],
+    TT["EEEQ"],
+    TT["LTEEQ"],
+    TT["GTEEQ"],
+    TT["LTEQ"],
+    TT["GTEQ"]
 ]

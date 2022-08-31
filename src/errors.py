@@ -140,7 +140,7 @@ class RTTypeError(RunTimeError):
 
 
 class RTFileNotFoundError(RunTimeError):
-    """File not found (like 'open "this_file_does_not_exist"')"""
+    """File not found (like `open "this_file_does_not_exist"`)"""
     def __init__(self, pos_start, pos_end, file_name, context: Context):
         super().__init__(pos_start, pos_end, f"file '{file_name}' does not exist.", context, rt_error=False,
                          error_name="FileNotFoundError")

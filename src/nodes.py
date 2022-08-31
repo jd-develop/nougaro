@@ -20,7 +20,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.token import Token
-from src.token_types import TT_EQ, TT_STRING
+from src.token_types import TT
 # built-in python imports
 from typing import Union
 
@@ -74,7 +74,7 @@ class VarAssignNode(Node):
                                value_node is VarAccessNode where var_name_tokens_list is [Token(TT_IDENTIFIER, 'bar')]
                                equal is TT_PLUSEQ
     """
-    def __init__(self, var_name_token, value_node, equal=TT_EQ):
+    def __init__(self, var_name_token, value_node, equal=TT["EQ"]):
         self.var_name_token = var_name_token
         self.value_node = value_node
         self.equal = equal
@@ -211,7 +211,7 @@ class AssertNode(Node):
         self.pos_end = pos_end
 
         if self.errmsg is None:
-            self.errmsg = StringNode(Token(TT_STRING, value='',
+            self.errmsg = StringNode(Token(TT["STRING"], value='',
                                            pos_start=self.pos_start.copy(), pos_end=self.pos_end.copy()))
 
 
@@ -462,7 +462,7 @@ class ReadNode(Node):
     """
     def __init__(self, file_name_expr: Node, identifier: Token, line_number: Union[int, str], pos_start, pos_end):
         self.file_name_expr: Node = file_name_expr
-        self.identifier: Node = identifier
+        self.identifier: Token = identifier
         self.line_number: Union[int, str] = line_number
 
         self.pos_start = pos_start

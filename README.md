@@ -13,7 +13,7 @@
 ## French description
  Un langage de programmation. Interpréteur écrit en Python.
  
- Executez le shell avec `python3 shell.py`. Ouvrez des fichiers avec `python3 shell.py (filename.extension)`
+ Exécutez le shell avec `python3 shell.py`. Ouvrez des fichiers avec `python3 shell.py (filename.extension)`
  
  Le code est compilé pour Windows. Disponible dans l'onglet [releases](https://github.com/jd-develop/nougaro/releases/) !
  

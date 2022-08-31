@@ -140,7 +140,7 @@ print()
 var list_ = [1, 2, 3, "4", '5', '6']
 
 print(append(list_, 7))  # append elements to a list.
-print(list_ = 7)  # another way to do it
+print(var list_ += 7)  # another way to do it
 print()
 
 print(pop(list_, -1))  # pop elements to a list

@@ -23,7 +23,7 @@ from src.values.functions.base_function import BaseFunction
 from src.context import Context
 from src.values.basevalues import *
 from src.values.specific_values.number import *
-from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam, is_keyword
+from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam, is_keyword, does_tok_type_exist
 from src.errors import RTFileNotFoundError, RTTypeError
 # built-in python imports
 from os import system as os_system, name as os_name
@@ -527,7 +527,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         list_ = exec_context.symbol_table.get('list')
         index_ = exec_context.symbol_table.get('index')
 
-        if not isinstance(list_, List):  # we check if the lsit is a list
+        if not isinstance(list_, List):  # we check if the list is a list
             return RTResult().failure(
                 RTTypeError(
                     list_.pos_start, list_.pos_end,
@@ -1146,5 +1146,26 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute___is_keyword__.param_names = ["word"]
     execute___is_keyword__.optional_params = []
     execute___is_keyword__.should_respect_args_number = True
+
+    def execute___does_tok_type_exist__(self, exec_ctx: Context):
+        """Check if the type is a nougaro token type."""
+        # Params :
+        # * type
+
+        # we get the type to check
+        type_ = exec_ctx.symbol_table.get("type")
+        if not isinstance(type_, String):  # we check if it is a string
+            return RTResult().failure(RTTypeError(
+                type_.pos_start, type_.pos_end,
+                f"first argument of builtin function '__does_tok_type_exist__' must be a str.",
+                exec_ctx
+            ))
+        result = RTResult()
+        # then we return if this is a valid tok type or not.
+        return result.success(TRUE) if does_tok_type_exist(type_.value) else result.success(FALSE)
+
+    execute___does_tok_type_exist__.param_names = ["type"]
+    execute___does_tok_type_exist__.optional_params = []
+    execute___does_tok_type_exist__.should_respect_args_number = True
 
     # ==================

@@ -72,3 +72,4 @@ NOUGARO = BuiltInFunction('nougaro')
 GPL = BuiltInFunction('__gpl__')
 
 IS_KEYWORD = BuiltInFunction('__is_keyword__')
+DOES_TOK_TYPE_EXIST = BuiltInFunction('__does_tok_type_exist__')

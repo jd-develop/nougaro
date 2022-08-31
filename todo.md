@@ -12,7 +12,7 @@
     * `interpreter.py`
     * `lexer.py`
     * ✅ ~~`misc.py`~~
-    * `nodes.py`
+    * ✅ ~~`nodes.py`~~
     * ✅ ~~`nougaro.py`~~
     * ✅ ~~`parse_result.py`~~
     * `parser.py`

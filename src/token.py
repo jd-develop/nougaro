@@ -19,7 +19,7 @@
 
 # NO IMPORTS
 
-"""File for Token class. For token types list, please refer to ./token_constants.py"""
+"""File for Token class. For token types list, please refer to ./token_types.py"""
 
 
 # ##########

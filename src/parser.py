@@ -19,7 +19,7 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.token_constants import *
+from src.token_types import *
 from src.errors import InvalidSyntaxError
 from src.parse_result import ParseResult
 from src.nodes import *  # src.tokens.Token is imported in src.nodes

@@ -19,8 +19,8 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.tokens import Token
-from src.token_constants import TT_EQ, TT_STRING
+from src.token import Token
+from src.token_types import TT_EQ, TT_STRING
 # built-in python imports
 from typing import Union
 

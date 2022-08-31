@@ -26,7 +26,7 @@ from src.values.functions.base_function import BaseFunction
 from src.constants import PROTECTED_VARS, MODULES
 from src.nodes import *
 from src.errors import NotDefinedError, RunTimeError, RTIndexError, RTTypeError, RTFileNotFoundError, RTAssertionError
-from src.token_constants import *
+from src.token_types import *
 from src.runtime_result import RTResult
 from src.context import Context
 from src.misc import CustomInterpreterVisitMethod

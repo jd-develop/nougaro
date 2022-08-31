@@ -20,8 +20,8 @@
     * ✅ ~~`runtime_result.py`~~
     * ✅ ~~`set_symbol_table.py`~~
     * ✅ ~~`strings_with_arrows.py`~~
-    * ✅ ~~`token_constants.py`~~
-    * ✅ ~~`tokens.py`~~
+    * ✅ ~~`token_types.py`~~
+    * ✅ ~~`token.py`~~
   * ✅ ~~`build.bat`~~
   * ✅ ~~`example.noug`~~
   * ✅ ~~`shell.py`~~

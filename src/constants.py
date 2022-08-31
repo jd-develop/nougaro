@@ -19,7 +19,7 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.token_constants import KEYWORDS
+from src.token_types import KEYWORDS
 from lib_.__TABLE_OF_MODULES__ import TABLE_OF_MODULES
 # built-in python imports
 import string

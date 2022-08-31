@@ -19,7 +19,7 @@
 
 # NO IMPORTS
 
-"""File for token types list. For Token class, please refer to ./tokens.py"""
+"""File for token types list. For Token class, please refer to ./token.py"""
 
 # list of all the tokens
 TT_NEWLINE = 'new line'       # new line

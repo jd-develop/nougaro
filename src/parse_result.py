@@ -26,7 +26,7 @@ class ParseResult:
     """Result of parsed tokens, with a parent node."""
     def __init__(self):
         self.error = None  # any error that may have been encountered
-        self.node = None  # parent node
+        self.node = None  # parent node of the code (the parent node is a ListNode)
         self.advance_count = 0
         self.to_reverse_count = 0
 

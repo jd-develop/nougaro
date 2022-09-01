@@ -123,7 +123,7 @@ KEYWORDS = [                        # List of all the keywords (TT["KEYWORD)
     'assert',
 ]
 
-TOKENS_TO_QUOTE = [  # list of all the tokens that needs "'" when there are printed (e.g. in an error)
+TOKENS_TO_QUOTE = [  # list of all the tokens that needs a quote ("'") when there are printed (e.g. in an error)
     TT["PLUS"],
     TT["MINUS"],
     TT["MUL"],
@@ -169,7 +169,7 @@ TOKENS_TO_QUOTE = [  # list of all the tokens that needs "'" when there are prin
     TT["TO_AND_OVERWRITE"]
 ]
 
-EQUALS = [  # all the equal tokens ('=', '+=', ...) but not the equal tokens for tests ('==', '!=', ...)
+EQUALS = [  # all the assignation tokens ('=', '+=', ...) but not the equal tokens for tests ('==', '!=', ...)
     TT["EQ"],
     TT["PLUSEQ"],
     TT["MINUSEQ"],

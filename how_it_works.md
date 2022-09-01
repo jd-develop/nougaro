@@ -67,5 +67,5 @@
     }
 
 
-# You don't find what you search ?
+# You don't find what you're looking for?
  [Email me](mailto://jd-dev@laposte.net), so I can update this file :) (You can also send me a Discord message, if you have my discord)

@@ -42,7 +42,7 @@ class NumberNode(Node):
         self.pos_end = self.token.pos_end
 
     def __repr__(self):
-        return f'{self.token}'
+        return f'num:{self.token}'
 
 
 class StringNode(Node):

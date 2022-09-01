@@ -1,0 +1,71 @@
+# How Nougaro works internally ?
+ Wow, what a question. We are going to explain you. Keep calm and read ;)
+ 
+## Lexer, parser, interpreter
+ When you enter something in the shell, or that you run a nougaro file, the code always pass into these three steps: lexer, parser, interpreter.
+
+### Lexer
+ Firsts things first, the lexer converts your plain text code into tokens. Tokens are small pieces of code, such as a '+', a keyword like 'import' or an identifier.
+
+ For example, the line `while a != 10 then var a += 1` is translated by the lexer to this list of tokens :
+
+    keyword:while, identifier:a, !=, int:10, keyword:then, keyword:var, identifier:a, +=, int:1, end of file
+
+ The list of the token types in this example is:
+
+    KEYWORD, IDENTIFIER, INT, KEYWORD, KEYWORD, IDENTIFIER, PLUSEQ, INT, EOF
+
+### Parser
+ After the lexer, the parser converts the tokens into nodes, following some [grammar rules](grammar.txt). Nodes are bigger parts of the code, such as function definitions or binary operators.
+
+ Let's take the tokens from the previous example and put them into the parser. We get this:
+
+    (list:[[(while:[(var_access:[identifier:a]), !=, num:int:10] then:(var_assign:identifier:a += [num:int:1]))]])
+
+ Ouch... Let's organise this mess to explain it easier.
+
+    (list:[
+      [(while:
+         [
+            (
+               var_access:[identifier:a]
+            ),
+            !=,
+            num:int:10
+         ]
+      then:
+         (
+            var_assign:identifier:a += [num:int:1]
+         )
+      )]
+    ])
+
+ First, we have a `ListNode`. It contains only one other node, but if the code to execute had more lines, there would be more nodes.
+ 
+ The node inside the `ListNode` is a `WhileNode` that is split into two parts: the `while` part including the condition, and the `then` part containing the body.
+
+ The condition is `[(var_access:[identifier:a]), !=, num:int:10]`: first we have a VarAccessNode, with the identifier `a`. It means that user wants to access to the value of the variable `a`. Then, there is a NE (not equal) token, and, finally, a NumberNode with an INT (int) token, with a value of 10. So we have our `a != 10` condition from the line!
+
+ After the `then`, we have the "body node". Here, the body node is just a `VarAssignNode`, that contains the identifier (`a`), the PLUSEQ (+=) token, and then a NumberNode with an INT (int) token. So here again we have our `var a += 1` from the example line!
+
+### Interpreter
+
+ The interpreter (AKA runtime) take the nodes as entry and return a result. In our case, the `WhileNode` will be 'visited', and will return (if a=1) `[2, 3, 4, 5, 6, 7, 8, 9, 10]`. The variable `a` will be updated to 10.
+
+#### Context
+ The context contain a lot of useful thing for the interpreter, such as the `display_name` (name of the function), or the **Symbol Table**.
+
+##### Variables and symbol tables
+ The interpreter store all the variables in the Symbol Table. This is a table, with the name of the variables on one side and the values on the other side. This looks like that:
+   
+    {
+       "parent": None,
+       "symbols": {
+          "a": 10,
+          "builtin_function": <built-in function "built-in function">,
+       }
+    }
+
+
+# You don't find what you search ?
+ [Email me](mailto://jd-dev@laposte.net) so I can update this file :) (You can also send me a Discord message, if you have my discord)

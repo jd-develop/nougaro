@@ -918,7 +918,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         if error is not None:
             return RTResult().failure(error)
 
-        return RTResult().success(NoneValue(False))
+        return RTResult().success(value)
 
     execute_run.param_names = ["file_name"]
     execute_run.optional_params = []
@@ -963,7 +963,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         if error is not None:  # we check for errors
             return RTResult().failure(error)
 
-        return RTResult().success(NoneValue(False))
+        return RTResult().success(value)
 
     execute_example.param_names = ["example_name"]
     execute_example.optional_params = []

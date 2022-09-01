@@ -123,7 +123,7 @@ a()
 print()
 
 # builtin functions and lists
-var a = print_ret("this string is printed and assigned into a")
+var a = print_ret("this string is printed and assigned to a")
 print("type(a) is " + type(a))  # str
 print("is_str(a) is " + str(is_str(a)))  # True
 print("is_list(a) is " + str(is_list(a)))  # False

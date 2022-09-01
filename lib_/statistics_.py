@@ -582,7 +582,7 @@ class Statistics(BaseBuiltInFunction):
         multimode = statistics.multimode(data_)  # we calculate the multimode
         multimode_ = []
         for e in multimode:
-            multimode_.append(py2noug(e))  # it converts from python types to nougaro values
+            multimode_.append(py2noug(e))  # it converts python types to nougaro values
         return RTResult().success(List(multimode_))
 
     execute_statistics_multimode.param_names = ['data']

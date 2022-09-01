@@ -44,7 +44,7 @@
  
  The node inside the `ListNode` is a `WhileNode` that is split into two parts: the `while` part including the condition, and the `then` part containing the body.
 
- The condition is `[(var_access:[identifier:a]), !=, num:int:10]`: first we have a VarAccessNode, with the identifier `a`. It means that user wants to access to the value of the variable `a`. Then, there is a NE (not equal) token, and, finally, a NumberNode with an INT (int) token, with a value of 10. So we have our `a != 10` condition from the line!
+ The condition is a `BinOpNode`: `[(var_access:[identifier:a]), !=, num:int:10]`: first we have a VarAccessNode, with the identifier `a`. It means that user wants to access to the value of the variable `a`. Then, there is a NE (not equal) token, and, finally, a NumberNode with an INT (int) token, with a value of 10. So we have our `a != 10` condition from the line!
 
  After the `then`, we have the "body node". Here, the body node is just a `VarAssignNode`, that contains the identifier (`a`), the PLUSEQ (+=) token, and then a NumberNode with an INT (int) token. So here again we have our `var a += 1` from the example line!
 

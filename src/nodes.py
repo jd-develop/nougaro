@@ -53,7 +53,7 @@ class StringNode(Node):
         self.pos_end = self.token.pos_end
 
     def __repr__(self):
-        return f'{self.token}'
+        return f'string_node:{self.token}'
 
 
 class ListNode(Node):

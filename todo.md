@@ -7,7 +7,7 @@
   * `src`
     * ✅ ~~`values`~~
     * ✅ ~~`constants.py`~~
-    * `context.py`
+    * ✅ ~~`context.py`~~
     * ✅ ~~`errors.py`~~
     * `interpreter.py`
     * `lexer.py`

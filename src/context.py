@@ -28,13 +28,19 @@ import pprint
 # CONTEXT
 # ##########
 class Context:
+    """Class for the interpreter Context"""
     def __init__(self, display_name, parent=None, parent_entry_pos=None):
-        self.display_name = display_name
-        self.parent = parent
-        self.parent_entry_pos = parent_entry_pos
+        self.display_name = display_name  # name of the function we are in
+        self.parent: Context = parent  # parent context
+        self.parent_entry_pos = parent_entry_pos  # pos_start of the parent context, used in errors tracebacks
+        # ABOUT self.parent_entry_pos:
+        # I actually don't know why there is a parent_entry_pos to every context, but there is no pos_start.
+        # The entry pos seems to be the pos start of a context, but... Well, I don't know....
+        # TODO: find what tf is this
         self.symbol_table: SymbolTable = None
 
     def dict_(self) -> dict:
+        """Repr the context under a dict form."""
         repr_dict = {'symbol_table': self.symbol_table,
                      'parent': self.parent,
                      'parent_entry_pos': self.parent_entry_pos,
@@ -43,12 +49,16 @@ class Context:
         return repr_dict
 
     def __repr__(self):
+        """Convert the dict returned by Context.dict_ method into a string-like object.
+        If you want a string, use the Context.__str__ method"""
         return pprint.pformat(self.dict_())
 
     def __str__(self) -> str:
+        """Return the dict returned by Context.dict_ under a str form."""
         return str(self.__repr__())
 
     def copy(self):
+        """Return a copy of self."""
         new_ctx = Context(self.display_name, self.parent, self.parent_entry_pos)
         new_ctx.symbol_table = self.symbol_table.copy()
         return new_ctx

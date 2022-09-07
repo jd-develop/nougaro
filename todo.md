@@ -10,7 +10,7 @@
     * ✅ ~~`context.py`~~
     * ✅ ~~`errors.py`~~
     * `interpreter.py`
-    * `lexer.py`
+    * ✅ ~~`lexer.py`~~
     * ✅ ~~`misc.py`~~
     * ✅ ~~`nodes.py`~~
     * ✅ ~~`nougaro.py`~~

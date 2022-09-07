@@ -6,7 +6,7 @@
  When you enter something in the shell, or that you run a nougaro file, the code always pass into these three steps: [lexer](#Lexer), [parser](#Parser), [interpreter](#Interpreter).
 
 ### Lexer
- Firsts things first, the [lexer](src/lexer.py) converts your plain text code into [tokens](src/token_types.py). Tokens are small pieces of code, such as a '+', a keyword like 'import' or an identifier.
+ Firsts things first, the [lexer](src/lexer.py) converts your plain text code into [tokens](src/token_types.py). Tokens (in French: "lexèmes") are like lexical units, such as a '+', a keyword like 'import' or an identifier.
 
  For example, the line `while a != 10 then var a += 1` is translated by the lexer to this list of tokens :
 

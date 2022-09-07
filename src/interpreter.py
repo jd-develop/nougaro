@@ -330,17 +330,17 @@ class Interpreter:
                         return result.failure(error)
                     ctx.symbol_table.set(var_name, final_value)
                 else:
-                    if ctx.symbol_table.exists(f'__{var_name.value}__'):
+                    if ctx.symbol_table.exists(f'__{var_name}__'):
                         return result.failure(
                             NotDefinedError(
-                                node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined yet, "
-                                                              f"but '__{var_name.value}__' is.", ctx
+                                node.pos_start, node.pos_end, f"name '{var_name}' is not defined yet, "
+                                                              f"but '__{var_name}__' is.", ctx
                             )
                         )
                     else:
                         return result.failure(
                             NotDefinedError(
-                                node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined yet.", ctx
+                                node.pos_start, node.pos_end, f"name '{var_name}' is not defined yet.", ctx
                             )
                         )
         else:

@@ -46,8 +46,8 @@ class Lexer:
         # set the new current char - the next one in the code or None if this is EOF (end of file)
         self.current_char = self.text[self.pos.index] if self.pos.index < len(self.text) else None
 
-    def make_tokens(self) -> Union[tuple[(list[Token], None)], tuple[(None, Error)]]:  # is it too much typing ?
-        """Returns a token list with self.text"""
+    def make_tokens(self):
+        """Returns a token list with self.text. Return tok_list, None or None, error."""
         tokens = []
 
         while self.current_char is not None:  # None is EOF

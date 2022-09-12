@@ -31,17 +31,18 @@ from typing import Any, Union
 # PARSER
 # ##########
 class Parser:
-    """
-        Please see grammar.txt for operation priority.
+    """ The Parser (transforms Tokens from the Lexer to Nodes for the Interpreter).
+        Please see grammar.txt for AST.
     """
 
-    def __init__(self, tokens):
-        self.tokens = tokens
-        self.token_index = -1
+    def __init__(self, tokens: list):
+        self.tokens: list = tokens  # tokens from the lexer
+        self.token_index = -1  # we start at -1, because we advance 2 lines after, so the index will be 0
         self.current_token: Token = None  # Token is imported in src.nodes
         self.advance()
 
     def parse(self):
+        """Parse tokens and return a result that contain a main node"""
         result = self.statements()
         if result.error is not None and self.current_token.type != TT["EOF"]:
             return result.failure(
@@ -51,63 +52,64 @@ class Parser:
         return result
 
     def advance(self):
+        """Advance of 1 token"""
         self.token_index += 1
         self.update_current_token()
         return self.current_token
 
     def reverse(self, amount: int = 1):
+        """Advance of -1 token"""
         # this is just the opposite of self.advance ^^
         self.token_index -= amount
         self.update_current_token()
         return self.current_token
 
     def update_current_token(self):
-        if 0 <= self.token_index < len(self.tokens):
-            self.current_token = self.tokens[self.token_index]
+        """Update current token after having advanced"""
+        if 0 <= self.token_index < len(self.tokens):  # if the index is correct
+            self.current_token = self.tokens[self.token_index]  # we update
 
     # GRAMMARS ATOMS (AST) :
 
-    def statements(self, stop: list[Union[tuple[str, Any], str]] = None) -> ParseResult:
+    def statements(self, stop: list[Union[tuple[(str, Any)], str]] = None) -> ParseResult:
+        """The returned node in the parse result is ALWAYS a ListNode here."""
         if stop is None:
-            stop = [TT["EOF"]]
-        result = ParseResult()
-        statements = []
-        pos_start = self.current_token.pos_start.copy()
+            stop = [TT["EOF"]]  # token(s) that stops parser in this function
+        result = ParseResult()  # we create the result
+        statements = []  # list of statements
+        pos_start = self.current_token.pos_start.copy()  # pos_start
 
-        while self.current_token.type == TT["NEWLINE"]:
+        while self.current_token.type == TT["NEWLINE"]:  # skip new lines
             result.register_advancement()
             self.advance()
 
-        if self.current_token.type == TT["EOF"]:
+        if self.current_token.type == TT["EOF"]:  # End Of File -> nothing to parse!
             return result.success(NoNode())
 
         last_token_type = self.current_token.type
 
-        statement = result.register(self.statement())
-        if result.error is not None:
+        statement = result.register(self.statement())  # we register a statement
+        if result.error is not None:  # we check for errors
             return result
-        statements.append(statement)
+        statements.append(statement)  # we append the statement to our list of there is no error
 
-        while True:
+        while True:  # 'break's inside the loop
             newline_count = 0
-            while self.current_token.type == TT["NEWLINE"]:
+            while self.current_token.type == TT["NEWLINE"]:  # skip new lines
                 result.register_advancement()
                 self.advance()
                 newline_count += 1
 
-            have_to_break = False
-            for e in stop:
-                if isinstance(e, tuple):
-                    if self.current_token.matches(*e):
-                        have_to_break = True
-                else:
-                    if self.current_token.type == e:
-                        have_to_break = True
-            if have_to_break:
+            # we check if we have to stop parsing
+            # in stop there can be tok types or tuples like (tok_type, tok_value)
+            # I made a HUGE optimisation here: there was a 'for' loop (git blame for date)
+            if self.current_token.type in stop or (self.current_token.type, self.current_token.value) in stop:
                 break
             else:
-                if newline_count == 0:
+                if newline_count == 0:  # there was no new line between the last statement and this one: unexpected
+                    # token
                     if last_token_type == TT["IDENTIFIER"] and self.current_token.type in EQUALS:
+                        # there was no new line but there is 'id =' (need 'var')
                         return result.failure(
                             InvalidSyntaxError(
                                 self.current_token.pos_start, self.current_token.pos_end,
@@ -121,20 +123,22 @@ class Parser:
                         )
                     )
 
+            # we replace the last token type
             last_token_type = self.current_token.type
 
+            # we register a statement, check for errors and append the statement if all is OK
             statement = result.register(self.statement())
             if result.error is not None:
                 return result
             statements.append(statement)
 
-        return result.success(ListNode(
+        return result.success(ListNode(  # we put all the nodes parsed here into a ListNode
             statements,
             pos_start,
             self.current_token.pos_end.copy()
         ))
 
-    def statement(self):
+    def statement(self) -> ParseResult:  # only one statement
         result = ParseResult()
         pos_start = self.current_token.pos_start.copy()
 
@@ -188,7 +192,7 @@ class Parser:
 
         return result.success(expr)
 
-    def expr(self):
+    def expr(self) -> ParseResult:
         result = ParseResult()
         pos_start = self.current_token.pos_start.copy()
         if self.current_token.matches(TT["KEYWORD"], 'var'):
@@ -383,7 +387,7 @@ class Parser:
 
         return result.success(node)
 
-    def comp_expr(self):
+    def comp_expr(self) -> ParseResult:
         result = ParseResult()
         if self.current_token.matches(TT["KEYWORD"], 'not') or self.current_token.type == TT["BITWISENOT"]:
             op_token = self.current_token
@@ -411,13 +415,13 @@ class Parser:
                                                      "expected int, float, identifier, '+', '-', '(', '[' or 'not'."))
         return result.success(node)
 
-    def arith_expr(self):
+    def arith_expr(self) -> ParseResult:
         return self.bin_op(self.term, (TT["PLUS"], TT["MINUS"]))
 
-    def term(self):
+    def term(self) -> ParseResult:
         return self.bin_op(self.factor, (TT["MUL"], TT["DIV"], TT["PERC"], TT["FLOORDIV"]))
 
-    def factor(self):
+    def factor(self) -> ParseResult:
         result = ParseResult()
         token = self.current_token
 
@@ -431,10 +435,10 @@ class Parser:
 
         return self.power()
 
-    def power(self):
-        return self.bin_op(self.call, (TT["POW"], ), self.factor)  # do not remove the comma after 'TT["POW"]' !!
+    def power(self) -> ParseResult:
+        return self.bin_op(self.call, (TT["POW"],), self.factor)  # do not remove the comma after 'TT["POW"]' !!
 
-    def call(self):
+    def call(self) -> ParseResult:
         result = ParseResult()
         atom = result.register(self.atom())
         if result.error is not None:
@@ -500,7 +504,7 @@ class Parser:
             return result.success(call_node)
         return result.success(atom)
 
-    def atom(self):
+    def atom(self) -> ParseResult:
         result = ParseResult()
         token = self.current_token
 
@@ -601,7 +605,7 @@ class Parser:
                                                                "'def', '+', '-', '[' or '('.")
         )
 
-    def list_expr(self):
+    def list_expr(self) -> ParseResult:
         result = ParseResult()
         element_nodes = []
         pos_start = self.current_token.pos_start.copy()
@@ -670,7 +674,7 @@ class Parser:
             element_nodes, pos_start, self.current_token.pos_end.copy()
         ))
 
-    def if_expr(self):
+    def if_expr(self) -> ParseResult:
         result = ParseResult()
         all_cases = result.register(self.if_expr_cases('if'))
         if result.error is not None:
@@ -678,10 +682,10 @@ class Parser:
         cases, else_cases = all_cases
         return result.success(IfNode(cases, else_cases))
 
-    def if_expr_b(self):  # elif
+    def if_expr_b(self) -> ParseResult:  # elif
         return self.if_expr_cases("elif")
 
-    def if_expr_c(self):  # else
+    def if_expr_c(self) -> ParseResult:  # else
         result = ParseResult()
         else_case = None
 
@@ -714,7 +718,7 @@ class Parser:
 
         return result.success(else_case)
 
-    def if_expr_b_or_c(self):  # elif elif elif (...) else or just else
+    def if_expr_b_or_c(self) -> ParseResult:  # elif elif elif (...) else or just else
         result = ParseResult()
         cases, else_case = [], None
 
@@ -730,7 +734,7 @@ class Parser:
 
         return result.success((cases, else_case))
 
-    def if_expr_cases(self, case_keyword):  # how to explain this function ? IDK
+    def if_expr_cases(self, case_keyword) -> ParseResult:  # how to explain this function ? IDK
         result = ParseResult()
         cases = []
         else_case = None
@@ -789,7 +793,7 @@ class Parser:
 
         return result.success((cases, else_case))
 
-    def for_expr(self):
+    def for_expr(self) -> ParseResult:
         result = ParseResult()
         if not self.current_token.matches(TT["KEYWORD"], 'for'):
             return result.error(InvalidSyntaxError, self.current_token.pos_start, self.current_token.pos_end,
@@ -927,7 +931,7 @@ class Parser:
 
         return result.success(ForNode(var_name, start_value, end_value, step_value, body, False))
 
-    def while_expr(self):
+    def while_expr(self) -> ParseResult:
         result = ParseResult()
 
         if not self.current_token.matches(TT["KEYWORD"], 'while'):
@@ -973,7 +977,7 @@ class Parser:
 
         return result.success(WhileNode(condition, body, False))
 
-    def do_expr(self):
+    def do_expr(self) -> ParseResult:
         result = ParseResult()
 
         if not self.current_token.matches(TT["KEYWORD"], 'do'):
@@ -1032,7 +1036,7 @@ class Parser:
 
         return result.success(DoWhileNode(body, condition, should_return_none))
 
-    def func_def(self):
+    def func_def(self) -> ParseResult:
         result = ParseResult()
 
         if not self.current_token.matches(TT["KEYWORD"], 'def'):
@@ -1169,7 +1173,7 @@ class Parser:
             False
         ))
 
-    def bin_op(self, func_a, ops, func_b=None, left_has_priority: bool = True):
+    def bin_op(self, func_a, ops, func_b=None, left_has_priority: bool = True) -> ParseResult:
         # param left_has_priority is used to know if we have to parse (for exemple) 3==3==3 into
         # ((int:3, ==, int:3), ==, int:3) or (int:3, ==, int:3, ==, int:3)
         if func_b is None:

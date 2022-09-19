@@ -1,5 +1,4 @@
 print("Hello Toulouse!")  # the entire world is actually Toulouse, trust me. If you say 'pain au chocolat', you're not in the world.
-print("Bonjour, Toulouse !")
 # comment
 
 # basic syntax
@@ -19,6 +18,7 @@ assert (3 ^^ 2) == 1
 
 # variables
 ## definition
+var hello = "Hello Toulouse!"
 assert (var a = 1) == 1
 assert (var b = var c = 2) == 2
 
@@ -92,6 +92,37 @@ end
 
 ## call
 assert (def()->"str")() == func()
+
+# builtin funcs
+print("Please test these builtin functions after the execution of the test:")
+print("input")
+print("input_int")
+print("input_num")
+
+assert print(hello) == None
+assert print_ret(hello) == hello
+
+assert type("a") == "str"
+assert type(123) == "int"
+assert type(3.14) == "float"
+assert type([1, 2, 3]) == "list"
+assert type(def()->null) == "func"
+assert type(type) == "built-in func"
+
+assert is_int(123)
+assert is_float(3.14)
+assert is_num(123)
+assert is_num(3.14)
+assert is_str("abc")
+assert is_list([1, 2, 3])
+assert is_func(is_func)
+assert is_func(def()->null)
+assert is_none(None)
+
+assert str(123) == "123"
+assert int("123") == 123
+assert float("3.14") == 3.14
+assert list("abc") = ["a", "b", "c"]
 
 # everything is fine in this file
 print("everything seems fine")

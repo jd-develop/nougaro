@@ -2,6 +2,7 @@
 * add `var id, id2 = *, *2` (like in python)
 * in lists, you can do `[1, 2,  *[3, 4, 5]]`, but you can't do `[1, 2, *foo_list]`. That's annoying...
 * `.5` doesn't return 0.5, but 5. returns 5.0
+* fix #6
 
 * comment these files :
   * ✅ ~~`lib_`~~

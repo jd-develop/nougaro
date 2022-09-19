@@ -1,0 +1,65 @@
+print("Hello, world")
+# comment
+
+# basic syntax
+print("a") ; print("b")
+
+# operators
+assert 1 ^ 2 == 1
+assert 1 * 2 == 2
+assert 1 % 2 == 1
+assert 1 / 2 == 0.5
+assert 1 // 2 == 0
+assert 1 + 2 == 3
+assert 1 - 2 == -1
+assert (1 & 2) == 0
+assert (1 | 2) == 3
+assert (3 ^^ 2) == 1
+
+# variables
+## definition
+assert (var a = 1) == 1
+assert (var b = var c = 2) == 2
+
+assert (1 + (var a = 2)) == 3
+
+## edit
+assert (var a = 1) == 1
+assert (var a += 1) == 2
+assert (var a -= 1) == 1
+assert (var a *= 1) == 1
+assert (var a /= 1) == 1
+assert (var a ^= 1) == 1
+assert (var a //= 1) == 1
+assert (var a %= 1) == 0
+assert (var a ||= 1) == 1
+assert (var a &&= 1) == 1
+assert (var a ^^^= 1) == 0
+assert (var a |= 1) == 1
+assert (var a &= 1) == 1
+assert (var a ^^= 1) == 0
+assert (var a === 1) == 0
+assert (var a <== 1) == 1
+assert (var a <<= 1) == 0
+assert (var a >== 1) == 0
+assert (var a >>= 1) == 0
+
+## access
+assert a==0
+
+## deletion
+del a
+
+# strings
+"a"
+'b'
+"a\""
+'b\''
+"a\nb"
+"a\tb"
+"a\\b"
+
+## operations
+assert ("a" + "b") == 'ab'
+
+print("everything seems fine")

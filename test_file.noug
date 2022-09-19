@@ -1,8 +1,9 @@
-print("Hello, world")
+print("Hello Toulouse!")  # the entire world is actually Toulouse, trust me. If you say 'pain au chocolat', you're not in the world.
+print("Bonjour, Toulouse !")
 # comment
 
 # basic syntax
-print("a") ; print("b")
+"a" ; "b"
 
 # operators
 assert 1 ^ 2 == 1
@@ -62,4 +63,35 @@ del a
 ## operations
 assert ("a" + "b") == 'ab'
 
+## tests
+assert True==1
+assert False==0
+assert null==0
+assert "a" in "this is an example string"
+assert 1 in "123"
+assert "azerty" in ["azerty", "qwerty", "bépo"]
+assert 1 > 0
+assert 1 >= 1
+assert 0 < 1
+assert 1 <= 1
+assert True
+assert True and True
+assert True or False
+assert False or True
+assert not (False and True)
+assert False xor True
+assert not (True xor True)
+assert not False
+
+# functions
+## definition
+def func()
+    ## return
+    return "str"
+end
+
+## call
+assert (def()->"str")() == func()
+
+# everything is fine in this file
 print("everything seems fine")

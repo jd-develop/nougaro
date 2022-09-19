@@ -41,16 +41,16 @@ atom       : INT|FLOAT|(STRING (STRING)?*)|(IDENTIFIER (INTERROGATIVE_PNT IDENTI
 list_expr  : LSQUARE ((expr|MUL list_expr) (COMMA (expr|MUL list_expr))?*)? RSQUARE
 
 if_expr    : KEYWORD:IF expr KEYWORD:THEN
-             (statement if_expr_b|if_expr_c?)
-           | (NEWLINE statements KEYWORD:END|if_expr_b|if_expr_c)
+             ((statement if_expr_b|if_expr_c?)
+           | (NEWLINE statements KEYWORD:END|if_expr_b|if_expr_c))
 
 if_expr_b  : KEYWORD:ELIF expr KEYWORD:THEN
-             (statement if_expr_b|if_expr_c?)
-           | (NEWLINE statements KEYWORD:END|if_expr_b|if_expr_c)
+             ((statement if_expr_b|if_expr_c?)
+           | (NEWLINE statements KEYWORD:END|if_expr_b|if_expr_c))
 
 if_expr_c  : KEYWORD:ELSE
-             statement
-           | (NEWLINE statements KEYWORD:END)
+             (statement
+           | (NEWLINE statements KEYWORD:END))
 
 for_expr   : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr (KEYWORD:STEP expr)? KEYWORD:THEN
              statement | (NEWLINE statements KEYWORD:END)

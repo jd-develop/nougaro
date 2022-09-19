@@ -1,6 +1,7 @@
-# TODO list :
+# TODO list before releasing beta:
 * add `var id, id2 = *, *2` (like in python)
-* add attributes
+* in lists, you can do `[1, 2,  *[3, 4, 5]]`, but you can't do `[1, 2, *foo_list]`. That's annoying...
+* `.5` doesn't return 0.5, but 5. returns 5.0
 
 * comment these files :
   * ✅ ~~`lib_`~~
@@ -25,3 +26,6 @@
   * ✅ ~~`build.bat`~~
   * ✅ ~~`example.noug`~~
   * ✅ ~~`shell.py`~~
+
+# TODO list during beta:
+* add attributes (or maybe not?...)

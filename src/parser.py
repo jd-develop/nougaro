@@ -831,42 +831,72 @@ class Parser:
         ))
 
     def if_expr(self) -> ParseResult:
+        """
+        if_expr : KEYWORD:IF expr KEYWORD:THEN
+                  ((statement if_expr_b|if_expr_c?)
+                  | (NEWLINE statements KEYWORD:END|if_expr_b|if_expr_c))
+        """
         result = ParseResult()
+        # we register our if expr using a super cool function
         all_cases = result.register(self.if_expr_cases('if'))
         if result.error is not None:
             return result
-        cases, else_cases = all_cases
-        return result.success(IfNode(cases, else_cases))
+        # we unpack the values. cases are 'if' and 'elif's, else_cases is 'else'
+        cases, else_case = all_cases
+        return result.success(IfNode(cases, else_case))
 
     def if_expr_b(self) -> ParseResult:  # elif
+        """
+        if_expr_b : KEYWORD:ELIF expr KEYWORD:THEN
+                    ((statement if_expr_b|if_expr_c?)
+                    | (NEWLINE statements KEYWORD:END|if_expr_b|if_expr_c))
+        """
         return self.if_expr_cases("elif")
 
     def if_expr_c(self) -> ParseResult:  # else
+        """
+        if_expr_c : KEYWORD:ELSE
+                    (statement
+                    | (NEWLINE statements KEYWORD:END))
+        """
         result = ParseResult()
+        # as we know so far, there is no 'else' structure
         else_case = None
 
+        # now we know there is a 'else' keyword
         if self.current_token.matches(TT["KEYWORD"], 'else'):
+            else_tok_pos = [self.current_token.pos_start.copy(), self.current_token.pos_end.copy()]
+            # we advance
             result.register_advancement()
             self.advance()
 
+            # (NEWLINE statements KEYWORD:END)
             if self.current_token.type == TT["NEWLINE"]:
+                # we advance
                 result.register_advancement()
                 self.advance()
 
+                # we register our statements, and we stop at an 'end' keyword.
                 statements = result.register(self.statements(stop=[(TT["KEYWORD"], 'end')]))
                 if result.error is not None:
                     return result
                 else_case = (statements, True)
 
                 if self.current_token.matches(TT["KEYWORD"], 'end'):
+                    # we advance
                     result.register_advancement()
                     self.advance()
                 else:
+                    # it happens only in one case:
+                    # if condition then
+                    #   expr
+                    # else
+                    # (EOF)
                     return result.failure(InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected 'end'."
+                        *else_tok_pos,
+                        "expected 'end' to close this 'else'."
                     ))
-            else:
+            else:  # there is no newline: statement
                 expr = result.register(self.statement())
                 if result.error is not None:
                     return result
@@ -876,6 +906,7 @@ class Parser:
 
     def if_expr_b_or_c(self) -> ParseResult:  # elif elif elif (...) else or just else
         result = ParseResult()
+        # cases are all the 'elif' cases and else_case is None so far.
         cases, else_case = [], None
 
         if self.current_token.matches(TT["KEYWORD"], 'elif'):

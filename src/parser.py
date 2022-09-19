@@ -756,8 +756,11 @@ class Parser:
         """
         # we create the result
         result = ParseResult()
+        # the python list that will contain the nougaro list's elements
         element_nodes = []
+        # we copy the current token pos start
         pos_start = self.current_token.pos_start.copy()
+        first_tok_pos_end = self.current_token.pos_end.copy()
 
         if self.current_token.type != TT["LSQUARE"]:
             return result.failure(InvalidSyntaxError(
@@ -765,57 +768,61 @@ class Parser:
                 "expected '['."
             ))
 
+        # we advance
         result.register_advancement()
         self.advance()
 
-        if self.current_token.type == TT["RSQUARE"]:
+        if self.current_token.type == TT["RSQUARE"]:  # ] : we close the list
             result.register_advancement()
             self.advance()
-        else:
-            if self.current_token.type == TT["MUL"]:
+        else:  # there are elements
+            # ((expr|MUL list_expr) (COMMA (expr|MUL list_expr))?*)?
+            if self.current_token.type == TT["MUL"]:  # MUL list_expr
+                # we advance
                 result.register_advancement()
                 self.advance()
+                # we register a list
                 list_node: ListNode = result.register(self.list_expr())
                 if result.error is not None:
                     return result
-                for node in list_node.element_nodes:
-                    element_nodes.append(node)
-            else:
+                # we extend our list with the new one
+                element_nodes.extend(list_node.element_nodes)
+            else:  # expr
+                # we register an expr then check for an error
                 element_nodes.append(result.register(self.expr()))
                 if result.error is not None:
-                    return result.failure(
-                        InvalidSyntaxError(
-                            self.current_token.pos_start, self.current_token.pos_end,
-                            "expected ']', '*', 'var', 'if', 'for', 'while', 'def', int, float, identifier, '+', '-', "
-                            "'(', '[' or 'not'."
-                        )
-                    )
+                    return result
 
-            while self.current_token.type == TT["COMMA"]:
+            while self.current_token.type == TT["COMMA"]:  # (COMMA (expr|MUL list_expr))?*
+                # we advance
                 result.register_advancement()
                 self.advance()
 
-                if self.current_token.type == TT["MUL"]:
+                if self.current_token.type == TT["MUL"]:  # MUL list_expr
+                    # we advance
                     result.register_advancement()
                     self.advance()
+                    # we register a list
                     list_node: ListNode = result.register(self.list_expr())
                     if result.error is not None:
                         return result
-                    for node in list_node.element_nodes:
-                        element_nodes.append(node)
-                else:
+                    # we extend our list with the new one
+                    element_nodes.extend(list_node.element_nodes)
+                else:  # expr
+                    # # we register an expr then check for an error
                     element_nodes.append(result.register(self.expr()))
                     if result.error is not None:
                         return result
 
-            if self.current_token.type != TT["RSQUARE"]:
+            if self.current_token.type != TT["RSQUARE"]:  # there is no ']' to close the list
                 return result.failure(
                     InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected ',' or ']'."
+                        pos_start, first_tok_pos_end,
+                        "'[' was never closed."
                     )
                 )
 
+            # we advance
             result.register_advancement()
             self.advance()
 

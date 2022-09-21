@@ -95,9 +95,9 @@ assert (def()->"str")() == func()
 
 # builtin funcs
 print("Please test these builtin functions after the execution of the test:")
-print("input")
-print("input_int")
-print("input_num")
+print("* input")
+print("* input_int")
+print("* input_num")
 
 assert print(hello) == None
 assert print_ret(hello) == hello
@@ -122,7 +122,7 @@ assert is_none(None)
 assert str(123) == "123"
 assert int("123") == 123
 assert float("3.14") == 3.14
-assert list("abc") = ["a", "b", "c"]
+assert list("abc") == ["a", "b", "c"]
 
 # everything is fine in this file
 print("everything seems fine")

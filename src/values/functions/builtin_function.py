@@ -388,6 +388,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Remove element at 'index' from 'list'"""
         # Params:
         # * list
+        # Optional params:
         # * index
         # we get the list and the index
         list_ = exec_context.symbol_table.get('list')
@@ -400,6 +401,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_context
             ))
 
+        if index is None:
+            index = Number(-1)
         if not isinstance(index, Number):  # we check if the index is a number
             return RTResult().failure(RTTypeError(
                 index.pos_start, index.pos_end,
@@ -417,8 +420,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
         return RTResult().success(list_)
 
-    execute_pop.param_names = ['list', 'index']
-    execute_pop.optional_params = []
+    execute_pop.param_names = ['list']
+    execute_pop.optional_params = ['index']
     execute_pop.should_respect_args_number = True
 
     def execute_insert(self, exec_context: Context):

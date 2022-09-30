@@ -25,7 +25,7 @@ from src.token_types import *
 from src.constants import DIGITS, LETTERS, LETTERS_DIGITS
 from src.errors import *
 # built-in python imports
-from typing import Union
+# no imports
 
 
 # ##########
@@ -59,7 +59,7 @@ class Lexer:
                 tokens.append(Token(TT["NEWLINE"], pos_start=self.pos))
                 self.advance()
 
-            elif self.current_char in DIGITS:  # the char is a digit: we generate a number
+            elif self.current_char in DIGITS + '.':  # the char is a digit: we generate a number
                 number, error = self.make_number()
                 if error is None:  # there is no error
                     tokens.append(number)
@@ -367,6 +367,12 @@ class Lexer:
             else:
                 num_str += self.current_char
             self.advance()  # we advance
+
+        if num_str == '.':
+            return None, InvalidSyntaxError(
+                pos_start, self.pos,
+                "no digit in number '.'."
+            )
 
         if dot_count == 0:  # if there is no dots, this is an INT, else this is a FLOAT
             return Token(TT["INT"], int(num_str), pos_start, self.pos.copy()), None

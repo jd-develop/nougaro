@@ -93,7 +93,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return result
 
         # special built-in functions that needs the 'run' function (in nougaro.py) in their arguments
-        if method_name in ['execute_run', 'execute_example']:
+        if method_name in ['execute_run', 'execute_example', 'execute___test__']:
             method: CustomBuiltInFuncMethodWithRunParam  # re-define the custom type
             return_value = result.register(method(exec_context, run))
 
@@ -1170,5 +1170,15 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute___does_tok_type_exist__.param_names = ["type"]
     execute___does_tok_type_exist__.optional_params = []
     execute___does_tok_type_exist__.should_respect_args_number = True
+
+    def execute___test__(self, exec_ctx: Context, run):
+        """Execute the test file."""
+        # no params
+        exec_ctx.symbol_table.set("file_name", String("test_file.noug"))
+        return self.execute_run(exec_ctx, run)
+
+    execute___test__.param_names = []
+    execute___test__.optional_params = []
+    execute___test__.should_respect_args_number = True
 
     # ==================

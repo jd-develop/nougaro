@@ -391,6 +391,8 @@ class Interpreter:
     def visit_AssertNode(self, node: AssertNode, ctx: Context):
         result = RTResult()
         assertion = result.register(self.visit(node.assertion, ctx))
+        if result.should_return():
+            return result
         errmsg = result.register(self.visit(node.errmsg, ctx))
         if result.should_return():
             return result

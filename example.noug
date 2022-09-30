@@ -169,6 +169,9 @@ print(math_sqrt(math_pi) == math_sqrt_pi)  # True
 print(math_root(27, 3))  # returns x with x^3 = 27, so 3
 print(math_degrees(12))  # radians -> degrees
 print(math_radians(math_degrees(12)))  # 12 :)
+print(math_log(3))  # log_e(3)
+print(math_log(3, 4))  # log_4(3)
+print(math_log2(3))  # log_2(3)
 # math_sin, math_cos, math_tan, math_asin, math_acos, math_atan...
 print(math_e)  # euler's number
 print()

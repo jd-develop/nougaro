@@ -29,7 +29,7 @@ from src.values.functions.builtin_function import *
 # Above line : Context, RTResult, errors and values are imported in builtin_function.py
 # built-in python imports
 from math import sqrt as math_sqrt, degrees as math_degrees, radians as math_radians, sin as math_sin, cos as math_cos
-from math import tan as math_tan, asin as math_asin, acos as math_acos, atan as math_atan, e, pi
+from math import tan as math_tan, asin as math_asin, acos as math_acos, atan as math_atan, log, log2, e, pi
 
 # constants
 PI = Number(pi)
@@ -345,6 +345,58 @@ class Math(BaseBuiltInFunction):
     execute_math_abs.optional_params = []
     execute_math_abs.should_respect_args_number = True
 
+    def execute_math_log(self, exec_context: Context):
+        """Exactly like python 'log()'. Default base is 'e' (math_e)."""
+        # Params:
+        # * value
+        # Optional params:
+        # * base
+        value: Value = exec_context.symbol_table.get('value')  # we get the value
+        if not isinstance(value, Number):  # we check if the value is a number
+            return RTResult().failure(RunTimeError(
+                value.pos_start, value.pos_end,
+                "first argument of built-in module function 'math_log' must be a number.",
+                exec_context
+            ))
+
+        base: Value = exec_context.symbol_table.get('base')  # we get the base
+        if base is None:
+            value_to_return = Number(log(value.value))
+        else:
+            if not isinstance(base, Number):  # we check if the base is a number
+                return RTResult().failure(RunTimeError(
+                    base.pos_start, base.pos_end,
+                    "second argument of built-in module function 'math_log' must be a number.",
+                    exec_context
+                ))
+            value_to_return = Number(log(value.value, base.value))
+
+        return RTResult().success(value_to_return)
+
+    execute_math_log.param_names = ['value']
+    execute_math_log.optional_params = ['base']
+    execute_math_log.should_respect_args_number = True
+
+    def execute_math_log2(self, exec_context: Context):
+        """Exactly like python 'log2()', is log(n, 2)"""
+        # Params:
+        # * value
+        value: Value = exec_context.symbol_table.get('value')  # we get the value
+        if not isinstance(value, Number):  # we check if the value is a number
+            return RTResult().failure(RunTimeError(
+                value.pos_start, value.pos_end,
+                "first argument of built-in module function 'math_log2' must be a number.",
+                exec_context
+            ))
+
+        value_to_return = Number(log2(value.value))
+
+        return RTResult().success(value_to_return)
+
+    execute_math_log2.param_names = ['value']
+    execute_math_log2.optional_params = []
+    execute_math_log2.should_respect_args_number = True
+
 
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported
     # Constants
@@ -364,4 +416,6 @@ WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the modu
     "acos": Math("acos"),
     "atan": Math("atan"),
     "abs": Math("abs"),
+    "log": Math("log"),
+    "log2": Math("log2"),
 }

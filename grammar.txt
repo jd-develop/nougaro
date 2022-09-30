@@ -54,7 +54,7 @@ if_expr_c  : KEYWORD:ELSE
 
 for_expr   : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr (KEYWORD:STEP expr)? KEYWORD:THEN
              statement | (NEWLINE statements KEYWORD:END)
-           : KEYWORD:FOR IDENTIFIER IN expr KEYWORD:THEN
+           : KEYWORD:FOR IDENTIFIER KEYWORD:IN expr KEYWORD:THEN
              statement | (NEWLINE statements KEYWORD:END)
 
 while_expr : KEYWORD:WHILE expr KEYWORD:THEN

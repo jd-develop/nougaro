@@ -114,7 +114,7 @@ def set_symbol_table(symbol_table: SymbolTable):
                      ))
     symbol_table.set("__gpl__", GPL)
     symbol_table.set("__is_keyword__", IS_KEYWORD)
-    symbol_table.set("__does_tok_type_exist__", DOES_TOK_TYPE_EXIST)
+    symbol_table.set("__is_valid_token_type__", IS_VALID_TOKEN_TYPE)
     symbol_table.set("__test__", TEST)
 
     symbol_table.set('__symbol_table__', String(pprint.pformat(symbol_table.symbols)))

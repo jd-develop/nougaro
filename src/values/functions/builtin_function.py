@@ -1150,7 +1150,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute___is_keyword__.optional_params = []
     execute___is_keyword__.should_respect_args_number = True
 
-    def execute___does_tok_type_exist__(self, exec_ctx: Context):
+    def execute___is_valid_token_type__(self, exec_ctx: Context):
         """Check if the type is a nougaro token type."""
         # Params :
         # * type
@@ -1160,16 +1160,16 @@ class BuiltInFunction(BaseBuiltInFunction):
         if not isinstance(type_, String):  # we check if it is a string
             return RTResult().failure(RTTypeError(
                 type_.pos_start, type_.pos_end,
-                f"first argument of builtin function '__does_tok_type_exist__' must be a str.",
+                f"first argument of builtin function '__is_valid_token_type__' must be a str.",
                 exec_ctx
             ))
         result = RTResult()
         # then we return if this is a valid tok type or not.
         return result.success(TRUE) if does_tok_type_exist(type_.value) else result.success(FALSE)
 
-    execute___does_tok_type_exist__.param_names = ["type"]
-    execute___does_tok_type_exist__.optional_params = []
-    execute___does_tok_type_exist__.should_respect_args_number = True
+    execute___is_valid_token_type__.param_names = ["type"]
+    execute___is_valid_token_type__.optional_params = []
+    execute___is_valid_token_type__.should_respect_args_number = True
 
     def execute___test__(self, exec_ctx: Context, run):
         """Execute the test file."""

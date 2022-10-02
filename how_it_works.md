@@ -81,4 +81,5 @@
  `src/nougaro.py` have also important roles: it sets the symbol table by calling the function in [src/set_symbol_table.py](src/set_symbol_table.py), it sends the code to the lexer, the parser and then the interpreter, by checking at every step if there is any error to return to The shell.
 
 # You don't find what you're looking for?
- [Email me](mailto://jd-dev@laposte.net), so I can update this file :) (You can also send me a Discord message, if you have my discord)
+ Open an [issue](https://github.com/jd-develop/nougaro/issues/new/choose)
+ If you can not open an issue, consider [emailing me](mailto://jd-dev@laposte.net), so I can update this file :) (You can also send me a Discord message, if you have my discord)

@@ -14,7 +14,7 @@
 
  The list of the token types in this example is:
 
-    KEYWORD, IDENTIFIER, INT, KEYWORD, KEYWORD, IDENTIFIER, PLUSEQ, INT, EOF
+    KEYWORD, IDENTIFIER, NE, INT, KEYWORD, KEYWORD, IDENTIFIER, PLUSEQ, INT, EOF
 
  The lexer uses the [position class](src/position.py) to do not lose itself in the raw code.
 

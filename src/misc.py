@@ -22,13 +22,16 @@
 from src.context import Context
 # built-in python imports
 from typing import Protocol, Any
-from colorama import Fore
+from colorama import init as colorama_init, Fore
+
+
+colorama_init()
 
 
 # ##########
 # COLORS
 # ##########
-# prints text in red. TODO : Sometimes it doesn't work (like in CMD), but this is not my priority.
+# prints text in red.
 def print_in_red(txt): print(Fore.RED + txt + Fore.RESET)
 
 

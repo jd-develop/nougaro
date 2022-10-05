@@ -38,7 +38,7 @@ rem We build
 python -m nuitka --standalone --windows-company-name=Nougaro --windows-product-name=Nougaro --windows-product-version=%NOUGVERSION% shell.py
 
 rem We copy the important files to the created directory
-for %%y in (example.noug "highlight theme for NPP.xml" LICENSE noug_version.json README.md shell.py) do xcopy %%y shell.dist\
+for %%y in (example.noug "highlight theme for NPP.xml" LICENSE noug_version.json README.md shell.py CONTRIBUTING.md "CODE_OF_CONDUCT.md" how_it_works.md test_file.noug) do xcopy %%y shell.dist\
 
 for %%y in (examples lib_ src) do xcopy /s /i %%y shell.dist\%%y
 

@@ -2,30 +2,7 @@
 * add `var id, id2 = *, *2` (like in python)
 * in lists, you can do `[1, 2,  *[3, 4, 5]]`, but you can't do `[1, 2, *foo_list]`. That's annoying...
 * fix #6
-
-* comment these files :
-  * ✅ ~~`lib_`~~
-  * `src`
-    * ✅ ~~`values`~~
-    * ✅ ~~`constants.py`~~
-    * ✅ ~~`context.py`~~
-    * ✅ ~~`errors.py`~~
-    * `interpreter.py`
-    * ✅ ~~`lexer.py`~~
-    * ✅ ~~`misc.py`~~
-    * ✅ ~~`nodes.py`~~
-    * ✅ ~~`nougaro.py`~~
-    * ✅ ~~`parse_result.py`~~
-    * ✅ ~~`parser.py`~~
-    * ✅ ~~`position.py`~~
-    * ✅ ~~`runtime_result.py`~~
-    * ✅ ~~`set_symbol_table.py`~~
-    * ✅ ~~`strings_with_arrows.py`~~
-    * ✅ ~~`token_types.py`~~
-    * ✅ ~~`token.py`~~
-  * ✅ ~~`build.bat`~~
-  * ✅ ~~`example.noug`~~
-  * ✅ ~~`shell.py`~~
+* do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
 
 # TODO list during beta:
 * add attributes (or maybe not?...)

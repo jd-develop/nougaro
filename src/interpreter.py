@@ -32,6 +32,7 @@ from src.context import Context
 from src.misc import CustomInterpreterVisitMethod
 # built-in python imports
 from inspect import signature
+import os.path
 
 
 # ##########
@@ -811,13 +812,18 @@ class Interpreter:
                     file.write(str_to_write_value)
                     file.close()
             else:  # a line number was given
-                # TODO: create a new file if the actual one does not exist
+                file_was_created = False
+                if not os.path.exists(file_name_value):  # the file does not exist
+                    with open(file_name_value, 'w+', encoding='UTF-8') as file:  # we create our file
+                        file.close()
+                        file_was_created = True
                 with open(file_name_value, 'r+', encoding='UTF-8') as file:  # we read our file
                     file_data = file.readlines()
                     file.close()
                 if line_number > len(file_data):  # if it exceeds, we add some blank lines
                     with open(file_name_value, 'a+', encoding='UTF-8') as file:  # no matter the open mode
-                        file.write('\n' * (line_number - len(file_data)))
+                        # here "int(file_was_created)" is 1 if the file is empty or 0 if the file is not empty.
+                        file.write('\n' * (line_number - int(file_was_created) - len(file_data)))
                         file.write(str_to_write_value)
                         file.close()
                 else:  # if it does not exceed the file length

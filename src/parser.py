@@ -219,8 +219,9 @@ class Parser:
 
     def expr(self) -> ParseResult:
         """
-        expr    : KEYWORD:VAR IDENTIFIER (EQ|PLUSEQ|MINUSEQ|MULTEQ|DIVEQ|POWEQ|FLOORDIVEQ|PERCEQ|OREQ|ANDEQ|XOREQ|
-                    BITWISEANDEQ|BITWISEOREQ|BITWISEXOREQ|EEEQ|GTEQ|GTEEQ|LTEQ|LTEEQ) expr
+        expr    : KEYWORD:VAR IDENTIFIER (COMMA IDENTIFIER)?* (EQ|PLUSEQ|MINUSEQ|MULTEQ|DIVEQ|POWEQ|FLOORDIVEQ|PERCEQ|
+                    OREQ|ANDEQ|XOREQ|BITWISEANDEQ|BITWISEOREQ|BITWISEXOREQ|EEEQ|GTEQ|GTEEQ|LTEQ|LTEEQ) expr
+                    (COMMA expr)?*
                 : KEYWORD:DEL IDENTIFIER
                 : KEYWORD:WRITE expr (TO|TO_AND_OVERWRITE) expr INT?
                 : KEYWORD:READ expr (TO IDENTIFIER)? INT?
@@ -231,10 +232,11 @@ class Parser:
         result = ParseResult()
         pos_start = self.current_token.pos_start.copy()
 
-        # KEYWORD:VAR IDENTIFIER (...) expr
+        # KEYWORD:VAR IDENTIFIER (COMMA IDENTIFIER)?* (EQ|...) expr (COMMA expr)?)
         if self.current_token.matches(TT["KEYWORD"], 'var'):
             result.register_advancement()
             self.advance()
+            var_names = []
 
             # we check for identifier
             if self.current_token.type != TT["IDENTIFIER"]:
@@ -254,10 +256,34 @@ class Parser:
                         "use keyword as identifier is illegal."
                     ))
 
-            # we assign the identifier to a variable then we advance
-            var_name = self.current_token
-            result.register_advancement()
-            self.advance()
+            # IDENTIFIER (COMMA IDENTIFIER)?*
+            while self.current_token.type == TT["IDENTIFIER"]:
+                var_names.append(self.current_token)
+
+                result.register_advancement()
+                self.advance()
+                if self.current_token.type != TT["COMMA"]:  # (COMMA IDENTIFIER)?*
+                    break
+
+                # there is a comma: next token should be identifier
+                result.register_advancement()
+                self.advance()
+                if self.current_token.type != TT["IDENTIFIER"]:  # return an error.
+                    if self.current_token.type != TT["KEYWORD"]:
+                        if self.current_token.type not in TOKENS_TO_QUOTE:
+                            error_msg = f"expected identifier, but got {self.current_token.type}."
+                        else:
+                            error_msg = f"expected identifier, but got '{self.current_token.type}'."
+                        return result.failure(
+                            InvalidSyntaxError(
+                                self.current_token.pos_start, self.current_token.pos_end, error_msg
+                            )
+                        )
+                    else:
+                        return result.failure(InvalidSyntaxError(
+                            self.current_token.pos_start, self.current_token.pos_end,
+                            "use keyword as identifier is illegal."
+                        ))
 
             # EQUALS is stored in src/token_types.py
             equal = self.current_token
@@ -282,10 +308,18 @@ class Parser:
             self.advance()
 
             # we register an expr
-            expr = result.register(self.expr())
+            expressions = [result.register(self.expr())]
             if result.error is not None:
                 return result
-            return result.success(VarAssignNode(var_name, expr, equal))
+
+            while self.current_token.type == TT["COMMA"]:  # (COMMA expr)?*
+                result.register_advancement()
+                self.advance()
+                expressions.append(result.register(self.expr()))
+                if result.error is not None:
+                    return result
+
+            return result.success(VarAssignNode(var_names, expressions, equal))
 
         # KEYWORD:DEL IDENTIFIER
         if self.current_token.matches(TT["KEYWORD"], 'del'):

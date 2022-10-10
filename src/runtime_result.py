@@ -31,6 +31,7 @@ class RTResult:
 
         self.loop_should_continue = False  # there is a 'continue' statement
         self.loop_should_break = False  # there is a 'break' statement
+        self.old_should_return = False  # The old value of self.should_return()
 
         self.reset()
 
@@ -42,9 +43,13 @@ class RTResult:
 
         self.loop_should_continue = False
         self.loop_should_break = False
+        self.old_should_return = False
 
     def register(self, result):
         """Register another result in this result"""
+        if not self.old_should_return:  # True -> DON'T TOUCH IT, False -> change to the new
+            self.old_should_return = self.should_return()
+
         # we copy the attrs of other result into the self attrs
         if result.error is not None:
             self.error = result.error
@@ -53,6 +58,7 @@ class RTResult:
         self.function_return_value = result.function_return_value
         self.loop_should_continue = result.loop_should_continue
         self.loop_should_break = result.loop_should_break
+
         return result.value  # we return the other result value
 
     def success(self, value):  # success, we clean up our attrs, we write the new value, and we return self
@@ -80,8 +86,8 @@ class RTResult:
         self.error = error
         return self
 
-    def should_return(self):  # if we should stop the interpretation because of an error, or a statement
-        #                       (return, break, continue)
+    def should_return(self) -> bool:  # if we should stop the interpretation because of an error, or a statement
+        #                               (return, break, continue)
         return (
             self.error or
             self.function_return_value or

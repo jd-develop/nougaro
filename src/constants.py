@@ -20,7 +20,6 @@
 # IMPORTS
 # nougaro modules imports
 from src.token_types import KEYWORDS
-from lib_.__TABLE_OF_MODULES__ import TABLE_OF_MODULES
 # built-in python imports
 import string
 
@@ -69,7 +68,6 @@ BUILTIN_FUNCTIONS = [
     'nougaro',
     '__gpl__',
 ]
-MODULES = [*TABLE_OF_MODULES.keys()]  # all the modules names are stored in lib_.table_of_modules.TABLE_OF_MODULES
 PROTECTED_VARS = [  # finally, the list with all the names that can't be defined by the user
     "null",
     "True",
@@ -89,5 +87,4 @@ PROTECTED_VARS = [  # finally, the list with all the names that can't be defined
     'answerToTheLifeTheUniverseAndEverything',
     *KEYWORDS,  # all the keywords
     *BUILTIN_FUNCTIONS,  # all the builtin function names
-    *MODULES  # all the module names
 ]

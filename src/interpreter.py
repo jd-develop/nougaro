@@ -23,7 +23,7 @@ from src.values.basevalues import Number, String, List, NoneValue, Value
 from src.values.specific_values.number import FALSE
 from src.values.functions.function import Function
 from src.values.functions.base_function import BaseFunction
-from src.constants import PROTECTED_VARS, MODULES
+from src.constants import PROTECTED_VARS
 from src.nodes import *
 from src.errors import NotDefinedError, RunTimeError, RTIndexError, RTTypeError, RTFileNotFoundError, RTAssertionError
 from src.token_types import TT
@@ -33,6 +33,7 @@ from src.misc import CustomInterpreterVisitMethod
 # built-in python imports
 from inspect import signature
 import os.path
+import importlib
 
 
 # ##########
@@ -292,7 +293,7 @@ class Interpreter:
         if len(var_names) != len(values):
             return result.failure(
                 RunTimeError(
-                    node.pos_start, node.pos_end, f"there should be the same amount of identifiers and values."
+                    node.pos_start, node.pos_end, f"there should be the same amount of identifiers and values. "
                                                   f"There is {len(var_names)} identifiers and {len(values)} values.",
                     ctx
                 )
@@ -749,26 +750,16 @@ class Interpreter:
         name_to_import = identifier.value  # we get the module identifier
         is_module = False
 
-        if name_to_import in MODULES:  # the identifier corresponds to a module
-            is_module = True
-
-        if not is_module:
-            if f'__{name_to_import}__' in MODULES:  # e.g. user typed 'import foo' instead of 'import __foo__'
-                return result.failure(
-                    NotDefinedError(
-                        node.pos_start, node.pos_end, f"name '{name_to_import}' is not a module. "
-                                                      f"Did you mean '__{name_to_import}__'?", ctx
-                    )
+        try:
+            module = importlib.import_module(f"lib_.{name_to_import}_")
+        except ImportError:
+            return result.failure(
+                NotDefinedError(
+                    node.pos_start, node.pos_end, f"name '{name_to_import}' is not a module.", ctx
                 )
-            else:
-                return result.failure(
-                    NotDefinedError(
-                        node.pos_start, node.pos_end, f"name '{name_to_import}' is not a module.", ctx
-                    )
-                )
+            )
 
-        from lib_.__TABLE_OF_MODULES__ import TABLE_OF_MODULES  # where modules names are stored
-        what_to_import = TABLE_OF_MODULES[name_to_import]
+        what_to_import = module.WHAT_TO_IMPORT
         for key in what_to_import.keys():  # we import each element of the module
             ctx.symbol_table.set(f"{name_to_import}_{key}", what_to_import[key])
 

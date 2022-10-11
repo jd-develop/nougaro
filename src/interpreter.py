@@ -748,14 +748,13 @@ class Interpreter:
         result = RTResult()
         identifier: Token = node.identifier  # we get the module identifier token
         name_to_import = identifier.value  # we get the module identifier
-        is_module = False
 
         try:
             module = importlib.import_module(f"lib_.{name_to_import}_")
         except ImportError:
             return result.failure(
                 NotDefinedError(
-                    node.pos_start, node.pos_end, f"name '{name_to_import}' is not a module.", ctx
+                    identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx
                 )
             )
 

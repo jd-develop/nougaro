@@ -99,7 +99,7 @@ class Parser:
         statements.append(statement)  # we append the statement to our list of there is no error
 
         # (NEWLINE+ statement)*
-        while True:  # 'break is inside the loop
+        while True:  # 'break' inside the loop
             newline_count = 0
             while self.current_token.type == TT["NEWLINE"]:  # skip new lines
                 result.register_advancement()
@@ -122,6 +122,27 @@ class Parser:
                                 "unexpected token. To declare a variable, use 'var' keyword."
                             )
                         )
+                    if last_token_type == TT["IDENTIFIER"] and self.current_token.type == TT["COMMA"]:
+                        result.register_advancement()
+                        self.advance()
+                        missing_var = True
+                        while self.current_token.type == TT["IDENTIFIER"]:
+                            result.register_advancement()
+                            self.advance()
+                            if self.current_token.type != TT["COMMA"] and self.current_token.type not in EQUALS:
+                                missing_var = False
+                                break
+                            if self.current_token.type not in EQUALS:
+                                result.register_advancement()
+                                self.advance()
+                        if missing_var and self.current_token.type in EQUALS:
+                            # there was no new line but there is 'id1, id2, ... =' (need 'var')
+                            return result.failure(
+                                InvalidSyntaxError(
+                                    self.current_token.pos_start, self.current_token.pos_end,
+                                    "unexpected token. To declare a variable, use 'var' keyword."
+                                )
+                            )
                     return result.failure(
                         InvalidSyntaxError(
                             self.current_token.pos_start, self.current_token.pos_end,

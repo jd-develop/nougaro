@@ -742,12 +742,22 @@ class Interpreter:
         """Visit BreakNode"""
         return RTResult().success_break()  # set RTResult().loop_should_continue to True
 
-    @staticmethod
-    def visit_ImportNode(node: ImportNode, ctx: Context) -> RTResult:
+    def visit_ImportNode(self, node: ImportNode, ctx: Context) -> RTResult:
         """Visit ImportNode"""
         result = RTResult()
         identifier: Token = node.identifier  # we get the module identifier token
         name_to_import = identifier.value  # we get the module identifier
+
+        if os.path.exists(f"lib_/{name_to_import}.noug"):
+            with open(f"lib_/{name_to_import}.noug") as lib_:
+                text = lib_.read()
+                lib_.close()
+            value, error = self.run(file_name=f"{name_to_import} (lib)", text=text, exec_from=ctx.display_name)
+            if error is not None:
+                return result.failure(error)
+            if result.should_return():
+                return result
+            return result.success(NoneValue(False))
 
         try:
             module = importlib.import_module(f"lib_.{name_to_import}_")

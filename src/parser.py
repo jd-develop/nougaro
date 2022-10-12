@@ -129,12 +129,13 @@ class Parser:
                         while self.current_token.type == TT["IDENTIFIER"]:
                             result.register_advancement()
                             self.advance()
+                            if self.current_token.type in EQUALS:
+                                break  # missing_var is already True
                             if self.current_token.type != TT["COMMA"] and self.current_token.type not in EQUALS:
                                 missing_var = False
                                 break
-                            if self.current_token.type not in EQUALS:
-                                result.register_advancement()
-                                self.advance()
+                            result.register_advancement()
+                            self.advance()
                         if missing_var and self.current_token.type in EQUALS:
                             # there was no new line but there is 'id1, id2, ... =' (need 'var')
                             return result.failure(

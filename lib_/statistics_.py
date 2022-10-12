@@ -24,15 +24,13 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.values.py2noug import py2noug
 from lib_.lib_to_make_libs import *
 # Comment about the above line : Context, RTResult and values are imported in lib_to_make_libs.py
-import src.errors
 # built-in python imports
 import statistics
 
 
-class RTStatisticsError(src.errors.RunTimeError):
+class RTStatisticsError(RunTimeError):
     """StatisticsError is an error that can be triggered ONLY via functions in this module."""
     def __init__(self, pos_start, pos_end, details, context: Context):
         super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="StatisticsError")

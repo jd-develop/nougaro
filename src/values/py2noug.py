@@ -31,6 +31,8 @@ def py2noug(value: Any):
         return String(value)
     elif is_num(value):
         return Number(value)
+    elif isinstance(value, bool):
+        return Number(int(value))
     elif isinstance(value, list) or isinstance(value, tuple):
         list_ = list(value)  # we want a list instead of a tuple
         return List(list_)
@@ -38,3 +40,15 @@ def py2noug(value: Any):
         return NoneValue()
     else:
         return Value()  # we just return a base value if there is no equivalent...
+
+
+def noug2py(value: Any):
+    """Converts nougaro values to python ones."""
+    if isinstance(value, String) or isinstance(value, Number):
+        return value.value
+    elif isinstance(value, List):
+        return value.elements
+    elif isinstance(value, NoneValue):
+        return None
+    else:
+        return None

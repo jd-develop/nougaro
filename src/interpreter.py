@@ -25,7 +25,7 @@ from src.values.functions.function import Function
 from src.values.functions.base_function import BaseFunction
 from src.constants import PROTECTED_VARS
 from src.nodes import *
-from src.errors import NotDefinedError, RunTimeError, RTIndexError, RTTypeError, RTFileNotFoundError, RTAssertionError
+from src.errors import RTNotDefinedError, RunTimeError, RTIndexError, RTTypeError, RTFileNotFoundError, RTAssertionError
 from src.token_types import TT
 from src.runtime_result import RTResult
 from src.context import Context
@@ -248,7 +248,7 @@ class Interpreter:
                         var_name.value == "exitt":
                     # my keyboard is sh*tty, so sometimes it types a letter twice...
                     return result.failure(
-                        NotDefinedError(
+                        RTNotDefinedError(
                             node.pos_start, node.pos_end,
                             f"name '{var_name.value}' is not defined. Did you mean 'exit'?",
                             ctx
@@ -258,7 +258,7 @@ class Interpreter:
                     if ctx.symbol_table.exists(f'__{var_name.value}__'):
                         # e.g. the user typed symbol_table instead of __symbol_table__
                         return result.failure(
-                            NotDefinedError(
+                            RTNotDefinedError(
                                 node.pos_start, node.pos_end,
                                 f"name '{var_name.value}' is not defined. Did you mean '__{var_name.value}__'?",
                                 ctx
@@ -266,13 +266,13 @@ class Interpreter:
                         )
                     else:  # not defined at all
                         return result.failure(
-                            NotDefinedError(
+                            RTNotDefinedError(
                                 node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined.", ctx
                             )
                         )
             else:  # none of the identifiers is defined
                 return result.failure(
-                    NotDefinedError(
+                    RTNotDefinedError(
                         node.pos_start, node.pos_end, f"none of the given identifiers is defined.", ctx
                     )
                 )
@@ -363,14 +363,14 @@ class Interpreter:
                         if ctx.symbol_table.exists(f'__{var_name}__'):
                             # e.g. user entered `var foo += 1` instead of `var __foo__ += 1`
                             return result.failure(
-                                NotDefinedError(
+                                RTNotDefinedError(
                                     node.pos_start, node.pos_end, f"name '{var_name}' is not defined yet. "
                                                                   f"Did you mean '__{var_name}__'?", ctx
                                 )
                             )
                         else:
                             return result.failure(
-                                NotDefinedError(
+                                RTNotDefinedError(
                                     node.pos_start, node.pos_end, f"name '{var_name}' is not defined yet.", ctx
                                 )
                             )
@@ -390,8 +390,8 @@ class Interpreter:
         var_name = node.var_name_token.value  # we get the var name
 
         if var_name not in ctx.symbol_table.symbols:  # the variable is not defined thus we can't delete it
-            return result.failure(NotDefinedError(node.pos_start, node.pos_end, f"name '{var_name}' is not defined.",
-                                                  ctx))
+            return result.failure(RTNotDefinedError(node.pos_start, node.pos_end, f"name '{var_name}' is not defined.",
+                                                    ctx))
 
         if var_name not in PROTECTED_VARS:  # the variable isn't protected, we can safely delete it
             ctx.symbol_table.remove(var_name)
@@ -415,7 +415,7 @@ class Interpreter:
                     return result
                 return result.success(NoneValue(False) if should_return_none else expr_value)
 
-        if node.else_case is not None:  # if none of the if elif cases are true, we check for a else case
+        if node.else_case is not None:  # if none of the if elif cases are true, we check for an else case
             expr, should_return_none = node.else_case
             else_value = result.register(self.visit(expr, ctx))
             if result.should_return():  # check for errors
@@ -753,7 +753,7 @@ class Interpreter:
             module = importlib.import_module(f"lib_.{name_to_import}_")
         except ImportError:
             return result.failure(
-                NotDefinedError(
+                RTNotDefinedError(
                     identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx
                 )
             )

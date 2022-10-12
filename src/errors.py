@@ -125,7 +125,7 @@ class RTArithmeticError(RunTimeError):
         self.context = context
 
 
-class NotDefinedError(RunTimeError):
+class RTNotDefinedError(RunTimeError):
     """When a name is not defined"""
     def __init__(self, pos_start, pos_end, details, context: Context):
         super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="NotDefinedError")

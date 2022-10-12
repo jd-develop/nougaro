@@ -136,7 +136,10 @@ class Number(Value):
 
     def added_to(self, other):  # ADDITION
         if isinstance(other, Number):
-            return Number(self.value + other.value).set_context(self.context), None
+            try:
+                return Number(self.value + other.value).set_context(self.context), None
+            except OverflowError as e:
+                return None, RunTimeError(self.pos_start, self.pos_end, f"overflow: {e}", self.context)
         else:
             return None, self.illegal_operation(other)
 

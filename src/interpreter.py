@@ -230,17 +230,21 @@ class Interpreter:
         else:
             return result.success(number.set_pos(node.pos_start, node.pos_end))
 
-    @staticmethod
-    def visit_VarAccessNode(node: VarAccessNode, ctx: Context) -> RTResult:
+    def visit_VarAccessNode(self, node: VarAccessNode, ctx: Context) -> RTResult:
         """Visit VarAccessNode"""
         result = RTResult()
         var_names_list = node.var_name_tokens_list  # there is a list because it can be `a ? b ? c`
         value = None
         var_name = var_names_list[0]  # first we take the first identifier
-        for var_name in var_names_list:   # we check for all the identifiers
-            value = ctx.symbol_table.get(var_name.value)  # we get the value of the variable
-            if value is not None:  # if the variable is defined, we can stop here
-                break
+        for i, var_name in enumerate(var_names_list):   # we check for all the identifiers
+            if isinstance(var_name, Token) and var_name.type == TT["IDENTIFIER"]:
+                value = ctx.symbol_table.get(var_name.value)  # we get the value of the variable
+                if value is not None:  # if the variable is defined, we can stop here
+                    break
+            else:
+                value = result.register(self.visit(var_name, ctx))  # here var_name is an expr
+                if not result.should_return():
+                    break
 
         if value is None:  # the variable is not defined
             if len(var_names_list) == 1:

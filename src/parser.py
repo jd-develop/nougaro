@@ -718,26 +718,21 @@ class Parser:
                 result.register_advancement()
                 self.advance()
 
+                value = self.current_token
                 # we check for identifier
                 if self.current_token.type != TT["IDENTIFIER"]:
-                    # error message
-                    if self.current_token.type in TOKENS_TO_QUOTE:
-                        return result.failure(
-                            InvalidSyntaxError(
-                                self.current_token.pos_start, self.current_token.pos_end,
-                                f"expected identifier after '?', but got '{self.current_token.type}'."
-                            )
-                        )
-                    else:
-                        return result.failure(
-                            InvalidSyntaxError(
-                                self.current_token.pos_start, self.current_token.pos_end,
-                                f"expected identifier after '?', but got {self.current_token.type}."
-                            )
-                        )
-                # append the identifier token to our list
-                choices.append(self.current_token)
-                # wa advance
+                    value = result.register(self.expr())  # eventually, the user could use a value instead of an
+                    #                                       identifier
+                    if result.error is not None:
+                        return result
+                    # append the token to our list
+                    choices.append(value)
+                    break  # the expr is the final value we want to parse
+                    #        E.g.: `identifier ? identifier ? expr ? whatever` : we don't want the `? whatever`
+
+                # append the token to our list
+                choices.append(value)
+                # we advance
                 result.register_advancement()
                 self.advance()
 

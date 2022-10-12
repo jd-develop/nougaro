@@ -236,7 +236,7 @@ class Interpreter:
         var_names_list = node.var_name_tokens_list  # there is a list because it can be `a ? b ? c`
         value = None
         var_name = var_names_list[0]  # first we take the first identifier
-        for i, var_name in enumerate(var_names_list):   # we check for all the identifiers
+        for i, var_name in enumerate(var_names_list):  # we check for all the identifiers
             if isinstance(var_name, Token) and var_name.type == TT["IDENTIFIER"]:
                 value = ctx.symbol_table.get(var_name.value)  # we get the value of the variable
                 if value is not None:  # if the variable is defined, we can stop here
@@ -545,10 +545,11 @@ class Interpreter:
                     return result
 
                 if result.loop_should_continue:
-                    continue  # will continue the 'for e in iterable_.value' -> the interpreted 'for' loop is continued
+                    continue  # will continue the 'for e in iterable_.to_str()' -> the interpreted 'for' loop is
+                    #           continued
 
                 if result.loop_should_break:
-                    break  # will break the 'for e in iterable_.value' -> the interpreted 'for' loop is break
+                    break  # will break the 'for e in iterable_.to_str()' -> the interpreted 'for' loop is break
 
                 elements.append(value)
 

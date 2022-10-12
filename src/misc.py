@@ -24,7 +24,6 @@ from src.context import Context
 from typing import Protocol, Any
 from colorama import init as colorama_init, Fore
 
-
 colorama_init()
 
 

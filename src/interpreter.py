@@ -509,24 +509,25 @@ class Interpreter:
         result = RTResult()
         elements = []
 
-        list_ = result.register(self.visit(node.list_node, ctx))  # we get the list
+        iterable_ = result.register(self.visit(node.list_node, ctx))  # we get the list
         if result.should_return():  # check for errors
             return result
 
-        if isinstance(list_, List):  # if the list is really a list
-            for i in list_.elements:
-                # we set the in-game... wait, the in-code 'i' variable to the actual list element
-                ctx.symbol_table.set(node.var_name_token.value, i)
+        if isinstance(iterable_, List):  # if the list is really a list
+            for e in iterable_.elements:
+                # we set the in-game... wait, the in-code 'e' variable to the actual list element
+                ctx.symbol_table.set(node.var_name_token.value, e)
                 value = result.register(self.visit(node.body_node, ctx))  # we execute the body node
                 if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
                     # error or 'return' statement
                     return result
 
                 if result.loop_should_continue:
-                    continue  # will continue the 'for i in list_.elements' -> the interpreted 'for' loop is continued
+                    continue  # will continue the 'for e in iterable_.elements' -> the interpreted 'for' loop is
+                    #           continued
 
                 if result.loop_should_break:
-                    break  # will break the 'for i in list_.elements' -> the interpreted 'for' loop is break
+                    break  # will break the 'for e in iterable_.elements' -> the interpreted 'for' loop is break
 
                 elements.append(value)
 
@@ -534,10 +535,31 @@ class Interpreter:
                 NoneValue(False) if node.should_return_none else
                 List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
             )
-        else:  # this is not a list
+        elif isinstance(iterable_, String):
+            for e in iterable_.to_str():
+                # we set the in-game... wait, the in-code 'e' variable to the actual str char
+                ctx.symbol_table.set(node.var_name_token.value, String(e))
+                value = result.register(self.visit(node.body_node, ctx))  # we execute the body node
+                if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
+                    # error or 'return' statement
+                    return result
+
+                if result.loop_should_continue:
+                    continue  # will continue the 'for e in iterable_.value' -> the interpreted 'for' loop is continued
+
+                if result.loop_should_break:
+                    break  # will break the 'for e in iterable_.value' -> the interpreted 'for' loop is break
+
+                elements.append(value)
+
+            return result.success(
+                NoneValue(False) if node.should_return_none else
+                List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
+            )
+        else:  # this is not a list nor a str
             return result.failure(
                 RTTypeError(node.list_node.pos_start, node.list_node.pos_end,
-                            f"expected a list after 'in', but found {list_.type_}.",
+                            f"expected a list or a str after 'in', but found {iterable_.type_}.",
                             ctx)
             )
 

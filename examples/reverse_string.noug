@@ -3,7 +3,7 @@
 var string = input("Enter a string to reverse: ")
 var new_string = ''
 
-for letter in list(string) then
+for letter in string then
 	var new_string = letter + new_string
 end
 

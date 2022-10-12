@@ -1079,7 +1079,7 @@ class Parser:
             self.advance()
 
             # expr
-            list_ = result.register(self.expr())
+            iterable_ = result.register(self.expr())
             if result.error is not None:
                 return result
 
@@ -1110,14 +1110,14 @@ class Parser:
                 result.register_advancement()
                 self.advance()
 
-                return result.success(ForNodeList(var_name, body, list_, True))
+                return result.success(ForNodeList(var_name, body, iterable_, True))
 
             # statement
             body = result.register(self.statement())
             if result.error is not None:
                 return result
 
-            return result.success(ForNodeList(var_name, body, list_, False))
+            return result.success(ForNodeList(var_name, body, iterable_, False))
         elif self.current_token.type != TT["EQ"]:
             if self.current_token.type not in TOKENS_TO_QUOTE:
                 error_msg = f"expected 'in' or '=', but got {self.current_token.type}."

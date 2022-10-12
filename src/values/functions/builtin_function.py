@@ -940,6 +940,19 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_ctx
             ))
 
+        return_example_value = exec_ctx.symbol_table.get("return_example_value")
+        if return_example_value is None:
+            return_example_value = FALSE
+
+        if not isinstance(return_example_value, Number):
+            return RTResult().failure(RTTypeError(
+                return_example_value.pos_start, return_example_value.pos_end,
+                "second argument of built-in function 'example' must be a number.",
+                exec_ctx
+            ))
+
+        return_example_value = bool(return_example_value.value)
+
         file_name = "examples/" + example_name.value + ".noug"  # we put the right extension
 
         try:  # we try to open the example file
@@ -966,10 +979,12 @@ class BuiltInFunction(BaseBuiltInFunction):
         if error is not None:  # we check for errors
             return RTResult().failure(error)
 
-        return RTResult().success(value)
+        if return_example_value:
+            return RTResult().success(value)
+        return RTResult().success(NoneValue(False))
 
     execute_example.param_names = ["example_name"]
-    execute_example.optional_params = []
+    execute_example.optional_params = ["return_example_value"]
     execute_example.should_respect_args_number = True
 
     def execute_system_call(self, exec_ctx: Context):

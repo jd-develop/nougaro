@@ -23,6 +23,7 @@ import time
 # Basics :
 # Print
 print("Hello, world!")  # it prints the text then puts a back line
+import hello  # this lib just prints "Hello, world!"
 print()  # this prints a blank line with a back line at the end
 
 # Mathematical operators

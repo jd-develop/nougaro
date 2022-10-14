@@ -52,7 +52,7 @@ class Error:
             # Add chars after the space in the string after the "while string_line[0] in" to delete them.
             string_line = string_line[1:]
         if PRINT_ORIGIN_FILE:
-            result = f"(from {self.origin_file}\n" \
+            result = f"(from {self.origin_file})\n" \
                      f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n \t' + \
                      string_line + '\n '
         else:

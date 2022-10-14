@@ -107,7 +107,7 @@ class String(Value):
         if isinstance(other, List):
             for x in other.elements:
                 if self.value == x.value:
-                    return Number.TRUE.set_context(self.context), None
+                    return Number.TRUE.copy().set_context(self.context), None
             return Number.FALSE.set_context(self.context), None
         elif isinstance(other, String):
             return Number(int(self.value in other.value)).set_context(self.context), None
@@ -306,6 +306,8 @@ class Number(Value):
                     list_.append(String('-'))
                 elif element.value == ".":
                     list_.append(String('.'))
+                elif element.value == "e":  # try 10^-100 -> 10e-100
+                    list_.append(String('e'))
                 else:
                     element_to_int = element.to_int_()[0]
                     if element_to_int is None:
@@ -320,7 +322,7 @@ class Number(Value):
         if isinstance(other, List):
             for x in other.elements:
                 if self.value == x.value:
-                    return Number.TRUE.set_context(self.context), None
+                    return Number.TRUE.copy().set_context(self.context), None
             return Number.FALSE.set_context(self.context), None
         elif isinstance(other, String):
             return Number(int(self.to_str_()[0].value in other.value)).set_context(self.context), None
@@ -414,6 +416,8 @@ class List(Value):
         return self.copy(), None
 
     def is_eq(self, other):
+        # think this is very slow
+        # TODO: maybe find something to improve speed of this method
         if isinstance(other, List):
             if len(self.elements) != len(other.elements):
                 return False
@@ -447,18 +451,18 @@ class List(Value):
         if is_eq is None:
             return None, self.can_not_compare(other)
         elif is_eq:
-            return Number.TRUE.set_context(self.context), None
+            return Number.TRUE.copy().set_context(self.context), None
         else:
-            return Number.FALSE.set_context(self.context), None
+            return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_ne(self, other):
         is_eq = self.is_eq(other)
         if is_eq is None:
             return None, self.can_not_compare(other)
         elif is_eq:
-            return Number.FALSE.set_context(self.context), None
+            return Number.FALSE.copy().set_context(self.context), None
         else:
-            return Number.TRUE.set_context(self.context), None
+            return Number.TRUE.copy().set_context(self.context), None
 
     def is_in(self, other):
         if isinstance(other, List):
@@ -493,15 +497,15 @@ class NoneValue(Value):
 
     def get_comparison_eq(self, other):
         if isinstance(other, NoneValue):
-            return Number(Number.TRUE), None
+            return Number.TRUE.copy(), None
         else:
-            return Number(Number.FALSE), None
+            return Number.FALSE.copy(), None
 
     def get_comparison_ne(self, other):
         if isinstance(other, NoneValue):
-            return Number(Number.FALSE), None
+            return Number.FALSE.copy(), None
         else:
-            return Number(Number.TRUE), None
+            return Number.TRUE.copy(), None
 
     def to_str_(self):
         return String('None').set_context(self.context), None
@@ -519,8 +523,8 @@ class NoneValue(Value):
         if isinstance(other, List):
             for element in other.elements:
                 if isinstance(element, NoneValue):
-                    return Number.TRUE.set_context(self.context), None
-            return Number.FALSE.set_context(self.context), None
+                    return Number.TRUE.copy().set_context(self.context), None
+            return Number.FALSE.copy().set_context(self.context), None
         elif isinstance(other, String):
             return Number(int('none' in other.value.lower())).set_context(self.context), None
         else:

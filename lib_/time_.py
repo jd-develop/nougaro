@@ -52,7 +52,7 @@ class Time(Module):
         # * seconds
         seconds = exec_ctx.symbol_table.get('seconds')  # we get the number of seconds we have to sleep
         if not isinstance(seconds, Number):  # we check if it is a number
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 seconds.pos_start, seconds.pos_end,
                 f"first argument of built-in module function 'time_sleep' must be a number, not {seconds.type_}.",
                 exec_ctx
@@ -71,7 +71,7 @@ class Time(Module):
         # * milliseconds
         milliseconds = exec_ctx.symbol_table.get('milliseconds')  # we get the number of milliseconds we have to sleep
         if not isinstance(milliseconds, Number):  # we check if it is a number
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 milliseconds.pos_start, milliseconds.pos_end,
                 f"first argument of built-in module function 'time_sleep_milliseconds' must be an integer, not"
                 f" {milliseconds.type_}.",
@@ -79,7 +79,7 @@ class Time(Module):
             ))
 
         if milliseconds.is_float():  # we do not want a float
-            return RTResult().failure(RunTimeError(
+            return RTResult().failure(RTTypeError(
                 milliseconds.pos_start, milliseconds.pos_end,
                 "first argument of built-in module function 'time_sleep_milliseconds' must be an integer, not float.",
                 exec_ctx

@@ -140,7 +140,7 @@ class Statistics(Module):
                 f"python statistics.geometric_mean() crashed with this error: "
                 f"{exception.__class__.__name__}: {exception}.\n"
                 f"PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: https://jd-develop.github.io/nougaro/bugreport.html !",
-                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_geometric_mean"
+                exec_ctx, origin_file="lib_.statistics_.Statistics.execute_statistics_geometric_mean"
             ))
 
         return RTResult().success(Number(geometric_mean_))
@@ -236,7 +236,7 @@ class Statistics(Module):
                 f"python statistics.harmonic_mean() crashed with this error: "
                 f"{exception.__class__.__name__}: {exception}.\n"
                 f"PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: https://jd-develop.github.io/nougaro/bugreport.html !",
-                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_harmonic_mean"
+                exec_ctx, origin_file="lib_.statistics_.Statistics.execute_statistics_harmonic_mean"
             ))
 
         return RTResult().success(Number(harmonic_mean_))

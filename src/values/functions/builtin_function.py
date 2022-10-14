@@ -910,7 +910,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f"failed to load script '{file_name}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
-                exec_ctx, "src.values.function.builtin_function.BuiltInFunction.execute_run"
+                exec_ctx, origin_file="src.values.function.builtin_function.BuiltInFunction.execute_run"
             ))
 
         # we run the script
@@ -969,7 +969,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f"failed to load script '{file_name}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
-                exec_ctx, "src.values.function.builtin_function.BuiltInFunction.execute_example"
+                exec_ctx, origin_file="src.values.function.builtin_function.BuiltInFunction.execute_example"
             ))
 
         # then we execute the file
@@ -1006,7 +1006,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f"failed to call '{cmd}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
-                exec_ctx, "src.values.function.builtin_function.BuiltInFunction.execute_system_call"
+                exec_ctx, origin_file="src.values.function.builtin_function.BuiltInFunction.execute_system_call"
             ))
 
     execute_system_call.param_names = ["cmd"]
@@ -1082,7 +1082,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 song.pos_start, song.pos_end,
                 f"'{song.value}' is not a song in the actual database. Available songs: "
                 f"{', '.join(list(songs.keys()))}",
-                exec_ctx, "src.values.function.builtin_function.BuiltInFunction.execute_nougaro"
+                exec_ctx, origin_file="src.values.function.builtin_function.BuiltInFunction.execute_nougaro"
             ))
 
     execute_nougaro.param_names = []

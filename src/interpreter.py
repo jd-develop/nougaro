@@ -301,7 +301,7 @@ class Interpreter:
                 RunTimeError(
                     node.pos_start, node.pos_end, f"there should be the same amount of identifiers and values. "
                                                   f"There is {len(var_names)} identifiers and {len(values)} values.",
-                    ctx, "src.interpreter.Interpreter.visit_VarAssignNode"
+                    ctx, origin_file="src.interpreter.Interpreter.visit_VarAssignNode"
                 )
             )
 
@@ -385,7 +385,7 @@ class Interpreter:
             else:  # protected variable name
                 return result.failure(RunTimeError(node.pos_start, node.pos_end,
                                                    f"can not create or edit a variable with builtin name '{var_name}'.",
-                                                   ctx, "src.interpreter.Interpreter.visit_VarAssignNode"))
+                                                   ctx, origin_file="src.interpreter.Interpreter.visit_VarAssignNode"))
             final_values.append(final_value)
         return result.success(
             List(final_values).set_pos(node.pos_start, node.pos_end) if len(final_values) != 1 else final_values[0]
@@ -406,7 +406,7 @@ class Interpreter:
         else:  # the variable is protected
             return result.failure(RunTimeError(node.pos_start, node.pos_end,
                                                f"can not delete value assigned to builtin name '{var_name}'.",
-                                               ctx, "src.interpreter.Interpreter.visit_VarDeleteNode"))
+                                               ctx, origin_file="src.interpreter.Interpreter.visit_VarDeleteNode"))
         return result.success(NoneValue(False))
 
     def visit_IfNode(self, node: IfNode, ctx: Context) -> RTResult:
@@ -658,7 +658,7 @@ class Interpreter:
             else:  # the name is protected
                 return result.failure(RunTimeError(node.pos_start, node.pos_end,
                                                    f"can not create a function with builtin name '{func_name}'.",
-                                                   ctx, "src.interpreter.Interpreter.visit_FuncDefNode"))
+                                                   ctx, origin_file="src.interpreter.Interpreter.visit_FuncDefNode"))
 
         return result.success(func_value)  # we return our Function value
 
@@ -712,7 +712,7 @@ class Interpreter:
                     return result.failure(RunTimeError(
                         node.pos_start, node.pos_end,
                         f"indexes must be integers, not {index.type_}.",
-                        ctx, "src.interpreter.Interpreter.visit_CallNode"
+                        ctx, origin_file="src.interpreter.Interpreter.visit_CallNode"
                     ))
             elif len(node.arg_nodes) > 1:  # there is more than one index given
                 return_value = []
@@ -734,20 +734,20 @@ class Interpreter:
                         return result.failure(RunTimeError(
                             arg_node.pos_start, arg_node.pos_end,
                             f"indexes must be integers, not {index.type_}.",
-                            ctx, "src.interpreter.Interpreter.Visit_CallNode"
+                            ctx, origin_file="src.interpreter.Interpreter.Visit_CallNode"
                         ))
                 return result.success(List(return_value).set_context(ctx).set_pos(node.pos_start, node.pos_end))
             else:  # there is no index given
                 return result.failure(RunTimeError(
                     node.pos_start, node.pos_end,
                     f"please give at least one index.",
-                    ctx, "src.interpreter.Interpreter.Visit_CallNode"
+                    ctx, origin_file="src.interpreter.Interpreter.Visit_CallNode"
                 ))
         else:  # the object is not callable
             return result.failure(RunTimeError(
                 node.pos_start, node.pos_end,
                 f"{value_to_call.type_} is not callable.",
-                ctx, "src.interpreter.Interpreter.Visit_CallNode"
+                ctx, origin_file="src.interpreter.Interpreter.Visit_CallNode"
             ))
 
     def visit_ReturnNode(self, node: ReturnNode, ctx: Context) -> RTResult:
@@ -851,7 +851,7 @@ class Interpreter:
                 return result.failure(
                     RunTimeError(
                         node.pos_start, node.pos_end, f"can not overwrite <stdout>.", ctx,
-                        "src.interpreter.Interpreter.visit_WriteNode"
+                        origin_file="src.interpreter.Interpreter.visit_WriteNode"
                     )
                 )
             print(str_to_write_value)
@@ -913,7 +913,7 @@ class Interpreter:
                 RunTimeError(
                     node.pos_start, node.pos_end, f"unable to write in file '{file_name_value}'. "
                                                   f"More info : Python{e.__class__.__name__}: {e}", ctx,
-                    "src.interpreter.Interpreter.visit_WriteNode"
+                    origin_file="src.interpreter.Interpreter.visit_WriteNode"
                 )
             )
 
@@ -968,7 +968,7 @@ class Interpreter:
                 RunTimeError(
                     node.pos_start, node.pos_end, f"unable to write in file '{file_name_value}'. "
                                                   f"More info : Python{e.__class__.__name__}: {e}", ctx,
-                    "src.interpreter.Interpreter.visit_ReadNode"
+                    origin_file="src.interpreter.Interpreter.visit_ReadNode"
                 )
             )
 
@@ -980,7 +980,7 @@ class Interpreter:
                     RunTimeError(
                         node.pos_start, node.pos_end,
                         f"unable to create a variable with builtin name '{identifier.value}'.",
-                        ctx, "src.interpreter.Interpreter.visit_ReadNode"
+                        ctx, origin_file="src.interpreter.Interpreter.visit_ReadNode"
                     )
                 )
 

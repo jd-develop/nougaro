@@ -82,7 +82,7 @@ class Random(Module):
                 a.pos_start, b.pos_end,
                 "first argument of built-in module function 'random_randint' MUST be less than or equal to its second"
                 " argument.",
-                exec_ctx, "lib_.random_.Random.execute_random_randint"
+                exec_ctx, origin_file="lib_.random_.Random.execute_random_randint"
             ))
 
         random_number = random.randint(a.value, b.value)
@@ -116,7 +116,7 @@ class Random(Module):
             return RTResult().failure(RunTimeError(
                 list_.pos_start, list_.pos_end,
                 "list is empty.",
-                exec_ctx, "lib_.random_.Random.execute_random_choice"
+                exec_ctx, origin_file="lib_.random_.Random.execute_random_choice"
             ))
         return RTResult().success(random.choice(list_.elements))  # then we return a random element of the list
 

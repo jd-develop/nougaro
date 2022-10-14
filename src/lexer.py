@@ -400,6 +400,13 @@ class Lexer:
                 "src.lexer.Lexer.make_number"
             )
 
+        if num_str == '':
+            return None, InvalidSyntaxError(
+                pos_start, self.pos,
+                "can not make a number with this expression.",
+                "src.lexer.Lexer.make_number"
+            )
+
         if dot_count == 0:  # if there is no dots, this is an INT, else this is a FLOAT
             return Token(TT["INT"], int(num_str), pos_start, self.pos.copy()), None
         else:

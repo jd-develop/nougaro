@@ -42,7 +42,7 @@ global_symbol_table = SymbolTable()
 set_symbol_table(global_symbol_table)  # This function is in src.set_symbol_table
 
 
-with open("noug_version.json") as ver_json:  # we get the nougaro version from noug_version.json
+with open("config/noug_version.json") as ver_json:  # we get the nougaro version from noug_version.json
     ver_json_loaded = json.load(ver_json)
     version_ = ver_json_loaded.get("phase") + " " + ver_json_loaded.get("noug_version")
 

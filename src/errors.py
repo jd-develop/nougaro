@@ -25,16 +25,22 @@ from src.context import Context
 # no imports
 
 
+with open("config/debug") as debug:
+    PRINT_ORIGIN_FILE = bool(int(debug.read()))
+    debug.close()
+
+
 # ##########
 # ERRORS
 # ##########
 class Error:
     """Parent class for all the Nougaro errors."""
-    def __init__(self, pos_start, pos_end, error_name, details):
+    def __init__(self, pos_start, pos_end, error_name, details, origin_file: str = "(undetermined)"):
         self.pos_start = pos_start
         self.pos_end = pos_end
         self.error_name = error_name  # e.g. IllegalCharError
         self.details = details  # e.g. "'ù' is an illegal character."
+        self.origin_file: str = origin_file
 
     def as_string(self):
         """Returns a printable clean error message with all the information.
@@ -45,27 +51,33 @@ class Error:
             # delete spaces at the start of the str.
             # Add chars after the space in the string after the "while string_line[0] in" to delete them.
             string_line = string_line[1:]
-        result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n \t' + \
-                 string_line + '\n '
+        if PRINT_ORIGIN_FILE:
+            result = f"(from {self.origin_file}\n" \
+                     f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n \t' + \
+                     string_line + '\n '
+        else:
+            result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n \t' + \
+                     string_line + '\n '
         result += f'{self.error_name}: {self.details}' if self.details != '' else f'{self.error_name}'
         return result
 
 
 class IllegalCharError(Error):
     """Illegal Character (like 'ù')"""
-    def __init__(self, pos_start, pos_end, details):
-        super().__init__(pos_start, pos_end, "IllegalCharError", details)
+    def __init__(self, pos_start, pos_end, details, origin_file: str = "(undetermined)"):
+        super().__init__(pos_start, pos_end, "IllegalCharError", details, origin_file=origin_file)
 
 
 class InvalidSyntaxError(Error):
     """Invalid Syntax"""
-    def __init__(self, pos_start, pos_end, details):
-        super().__init__(pos_start, pos_end, "InvalidSyntaxError", details)
+    def __init__(self, pos_start, pos_end, details, origin_file: str = "(undetermined)"):
+        super().__init__(pos_start, pos_end, "InvalidSyntaxError", details, origin_file=origin_file)
 
 
 class RunTimeError(Error):
     """Parent class for all the run-time Nougaro errors (happens when interpreting code with interpreter.py)"""
-    def __init__(self, pos_start, pos_end, details, context: Context, rt_error: bool = True, error_name: str = ""):
+    def __init__(self, pos_start, pos_end, details, context: Context, rt_error: bool = True, error_name: str = "",
+                 origin_file: str = "(undetermined)"):
         """
 
         :param pos_start: position start
@@ -74,8 +86,10 @@ class RunTimeError(Error):
         :param context: context where the error happens
         :param rt_error: if the error name is RunTimeError or not. (bool)
         :param error_name: the error name if rt_error==False
+        :param origin_file: the original python file from where this error is called
         """
-        super().__init__(pos_start, pos_end, "RunTimeError" if rt_error else error_name, details)
+        super().__init__(pos_start, pos_end, "RunTimeError" if rt_error else error_name, details,
+                         origin_file=origin_file)
         self.context = context
 
     def as_string(self):
@@ -104,7 +118,10 @@ class RunTimeError(Error):
             pos = ctx.parent_entry_pos
             ctx = ctx.parent
 
-        return "Traceback (more recent call last) :\n" + result
+        if PRINT_ORIGIN_FILE:
+            return f"(from {self.origin_file})\nTraceback (more recent call last) :\n" + result
+        else:
+            return "Traceback (more recent call last) :\n" + result
 
     def set_pos(self, pos_start, pos_end):
         self.pos_start = pos_start
@@ -113,42 +130,47 @@ class RunTimeError(Error):
 
 class RTIndexError(RunTimeError):
     """Index error (like '[1, 2](2)')"""
-    def __init__(self, pos_start, pos_end, details, context: Context):
-        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="IndexError")
+    def __init__(self, pos_start, pos_end, details, context: Context, origin_file: str = "(undetermined)"):
+        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="IndexError",
+                         origin_file=origin_file)
         self.context = context
 
 
 class RTArithmeticError(RunTimeError):
     """Arithmetic error (like 1/0)"""
-    def __init__(self, pos_start, pos_end, details, context: Context):
-        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="ArithmeticError")
+    def __init__(self, pos_start, pos_end, details, context: Context, origin_file: str = "(undetermined)"):
+        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="ArithmeticError",
+                         origin_file=origin_file)
         self.context = context
 
 
 class RTNotDefinedError(RunTimeError):
     """When a name is not defined"""
-    def __init__(self, pos_start, pos_end, details, context: Context):
-        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="NotDefinedError")
+    def __init__(self, pos_start, pos_end, details, context: Context, origin_file: str = "(undetermined)"):
+        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="NotDefinedError",
+                         origin_file=origin_file)
         self.context = context
 
 
 class RTTypeError(RunTimeError):
     """Type error (like 'max("foo")')"""
-    def __init__(self, pos_start, pos_end, details, context: Context):
-        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="TypeError")
+    def __init__(self, pos_start, pos_end, details, context: Context, origin_file: str = "(undetermined)"):
+        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="TypeError",
+                         origin_file=origin_file)
         self.context = context
 
 
 class RTFileNotFoundError(RunTimeError):
     """File not found (like `open "this_file_does_not_exist"`)"""
-    def __init__(self, pos_start, pos_end, file_name, context: Context):
+    def __init__(self, pos_start, pos_end, file_name, context: Context, origin_file: str = "(undetermined)"):
         super().__init__(pos_start, pos_end, f"file '{file_name}' does not exist.", context, rt_error=False,
-                         error_name="FileNotFoundError")
+                         error_name="FileNotFoundError", origin_file=origin_file)
         self.context = context
 
 
 class RTAssertionError(RunTimeError):
     """When an assertion is false (like 'assert False')"""
-    def __init__(self, pos_start, pos_end, errmsg, context: Context):
-        super().__init__(pos_start, pos_end, errmsg, context, rt_error=False, error_name="AssertionError")
+    def __init__(self, pos_start, pos_end, errmsg, context: Context, origin_file: str = "(undetermined)"):
+        super().__init__(pos_start, pos_end, errmsg, context, rt_error=False, error_name="AssertionError",
+                         origin_file=origin_file)
         self.context = context

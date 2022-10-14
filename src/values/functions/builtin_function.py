@@ -374,7 +374,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 list_.pos_start, list_.pos_end,
                 "first argument of built-in function 'append' must be a list.",
-                exec_context
+                exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_append"
             ))
 
         list_.elements.append(value)  # we append the element to the list (changes in the symbol table too)
@@ -398,7 +398,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 list_.pos_start, list_.pos_end,
                 "first argument of built-in function 'pop' must be a list.",
-                exec_context
+                exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_pop"
             ))
 
         if index is None:
@@ -407,7 +407,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 index.pos_start, index.pos_end,
                 "second argument of built-in function 'pop' must be a number.",
-                exec_context
+                exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_pop"
             ))
 
         try:  # we try to pop the element
@@ -416,7 +416,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTIndexError(
                 list_.pos_start, index.pos_end,
                 f'pop index {index.value} out of range.',
-                self.context
+                exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_pop"
             ))
         return RTResult().success(list_)
 
@@ -440,7 +440,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 list_.pos_start, list_.pos_end,
                 "first argument of built-in function 'insert' must be a list.",
-                exec_context
+                exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_insert"
             ))
 
         if index is None:
@@ -450,7 +450,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 index.pos_start, index.pos_end,
                 "third argument of built-in function 'insert' must be a number.",
-                exec_context
+                exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_insert"
             ))
 
         # if everything ok, we insert the element to the list at the right index
@@ -478,14 +478,14 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 list1.pos_start, list1.pos_end,
                 "first argument of built-in function 'extend' must be a list.",
-                exec_context
+                exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_extend"
             ))
 
         if not isinstance(list2, List):
             return RTResult().failure(RTTypeError(
                 list2.pos_start, list2.pos_end,
                 "second argument of built-in function 'extend' must be a list.",
-                exec_context
+                exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_extend"
             ))
 
         # if delete_duplicates is defined
@@ -494,7 +494,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 return RTResult().failure(RTTypeError(
                     list2.pos_start, list2.pos_end,
                     "third argument of built-in function 'extend' must be a number.",
-                    exec_context
+                    exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_extend"
                 ))
             if delete_duplicates.value != FALSE.value:  # we have to delete duplicates
                 list1_e = list1.elements
@@ -535,7 +535,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 RTTypeError(
                     list_.pos_start, list_.pos_end,
                     "first argument of built-in function 'get' must be a list.",
-                    exec_context
+                    exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_get"
                 )
             )
 
@@ -544,7 +544,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 RTTypeError(
                     index_.pos_start, index_.pos_end,
                     "second argument of built-in function 'get' must be an int.",
-                    exec_context
+                    exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_get"
                 )
             )
 
@@ -554,7 +554,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTIndexError(
                 list_.pos_start, index_.pos_end,
                 f'list index {index_.value} out of range.',
-                exec_context
+                exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_get"
             ))
 
     execute_get.param_names = ['list', 'index']
@@ -577,8 +577,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(
                 RTTypeError(
                     list_.pos_start, list_.pos_end,
-                    "first argument of built-in function 'get' must be a list.",
-                    exec_context
+                    "first argument of built-in function 'replace' must be a list.",
+                    exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_replace"
                 )
             )
 
@@ -586,8 +586,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(
                 RTTypeError(
                     index_.pos_start, index_.pos_end,
-                    "second argument of built-in function 'get' must be an int.",
-                    exec_context
+                    "second argument of built-in function 'replace' must be an int.",
+                    exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_replace"
                 )
             )
 
@@ -598,7 +598,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTIndexError(
                 list_.pos_start, index_.pos_end,
                 f'list index {index_.value} out of range.',
-                exec_context
+                exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_replace"
             ))
 
         return RTResult().success(list_)
@@ -621,7 +621,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 RTTypeError(
                     list_.pos_start, list_.pos_end,
                     "first argument of builtin function 'max' must be a list.",
-                    exec_context
+                    exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_max"
                 )
             )
 
@@ -634,7 +634,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 RTTypeError(
                     ignore_not_num.pos_start, ignore_not_num.pos_end,
                     "second argument of builtin function 'max' must be a number.",
-                    exec_context
+                    exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_max"
                 )
             )
 
@@ -646,7 +646,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                         list_.pos_start, list_.pos_end,
                         "first argument of builtin function 'max' must be a list containing only numbers. "
                         "You can execute the function with True as the second argument to avoid this error.",
-                        exec_context
+                        exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_max"
                     )
                 )
 
@@ -677,7 +677,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 RTTypeError(
                     list_.pos_start, list_.pos_end,
                     "first argument of builtin function 'min' must be a list.",
-                    exec_context
+                    exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_min"
                 )
             )
 
@@ -690,7 +690,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 RTTypeError(
                     ignore_not_num.pos_start, ignore_not_num.pos_end,
                     "second argument of builtin function 'min' must be a number.",
-                    exec_context
+                    exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_min"
                 )
             )
 
@@ -702,7 +702,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                         list_.pos_start, list_.pos_end,
                         "first argument of builtin function 'min' must be a list containing only numbers. "
                         "You can execute the function with True as the second argument to avoid this error.",
-                        exec_context
+                        exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_min"
                     )
                 )
 
@@ -733,7 +733,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 RTTypeError(
                     self.pos_start, self.pos_end,
                     "first argument of builtin function 'split' must be a str.",
-                    exec_context
+                    exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_split"
                 )
             )
         if char is None or isinstance(char, NoneValue):
@@ -743,7 +743,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 RTTypeError(
                     self.pos_start, self.pos_end,
                     "second argument of builtin function 'split' must be a str or None.",
-                    exec_context
+                    exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_split"
                 )
             )
         # we split and make the list that we return
@@ -858,7 +858,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 value_.pos_start, value_.pos_end,
                 "first argument of built-in function 'len' must be a list or a str.",
-                exec_ctx
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_len"
             ))
 
         if isinstance(value_, List):
@@ -891,7 +891,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 file_name.pos_start, file_name.pos_end,
                 "first argument of built-in function 'run' must be a str.",
-                exec_ctx
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_run"
             ))
 
         file_name = file_name.value
@@ -904,13 +904,13 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTFileNotFoundError(
                 self.pos_start, self.pos_end,
                 file_name,
-                exec_ctx
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_run"
             ))
         except Exception as e:
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f"failed to load script '{file_name}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
-                exec_ctx
+                exec_ctx, "src.values.function.builtin_function.BuiltInFunction.execute_run"
             ))
 
         # we run the script
@@ -937,7 +937,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 example_name.pos_start, example_name.pos_end,
                 "first argument of built-in function 'example' must be a str.",
-                exec_ctx
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_example"
             ))
 
         return_example_value = exec_ctx.symbol_table.get("return_example_value")
@@ -948,7 +948,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 return_example_value.pos_start, return_example_value.pos_end,
                 "second argument of built-in function 'example' must be a number.",
-                exec_ctx
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_example"
             ))
 
         return_example_value = bool(return_example_value.value)
@@ -963,13 +963,13 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTFileNotFoundError(
                 self.pos_start, self.pos_end,
                 file_name,
-                exec_ctx
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_example"
             ))
         except Exception as e:
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f"failed to load script '{file_name}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
-                exec_ctx
+                exec_ctx, "src.values.function.builtin_function.BuiltInFunction.execute_example"
             ))
 
         # then we execute the file
@@ -996,7 +996,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 cmd.pos_start, cmd.pos_end,
                 f"first argument of builtin function 'system_call' must be a str.",
-                exec_ctx
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_system_call"
             ))
 
         try:  # we execute the command
@@ -1006,7 +1006,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f"failed to call '{cmd}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
-                exec_ctx
+                exec_ctx, "src.values.function.builtin_function.BuiltInFunction.execute_system_call"
             ))
 
     execute_system_call.param_names = ["cmd"]
@@ -1022,7 +1022,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
                 f"first argument of builtin function 'lower' must be a str.",
-                exec_ctx
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_lower"
             ))
         return RTResult().success(String(value.value.lower()))  # we return the lower str
 
@@ -1039,7 +1039,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
                 f"first argument of builtin function 'upper' must be a str.",
-                exec_ctx
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_upper"
             ))
         return RTResult().success(String(value.value.upper()))  # we return the upper str
 
@@ -1067,7 +1067,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 song.pos_start, song.pos_end,
                 f"first argument of builtin function 'nougaro' must be a str.",
-                exec_ctx
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_nougaro"
             ))
 
         if song.value == "help":  # help message
@@ -1082,7 +1082,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 song.pos_start, song.pos_end,
                 f"'{song.value}' is not a song in the actual database. Available songs: "
                 f"{', '.join(list(songs.keys()))}",
-                exec_ctx
+                exec_ctx, "src.values.function.builtin_function.BuiltInFunction.execute_nougaro"
             ))
 
     execute_nougaro.param_names = []
@@ -1102,7 +1102,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 print_in_term.pos_start, print_in_term.pos_end,
                 f"first argument of builtin function '__gpl__' must be an int.",
-                exec_ctx
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute___gpl__"
             ))
 
         if not os.path.exists("LICENSE"):  # the GPL3 file is not found
@@ -1155,7 +1155,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 word.pos_start, word.pos_end,
                 f"first argument of builtin function '__is_keyword__' must be a str.",
-                exec_ctx
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute___is_keyword__"
             ))
         result = RTResult()
         # then we return if this is a keyword or not.
@@ -1176,7 +1176,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeError(
                 type_.pos_start, type_.pos_end,
                 f"first argument of builtin function '__is_valid_token_type__' must be a str.",
-                exec_ctx
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute___is_valid_token_type__"
             ))
         result = RTResult()
         # then we return if this is a valid tok type or not.

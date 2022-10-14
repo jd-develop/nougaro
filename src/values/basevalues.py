@@ -75,7 +75,7 @@ class String(Value):
         except ValueError:
             return None, RTResult().failure(RunTimeError(self.pos_start, self.pos_end,
                                                          f"str '{self.value}' can not be converted to int.",
-                                                         self.context))
+                                                         self.context, "src.values.basevalues.String.to_int"))
 
     def to_float_(self):
         try:
@@ -83,7 +83,7 @@ class String(Value):
         except ValueError:
             return None, RTResult().failure(RunTimeError(self.pos_start, self.pos_end,
                                                          f"str '{self.value}' can not be converted to int.",
-                                                         self.context))
+                                                         self.context, "src.values.basevalues.String.to_float"))
 
     def to_list_(self):
         list_ = []
@@ -139,7 +139,8 @@ class Number(Value):
             try:
                 return Number(self.value + other.value).set_context(self.context), None
             except OverflowError as e:
-                return None, RunTimeError(self.pos_start, self.pos_end, f"overflow: {e}", self.context)
+                return None, RunTimeError(self.pos_start, self.pos_end, f"overflow: {e}", self.context,
+                                          "src.values.basevalues.Number.added_to")
         else:
             return None, self.illegal_operation(other)
 
@@ -165,7 +166,8 @@ class Number(Value):
         if isinstance(other, Number):
             if other.value == 0:
                 return None, RTArithmeticError(
-                    other.pos_start, other.pos_end, 'division by zero is not possible.', self.context
+                    other.pos_start, other.pos_end, 'division by zero is not possible.', self.context,
+                    "src.values.basevalues.Number.dived_by"
                 )
             return Number(self.value / other.value).set_context(self.context), None
         else:
@@ -175,7 +177,8 @@ class Number(Value):
         if isinstance(other, Number):
             if other.value == 0:
                 return None, RTArithmeticError(
-                    other.pos_start, other.pos_end, 'division by zero is not possible.', self.context
+                    other.pos_start, other.pos_end, 'division by zero is not possible.', self.context,
+                    "src.values.basevalues.Number.modded_by"
                 )
             return Number(self.value % other.value).set_context(self.context), None
         else:
@@ -185,7 +188,8 @@ class Number(Value):
         if isinstance(other, Number):
             if other.value == 0:
                 return None, RTArithmeticError(
-                    other.pos_start, other.pos_end, 'division by zero is not possible.', self.context
+                    other.pos_start, other.pos_end, 'division by zero is not possible.', self.context,
+                    "src.values.basevalues.Number.floor_dived_by"
                 )
             return Number(self.value // other.value).set_context(self.context), None
         else:
@@ -376,7 +380,7 @@ class List(Value):
                 return None, RTIndexError(
                     other.pos_start, other.pos_end,
                     f'pop index {other.value} out of range.',
-                    self.context
+                    self.context, "src.values.basevalues.List.subbed_by"
                 )
         else:
             return None, self.illegal_operation(other)
@@ -404,7 +408,7 @@ class List(Value):
                 return None, RTIndexError(
                     other.pos_start, other.pos_end,
                     f'list index {other.value} out of range.',
-                    self.context
+                    self.context, "src.values.basevalues.List.dived_by"
                 )
         else:
             return None, self.illegal_operation(other)

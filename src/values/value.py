@@ -289,23 +289,26 @@ class Value:
         """Returns a RunTimeError with message 'illegal operation (with self/between self and other)"""
         if other is None:
             return RunTimeError(
-                self.pos_start, self.pos_end, f'illegal operation with {self.type_}.', self.context
+                self.pos_start, self.pos_end, f'illegal operation with {self.type_}.', self.context,
+                "src.values.value.Value.illegal_operation"
             )
         return RunTimeError(
-            self.pos_start, other.pos_end, f'illegal operation between {self.type_} and {other.type_}.', self.context
+            self.pos_start, other.pos_end, f'illegal operation between {self.type_} and {other.type_}.', self.context,
+            "src.values.value.Value.illegal_operation"
         )
 
     def can_not_compare(self, other):
         """Returns a RunTimeError with message 'can not compare self and other'"""
         return RunTimeError(
-            self.pos_start, other.pos_end, f'can not compare {self.type_} and {other.type_}.', self.context
+            self.pos_start, other.pos_end, f'can not compare {self.type_} and {other.type_}.', self.context,
+            "src.values.value.Value.can_not_compare"
         )
 
     def can_not_be_in(self, other):
         """Returns a RunTimeError with message 'other is not iterable or can not contain self'"""
         return RunTimeError(
             self.pos_start, other.pos_end, f'{other.type_} is not iterable or can not contain {self.type_}.',
-            self.context
+            self.context, "src.value.Value.can_not_be_in"
         )
 
     # =================

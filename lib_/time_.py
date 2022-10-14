@@ -55,7 +55,7 @@ class Time(Module):
             return RTResult().failure(RTTypeError(
                 seconds.pos_start, seconds.pos_end,
                 f"first argument of built-in module function 'time_sleep' must be a number, not {seconds.type_}.",
-                exec_ctx
+                exec_ctx, "lib_.time_.Time.execute_time_sleep"
             ))
 
         time.sleep(seconds.value)  # we sleep
@@ -75,14 +75,14 @@ class Time(Module):
                 milliseconds.pos_start, milliseconds.pos_end,
                 f"first argument of built-in module function 'time_sleep_milliseconds' must be an integer, not"
                 f" {milliseconds.type_}.",
-                exec_ctx
+                exec_ctx, "lib_.time_.Time.execute_time_sleep_milliseconds"
             ))
 
         if milliseconds.is_float():  # we do not want a float
             return RTResult().failure(RTTypeError(
                 milliseconds.pos_start, milliseconds.pos_end,
                 "first argument of built-in module function 'time_sleep_milliseconds' must be an integer, not float.",
-                exec_ctx
+                exec_ctx, "lib_.time_.Time.execute_time_sleep_milliseconds"
             ))
 
         time.sleep(milliseconds.value / 1000)  # ms/1000 = sec

@@ -152,7 +152,8 @@ class Lexer:
                 # illegal char
                 pos_start = self.pos.copy()
                 char = self.current_char
-                return [], IllegalCharError(pos_start, self.pos.advance(), f"'{char}' is an illegal character.")
+                return [], IllegalCharError(pos_start, self.pos.advance(), f"'{char}' is an illegal character.",
+                                            origin_file="src.lexer.Lexer.make_tokens")
 
         # append the end of file
         tokens.append(Token(TT["EOF"], pos_start=self.pos))
@@ -237,7 +238,8 @@ class Lexer:
             elif self.current_char == '^':  # ^^^
                 self.advance()
                 if self.current_char != "=":
-                    return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '^^^'.")
+                    return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '^^^'.",
+                                                    "src.lexer.Lexer.make_pow")
                 token_type = TT["XOREQ"]  # ^^^=
                 self.advance()
 
@@ -270,7 +272,8 @@ class Lexer:
         elif self.current_char == '|':  # ||
             self.advance()
             if self.current_char != "=":
-                return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '||'.")
+                return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '||'.",
+                                                "src.lexer.Lexer.make_or")
             token_type = TT["OREQ"]  # ||=
             self.advance()
 
@@ -291,7 +294,8 @@ class Lexer:
         elif self.current_char == '&':  # &&
             self.advance()
             if self.current_char != "=":
-                return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '&&'.")
+                return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '&&'.",
+                                                "src.lexer.Lexer.make_and")
             token_type = TT["ANDEQ"]  # &&=
             self.advance()
 
@@ -321,7 +325,8 @@ class Lexer:
             if self.current_char is None:  # EOF: the string was not closed.
                 return None, InvalidSyntaxError(
                     pos_start, self.pos,
-                    f"{other_quote}{quote}{other_quote} was never closed."
+                    f"{other_quote}{quote}{other_quote} was never closed.",
+                    "src.lexer.Lexer.make_string"
                 )
             if escape_character:  # if the last char is \, we check for escape sequence
                 string_ += escape_characters.get(self.current_char, self.current_char)  # the arg is doubled: if
@@ -361,7 +366,8 @@ class Lexer:
         while self.current_char is not None and self.current_char in DIGITS + '.':  # if char is still a number or a dot
             if self.current_char == '.':  # if the char is a dot
                 if dot_count == 1:  # if we already encountered a dot
-                    return None, InvalidSyntaxError(pos_start, self.pos, "a number can't have more than one dot.")
+                    return None, InvalidSyntaxError(pos_start, self.pos, "a number can't have more than one dot.",
+                                                    "src.lexer.Lexer.make_number")
                 dot_count += 1
                 num_str += '.'
             else:
@@ -371,7 +377,8 @@ class Lexer:
         if num_str == '.':
             return None, InvalidSyntaxError(
                 pos_start, self.pos,
-                "no digit in number '.'."
+                "no digit in number '.'.",
+                "src.lexer.Lexer.make_number"
             )
 
         if dot_count == 0:  # if there is no dots, this is an INT, else this is a FLOAT
@@ -391,13 +398,15 @@ class Lexer:
         elif self.current_char == '>':  # !>
             self.advance()
             if self.current_char != '>':
-                return None, InvalidSyntaxError(pos_start, self.pos, "expected '!>>', but got '!>'.")
+                return None, InvalidSyntaxError(pos_start, self.pos, "expected '!>>', but got '!>'.",
+                                                "src.lexer.Lexer.make_not_equals")
             # !>>
             self.advance()
             return Token(TT["TO_AND_OVERWRITE"], pos_start=pos_start, pos_end=self.pos), None
 
         self.advance()
-        return None, InvalidSyntaxError(pos_start, self.pos, "expected '!=' or '!>>', but got '!'.")
+        return None, InvalidSyntaxError(pos_start, self.pos, "expected '!=' or '!>>', but got '!'.",
+                                        "src.lexer.Lexer.make_not_equals")
 
     def make_equals(self):
         """Make = , == or ===
@@ -439,7 +448,8 @@ class Lexer:
                 return None, InvalidSyntaxError(
                     pos_start,
                     self.pos,
-                    f"expected '=' after '<<', got '{self.current_char}."
+                    f"expected '=' after '<<', got '{self.current_char}.",
+                    "src.lexer.Lexer.make_less_than"
                 )
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None

@@ -32,8 +32,9 @@ import statistics
 
 class RTStatisticsError(RunTimeError):
     """StatisticsError is an error that can be triggered ONLY via functions in this module."""
-    def __init__(self, pos_start, pos_end, details, context: Context):
-        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="StatisticsError")
+    def __init__(self, pos_start, pos_end, details, context: Context, origin_file: str = "lib_.statistics_"):
+        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="StatisticsError",
+                         origin_file=origin_file)
         self.context = context
 
 
@@ -59,7 +60,7 @@ class Statistics(Module):
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_mean' must be a list of numbers.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_mean"
             ))
 
         data_ = []
@@ -69,7 +70,7 @@ class Statistics(Module):
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_mean' must be a list of numbers, not "
                     f"{e.type_}.",
-                    exec_ctx
+                    exec_ctx, "lib_.statistics_.Statistics.execute_statistics_mean"
                 ))
             data_.append(e.value)
 
@@ -77,7 +78,7 @@ class Statistics(Module):
             return RTResult().failure(RTStatisticsError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_mean' must not be empty.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_mean"
             ))
 
         try:
@@ -103,7 +104,7 @@ class Statistics(Module):
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_geometric_mean' must be a list of positive "
                 "numbers.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_geometric_mean"
             ))
 
         data_ = []
@@ -113,14 +114,14 @@ class Statistics(Module):
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_geometric_mean' must be a list of "
                     f"positive numbers, not {e.type_}.",
-                    exec_ctx
+                    exec_ctx, "lib_.statistics_.Statistics.execute_statistics_geometric_mean"
                 ))
             if e.value < 0:
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_geometric_mean' must be a list of "
                     f"positive numbers.",
-                    exec_ctx
+                    exec_ctx, "lib_.statistics_.Statistics.execute_statistics_geometric_mean"
                 ))
             data_.append(e.value)
 
@@ -128,7 +129,7 @@ class Statistics(Module):
             return RTResult().failure(RTStatisticsError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_geometric_mean' must not be empty.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_geometric_mean"
             ))
 
         try:
@@ -139,7 +140,7 @@ class Statistics(Module):
                 f"python statistics.geometric_mean() crashed with this error: "
                 f"{exception.__class__.__name__}: {exception}.\n"
                 f"PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: https://jd-develop.github.io/nougaro/bugreport.html !",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_geometric_mean"
             ))
 
         return RTResult().success(Number(geometric_mean_))
@@ -159,7 +160,7 @@ class Statistics(Module):
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_harmonic_mean' must be a list of numbers.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_harmonic_mean"
             ))
 
         weights = exec_ctx.symbol_table.get('weights')  # we get the list of weights
@@ -167,7 +168,7 @@ class Statistics(Module):
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "second argument of built-in module function 'statistics_harmonic_mean' must be a list of numbers.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_harmonic_mean"
             ))
 
         if weights is not None and len(weights.elements) != len(data.elements):
@@ -175,7 +176,7 @@ class Statistics(Module):
             return RTResult().failure(RTIndexError(
                 data.pos_start, weights.pos_end,
                 "the two arguments of built-in module function 'statistics_harmonic_mean' must have the same length.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_harmonic_mean"
             ))
 
         data_ = []
@@ -185,14 +186,14 @@ class Statistics(Module):
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_harmonic_mean' must be a list of positive"
                     f" numbers, not {e.type_}.",
-                    exec_ctx
+                    exec_ctx, "lib_.statistics_.Statistics.execute_statistics_harmonic_mean"
                 ))
             if e.value < 0:  # the data must contain only positive numbers
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
                     "first argument of built-in module function 'statistics_harmonic_mean' must be a list of "
                     "positives numbers.",
-                    exec_ctx
+                    exec_ctx, "lib_.statistics_.Statistics.execute_statistics_harmonic_mean"
                 ))
             data_.append(e.value)
 
@@ -200,7 +201,7 @@ class Statistics(Module):
             return RTResult().failure(RTStatisticsError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_harmonic_mean' must not be empty.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_harmonic_mean"
             ))
 
         if weights is not None:  # if there is weights
@@ -211,14 +212,14 @@ class Statistics(Module):
                         e.pos_start, e.pos_end,
                         f"first argument of built-in module function 'statistics_harmonic_mean' must be a list of "
                         f"positive numbers, not {e.type_}.",
-                        exec_ctx
+                        exec_ctx, "lib_.statistics_.Statistics.execute_statistics_harmonic_mean"
                     ))
                 if e.value < 0:  # a weight must be a positive number
                     return RTResult().failure(RTTypeError(
                         e.pos_start, e.pos_end,
                         "first argument of built-in module function 'statistics_harmonic_mean' must be a list of "
                         "positives numbers.",
-                        exec_ctx
+                        exec_ctx, "lib_.statistics_.Statistics.execute_statistics_harmonic_mean"
                     ))
                 weights_.append(e.value)
         else:  # weights list is not defined, so all the weights are 1
@@ -235,7 +236,7 @@ class Statistics(Module):
                 f"python statistics.harmonic_mean() crashed with this error: "
                 f"{exception.__class__.__name__}: {exception}.\n"
                 f"PLEASE REPORT THIS BUG BY FOLLOWING THIS LINK: https://jd-develop.github.io/nougaro/bugreport.html !",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_harmonic_mean"
             ))
 
         return RTResult().success(Number(harmonic_mean_))
@@ -253,7 +254,7 @@ class Statistics(Module):
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_median' must be a list of numbers.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_median"
             ))
 
         data_ = []
@@ -262,7 +263,7 @@ class Statistics(Module):
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_median' must be a list of numbers, not "
-                    f"{e.type_}.", exec_ctx
+                    f"{e.type_}.", exec_ctx, "lib_.statistics_.Statistics.execute_statistics_median"
                 ))
             data_.append(e.value)
 
@@ -270,14 +271,15 @@ class Statistics(Module):
             return RTResult().failure(RTStatisticsError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_median' must not be empty.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_median"
             ))
 
         try:  # we try to calculate the median
             median_ = statistics.median(data_)
         except statistics.StatisticsError as exception:
             return RTResult().failure(RTStatisticsError(
-                self.pos_start, self.pos_end, str(exception) + '.', exec_ctx
+                self.pos_start, self.pos_end, str(exception) + '.', exec_ctx,
+                "lib_.statistics_.Statistics.execute_statistics_median"
             ))
 
         return RTResult().success(Number(median_))
@@ -359,7 +361,7 @@ class Statistics(Module):
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_quantiles' must be a list of numbers.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_quantiles"
             ))
 
         n = exec_ctx.symbol_table.get('n')  # we get 'n' (the number of quantiles we want)
@@ -370,14 +372,14 @@ class Statistics(Module):
             return RTResult().failure(RTTypeError(
                 n.pos_start, n.pos_end,
                 "second argument of built-in module function 'statistics_quantiles' must be a number.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_quantiles"
             ))
 
         if n.value < 1:  # 'n' must be at least 1
             return RTResult().failure(RTStatisticsError(
                 n.pos_start, n.pos_end,
                 "second argument of built-in module function 'statistics_quantiles' must be at least 1.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_quantiles"
             ))
 
         method = exec_ctx.symbol_table.get('method')  # we get the method we use
@@ -388,14 +390,14 @@ class Statistics(Module):
             return RTResult().failure(RTTypeError(
                 method.pos_start, method.pos_end,
                 "third argument of built-in module function 'statistics_quantiles' must be a str.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_quantiles"
             ))
 
         if method.value not in ['exclusive', 'inclusive']:  # the method should be "inclusive" or "exclusive"
             return RTResult().failure(RTStatisticsError(
                 method.pos_start, method.pos_end,
                 f"unknown method: {method.value}.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_quantiles"
             ))
 
         data_ = []
@@ -404,7 +406,7 @@ class Statistics(Module):
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_quantiles' must be a list of numbers, not "
-                    f"{e.type_}.", exec_ctx
+                    f"{e.type_}.", exec_ctx, "lib_.statistics_.Statistics.execute_statistics_quantiles"
                 ))
             data_.append(e.value)
 
@@ -412,14 +414,15 @@ class Statistics(Module):
             return RTResult().failure(RTStatisticsError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_median' must have at least two elements.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_quantiles"
             ))
 
         try:  # we try to calculate quantiles
             quantiles_ = statistics.quantiles(data_, n=n.value, method=method.value)
         except statistics.StatisticsError as exception:
             return RTResult().failure(RTStatisticsError(
-                self.pos_start, self.pos_end, str(exception) + '.', exec_ctx
+                self.pos_start, self.pos_end, str(exception) + '.', exec_ctx,
+                "lib_.statistics_.Statistics.execute_statistics_quantiles"
             ))
 
         return RTResult().success(List(quantiles_))
@@ -437,7 +440,7 @@ class Statistics(Module):
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_scope' must be a list of numbers.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_scope"
             ))
 
         data_ = []
@@ -446,14 +449,15 @@ class Statistics(Module):
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_scope' must be a list of numbers, not "
-                    f"{e.type_}.", exec_ctx
+                    f"{e.type_}.", exec_ctx, "lib_.statistics_.Statistics.execute_statistics_scope"
                 ))
             data_.append(e.value)
 
         if len(data_) < 1:  # data must not be empty
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
-                "first argument of built-in module function 'statistics_scope' must not be empty.", exec_ctx
+                "first argument of built-in module function 'statistics_scope' must not be empty.", exec_ctx,
+                "lib_.statistics_.Statistics.execute_statistics_scope"
             ))
 
         scope = max(data_) - min(data_)  # we calculate the scope
@@ -472,7 +476,7 @@ class Statistics(Module):
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_mode' must be a list of numbers.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_mode"
             ))
 
         data_ = []
@@ -481,14 +485,15 @@ class Statistics(Module):
                 return RTResult().failure(RTTypeError(
                     e.pos_start, e.pos_end,
                     f"first argument of built-in module function 'statistics_mode' must be a list of numbers, not "
-                    f"{e.type_}.", exec_ctx
+                    f"{e.type_}.", exec_ctx, "lib_.statistics_.Statistics.execute_statistics_mode"
                 ))
             data_.append(e.value)
 
         if len(data_) < 1:  # the data must not be empty
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
-                "first argument of built-in module function 'statistics_mode' must not be empty.", exec_ctx
+                "first argument of built-in module function 'statistics_mode' must not be empty.", exec_ctx,
+                "lib_.statistics_.Statistics.execute_statistics_mode"
             ))
 
         mode = statistics.mode(data_)  # we calculate the mode
@@ -507,7 +512,7 @@ class Statistics(Module):
             return RTResult().failure(RTTypeError(
                 data.pos_start, data.pos_end,
                 "first argument of built-in module function 'statistics_multimode' must be a list or a str.",
-                exec_ctx
+                exec_ctx, "lib_.statistics_.Statistics.execute_statistics_multimode"
             ))
 
         if isinstance(data, List):
@@ -518,7 +523,7 @@ class Statistics(Module):
                         e.pos_start, e.pos_end,
                         f"first argument of built-in module function 'statistics_multimode' must be a list that does"
                         f" not contains {e.type_}, or a str.",
-                        exec_ctx
+                        exec_ctx, "lib_.statistics_.Statistics.execute_statistics_multimode"
                     ))
                 data_.append(e.value)
         elif isinstance(data, String):

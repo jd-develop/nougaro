@@ -255,7 +255,7 @@ class Interpreter:
                         RTNotDefinedError(
                             node.pos_start, node.pos_end,
                             f"name '{var_name.value}' is not defined. Did you mean 'exit'?",
-                            ctx
+                            ctx, "src.interpreter.Interpreter.visit_varAccessNode"
                         )
                     )
                 else:
@@ -265,19 +265,21 @@ class Interpreter:
                             RTNotDefinedError(
                                 node.pos_start, node.pos_end,
                                 f"name '{var_name.value}' is not defined. Did you mean '__{var_name.value}__'?",
-                                ctx
+                                ctx, "src.interpreter.Interpreter.visit_varAccessNode"
                             )
                         )
                     else:  # not defined at all
                         return result.failure(
                             RTNotDefinedError(
-                                node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined.", ctx
+                                node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined.", ctx,
+                                "src.interpreter.Interpreter.visit_varAccessNode"
                             )
                         )
             else:  # none of the identifiers is defined
                 return result.failure(
                     RTNotDefinedError(
-                        node.pos_start, node.pos_end, f"none of the given identifiers is defined.", ctx
+                        node.pos_start, node.pos_end, f"none of the given identifiers is defined.", ctx,
+                        "src.interpreter.Interpreter.visit_varAccessNode"
                     )
                 )
 
@@ -299,7 +301,7 @@ class Interpreter:
                 RunTimeError(
                     node.pos_start, node.pos_end, f"there should be the same amount of identifiers and values. "
                                                   f"There is {len(var_names)} identifiers and {len(values)} values.",
-                    ctx
+                    ctx, "src.interpreter.Interpreter.visit_VarAssignNode"
                 )
             )
 
@@ -369,19 +371,21 @@ class Interpreter:
                             return result.failure(
                                 RTNotDefinedError(
                                     node.pos_start, node.pos_end, f"name '{var_name}' is not defined yet. "
-                                                                  f"Did you mean '__{var_name}__'?", ctx
+                                                                  f"Did you mean '__{var_name}__'?", ctx,
+                                    "src.interpreter.Interpreter.visit_VarAssignNode"
                                 )
                             )
                         else:
                             return result.failure(
                                 RTNotDefinedError(
-                                    node.pos_start, node.pos_end, f"name '{var_name}' is not defined yet.", ctx
+                                    node.pos_start, node.pos_end, f"name '{var_name}' is not defined yet.", ctx,
+                                    "src.interpreter.Interpreter.visit_VarAssignNode"
                                 )
                             )
             else:  # protected variable name
                 return result.failure(RunTimeError(node.pos_start, node.pos_end,
                                                    f"can not create or edit a variable with builtin name '{var_name}'.",
-                                                   ctx))
+                                                   ctx, "src.interpreter.Interpreter.visit_VarAssignNode"))
             final_values.append(final_value)
         return result.success(
             List(final_values).set_pos(node.pos_start, node.pos_end) if len(final_values) != 1 else final_values[0]
@@ -395,14 +399,14 @@ class Interpreter:
 
         if var_name not in ctx.symbol_table.symbols:  # the variable is not defined thus we can't delete it
             return result.failure(RTNotDefinedError(node.pos_start, node.pos_end, f"name '{var_name}' is not defined.",
-                                                    ctx))
+                                                    ctx, "src.interpreter.Interpreter.visit_VarDeleteNode"))
 
         if var_name not in PROTECTED_VARS:  # the variable isn't protected, we can safely delete it
             ctx.symbol_table.remove(var_name)
         else:  # the variable is protected
             return result.failure(RunTimeError(node.pos_start, node.pos_end,
                                                f"can not delete value assigned to builtin name '{var_name}'.",
-                                               ctx))
+                                               ctx, "src.interpreter.Interpreter.visit_VarDeleteNode"))
         return result.success(NoneValue(False))
 
     def visit_IfNode(self, node: IfNode, ctx: Context) -> RTResult:
@@ -444,14 +448,14 @@ class Interpreter:
             return result.failure(RTTypeError(
                 errmsg.pos_start, errmsg.pos_end,
                 f"error message should be a str, not {errmsg.type_}.",
-                ctx
+                ctx, "src.interpreter.Interpreter.visit_Assert_Node"
             ))
 
         if not assertion.is_true():  # the assertion is not true, we return an error
             return result.failure(RTAssertionError(
                 assertion.pos_start, assertion.pos_end,
                 errmsg.value,
-                ctx
+                ctx, "src.interpreter.Interpreter.visit_AssertNode"
             ))
 
         return result.success(NoneValue(False))
@@ -561,7 +565,7 @@ class Interpreter:
             return result.failure(
                 RTTypeError(node.list_node.pos_start, node.list_node.pos_end,
                             f"expected a list or a str after 'in', but found {iterable_.type_}.",
-                            ctx)
+                            ctx, "src.interpreter.Interpreter.visit_ForNodeList")
             )
 
     def visit_WhileNode(self, node: WhileNode, ctx: Context) -> RTResult:
@@ -654,7 +658,7 @@ class Interpreter:
             else:  # the name is protected
                 return result.failure(RunTimeError(node.pos_start, node.pos_end,
                                                    f"can not create a function with builtin name '{func_name}'.",
-                                                   ctx))
+                                                   ctx, "src.interpreter.Interpreter.visit_FuncDefNode"))
 
         return result.success(func_value)  # we return our Function value
 
@@ -701,14 +705,14 @@ class Interpreter:
                             RTIndexError(
                                 node.arg_nodes[0].pos_start, node.arg_nodes[0].pos_end,
                                 f'list index {index} out of range.',
-                                ctx
+                                ctx, "src.interpreter.Interpreter.visit_CallNode"
                             )
                         )
                 else:  # the index is not a number
                     return result.failure(RunTimeError(
                         node.pos_start, node.pos_end,
                         f"indexes must be integers, not {index.type_}.",
-                        ctx
+                        ctx, "src.interpreter.Interpreter.visit_CallNode"
                     ))
             elif len(node.arg_nodes) > 1:  # there is more than one index given
                 return_value = []
@@ -723,27 +727,27 @@ class Interpreter:
                                 RTIndexError(
                                     arg_node.pos_start, arg_node.pos_end,
                                     f'list index {index} out of range.',
-                                    ctx
+                                    ctx, "src.interpreter.Interpreter.Visit_CallNode"
                                 )
                             )
                     else:  # the index is not a number
                         return result.failure(RunTimeError(
                             arg_node.pos_start, arg_node.pos_end,
                             f"indexes must be integers, not {index.type_}.",
-                            ctx
+                            ctx, "src.interpreter.Interpreter.Visit_CallNode"
                         ))
                 return result.success(List(return_value).set_context(ctx).set_pos(node.pos_start, node.pos_end))
             else:  # there is no index given
                 return result.failure(RunTimeError(
                     node.pos_start, node.pos_end,
                     f"please give at least one index.",
-                    ctx
+                    ctx, "src.interpreter.Interpreter.Visit_CallNode"
                 ))
         else:  # the object is not callable
             return result.failure(RunTimeError(
                 node.pos_start, node.pos_end,
                 f"{value_to_call.type_} is not callable.",
-                ctx
+                ctx, "src.interpreter.Interpreter.Visit_CallNode"
             ))
 
     def visit_ReturnNode(self, node: ReturnNode, ctx: Context) -> RTResult:
@@ -791,7 +795,8 @@ class Interpreter:
         except ImportError:
             return result.failure(
                 RTNotDefinedError(
-                    identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx
+                    identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
+                    "src.interpreter.Interpreter.visit_ImportNode"
                 )
             )
 
@@ -822,7 +827,8 @@ class Interpreter:
         if not isinstance(str_to_write, String):  # if the str is not a String
             return result.failure(
                 RTTypeError(
-                    str_to_write.pos_start, str_to_write.pos_end, f"expected str, got {str_to_write.type_}.", ctx
+                    str_to_write.pos_start, str_to_write.pos_end, f"expected str, got {str_to_write.type_}.", ctx,
+                    "src.interpreter.Interpreter.visit_WriteNode"
                 )
             )
 
@@ -832,7 +838,8 @@ class Interpreter:
         if not isinstance(file_name, String):  # if the file name is not a String
             return result.failure(
                 RTTypeError(
-                    file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", ctx
+                    file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", ctx,
+                    "src.interpreter.Interpreter.visit_WriteNode"
                 )
             )
 
@@ -843,7 +850,8 @@ class Interpreter:
             if open_mode == 'w+':  # can not overwrite the console
                 return result.failure(
                     RunTimeError(
-                        node.pos_start, node.pos_end, f"can not overwrite <stdout>.", ctx
+                        node.pos_start, node.pos_end, f"can not overwrite <stdout>.", ctx,
+                        "src.interpreter.Interpreter.visit_WriteNode"
                     )
                 )
             print(str_to_write_value)
@@ -879,7 +887,8 @@ class Interpreter:
                         else:  # line number is negative
                             return result.failure(
                                 RTIndexError(
-                                    node.pos_start, node.pos_end, "line number can not be negative.", ctx
+                                    node.pos_start, node.pos_end, "line number can not be negative.", ctx,
+                                    "src.interpreter.Interpreter.visit_WriteNode"
                                 )
                             )
                     else:  # open_mode == 'w+'
@@ -890,7 +899,8 @@ class Interpreter:
                         else:  # line number is negative
                             return result.failure(
                                 RTIndexError(
-                                    node.pos_start, node.pos_end, "line number can not be negative.", ctx
+                                    node.pos_start, node.pos_end, "line number can not be negative.", ctx,
+                                    "src.interpreter.Interpreter.visit_WriteNode"
                                 )
                             )
 
@@ -902,7 +912,8 @@ class Interpreter:
             return result.failure(
                 RunTimeError(
                     node.pos_start, node.pos_end, f"unable to write in file '{file_name_value}'. "
-                                                  f"More info : Python{e.__class__.__name__}: {e}", ctx
+                                                  f"More info : Python{e.__class__.__name__}: {e}", ctx,
+                    "src.interpreter.Interpreter.visit_WriteNode"
                 )
             )
 
@@ -921,7 +932,8 @@ class Interpreter:
         if not isinstance(file_name, String):  # check if the str is a String
             return result.failure(
                 RTTypeError(
-                    file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", ctx
+                    file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", ctx,
+                    "src.interpreter.Interpreter.visit_ReadNode"
                 )
             )
         file_name_value = file_name.value
@@ -940,20 +952,23 @@ class Interpreter:
                     else:  # wrong index
                         return result.failure(
                             RTIndexError(
-                                node.pos_start, node.pos_end, f"{line_number}.", ctx
+                                node.pos_start, node.pos_end, f"{line_number}.", ctx,
+                                "src.interpreter.Interpreter.visit_ReadNode"
                             )
                         )
         except FileNotFoundError:  # file not found
             return result.failure(
                 RTFileNotFoundError(
-                    node.pos_start, node.pos_end, f"file '{file_name_value}' does not exist.", ctx
+                    node.pos_start, node.pos_end, f"file '{file_name_value}' does not exist.", ctx,
+                    "src.interpreter.Interpreter.visit_ReadNode"
                 )
             )
         except Exception as e:  # other python error
             return result.failure(
                 RunTimeError(
                     node.pos_start, node.pos_end, f"unable to write in file '{file_name_value}'. "
-                                                  f"More info : Python{e.__class__.__name__}: {e}", ctx
+                                                  f"More info : Python{e.__class__.__name__}: {e}", ctx,
+                    "src.interpreter.Interpreter.visit_ReadNode"
                 )
             )
 
@@ -965,7 +980,7 @@ class Interpreter:
                     RunTimeError(
                         node.pos_start, node.pos_end,
                         f"unable to create a variable with builtin name '{identifier.value}'.",
-                        ctx
+                        ctx, "src.interpreter.Interpreter.visit_ReadNode"
                     )
                 )
 

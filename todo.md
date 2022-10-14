@@ -4,7 +4,6 @@
 * do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
 * finish `test_file.noug`
 * write CONTRIBUTING.md
-* add (NUMBER)e(NUMBER) (=(NUMBER)*10^(NUMBER))
 
 # TODO list during beta:
 * add attributes (or maybe not?...)

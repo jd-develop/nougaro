@@ -357,19 +357,38 @@ class Lexer:
         token_type = TT["KEYWORD"] if id_str in KEYWORDS else TT["IDENTIFIER"]  # KEYWORDS is the keywords list
         return Token(token_type, id_str, pos_start, self.pos)
 
-    def make_number(self):
+    def make_number(self, can_have_e: bool = True):
         """Make number, int or float"""
         num_str = ''
         dot_count = 0  # we can't have more than one dot, so we count them
         pos_start = self.pos.copy()
 
-        while self.current_char is not None and self.current_char in DIGITS + '.':  # if char is still a number or a dot
+        if self.current_char == '+':
+            self.advance()
+        if self.current_char == '-':
+            num_str += '-'
+            self.advance()
+
+        # if char is still a number or a dot or a letter in 'e', 'b', 'x', 'o'
+        while self.current_char is not None and self.current_char in DIGITS + '.' + 'e':
             if self.current_char == '.':  # if the char is a dot
                 if dot_count == 1:  # if we already encountered a dot
-                    return None, InvalidSyntaxError(pos_start, self.pos, "a number can't have more than one dot.",
+                    return None, InvalidSyntaxError(self.pos, self.pos.copy().advance(),
+                                                    "a number can't have more than one dot.",
                                                     "src.lexer.Lexer.make_number")
                 dot_count += 1
                 num_str += '.'
+            elif self.current_char == "e":
+                if not can_have_e:
+                    return None, InvalidSyntaxError(self.pos, self.pos.copy().advance(), "invalid decimal literal.",
+                                                    "src.lexer.Lexer.make_number")
+                num_str += 'e'
+                self.advance()
+                tok, error = self.make_number(False)
+                if error is not None:
+                    return None, error
+                num_str += str(tok.value)
+                return Token(TT["FLOAT"], float(num_str), pos_start, self.pos.copy()), None
             else:
                 num_str += self.current_char
             self.advance()  # we advance

@@ -16,14 +16,18 @@
 
 # Debug: some debug tools
 
+var _CONF_DEBUG_FILE = "config/debug"
+
+var is_debug_enabled = int(read _CONF_DEBUG_FILE)
+
 
 def debug_mode_enable()
-	write "1" !>> "config/debug"
+	write "1" !>> _CONF_DEBUG_FILE
 	print("Please restart the Nougaro interpreter to enable DEBUG mode.")
 end
 
 
 def debug_mode_disable()
-	write "0" !>> "config/debug"
+	write "0" !>> _CONF_DEBUG_FILE
 	print("Please restart the Nougaro interpreter to disable DEBUG mode.")
 end

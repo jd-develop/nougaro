@@ -25,7 +25,7 @@ from src.context import Context
 # no imports
 
 
-with open("config/debug") as debug:
+with open("config/debug.conf") as debug:
     PRINT_ORIGIN_FILE = bool(int(debug.read()))
     debug.close()
 

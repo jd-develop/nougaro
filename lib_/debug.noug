@@ -16,7 +16,7 @@
 
 # Debug: some debug tools
 
-var _CONF_DEBUG_FILE = "config/debug"
+var _CONF_DEBUG_FILE = "config/debug.conf"
 
 var is_debug_enabled = int(read _CONF_DEBUG_FILE)
 

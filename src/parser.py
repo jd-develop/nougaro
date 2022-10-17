@@ -622,6 +622,7 @@ class Parser:
                     result.register_advancement()
                     self.advance()
                 else:  # ((expr (COMMA expr)*)|MUL list_expr)?
+                    # TODO: make like in list_expr, where you can do *any_node
                     if self.current_token.type == TT["MUL"]:  # MUL list_expr
                         result.register_advancement()
                         self.advance()
@@ -635,7 +636,7 @@ class Parser:
                                 )
                             )
 
-                        for node in list_node.element_nodes:
+                        for node, mul in list_node.element_nodes:
                             arg_nodes.append(node)
                     else:
                         # we check for an expr then append it to the args

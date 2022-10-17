@@ -205,7 +205,7 @@ class IfNode(Node):
     def __repr__(self):
         return f'if ({self.cases[0][0]}) then ({self.cases[0][1]}) ' \
                f'{" ".join([f"elif ({case[0]}) then ({case[1]})" for case in self.cases[1:]])} ' \
-               f'else {self.else_case[0]}'
+               f'else {self.else_case}'
 
 
 class AssertNode(Node):
@@ -391,7 +391,7 @@ class CallNode(Node):
 
         self.pos_start = self.node_to_call.pos_start
 
-        if len(self.arg_nodes) > 0:  # if there are parameters, we take the last one's pos_end as our pos_end.
+        if len(self.arg_nodes) > 0:  # if there are arguments, we take the last one's pos_end as our pos_end.
             self.pos_end = self.arg_nodes[-1].pos_end
         else:  # if there is no parameter, we take the node_to_call's pos_end as our pos_end.
             self.pos_end = self.node_to_call.pos_end

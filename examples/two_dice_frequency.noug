@@ -7,8 +7,7 @@ def tdf(l)
 	for i = 0 to l-1 then
 		var dice_sum = random_randint(1, 6) + random_randint(1, 6)
 		var actual_sum_in_list = list_(dice_sum-1)
-		pop(list_, dice_sum-1)
-		insert(list_, actual_sum_in_list+1, dice_sum-1)
+		replace(list_, dice_sum-1, actual_sum_in_list+1)
 	end
 	var new_list = []
 	for i in list_ then

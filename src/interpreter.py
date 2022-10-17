@@ -81,10 +81,23 @@ class Interpreter:
         result = RTResult()
         elements = []
 
-        for element_node in node.element_nodes:
-            elements.append(result.register(self.visit(element_node, ctx)))  # we visit every node from the list
-            if result.should_return():  # if there is an error
-                return result
+        for element_node, mul in node.element_nodes:  # we visit every node from the list
+            if mul:
+                list_: Value = result.register(self.visit(element_node, ctx))
+                if not isinstance(list_, List):
+                    return result.failure(
+                        RTTypeError(
+                            list_.pos_start, list_.pos_end,
+                            f"expected a list value after '*', but got '{list_.type_}.",
+                            ctx,
+                            origin_file="src.interpreter.Interpreter.visit_ListNode"
+                        )
+                    )
+                elements.extend(list_.elements)
+            else:
+                elements.append(result.register(self.visit(element_node, ctx)))
+                if result.should_return():  # if there is an error
+                    return result
 
         return result.success(List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end))
 

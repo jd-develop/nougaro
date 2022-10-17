@@ -97,7 +97,7 @@ class Parser:
         statement = result.register(self.statement())  # we register a statement
         if result.error is not None:  # we check for errors
             return result
-        statements.append(statement)  # we append the statement to our list of there is no error
+        statements.append((statement, False))  # we append the statement to our list of there is no error
 
         # (NEWLINE+ statement)*
         while True:  # 'break' inside the loop
@@ -163,7 +163,7 @@ class Parser:
             statement = result.register(self.statement())
             if result.error is not None:
                 return result
-            statements.append(statement)
+            statements.append((statement, False))
 
         return result.success(ListNode(  # we put all the nodes parsed here into a ListNode
             statements,
@@ -815,7 +815,7 @@ class Parser:
 
     def list_expr(self) -> ParseResult:
         """
-        list_expr  : LSQUARE ((expr|MUL list_expr) (COMMA (expr|MUL list_expr))?*)? RSQUARE
+        list_expr  : LSQUARE (MUL? expr (COMMA MUL? expr)?*)? RSQUARE
         """
         # we create the result
         result = ParseResult()
@@ -824,6 +824,8 @@ class Parser:
         # we copy the current token pos start
         pos_start = self.current_token.pos_start.copy()
         first_tok_pos_end = self.current_token.pos_end.copy()
+
+        mul = False
 
         if self.current_token.type != TT["LSQUARE"]:
             return result.failure(InvalidSyntaxError(
@@ -839,43 +841,44 @@ class Parser:
             result.register_advancement()
             self.advance()
         else:  # there are elements
-            # ((expr|MUL list_expr) (COMMA (expr|MUL list_expr))?*)?
-            if self.current_token.type == TT["MUL"]:  # MUL list_expr
+            # MUL? expr (COMMA MUL? expr)?*
+            if self.current_token.type == TT["MUL"]:  # MUL?
+                mul = True
                 # we advance
                 result.register_advancement()
                 self.advance()
-                # we register a list
-                list_node: ListNode = result.register(self.list_expr())
-                if result.error is not None:
-                    return result
-                # we extend our list with the new one
-                element_nodes.extend(list_node.element_nodes)
-            else:  # expr
-                # we register an expr then check for an error
-                element_nodes.append(result.register(self.expr()))
-                if result.error is not None:
-                    return result
+            # expr
+            # we register an expr then check for an error
+            element_nodes.append(
+                (
+                    result.register(self.expr()),
+                    mul
+                )
+            )
+            if result.error is not None:
+                return result
 
-            while self.current_token.type == TT["COMMA"]:  # (COMMA (expr|MUL list_expr))?*
+            while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
+                mul = False
                 # we advance
                 result.register_advancement()
                 self.advance()
 
-                if self.current_token.type == TT["MUL"]:  # MUL list_expr
+                if self.current_token.type == TT["MUL"]:  # MUL?
+                    mul = True
                     # we advance
                     result.register_advancement()
                     self.advance()
-                    # we register a list
-                    list_node: ListNode = result.register(self.list_expr())
-                    if result.error is not None:
-                        return result
-                    # we extend our list with the new one
-                    element_nodes.extend(list_node.element_nodes)
-                else:  # expr
-                    # # we register an expr then check for an error
-                    element_nodes.append(result.register(self.expr()))
-                    if result.error is not None:
-                        return result
+                # expr
+                # we register an expr then check for an error
+                element_nodes.append(
+                    (
+                        result.register(self.expr()),
+                        mul
+                    )
+                )
+                if result.error is not None:
+                    return result
 
             if self.current_token.type != TT["RSQUARE"]:  # there is no ']' to close the list
                 return result.failure(

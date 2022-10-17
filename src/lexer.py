@@ -369,7 +369,8 @@ class Lexer:
             num_str += '-'
             self.advance()
 
-        # if char is still a number or a dot or a letter in 'e', 'b', 'x', 'o'
+        # if char is still a number or a dot or a letter in 'e'
+        # TODO: make '0b', '0x', '0o' for binary, hexadecimal and octal
         while self.current_char is not None and self.current_char in DIGITS + '.' + 'e':
             if self.current_char == '.':  # if the char is a dot
                 if dot_count == 1:  # if we already encountered a dot

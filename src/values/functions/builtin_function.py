@@ -932,6 +932,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         # Params :
         # * example_name
         example_name = exec_ctx.symbol_table.get("example_name")  # we get the example name
+        if example_name is None:
+            example_name = String("../example")
 
         if not isinstance(example_name, String):  # we check if it is a str
             return RTResult().failure(RTTypeError(
@@ -983,8 +985,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().success(value)
         return RTResult().success(NoneValue(False))
 
-    execute_example.param_names = ["example_name"]
-    execute_example.optional_params = ["return_example_value"]
+    execute_example.param_names = []
+    execute_example.optional_params = ["example_name", "return_example_value"]
     execute_example.should_respect_args_number = True
 
     def execute_system_call(self, exec_ctx: Context):

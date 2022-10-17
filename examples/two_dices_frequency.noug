@@ -18,10 +18,14 @@ end
 
 var idx = 1
 var sum = 0
+var best = 0
+var best_idx = 1
 for x in tdf(1000) then
 	print(str(idx) + ' : ' + str(x))
+	if x > best then var best, best_idx = x, idx
 	var idx += 1
 	var sum += x
 end
 
 print("Sum of the frequencies: " + str(sum))
+print("Best value: " + str(best_idx) + " (with a probability of " + str(best) + ")")

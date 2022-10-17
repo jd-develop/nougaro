@@ -17,8 +17,22 @@
 # Debug: some debug tools
 
 var _CONF_DEBUG_FILE = "config/debug.conf"
+var _PRINT_CONTEXT_CONF_DEBUG_FILE = "config/print_context.conf"
 
 var is_debug_enabled = int(read _CONF_DEBUG_FILE)
+var should_print_context = int(read _PRINT_CONTEXT_CONF_DEBUG_FILE)
+
+
+def debug_enable_all()
+    debug_mode_enable()
+    debug_print_context()
+end
+
+
+def debug_disable_all()
+    debug_mode_disable()
+    debug_stop_print_context()
+end
 
 
 def debug_mode_enable()
@@ -30,4 +44,16 @@ end
 def debug_mode_disable()
 	write "0" !>> _CONF_DEBUG_FILE
 	print("Please restart the Nougaro interpreter to disable DEBUG mode.")
+end
+
+
+def debug_print_context()
+    write "1" !>> _PRINT_CONTEXT_CONF_DEBUG_FILE
+    print("Please restart the Nougaro interpreter to enable PRINT CONTEXT debug option.")
+end
+
+
+def debug_stop_print_context()
+    write "0" !>> _PRINT_CONTEXT_CONF_DEBUG_FILE
+    print("Please restart the Nougaro interpreter to disable PRINT CONTEXT debug option.")
 end

@@ -33,6 +33,13 @@ from src.values.basevalues import String
 # built-in python imports
 import json
 
+with open("config/debug.conf") as debug:
+    DEBUG_ON = bool(int(debug.read()))
+    debug.close()
+
+with open("config/print_context.conf") as print_context:
+    PRINT_CONTEXT = bool(int(print_context.read()))
+    print_context.close()
 
 # ##########
 # SYMBOL TABLE
@@ -64,14 +71,16 @@ def run(file_name: str, text: str, version: str = version_, exec_from: str = "(s
     tokens, error = lexer.make_tokens()
     if error is not None:  # if there is any error, we just stop
         return None, error
-    # print(tokens)  # uncomment this line to print the tokens
+    if DEBUG_ON:
+        print(tokens)
 
     # make the abstract syntax tree (AST) with the parser
     parser = Parser(tokens)
     ast = parser.parse()
     if ast.error is not None:  # if there is any error, we just stop
         return None, ast.error
-    # print(ast)  # uncomment this line to print the AST
+    if DEBUG_ON:
+        print(ast)
 
     # run the code (interpreter)
     interpreter = src.interpreter.Interpreter(run)
@@ -79,7 +88,8 @@ def run(file_name: str, text: str, version: str = version_, exec_from: str = "(s
     # don't forget to change the context symbol table to the global symbol table
     context.symbol_table = global_symbol_table
     result = interpreter.visit(ast.node, context)  # visit the main node of the AST with the created context
-    # print(context)  # uncomment this line to print the context of the interpreter
+    if PRINT_CONTEXT:
+        print(context.__str__())
 
     # finally, return the value and the error given by the interpreter
     # errors are managed by the shell.py file that calls this `run` function

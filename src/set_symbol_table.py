@@ -117,7 +117,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("__is_valid_token_type__", IS_VALID_TOKEN_TYPE)
     symbol_table.set("__test__", TEST)
 
-    symbol_table.set('__symbol_table__', String(pprint.pformat(symbol_table.symbols)))
+    # symbol_table.set('__symbol_table__', String(pprint.pformat(symbol_table.symbols)))
     # test_protected_vars(symbol_table)
 
 

@@ -26,7 +26,7 @@ from src.context import Context
 
 
 with open("config/debug.conf") as debug:
-    PRINT_ORIGIN_FILE = bool(int(debug.read()))
+    _PRINT_ORIGIN_FILE = bool(int(debug.read()))
     debug.close()
 
 
@@ -51,7 +51,7 @@ class Error:
             # delete spaces at the start of the str.
             # Add chars after the space in the string after the "while string_line[0] in" to delete them.
             string_line = string_line[1:]
-        if PRINT_ORIGIN_FILE:
+        if _PRINT_ORIGIN_FILE:
             result = f"(from {self.origin_file})\n" \
                      f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n \t' + \
                      string_line + '\n '
@@ -118,7 +118,7 @@ class RunTimeError(Error):
             pos = ctx.parent_entry_pos
             ctx = ctx.parent
 
-        if PRINT_ORIGIN_FILE:
+        if _PRINT_ORIGIN_FILE:
             return f"(from {self.origin_file})\nTraceback (more recent call last) :\n" + result
         else:
             return "Traceback (more recent call last) :\n" + result

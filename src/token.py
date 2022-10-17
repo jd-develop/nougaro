@@ -41,9 +41,9 @@ class Token:
             self.pos_end = pos_end.copy()  # if there is a pos_end, the pos_end is no longer pos_start+1
 
     def __repr__(self) -> str:
-        if self.value:
-            return f'{self.type}:{self.value}'
-        elif self.value == 0:
+        if self.value is not None:
+            if isinstance(self.value, str):
+                return f'{self.type}:"{self.value}"'
             return f'{self.type}:{self.value}'
         return f'{self.type}'
 

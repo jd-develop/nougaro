@@ -58,13 +58,13 @@ class StringNode(Node):
 
 class ListNode(Node):
     """Node for list. self.element_nodes is a list of nodes. Needs pos_start and pos_end when init."""
-    def __init__(self, element_nodes: list[Node], pos_start, pos_end):
+    def __init__(self, element_nodes: list[tuple[Node, bool]], pos_start, pos_end):
         self.element_nodes = element_nodes
         self.pos_start = pos_start
         self.pos_end = pos_end
 
     def __repr__(self):
-        return f'(list:{str(self.element_nodes)})'
+        return f'list:{str(self.element_nodes)}'
 
 
 # VAR NODES
@@ -88,7 +88,7 @@ class VarAssignNode(Node):
         self.pos_end = self.value_nodes[-1].pos_end
 
     def __repr__(self):
-        return f'(var_assign:{self.var_name_tokens} {self.equal} {self.value_nodes})'
+        return f'var_assign:({self.var_name_tokens} {self.equal} {self.value_nodes})'
 
 
 class VarAccessNode(Node):
@@ -103,7 +103,7 @@ class VarAccessNode(Node):
         self.pos_end = self.var_name_tokens_list[-1].pos_end
 
     def __repr__(self):
-        return f'(var_access:{self.var_name_tokens_list})'
+        return f'var_access:({self.var_name_tokens_list})'
 
 
 class VarDeleteNode(Node):
@@ -115,7 +115,7 @@ class VarDeleteNode(Node):
         self.pos_end = self.var_name_token.pos_end
 
     def __repr__(self):
-        return f'(var_delete:{self.var_name_token})'
+        return f'var_delete:({self.var_name_token})'
 
 
 # OPERATOR NODES
@@ -140,7 +140,7 @@ class BinOpNode(Node):
         self.pos_end = self.right_node.pos_end
 
     def __repr__(self):
-        return f'({self.left_node}, {self.op_token}, {self.right_node})'
+        return f'bin_op:({self.left_node}, {self.op_token}, {self.right_node})'
 
 
 class BinOpCompNode(Node):
@@ -158,7 +158,7 @@ class BinOpCompNode(Node):
         self.pos_end = self.nodes_and_tokens_list[-1].pos_end
 
     def __repr__(self):
-        return f'[{", ".join([str(x) for x in self.nodes_and_tokens_list])}]'
+        return f'bin_op_comp:({", ".join([str(x) for x in self.nodes_and_tokens_list])})'
 
 
 class UnaryOpNode(Node):
@@ -185,7 +185,7 @@ class UnaryOpNode(Node):
         self.pos_end = self.node.pos_end
 
     def __repr__(self):
-        return f'({self.op_token}, {self.node})'
+        return f'unary_op:({self.op_token}, {self.node})'
 
 
 # TEST NODES
@@ -201,6 +201,11 @@ class IfNode(Node):
 
         self.pos_start = self.cases[0][0].pos_start
         self.pos_end = (self.else_case or self.cases[len(self.cases) - 1])[0].pos_end
+
+    def __repr__(self):
+        return f'if ({self.cases[0][0]}) then ({self.cases[0][1]}) ' \
+               f'{" ".join([f"elif ({case[0]}) then ({case[1]})" for case in self.cases[1:]])} ' \
+               f'else {self.else_case[0]}'
 
 
 class AssertNode(Node):
@@ -218,6 +223,9 @@ class AssertNode(Node):
         if self.errmsg is None:
             self.errmsg = StringNode(Token(TT["STRING"], value='',
                                            pos_start=self.pos_start.copy(), pos_end=self.pos_end.copy()))
+
+    def __repr__(self):
+        return f'assert:({self.assertion}, {self.errmsg})'
 
 
 # LOOP NODES
@@ -251,6 +259,10 @@ class ForNode(Node):
         self.pos_start = self.var_name_token.pos_start
         self.pos_end = self.body_node.pos_end
 
+    def __repr__(self):
+        return f"for:({self.var_name_token} = {self.start_value_node} to {self.end_value_node} step " \
+               f"{self.step_value_node} then {self.body_node})"
+
 
 class ForNodeList(Node):
     """Node for 'for a in b then' structure, where b is a list/iterable.
@@ -274,6 +286,9 @@ class ForNodeList(Node):
         self.pos_start = self.var_name_token.pos_start
         self.pos_end = self.body_node.pos_end
 
+    def __repr__(self):
+        return f"for:({self.var_name_token} in {self.list_node} then {self.body_node})"
+
 
 class WhileNode(Node):
     """Node for 'while' structure.
@@ -291,7 +306,7 @@ class WhileNode(Node):
         self.pos_end = self.body_node.pos_end
 
     def __repr__(self):
-        return f'(while:{self.condition_node} then:{self.body_node})'
+        return f'while:({self.condition_node} then:{self.body_node})'
 
 
 class DoWhileNode(Node):
@@ -310,7 +325,7 @@ class DoWhileNode(Node):
         self.pos_end = self.body_node.pos_end
 
     def __repr__(self):
-        return f'(do:{self.body_node} then loop while:{self.condition_node})'
+        return f'do:({self.body_node} then loop while:{self.condition_node})'
 
 
 class BreakNode(Node):
@@ -320,7 +335,7 @@ class BreakNode(Node):
         self.pos_end = pos_end
 
     def __repr__(self):
-        return '(break)'
+        return 'break'
 
 
 class ContinueNode(Node):
@@ -330,7 +345,7 @@ class ContinueNode(Node):
         self.pos_end = pos_end
 
     def __repr__(self):
-        return '(continue)'
+        return 'continue'
 
 
 # FUNCTION NODES
@@ -361,7 +376,7 @@ class FuncDefNode(Node):
         self.pos_end = self.body_node.pos_end
 
     def __repr__(self):
-        return f'(funcdef:{self.var_name_token} args:{self.param_names_tokens})'
+        return f'def:{self.var_name_token}({self.param_names_tokens})->{self.body_node}'
 
 
 class CallNode(Node):
@@ -382,7 +397,7 @@ class CallNode(Node):
             self.pos_end = self.node_to_call.pos_end
 
     def __repr__(self):
-        return f'(call:{self.node_to_call}, arg_nodes:{self.arg_nodes})'
+        return f'call:{self.node_to_call}({self.arg_nodes})'
 
 
 class ReturnNode(Node):
@@ -396,7 +411,7 @@ class ReturnNode(Node):
         self.pos_end = pos_end
 
     def __repr__(self):
-        return f'(return:{self.node_to_return})'
+        return f'return:({self.node_to_return})'
 
 
 # MODULE NODES
@@ -411,7 +426,7 @@ class ImportNode(Node):
         self.pos_end = pos_end
 
     def __repr__(self):
-        return f'(import:{self.identifier})'
+        return f'import:({self.identifier})'
 
 
 # FILE NODES
@@ -442,7 +457,7 @@ class WriteNode(Node):
         self.pos_end = pos_end
 
     def __repr__(self):
-        return f'(write:{self.expr_to_write}{self.to_token.type}{self.file_name_expr} at line {self.line_number})'
+        return f'write:({self.expr_to_write}{self.to_token.type}{self.file_name_expr} at line {self.line_number})'
 
 
 class ReadNode(Node):
@@ -474,10 +489,11 @@ class ReadNode(Node):
         self.pos_end = pos_end
 
     def __repr__(self):
-        return f'(read:{self.file_name_expr}>>{self.identifier} at line {self.line_number})'
+        return f'read:({self.file_name_expr}>>{self.identifier} at line {self.line_number})'
 
 
 # SPECIAL NODES
 class NoNode(Node):
     """If the file to execute is empty or filled by back lines, this node is the only node of the node list."""
-    ...
+    def __repr__(self):
+        return "NoNode"

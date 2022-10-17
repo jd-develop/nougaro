@@ -33,6 +33,7 @@ print(2*3)
 print(6/2)
 print(3^2)  # this is the power
 print(math_abs(-5))  # the absolute value
+print(1e10)  # 1*10^10
 print()
 
 # Variables

@@ -3,6 +3,7 @@
 * do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
 * finish `test_file.noug`
 * write CONTRIBUTING.md
+* add '\xXX' and '\uXXXX' support
 
 # TODO list during beta:
 * add attributes (or maybe not?...)

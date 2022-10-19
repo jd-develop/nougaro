@@ -26,7 +26,6 @@ from src.values.specific_values.builtin_function import *
 from src.constants import PROTECTED_VARS
 # built-in python imports
 import platform
-import pprint
 import sys
 
 
@@ -78,6 +77,8 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("split", SPLIT)
     symbol_table.set("upper", UPPER)
     symbol_table.set("lower", LOWER)
+    symbol_table.set("ord", ORD)
+    symbol_table.set("chr", CHR)
 
     # Hum...
     symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))

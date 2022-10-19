@@ -62,6 +62,8 @@ LEN = BuiltInFunction('len')
 SPLIT = BuiltInFunction('split')
 LOWER = BuiltInFunction('lower')
 UPPER = BuiltInFunction('upper')
+ORD = BuiltInFunction('ord')
+CHR = BuiltInFunction('chr')
 
 EXIT = BuiltInFunction('exit')
 SYSTEM_CALL = BuiltInFunction('system_call')

@@ -166,6 +166,11 @@ print()
 
 void()  # Does ABSOLUTELY nothing... (in fact, returns None...)
 
+# misc builtin functions
+print(ord('😀'))  # prints the ord for this character
+print(chr(128512))  # prints the character for this ord
+
+
 # math functions
 print(math_sqrt(math_pi) == math_sqrt_pi)  # True
 print(math_root(27, 3))  # returns x with x^3 = 27, so 3

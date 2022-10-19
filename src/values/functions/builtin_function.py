@@ -1198,4 +1198,72 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute___test__.optional_params = []
     execute___test__.should_respect_args_number = True
 
+    def execute_ord(self, exec_ctx: Context):
+        """like python ord"""
+        # params:
+        # * chr
+        chr_ = exec_ctx.symbol_table.get("chr")  # we get the char
+        if not isinstance(chr_, String):  # we check if it is a string
+            return RTResult().failure(RTTypeError(
+                chr_.pos_start, chr_.pos_end,
+                f"first argument of builtin function 'ord' must be a str.",
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_ord"
+            ))
+
+        if len(chr_.value) != 1:
+            return RTResult().failure(RTTypeError(
+                chr_.pos_start, chr_.pos_end,
+                f"ord() expected a character, but string of length {len(chr_.value)} found.",
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_ord"
+            ))
+
+        try:
+            return RTResult().success(Number(ord(chr_.to_str())))
+        except Exception as e:
+            return RTResult().failure(
+                RunTimeError(
+                    self.pos_start, self.pos_end,
+                    f'Python error: {e.__class__.__name__}: {e}',
+                    exec_ctx, origin_file="src.values.functions.builtin_function.BuiltInFunction.execute_ord"
+                )
+            )
+
+    execute_ord.param_names = ["chr"]
+    execute_ord.optional_params = []
+    execute_ord.should_respect_args_number = True
+
+    def execute_chr(self, exec_ctx: Context):
+        """like python chr"""
+        # params:
+        # * ord
+        ord_ = exec_ctx.symbol_table.get("ord")  # we get the char
+        if not isinstance(ord_, Number):  # we check if it is a string
+            return RTResult().failure(RTTypeError(
+                ord_.pos_start, ord_.pos_end,
+                f"first argument of builtin function 'chr' must be an int.",
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_chr"
+            ))
+
+        if not ord_.is_int():
+            return RTResult().failure(RTTypeError(
+                ord_.pos_start, ord_.pos_end,
+                f"first argument of builtin function 'chr' must be an int.",
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_chr"
+            ))
+
+        try:
+            return RTResult().success(String(chr(ord_.value)))
+        except Exception as e:
+            return RTResult().failure(
+                RunTimeError(
+                    self.pos_start, self.pos_end,
+                    f'Python error: {e.__class__.__name__}: {e}',
+                    exec_ctx, origin_file="src.values.functions.builtin_function.BuiltInFunction.execute_chr"
+                )
+            )
+
+    execute_chr.param_names = ["ord"]
+    execute_chr.optional_params = []
+    execute_chr.should_respect_args_number = True
+
     # ==================

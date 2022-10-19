@@ -65,6 +65,8 @@ BUILTIN_FUNCTIONS = [
     'split',
     'lower',
     'upper',
+    'chr',
+    'ord',
     'nougaro',
     '__gpl__',
 ]

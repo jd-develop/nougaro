@@ -103,7 +103,7 @@ class VarAccessNode(Node):
         self.pos_end = self.var_name_tokens_list[-1].pos_end
 
     def __repr__(self):
-        return f'var_access:({self.var_name_tokens_list})'
+        return f'var_access:{self.var_name_tokens_list}'
 
 
 class VarDeleteNode(Node):
@@ -115,7 +115,7 @@ class VarDeleteNode(Node):
         self.pos_end = self.var_name_token.pos_end
 
     def __repr__(self):
-        return f'var_delete:({self.var_name_token})'
+        return f'var_delete:{self.var_name_token}'
 
 
 # OPERATOR NODES
@@ -203,8 +203,8 @@ class IfNode(Node):
         self.pos_end = (self.else_case or self.cases[len(self.cases) - 1])[0].pos_end
 
     def __repr__(self):
-        return f'if ({self.cases[0][0]}) then ({self.cases[0][1]}) ' \
-               f'{" ".join([f"elif ({case[0]}) then ({case[1]})" for case in self.cases[1:]])} ' \
+        return f'if {self.cases[0][0]} then {self.cases[0][1]} ' \
+               f'{" ".join([f"elif {case[0]} then {case[1]}" for case in self.cases[1:]])} ' \
                f'else {self.else_case}'
 
 

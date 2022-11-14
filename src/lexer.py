@@ -79,7 +79,7 @@ class Lexer:
                 # if you think the following code is awful and ugly, you're RIGHT
                 elif tokens[-1].type in (TT['INT'], TT['FLOAT']) and \
                         tok.type == TT['IDENTIFIER'] and \
-                        tok.value.startswith('e') and \
+                        (tok.value.startswith('e') or tok.value.startswith('E')) and \
                         tok.value[1:].isdigit() and \
                         self.current_char != '.':
                     tokens.append(Token(TT['E_INFIX'], pos_start=tok.pos_start, pos_end=tok.pos_start.copy().advance()))
@@ -87,7 +87,7 @@ class Lexer:
                                         tok.pos_end))
                 elif tokens[-1].type in (TT['INT'], TT['FLOAT']) and \
                         tok.type == TT['IDENTIFIER'] and \
-                        tok.value.startswith('e') and \
+                        (tok.value.startswith('e') or tok.value.startswith('E')) and \
                         self.current_char == '-':
                     # TODO: (x)e-(y)
                     tokens.append(tok)

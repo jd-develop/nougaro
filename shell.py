@@ -32,6 +32,14 @@ import platform
 
 
 def main():
+    with open("config/debug.conf") as debug_f:
+        debug_on = bool(int(debug_f.read()))
+        debug_f.close()
+
+    with open("config/print_context.conf") as print_context_f:
+        print_context = bool(int(print_context_f.read()))
+        print_context_f.close()
+
     # message for PR-makers: if you have a better idea to how to do these things with CLI arguments, make a PR :)
     args = sys.argv
     # print(args)
@@ -72,7 +80,12 @@ def main():
         print(f"Welcome to Nougaro {version} on {platform.system()}! "
               f"Contribute : https://github.com/jd-develop/nougaro/")
         print("This program is under GPL license. For details, type __gpl__() or __gpl__(1) to stay in terminal.\n"
-              "This program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.\n")
+              "This program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.")
+        if debug_on:
+            print("DEBUG mode is ENABLED")
+        if print_context:
+            print("PRINT CONTEXT debug option is ENABLED")
+        print()  # blank line
 
         while True:  # the shell loop (like game loop in a video game but, obviously, Nougaro isn't a video game)
             try:  # we ask for an input to be interpreted

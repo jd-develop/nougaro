@@ -47,27 +47,55 @@ class Lexer:
         self.current_char = self.text[self.pos.index] if self.pos.index < len(self.text) else None
 
     def make_tokens(self):
-        """Returns a token list with self.text. Return tok_list, None or None, error."""
-        tokens = []
+        """Returns a token list with self.text. Return tok_list, None or [], error."""
+        tokens: list[Token] = []
 
+        there_is_a_space_or_a_tab_or_a_comment = False
         while self.current_char is not None:  # None is EOF
             if self.current_char in ' \t':  # tab and space
+                there_is_a_space_or_a_tab_or_a_comment = True
                 self.advance()
             elif self.current_char == '#':  # for comments
+                there_is_a_space_or_a_tab_or_a_comment = True
                 self.skip_comment()
             elif self.current_char in ';\n':  # semicolons and new lines
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(Token(TT["NEWLINE"], pos_start=self.pos))
                 self.advance()
 
             elif self.current_char in DIGITS + '.':  # the char is a digit: we generate a number
+                there_is_a_space_or_a_tab_or_a_comment = False
                 number, error = self.make_number()
                 if error is None:  # there is no error
                     tokens.append(number)
                 else:  # there is an error, we return it
                     return [], error
             elif self.current_char in LETTERS + '_':  # the char is a letter or an underscore: identifier or keyword
-                tokens.append(self.make_identifier())
+                tok = self.make_identifier()
+                if len(tokens) == 0:
+                    tokens.append(tok)
+                elif there_is_a_space_or_a_tab_or_a_comment:
+                    tokens.append(tok)
+                # if you think the following code is awful and ugly, you're RIGHT
+                elif tokens[-1].type in (TT['INT'], TT['FLOAT']) and \
+                        tok.type == TT['IDENTIFIER'] and \
+                        tok.value.startswith('e') and \
+                        tok.value[1:].isdigit() and \
+                        self.current_char != '.':
+                    tokens.append(Token(TT['E_INFIX'], pos_start=tok.pos_start, pos_end=tok.pos_start.copy().advance()))
+                    tokens.append(Token(TT['INT'], int(tok.value[1:]), tok.pos_start.copy().advance().advance(),
+                                        tok.pos_end))
+                elif tokens[-1].type in (TT['INT'], TT['FLOAT']) and \
+                        tok.type == TT['IDENTIFIER'] and \
+                        tok.value.startswith('e') and \
+                        self.current_char == '-':
+                    # TODO: (x)e-(y)
+                    tokens.append(tok)
+                else:
+                    tokens.append(tok)
+                there_is_a_space_or_a_tab_or_a_comment = False
             elif self.current_char == '"' or self.current_char == "'":  # the char is a quote: str
+                there_is_a_space_or_a_tab_or_a_comment = False
                 string_, error = self.make_string(self.current_char)
                 if error is None:  # there is no error
                     tokens.append(string_)
@@ -76,64 +104,81 @@ class Lexer:
 
             # basic math stuff
             elif self.current_char == '+':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(self.make_plus())
             elif self.current_char == '-':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(self.make_minus_or_arrow())
             elif self.current_char == '*':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(self.make_mul())
             elif self.current_char == '/':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(self.make_div())
             elif self.current_char == '^':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_pow()
                 if error is not None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == '%':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(self.make_perc())
 
             # bitwise operators
             elif self.current_char == "|":
+                there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_or()
                 if error is not None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == "&":
+                there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_and()
                 if error is not None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == "~":
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(Token(TT["BITWISENOT"], pos_start=self.pos))
                 self.advance()
 
             # parentheses and brackets
             elif self.current_char == '(':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(Token(TT["LPAREN"], pos_start=self.pos))
                 self.advance()
             elif self.current_char == ')':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(Token(TT["RPAREN"], pos_start=self.pos))
                 self.advance()
             elif self.current_char == '[':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(Token(TT["LSQUARE"], pos_start=self.pos))
                 self.advance()
             elif self.current_char == ']':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(Token(TT["RSQUARE"], pos_start=self.pos))
                 self.advance()
 
             # equals (+=, -=, ... are generated above, in the 'basic math stuff' category)
             elif self.current_char == '!':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_not_equals()
                 if error is not None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == '=':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(self.make_equals())
             elif self.current_char == '<':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_less_than()
                 if error is not None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == '>':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_greater_than()
                 if error is not None:
                     return [], error
@@ -141,11 +186,13 @@ class Lexer:
 
             # syntax 'var a = b ? c ? d ? e ? f'
             elif self.current_char == '?':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(Token(TT["INTERROGATIVE_PNT"], pos_start=self.pos))
                 self.advance()
 
             # comma
             elif self.current_char == ',':
+                there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(Token(TT["COMMA"], pos_start=self.pos))
                 self.advance()
             else:
@@ -357,7 +404,7 @@ class Lexer:
         token_type = TT["KEYWORD"] if id_str in KEYWORDS else TT["IDENTIFIER"]  # KEYWORDS is the keywords list
         return Token(token_type, id_str, pos_start, self.pos)
 
-    def make_number(self, can_have_e: bool = True):
+    def make_number(self):
         """Make number, int or float"""
         num_str = ''
         dot_count = 0  # we can't have more than one dot, so we count them
@@ -369,9 +416,8 @@ class Lexer:
             num_str += '-'
             self.advance()
 
-        # if char is still a number or a dot or a letter in 'e'
-        # TODO: make '0b', '0x', '0o' for binary, hexadecimal and octal
-        while self.current_char is not None and self.current_char in DIGITS + '.' + 'e':
+        # if char is still a number or a dot
+        while self.current_char is not None and self.current_char in DIGITS + '.':
             if self.current_char == '.':  # if the char is a dot
                 if dot_count == 1:  # if we already encountered a dot
                     return None, InvalidSyntaxError(self.pos, self.pos.copy().advance(),
@@ -379,17 +425,6 @@ class Lexer:
                                                     "src.lexer.Lexer.make_number")
                 dot_count += 1
                 num_str += '.'
-            elif self.current_char == "e":
-                if not can_have_e:
-                    return None, InvalidSyntaxError(self.pos, self.pos.copy().advance(), "invalid decimal literal.",
-                                                    "src.lexer.Lexer.make_number")
-                num_str += 'e'
-                self.advance()
-                tok, error = self.make_number(False)
-                if error is not None:
-                    return None, error
-                num_str += str(tok.value)
-                return Token(TT["FLOAT"], float(num_str), pos_start, self.pos.copy()), None
             else:
                 num_str += self.current_char
             self.advance()  # we advance
@@ -407,6 +442,18 @@ class Lexer:
                 "can not make a number with this expression.",
                 "src.lexer.Lexer.make_number"
             )
+
+        # TODO: 0x, 0b, 0o
+        # if num_str == '0':
+        #     prefixes = {
+        #         "x": TT["0X_PREFIX"],
+        #         "o": TT["0O_PREFIX"],
+        #         "b": TT["0B_PREFIX"],
+        #     }
+        #     if self.current_char in prefixes.keys():
+        #         token = Token(prefixes[self.current_char], pos_start=pos_start, pos_end=self.pos.copy())
+        #         self.advance()
+        #         return token, None
 
         if dot_count == 0:  # if there is no dots, this is an INT, else this is a FLOAT
             return Token(TT["INT"], int(num_str), pos_start, self.pos.copy()), None

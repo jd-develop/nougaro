@@ -30,7 +30,12 @@ TT = {
     "STRING": 'str',             # string type, corresponds to python str
     "IDENTIFIER": 'identifier',  # Identifier of a var name
     "KEYWORD": 'keyword',        # Keyword, like "var"
-    
+
+    "0X_PREFIX": "0x",           # Ox prefix before a number
+    "0O_PREFIX": "0o",           # Oo prefix before a number
+    "0B_PREFIX": "0b",           # Ob prefix before a number
+    "E_INFIX": "e",              # e infix in a number (123e12 is 123*10^12)
+
     "PLUS": '+',                 # +
     "MINUS": '-',                # -
     "MUL": '*',                  # *

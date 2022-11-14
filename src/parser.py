@@ -150,7 +150,7 @@ class Parser:
                     return result.failure(
                         InvalidSyntaxError(
                             self.current_token.pos_start, self.current_token.pos_end,
-                            "unexpected token.",
+                            f"unexpected token: {self.current_token}.",
                             "src.parser.Parser.statements"
                         )
                     )
@@ -671,7 +671,7 @@ class Parser:
 
     def atom(self) -> ParseResult:
         """
-        atom  : INT|FLOAT|(STRING (STRING)?*)|(IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER)?*)
+        atom  : (INT|FLOAT)(E_INFIX INT)?|(STRING (STRING)?*)|(IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*)
               : LPAREN expr RPAREN
               : list_expr
               : if_expr
@@ -684,12 +684,36 @@ class Parser:
         result = ParseResult()
         token = self.current_token
 
-        # INT|FLOAT|STRING (STRING)?*|(IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER)?*)
-        # INT|FLOAT
+        # (INT|FLOAT)(E_INFIX INT)?|(STRING (STRING)?*)|(IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*)
+        # (INT|FLOAT)(E_INFIX INT)?
         if token.type in (TT["INT"], TT["FLOAT"]):
-            # we advance and then return a NumberNode
+            # we advance
             result.register_advancement()
             self.advance()
+
+            # (E_INFIX INT)?
+            if self.current_token.type == TT["E_INFIX"]:
+                # we advance
+                result.register_advancement()
+                self.advance()
+
+                # INT
+                if self.current_token.type != TT["INT"]:
+                    return result.failure(
+                        InvalidSyntaxError(
+                            self.current_token.pos_start, self.current_token.pos_end,
+                            f"expected an int here, but got {self.current_token.type}.",
+                            "src.parser.Parser.atom"
+                        )
+                    )
+                exp_token = self.current_token
+
+                # we advance
+                result.register_advancement()
+                self.advance()
+                return result.success(NumberENumberNode(token, exp_token))
+
+            # we return a NumberNode
             return result.success(NumberNode(token))
 
         # STRING (STRING)?*

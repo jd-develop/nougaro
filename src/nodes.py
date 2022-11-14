@@ -45,6 +45,16 @@ class NumberNode(Node):
         return f'num:{self.token}'
 
 
+class NumberENumberNode(Node):
+    """Node for numbers like 10e2 or 4e-5"""
+    def __init__(self, num_token: Token, exponent_token: Token):
+        self.num_token = num_token
+        self.exponent_token = exponent_token
+
+    def __repr__(self):
+        return f'numE:({self.num_token})e({self.exponent_token})'
+
+
 class StringNode(Node):
     """Node for strings. Tok type can be TT_STRING"""
     def __init__(self, token: Token):

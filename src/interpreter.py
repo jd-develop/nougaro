@@ -70,6 +70,21 @@ class Interpreter:
         return RTResult().success(Number(node.token.value).set_context(ctx).set_pos(node.pos_start, node.pos_end))
 
     @staticmethod
+    def visit_NumberENumberNode(node: NumberENumberNode, ctx: Context) -> RTResult:
+        """Visit NumberNode."""
+        value = node.num_token.value * (10 ** node.exponent_token.value)
+        if isinstance(value, int) or isinstance(value, float):
+            return RTResult().success(Number(value).set_context(ctx).set_pos(node.pos_start, node.pos_end))
+        else:
+            print(ctx)
+            print(f"NOUGARO INTERNAL ERROR : in visit_NumberENumberNode method defined in nougaro.Interpreter,\n"
+                  f"{value=}\n"
+                  f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all "
+                  f"informations above.")
+            raise Exception(f'{value=} in interpreter.Interpreter.visit_NumberENumberNode.')
+
+
+    @staticmethod
     def visit_StringNode(node: StringNode, ctx: Context) -> RTResult:
         """Visit StringNode"""
         return RTResult().success(

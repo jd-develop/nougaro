@@ -30,7 +30,7 @@ class Position:
         self.line_number = line_number
         self.colon = colon
         self.file_name = file_name
-        self.file_txt = file_txt
+        self.file_txt: str = file_txt
 
     def advance(self, current_char=None):
         """Add 1 to the index, automatically make back lines."""

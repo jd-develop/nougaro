@@ -417,7 +417,7 @@ class Lexer:
             self.advance()
 
         # if char is still a number or a dot
-        while self.current_char is not None and self.current_char in DIGITS + '.':
+        while self.current_char is not None and self.current_char in DIGITS + '.' + '_':
             if self.current_char == '.':  # if the char is a dot
                 if dot_count == 1:  # if we already encountered a dot
                     return None, InvalidSyntaxError(self.pos, self.pos.copy().advance(),
@@ -425,6 +425,8 @@ class Lexer:
                                                     "src.lexer.Lexer.make_number")
                 dot_count += 1
                 num_str += '.'
+            elif self.current_char == '_':  # you can write 5_371_281 instead of 5371281
+                pass
             else:
                 num_str += self.current_char
             self.advance()  # we advance
@@ -444,6 +446,8 @@ class Lexer:
             )
 
         # TODO: 0x, 0b, 0o
+        # when you have 0b or 0o, it is easy to check if the next int only contains digits between 0 to 1 or 0 to 7
+        # however, with 0x, it is more complicated...
         # if num_str == '0':
         #     prefixes = {
         #         "x": TT["0X_PREFIX"],

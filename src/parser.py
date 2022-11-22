@@ -596,7 +596,7 @@ class Parser:
 
     def call(self) -> ParseResult:
         """
-        call       : atom (LPAREN ((expr (COMMA expr)*)|MUL list_expr)? RPAREN)?*
+        call       : atom (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
         """
         result = ParseResult()
 
@@ -605,7 +605,7 @@ class Parser:
         if result.error is not None:
             return result
 
-        # (LPAREN ((expr (COMMA expr)*)|MUL list_expr)? RPAREN)?*
+        # (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
         if self.current_token.type == TT["LPAREN"]:
             call_node = atom
 
@@ -617,42 +617,47 @@ class Parser:
                 arg_nodes = []
 
                 comma_expected = False
+                mul = False
                 # we check for the closing paren.
                 if self.current_token.type == TT["RPAREN"]:
                     result.register_advancement()
                     self.advance()
-                else:  # ((expr (COMMA expr)*)|MUL list_expr)?
-                    # TODO: make like in list_expr, where you can do *any_node
-                    if self.current_token.type == TT["MUL"]:  # MUL list_expr
+                else:  # (MUL? expr (COMMA MUL? expr)?*)?
+                    if self.current_token.type == TT["MUL"]:  # MUL?
+                        mul = True
+                        # we advance
                         result.register_advancement()
                         self.advance()
-                        # we check for list expr
-                        list_node: ListNode = result.register(self.list_expr())
-                        if result.error is not None:
-                            return result.failure(
-                                InvalidSyntaxError(
-                                    self.current_token.pos_start, self.current_token.pos_end,
-                                    "expected a list after '*' in call arguments.", "src.parser.Parser.call"
-                                )
-                            )
+                    # expr
+                    arg_nodes.append(
+                        (
+                            result.register(self.expr()),
+                            mul
+                        )
+                    )
+                    if result.error is not None:
+                        return result
+                    while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
+                        mul = False
+                        # we advance
+                        result.register_advancement()
+                        self.advance()
 
-                        for node, mul in list_node.element_nodes:
-                            arg_nodes.append(node)
-                    else:
-                        # we check for an expr then append it to the args
-                        arg_nodes.append(result.register(self.expr()))
-                        if result.error is not None:
-                            return result
-                        # (COMMA expr)*
-                        while self.current_token.type == TT["COMMA"]:
+                        if self.current_token.type == TT["MUL"]:  # MUL?
+                            mul = True
+                            # we advance
                             result.register_advancement()
                             self.advance()
-
-                            # again, we check for expr and append it
-                            arg_nodes.append(result.register(self.expr()))
-                            if result.error is not None:
-                                return result
-                        comma_expected = True
+                        # expr
+                        # we register an expr then check for an error
+                        arg_nodes.append(
+                            (
+                                result.register(self.expr()),
+                                mul
+                            )
+                        )
+                        if result.error is not None:
+                            return result
 
                     if self.current_token.type != TT["RPAREN"]:  # there is no paren (it is expected)
                         return result.failure(

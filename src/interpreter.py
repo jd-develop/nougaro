@@ -702,10 +702,23 @@ class Interpreter:
 
         if isinstance(value_to_call, BaseFunction):  # if the value is a function
             # call the function
-            for arg_node in node.arg_nodes:  # we check the arguments
-                args.append(result.register(self.visit(arg_node, ctx)))
-                if result.should_return():  # check for errors
-                    return result
+            for arg_node, mul in node.arg_nodes:  # we check the arguments
+                if not mul:
+                    args.append(result.register(self.visit(arg_node, ctx)))
+                    if result.should_return():  # check for errors
+                        return result
+                else:
+                    list_: Value = result.register(self.visit(arg_node, ctx))
+                    if not isinstance(list_, List):
+                        return result.failure(
+                            RTTypeError(
+                                list_.pos_start, list_.pos_end,
+                                f"expected a list value after '*', but got '{list_.type_}.",
+                                ctx,
+                                origin_file="src.interpreter.Interpreter.visit_CallNode"
+                            )
+                        )
+                    args.extend(list_.elements)
 
             try:  # we try to execute it
                 return_value = result.register(value_to_call.execute(args, Interpreter, self.run,

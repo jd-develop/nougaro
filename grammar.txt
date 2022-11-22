@@ -27,7 +27,7 @@ factor     : (PLUS|MINUS) factor
 
 power      : call (POW factor)*
 
-call       : atom (LPAREN ((expr (COMMA expr)*)|MUL list_expr)? RPAREN)?*
+call       : atom (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
 
 atom       : (INT|FLOAT)(E_INFIX INT)?|(STRING (STRING)?*)|(IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*)
            : LPAREN expr RPAREN

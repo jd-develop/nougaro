@@ -54,3 +54,7 @@ class Token:
     def copy(self):
         """Returns a copy of self"""
         return Token(self.type, self.value, self.pos_start, self.pos_end)
+
+    def set_value(self, value):
+        self.value = value
+        return self

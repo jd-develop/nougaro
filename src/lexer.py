@@ -41,16 +41,24 @@ class Lexer:
         self.advance()
 
     def advance(self):
-        """advance of 1 char in self.text"""
+        """Advance of 1 char in self.text"""
         self.pos.advance(self.current_char)  # advance in position
         # set the new current char - the next one in the code or None if this is EOF (end of file)
         self.current_char = self.text[self.pos.index] if self.pos.index < len(self.text) else None
+
+    def next_char(self):
+        """Returns the next char"""
+        new_pos = self.pos.copy().advance(self.current_char)
+        # get the next char in the code (or None if this is EOF (end of file))
+        next_char = self.text[new_pos.index] if new_pos.index < len(self.text) else None
+        return next_char
 
     def make_tokens(self):
         """Returns a token list with self.text. Return tok_list, None or [], error."""
         tokens: list[Token] = []
 
         there_is_a_space_or_a_tab_or_a_comment = False
+        identifiers_legal_chars = LETTERS + '_'
         while self.current_char is not None:  # None is EOF
             if self.current_char in ' \t':  # tab and space
                 there_is_a_space_or_a_tab_or_a_comment = True
@@ -70,7 +78,7 @@ class Lexer:
                     tokens.append(number)
                 else:  # there is an error, we return it
                     return [], error
-            elif self.current_char in LETTERS + '_':  # the char is a letter or an underscore: identifier or keyword
+            elif self.current_char in identifiers_legal_chars:  # the char is legal: identifier or keyword
                 tok = self.make_identifier()
                 if len(tokens) == 0:
                     tokens.append(tok)
@@ -88,9 +96,20 @@ class Lexer:
                 elif tokens[-1].type in (TT['INT'], TT['FLOAT']) and \
                         tok.type == TT['IDENTIFIER'] and \
                         (tok.value.startswith('e') or tok.value.startswith('E')) and \
-                        self.current_char == '-':
-                    # TODO: (x)e-(y)
-                    tokens.append(tok)
+                        self.current_char == '-' and \
+                        self.next_char() in DIGITS:
+                    self.advance()
+                    num, error = self.make_number()
+                    num: Token
+                    if error is not None:
+                        return [], error
+                    elif num.type == TT["FLOAT"]:
+                        return [], InvalidSyntaxError(num.pos_start, num.pos_end, "expected int, get float.",
+                                                      "src.lexer.Lexer.make_tokens")
+                    else:
+                        tokens.append(
+                            Token(TT['E_INFIX'], pos_start=tok.pos_start, pos_end=tok.pos_start.copy().advance()))
+                        tokens.append(num.set_value(-1*num.value))
                 else:
                     tokens.append(tok)
                 there_is_a_space_or_a_tab_or_a_comment = False

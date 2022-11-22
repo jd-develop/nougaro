@@ -250,7 +250,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # depends on the os
         # if windows -> 'cls'
         # if Linux or MacOS -> 'clear'
-        # TODO: find more OSes to include OR find another way to clear the screen
+        # TODO: find more OSes to include here OR find another way to clear the screen
         os_system('cls' if (os_name.lower() == "nt" or os_name.lower().startswith("windows")) else 'clear')
         return RTResult().success(NoneValue(False))
 
@@ -504,7 +504,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                     can_append = True
                     for e1 in list1_e:
                         # very slow thing : for each element of a list we have to check all the other one ones
-                        # TODO: find another way to do that
+                        # TODO: find another way to do that (instead of this for loop) (extend > delete_duplicates)
                         equal, error = e.get_comparison_eq(e1)
                         if error is not None:  # there is an error, there are not the same
                             continue

@@ -423,7 +423,7 @@ class List(Value):
 
     def is_eq(self, other):
         # think this is very slow
-        # TODO: maybe find something to improve speed of this method
+        # TODO: maybe find something to improve speed of this method (is_eq in List)
         if isinstance(other, List):
             if len(self.elements) != len(other.elements):
                 return False

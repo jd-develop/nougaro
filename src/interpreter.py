@@ -824,7 +824,7 @@ class Interpreter:
             return result.failure(
                 RTNotDefinedError(
                     identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
-                    "src.interpreter.Interpreter.visit_ImportNode"
+                    "src.interpreter.Interpreter.visit_ImportNode (troubleshooting: do python importlib is working?)"
                 )
             )
 

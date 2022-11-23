@@ -99,11 +99,13 @@ class Lexer:
                         self.current_char == '-' and \
                         self.next_char() in DIGITS:
                     self.advance()
-                    num, error = self.make_number()
-                    num: Token
+
+                    num, error = self.make_number(_0prefixes=False)
                     if error is not None:
                         return [], error
-                    elif num.type == TT["FLOAT"]:
+                    
+                    num: Token
+                    if num.type == TT["FLOAT"]:
                         return [], InvalidSyntaxError(num.pos_start, num.pos_end, "expected int, get float.",
                                                       "src.lexer.Lexer.make_tokens")
                     else:
@@ -423,7 +425,7 @@ class Lexer:
         token_type = TT["KEYWORD"] if id_str in KEYWORDS else TT["IDENTIFIER"]  # KEYWORDS is the keywords list
         return Token(token_type, id_str, pos_start, self.pos)
 
-    def make_number(self):
+    def make_number(self, digits=DIGITS + '.', _0prefixes=True, mode="int"):
         """Make number, int or float"""
         num_str = ''
         dot_count = 0  # we can't have more than one dot, so we count them
@@ -436,7 +438,7 @@ class Lexer:
             self.advance()
 
         # if char is still a number or a dot
-        while self.current_char is not None and self.current_char in DIGITS + '.' + '_':
+        while self.current_char is not None and self.current_char in digits + '_':
             if self.current_char == '.':  # if the char is a dot
                 if dot_count == 1:  # if we already encountered a dot
                     return None, InvalidSyntaxError(self.pos, self.pos.copy().advance(),
@@ -449,6 +451,17 @@ class Lexer:
             else:
                 num_str += self.current_char
             self.advance()  # we advance
+
+        if isinstance(self.current_char, str) and self.current_char not in digits and self.current_char in "23456789":
+            base = {
+                "bin": 2,
+                "oct": 8
+            }
+            return None, InvalidSyntaxError(
+                self.pos, self.pos.copy().advance(),
+                f"invalid digit for base {base[mode]}: {self.current_char}",
+                "src.lexer.Lexer.make_number"
+            )
 
         if num_str == '.':
             return None, InvalidSyntaxError(
@@ -464,24 +477,36 @@ class Lexer:
                 "src.lexer.Lexer.make_number"
             )
 
-        # TODO: 0x, 0b, 0o
-        # when you have 0b or 0o, it is easy to check if the next int only contains digits between 0 to 1 or 0 to 7
-        # however, with 0x, it is more complicated...
-        # if num_str == '0':
-        #     prefixes = {
-        #         "x": TT["0X_PREFIX"],
-        #         "o": TT["0O_PREFIX"],
-        #         "b": TT["0B_PREFIX"],
-        #     }
-        #     if self.current_char in prefixes.keys():
-        #         token = Token(prefixes[self.current_char], pos_start=pos_start, pos_end=self.pos.copy())
-        #         self.advance()
-        #         return token, None
+        if _0prefixes and num_str == '0':
+            prefixes: dict[tuple[str, str, str]] = {
+                "x": ("012334567898ABCDEF"+"abcdef", "hex"),
+                "X": ("012334567898ABCDEF"+"abcdef", "hex"),
+                "o": ("01234567", "oct"),
+                "O": ("01234567", "oct"),
+                "b": ("01", "bin"),
+                "B": ("01", "bin"),
+            }
+            if self.current_char in prefixes.keys():
+                prefix = prefixes[self.current_char]
+                self.advance()
+                num, error = self.make_number(prefix[0], False, prefix[1])
+                if error is not None:
+                    return None, error
+                return num, None
 
-        if dot_count == 0:  # if there is no dots, this is an INT, else this is a FLOAT
-            return Token(TT["INT"], int(num_str), pos_start, self.pos.copy()), None
+        if mode == 'int':
+            if dot_count == 0:  # if there is no dots, this is an INT, else this is a FLOAT
+                return Token(TT["INT"], int(num_str), pos_start, self.pos.copy()), None
+            else:
+                return Token(TT["FLOAT"], float(num_str), pos_start, self.pos.copy()), None
+        elif mode == "hex":
+            return Token(TT["INT"], int(num_str, 16), pos_start, self.pos.copy()), None
+        elif mode == "oct":
+            return Token(TT["INT"], int(num_str, 8), pos_start, self.pos.copy()), None
+        elif mode == "bin":
+            return Token(TT["INT"], int(num_str, 2), pos_start, self.pos.copy()), None
         else:
-            return Token(TT["FLOAT"], float(num_str), pos_start, self.pos.copy()), None
+            raise Exception("The specified mode is incorrect...")
 
     def make_not_equals(self):
         """Make != or !>>"""

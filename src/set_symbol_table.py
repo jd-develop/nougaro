@@ -117,6 +117,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("__is_keyword__", IS_KEYWORD)
     symbol_table.set("__is_valid_token_type__", IS_VALID_TOKEN_TYPE)
     symbol_table.set("__test__", TEST)
+    symbol_table.set("__how_many_lines_of_code__", HOW_MANY_LINES_OF_CODE)
 
     # symbol_table.set('__symbol_table__', String(pprint.pformat(symbol_table.symbols)))
     # test_protected_vars(symbol_table)
@@ -127,7 +128,12 @@ def test_protected_vars(symbol_table: SymbolTable):
     error_count = 0
     for symbol in symbol_table.symbols:
         if symbol not in PROTECTED_VARS:
-            if symbol != "numberOfHornsOnAnUnicorn" and symbol != "theLoneliestNumber" and symbol != "rickroll":
+            if symbol not in [
+                "numberOfHornsOnAnUnicorn",
+                "theLoneliestNumber",
+                "rickroll",
+                "__how_many_lines_of_code__"
+            ]:
                 print(f"missing {symbol} in PROTECTED_VARS")
                 error_count += 1
     if error_count == 0:

@@ -1266,4 +1266,46 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_chr.optional_params = []
     execute_chr.should_respect_args_number = True
 
+    def execute___how_many_lines_of_code__(self, exec_ctx):
+        """Return the number of lines of code in the Nougaro Interpreter"""
+        total = 0
+        all_files = {}
+
+        print_values = exec_ctx.symbol_table.get("print_values")
+        print_ = True
+        if print_values:
+            if isinstance(print_values, Number):
+                if print_values.value == FALSE.value:
+                    print_ = False
+        if print_:
+            print("Computing...")
+
+        folders = ['.', 'lib_', 'src', 'src/values', 'src/values/functions', 'src/values/specific_values']
+        for folder in folders:
+            for file_dir in os.listdir(folder):
+                if file_dir != "example.noug" and (file_dir.endswith(".py") or file_dir.endswith(".noug")):
+                    with open(f"{folder}/{file_dir}", "r+", encoding="UTF-8") as file:
+                        len_ = len(file.readlines())
+                        total += len_
+                        file.close()
+                        if print_:
+                            print(f"In file: {folder}/{file_dir}: {len_}")
+                        all_files[f"{folder}/{file_dir}"] = len_
+
+        if print_:
+            all_files = {key: val for key, val in sorted(all_files.items(), key=lambda ele: ele[1], reverse=True)}
+            top_keys = list(all_files.keys())[:6]
+            top_values = [all_files[key] for key in top_keys]
+            top_ = {}
+            for i, key in enumerate(top_keys):
+                top_[key] = top_values[i]
+            print(f"\nTop files:")
+            for top_file in top_:
+                print(f"{top_file}: {top_[top_file]}")
+        return RTResult().success(Number(total))
+
+    execute___how_many_lines_of_code__.param_names = []
+    execute___how_many_lines_of_code__.optional_params = ["print_values"]
+    execute___how_many_lines_of_code__.should_respect_args_number = True
+
     # ==================

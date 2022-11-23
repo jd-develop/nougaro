@@ -76,3 +76,5 @@ GPL = BuiltInFunction('__gpl__')
 IS_KEYWORD = BuiltInFunction('__is_keyword__')
 IS_VALID_TOKEN_TYPE = BuiltInFunction('__is_valid_token_type__')
 TEST = BuiltInFunction("__test__")
+
+HOW_MANY_LINES_OF_CODE = BuiltInFunction("__how_many_lines_of_code__")

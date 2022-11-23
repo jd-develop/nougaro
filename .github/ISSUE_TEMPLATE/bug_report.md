@@ -25,8 +25,8 @@ If applicable, add screenshots to help explain your problem.
 
 **Your setup (please complete the following information):**
  - OS: [e.g. Ubuntu, Windows...]
- - OS version: [e.g. 21.10, 22.04 LTS, 10 20H2]
- - Nougaro version [e.g. 0.6-alpha]
+ - OS version: [e.g. 22.10, 22.04 LTS, 10 22H2]
+ - Nougaro version [e.g. 0.9-alpha]
 
 **Additional context**
 Add any other context about the problem here.

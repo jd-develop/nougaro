@@ -83,7 +83,6 @@ class Interpreter:
                   f"informations above.")
             raise Exception(f'{value=} in interpreter.Interpreter.visit_NumberENumberNode.')
 
-
     @staticmethod
     def visit_StringNode(node: StringNode, ctx: Context) -> RTResult:
         """Visit StringNode"""
@@ -735,7 +734,7 @@ class Interpreter:
         elif isinstance(value_to_call, List):  # the value is a list
             # get the element at the given index
             if len(node.arg_nodes) == 1:  # there is only one index given
-                index = result.register(self.visit(node.arg_nodes[0], ctx))
+                index = result.register(self.visit(node.arg_nodes[0][0], ctx))
                 if isinstance(index, Number):  # the index should be a number
                     index = index.value
                     try:  # we try to return the value at the index
@@ -744,7 +743,7 @@ class Interpreter:
                     except Exception:  # index error
                         return result.failure(
                             RTIndexError(
-                                node.arg_nodes[0].pos_start, node.arg_nodes[0].pos_end,
+                                node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
                                 f'list index {index} out of range.',
                                 ctx, "src.interpreter.Interpreter.visit_CallNode"
                             )
@@ -758,7 +757,7 @@ class Interpreter:
             elif len(node.arg_nodes) > 1:  # there is more than one index given
                 return_value = []
                 for arg_node in node.arg_nodes:  # for every index
-                    index = result.register(self.visit(arg_node, ctx))
+                    index = result.register(self.visit(arg_node[0], ctx))
                     if isinstance(index, Number):  # the index should be a number
                         index = index.value
                         try:  # we try to return the value at the given index
@@ -766,14 +765,14 @@ class Interpreter:
                         except Exception:  # index error
                             return result.failure(
                                 RTIndexError(
-                                    arg_node.pos_start, arg_node.pos_end,
+                                    arg_node[0].pos_start, arg_node[0].pos_end,
                                     f'list index {index} out of range.',
                                     ctx, "src.interpreter.Interpreter.Visit_CallNode"
                                 )
                             )
                     else:  # the index is not a number
                         return result.failure(RunTimeError(
-                            arg_node.pos_start, arg_node.pos_end,
+                            arg_node[0].pos_start, arg_node[0].pos_end,
                             f"indexes must be integers, not {index.type_}.",
                             ctx, origin_file="src.interpreter.Interpreter.Visit_CallNode"
                         ))

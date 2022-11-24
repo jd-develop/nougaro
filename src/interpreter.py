@@ -978,39 +978,42 @@ class Interpreter:
             )
         file_name_value = file_name.value
 
-        try:
-            if line_number == 'all':  # read all the file
-                with open(file_name_value, 'r+', encoding='UTF-8') as file:
-                    file_str = file.read()
-                    file.close()
-            else:  # read a single line
-                with open(file_name_value, 'r+', encoding='UTF-8') as file:
-                    file_data = file.readlines()
-                    file.close()
-                    if 0 < line_number <= len(file_data):  # good index
-                        file_str = file_data[line_number - 1]
-                    else:  # wrong index
-                        return result.failure(
-                            RTIndexError(
-                                node.pos_start, node.pos_end, f"{line_number}.", ctx,
-                                "src.interpreter.Interpreter.visit_ReadNode"
+        if file_name_value != "<stdin>":
+            try:
+                if line_number == 'all':  # read all the file
+                    with open(file_name_value, 'r+', encoding='UTF-8') as file:
+                        file_str = file.read()
+                        file.close()
+                else:  # read a single line
+                    with open(file_name_value, 'r+', encoding='UTF-8') as file:
+                        file_data = file.readlines()
+                        file.close()
+                        if 0 < line_number <= len(file_data):  # good index
+                            file_str = file_data[line_number - 1]
+                        else:  # wrong index
+                            return result.failure(
+                                RTIndexError(
+                                    node.pos_start, node.pos_end, f"{line_number}.", ctx,
+                                    "src.interpreter.Interpreter.visit_ReadNode"
+                                )
                             )
-                        )
-        except FileNotFoundError:  # file not found
-            return result.failure(
-                RTFileNotFoundError(
-                    node.pos_start, node.pos_end, f"file '{file_name_value}' does not exist.", ctx,
-                    "src.interpreter.Interpreter.visit_ReadNode"
+            except FileNotFoundError:  # file not found
+                return result.failure(
+                    RTFileNotFoundError(
+                        node.pos_start, node.pos_end, f"file '{file_name_value}' does not exist.", ctx,
+                        "src.interpreter.Interpreter.visit_ReadNode"
+                    )
                 )
-            )
-        except Exception as e:  # other python error
-            return result.failure(
-                RunTimeError(
-                    node.pos_start, node.pos_end, f"unable to write in file '{file_name_value}'. "
-                                                  f"More info : Python{e.__class__.__name__}: {e}", ctx,
-                    origin_file="src.interpreter.Interpreter.visit_ReadNode"
+            except Exception as e:  # other python error
+                return result.failure(
+                    RunTimeError(
+                        node.pos_start, node.pos_end, f"unable to write in file '{file_name_value}'. "
+                                                      f"More info : Python{e.__class__.__name__}: {e}", ctx,
+                        origin_file="src.interpreter.Interpreter.visit_ReadNode"
+                    )
                 )
-            )
+        else:
+            file_str = input()
 
         if identifier is not None:  # an identifier is given
             if identifier.value not in PROTECTED_VARS:  # the identifier is not protected

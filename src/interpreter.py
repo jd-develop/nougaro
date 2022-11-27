@@ -822,7 +822,6 @@ class Interpreter:
         if os.path.exists(f"lib_/{name_to_import}.noug"):
             with open(f"lib_/{name_to_import}.noug") as lib_:
                 text = lib_.read()
-                lib_.close()
             value, error = self.run(file_name=f"{name_to_import} (lib)", text=text, exec_from=ctx.display_name)
             if error is not None:
                 return result.failure(error)
@@ -901,22 +900,18 @@ class Interpreter:
             if line_number == 'last':  # if no line number was given
                 with open(file_name_value, open_mode, encoding='UTF-8') as file:  # we (over)write our text
                     file.write(str_to_write_value)
-                    file.close()
             else:  # a line number was given
                 file_was_created = False
                 if not os.path.exists(file_name_value):  # the file does not exist
-                    with open(file_name_value, 'w+', encoding='UTF-8') as file:  # we create our file
-                        file.close()
+                    with open(file_name_value, 'w+', encoding='UTF-8'):  # we create our file
                         file_was_created = True
                 with open(file_name_value, 'r+', encoding='UTF-8') as file:  # we read our file
                     file_data = file.readlines()
-                    file.close()
                 if line_number > len(file_data):  # if it exceeds, we add some blank lines
                     with open(file_name_value, 'a+', encoding='UTF-8') as file:  # no matter the open mode
                         # here "int(file_was_created)" is 1 if the file is empty or 0 if the file is not empty.
                         file.write('\n' * (line_number - int(file_was_created) - len(file_data)))
                         file.write(str_to_write_value)
-                        file.close()
                 else:  # if it does not exceed the file length
                     if open_mode == 'a+':  # we add our text to the end of the line
                         if line_number == 0:  # we insert at the top of the file
@@ -947,7 +942,6 @@ class Interpreter:
                     # we replace our old file by the new one
                     with open(file_name_value, 'w+', encoding='UTF-8') as file:
                         file.writelines(file_data)
-                        file.close()
         except Exception as e:  # python error
             return result.failure(
                 RunTimeError(
@@ -983,11 +977,9 @@ class Interpreter:
                 if line_number == 'all':  # read all the file
                     with open(file_name_value, 'r+', encoding='UTF-8') as file:
                         file_str = file.read()
-                        file.close()
                 else:  # read a single line
                     with open(file_name_value, 'r+', encoding='UTF-8') as file:
                         file_data = file.readlines()
-                        file.close()
                         if 0 < line_number <= len(file_data):  # good index
                             file_str = file_data[line_number - 1]
                         else:  # wrong index

@@ -34,11 +34,9 @@ import platform
 def main():
     with open("config/debug.conf") as debug_f:
         debug_on = bool(int(debug_f.read()))
-        debug_f.close()
 
     with open("config/print_context.conf") as print_context_f:
         print_context = bool(int(print_context_f.read()))
-        print_context_f.close()
 
     # message for PR-makers: if you have a better idea to how to do these things with CLI arguments, make a PR :)
     args = sys.argv
@@ -135,10 +133,8 @@ def main():
             else:  # there is no error nor result. If you know when that happens, tell me, please.
                 continue
     else:  # we don't open the shell because we have to run a file.
-        # why using the "with" structure ?
-        file = open(path, encoding="UTF-8")
-        file_content = str(file.read())
-        file.close()
+        with open(path, encoding="UTF-8") as file:
+            file_content = str(file.read())
         if file_content == "" or file_content is None:  # no need to run this empty file
             result, error = None, None
         else:  # the file isn't empty, let's run it !

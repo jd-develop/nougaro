@@ -35,11 +35,9 @@ import json
 
 with open("config/debug.conf") as debug:
     DEBUG_ON = bool(int(debug.read()))
-    debug.close()
 
 with open("config/print_context.conf") as print_context:
     PRINT_CONTEXT = bool(int(print_context.read()))
-    print_context.close()
 
 # ##########
 # SYMBOL TABLE

@@ -8,7 +8,7 @@
  
  Minimum : python 3.9
  
- Supports python 3.10
+ Supports python 3.10 and python 3.11
 
 ## French description
  Un langage de programmation. Interpréteur écrit en Python.
@@ -19,7 +19,7 @@
  
  Minimum : python 3.9
  
- Prend en charge python 3.10
+ Prend en charge python 3.10 et python 3.11
 
 # Documentation
  Please refer to the [wiki](https://github.com/jd-develop/nougaro/wiki/) for documentation.

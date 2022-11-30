@@ -73,7 +73,7 @@ assert False==0
 assert null==0
 assert "a" in "this is an example string"
 assert 1 in "123"
-assert "azerty" in ["azerty", "qwerty", "bépo"]
+assert "bépo" in ["azerty", "qwerty", "bépo"]
 assert 1 > 0
 assert 1 >= 1
 assert 0 < 1
@@ -170,5 +170,28 @@ assert __is_valid_token_type__("PLUS")  # the + token
 assert not __is_valid_token_type__("LOREM_IPSUM")
 assert __how_many_lines_of_code__(False) != 0
 
+# builtin variables
+assert __os_name__ in ["Windows", "Linux", "Darwin", "Java"], "Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html"
+
+# lists
+var list_ = [3, 4]
+assert [1, 2, *list_, 5] == [1, 2, 3, 4, 5]
+
+assert [1, 2, 'str'] + '3' == [1, 2, 'str', '3']
+assert append([1, 2, 'str'], 3) == [1, 2, 'str', 3]
+assert [1, 2, 'str'] * [3, 4, 'str2'] == [1, 2, 'str', 3, 4, 'str2']
+assert extend([1, 2, 'str'], [3, 4, 'str2']) == [1, 2, 'str', 3, 4, 'str2']
+assert [0]*3 == [0, 0, 0]
+assert ["a", None]*2 == ["a", None, "a", None]
+
+assert [1, 2, 'str'] / 0 == [1, 2, 'str'](0) == 1
+assert [1, 2, 'str'] / -1 == [1, 2, 'str'](-1) == 'str'
+assert [0, 1, 2, 3, 4](3, -4) == [3, 1]
+assert [1, 2, 'str'] - 0 == [2, 'str']
+assert [1, 2, 'str'] - -1 == [1, 2]
+assert pop([1, 2, 'str'], 0) == [2, 'str']
+
+# Loops
+
 # everything is fine in this file
-print("everything seems fine")
+print("Everything seems fine!")

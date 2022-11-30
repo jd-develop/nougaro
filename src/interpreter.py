@@ -71,7 +71,7 @@ class Interpreter:
 
     @staticmethod
     def visit_NumberENumberNode(node: NumberENumberNode, ctx: Context) -> RTResult:
-        """Visit NumberNode."""
+        """Visit NumberENumberNode."""
         value = node.num_token.value * (10 ** node.exponent_token.value)
         if isinstance(value, int) or isinstance(value, float):
             return RTResult().success(Number(value).set_context(ctx).set_pos(node.pos_start, node.pos_end))
@@ -194,7 +194,7 @@ class Interpreter:
             else:
                 visited_nodes_and_tokens_list.append(element)
 
-        test_result = FALSE  # FALSE is Nougaro False
+        test_result = FALSE.copy()  # FALSE is Nougaro False
         # let's test!
         for index, element in enumerate(visited_nodes_and_tokens_list):
             if index % 2 == 0:  # we take only visited nodes and not ops
@@ -230,7 +230,7 @@ class Interpreter:
                                     "src.interpreter.Interpreter.visit_BinOpCompNode")
                 if error is not None:  # there is an error
                     return res.failure(error)
-                if test_result.value == 0:  # the test is false so far: no need to continue
+                if test_result.value == FALSE.value:  # the test is false so far: no need to continue
                     return res.success(test_result.set_pos(node.pos_start, node.pos_end))
             else:
                 pass

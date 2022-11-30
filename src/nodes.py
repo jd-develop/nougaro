@@ -51,6 +51,9 @@ class NumberENumberNode(Node):
         self.num_token = num_token
         self.exponent_token = exponent_token
 
+        self.pos_start = num_token.pos_start
+        self.pos_end = exponent_token.pos_end
+
     def __repr__(self):
         return f'numE:({self.num_token})e({self.exponent_token})'
 

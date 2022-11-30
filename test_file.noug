@@ -15,6 +15,10 @@ assert 1 - 2 == -1
 assert (1 & 2) == 0
 assert (1 | 2) == 3
 assert (3 ^^ 2) == 1
+assert 1e3 == 1000
+assert 1e-3 == 0.001
+assert 1.1e1 == 11
+# assert 1.1e-1 == 0.11  # it crashes because 1.1e-1 = 0.11000000000000001...
 
 # variables
 ## definition
@@ -138,6 +142,10 @@ assert split("lorem ipsum dolor sit amet", 'o') == ["l", "rem ipsum d", "l", "r 
 assert split("lorem ipsum, dolor sit amet", ',') == ["lorem ipsum", " dolor sit amet"]
 assert len("lorem ipsum dolor sit amet") == 26
 
+assert ord('a') == 0x61
+assert chr(0x61) == 'a'
+assert chr(0x48) + chr(0b1100101) + 2*chr(0o154) + chr(111) + chr(32) + chr(84) + chr(111) + chr(117) + chr(108) + chr(111) + chr(117) + chr(115) + chr(101) + chr(33) == hello
+
 assert append(["lorem", "ipsum"], "dolor") == ["lorem", "ipsum", "dolor"]
 assert pop(["lorem", "ipsum", "dolor", "sit", "amet"]) == ["lorem", "ipsum", "dolor", "sit"]
 assert pop(["lorem", "ipsum", "dolor", "sit", "amet"], -1) == ["lorem", "ipsum", "dolor", "sit"]
@@ -160,6 +168,7 @@ assert __is_keyword__("assert")
 assert not __is_keyword__("print")  # we're not in Python 2 x)
 assert __is_valid_token_type__("PLUS")  # the + token
 assert not __is_valid_token_type__("LOREM_IPSUM")
+assert __how_many_lines_of_code__(False) != 0
 
 # everything is fine in this file
 print("everything seems fine")

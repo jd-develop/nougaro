@@ -163,6 +163,10 @@ assert min([12, 6, 4, 45, 7]) == 4
 assert min(["lorem", 12, 6, "ipsum", 4, 45, "dolor", 7], True) == 4
 assert len(split("lorem ipsum dolor sit amet")) == 5
 
+assert round(12) == 12
+assert round(12.4) == 12
+assert round(3.14159265358979323846264338327950288419, 5) == 3.14159
+
 assert void() == None
 assert __is_keyword__("assert")
 assert not __is_keyword__("print")  # we're not in Python 2 x)

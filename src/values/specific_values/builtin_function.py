@@ -48,6 +48,7 @@ INT = BuiltInFunction('int')
 FLOAT = BuiltInFunction('float')
 STR = BuiltInFunction('str')
 LIST = BuiltInFunction('list')
+ROUND = BuiltInFunction('round')
 
 APPEND = BuiltInFunction('append')
 POP = BuiltInFunction('pop')

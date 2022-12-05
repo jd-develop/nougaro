@@ -69,6 +69,7 @@ BUILTIN_FUNCTIONS = [
     'ord',
     'nougaro',
     '__gpl__',
+    'round'
 ]
 PROTECTED_VARS = [  # finally, the list with all the names that can't be defined by the user
     "null",

@@ -1308,4 +1308,39 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute___how_many_lines_of_code__.optional_params = ["print_values"]
     execute___how_many_lines_of_code__.should_respect_args_number = True
 
+    def execute_round(self, exec_ctx: Context):
+        """Like python 'round'"""
+        number = exec_ctx.symbol_table.get("number")
+        n_digits = exec_ctx.symbol_table.get("n_digits")
+
+        if not isinstance(number, Number):
+            return RTResult().failure(RTTypeError(
+                number.pos_start, number.pos_end,
+                f"first argument of builtin function 'round' must be a number.",
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_round"
+            ))
+
+        if not isinstance(n_digits, Number) and n_digits is not None:
+            return RTResult().failure(RTTypeError(
+                n_digits.pos_start, n_digits.pos_end,
+                f"second argument of builtin function 'round' must be an int.",
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_round"
+            ))
+
+        if n_digits is not None and not n_digits.is_int():
+            return RTResult().failure(RTTypeError(
+                n_digits.pos_start, n_digits.pos_end,
+                f"second argument of builtin function 'round' must be an int.",
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_round"
+            ))
+
+        if n_digits is not None:
+            n_digits = n_digits.value
+
+        return RTResult().success(Number(round(number.value, n_digits)))
+
+    execute_round.param_names = ["number"]
+    execute_round.optional_params = ["n_digits"]
+    execute_round.should_respect_args_number = True
+
     # ==================

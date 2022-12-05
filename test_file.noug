@@ -211,15 +211,27 @@ assert (read "test_file.noug" 2) == "# comment\n"
 
 # libs
 import hello
+
 import math
 assert math_sqrt_pi == math_sqrt(math_pi)
 assert math_root(8, 3) == 2
 assert math_degrees(math_pi) == 180
 assert math_radians(180) == math_pi
-# assert math_sin(math_pi) == 0
-# assert math_cos(math_pi) == -1
-# assert math_tan(math_pi) == 0
-# assert math_tan(2*math_pi) == math_tan(0)
+assert round(math_sin(math_pi), 5) == 0
+assert round(math_cos(math_pi), 5) == -1
+assert round(math_tan(math_pi), 5) == 0
+assert round(math_tan(2*math_pi), 5) == round(math_tan(0), 5)
+assert math_asin(0) == 0
+assert round(math_acos(-1), 9) == round(math_pi, 9)
+assert math_abs(10) == 10
+assert math_abs(-10) == 10
+assert round(math_log(12, 2), 9) == round(math_log2(12), 9)
+assert math_e == 2.718281828459045
+
+import random
+assert 0 <= random_random() <= 1
+assert random_randint(1, 5) in (for i = 1 to 5 then i)
+assert random_choice(for i = 1 to 5 then i) in (for i = 1 to 5 then i)
 
 # everything is fine in this file
 print("Everything seems fine!")

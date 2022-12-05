@@ -192,6 +192,30 @@ assert [1, 2, 'str'] - -1 == [1, 2]
 assert pop([1, 2, 'str'], 0) == [2, 'str']
 
 # Loops
+assert (while (assert True) == None then break) == []
+assert (for i in [1, 2, 3] then i) == [1, 2, 3]
+assert (for i = 0 to 9 step 2 then assert i%2 == 0) == [None]*5
+assert (for i = 0 to -9 step -2 then assert i%2 == 0) == [None]*5
+assert (do assert True then loop while False) == [None]
+
+# files
+assert (read "test_file.noug" 2) == "# comment\n"
+assert (write "# hey" !>> "test_file.noug" 2) == "# hey"
+assert (read "test_file.noug" 2) == "# hey\n"
+assert (write "# comment" !>> "test_file.noug" 2) == "# comment"
+assert (read "test_file.noug" 2) == "# comment\n"
+
+# libs
+import hello
+import math
+assert math_sqrt_pi == math_sqrt(math_pi)
+assert math_root(8, 3) == 2
+assert math_degrees(math_pi) == 180
+assert math_radians(180) == math_pi
+# assert math_sin(math_pi) == 0
+# assert math_cos(math_pi) == -1
+# assert math_tan(math_pi) == 0
+# assert math_tan(2*math_pi) == math_tan(0)
 
 # everything is fine in this file
 print("Everything seems fine!")

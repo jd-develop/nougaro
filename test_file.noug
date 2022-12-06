@@ -233,5 +233,8 @@ assert 0 <= random_random() <= 1
 assert random_randint(1, 5) in (for i = 1 to 5 then i)
 assert random_choice(for i = 1 to 5 then i) in (for i = 1 to 5 then i)
 
+import statistics
+assert statistics_mean([0, 20]) == 10
+
 # everything is fine in this file
 print("Everything seems fine!")

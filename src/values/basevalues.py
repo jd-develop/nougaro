@@ -477,6 +477,9 @@ class List(Value):
             return Number(int(self.to_str_()[0].value in other.value)).set_context(self.context), None
         else:
             return None, self.can_not_be_in(other)
+    
+    def is_true(self):
+        return bool(len(self.elements))
 
     def copy(self):
         """Return a copy of self"""

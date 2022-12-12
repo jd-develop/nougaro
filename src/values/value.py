@@ -79,9 +79,10 @@ class Value:
         E.g. : num_1 is a Number object that have a value of 3 and num_2 is another Number object with a value of 2.
                Then, num_1.multiplied_by(num_2) returns (num1 with the value of 6, None)
 
-        E.g.2: list_1 is a List object that have a value of [1, "hello"] and num_1 is a Number object with a value of 1.
-               However, you can't multiply a List with a Number.
-               Then, list_1.multiplied_by(num_1) returns \
+        E.g.2: list_1 is a List object that have a value of [1, "hello"] and str_1 is a String object with a value of\
+                "azerty".
+               However, you can't multiply a List with a String.
+               Then, list_1.multiplied_by(str_1) returns \
                                             (None, RunTimeError with correct context and error msg)
         """
         return None, self.illegal_operation(other)

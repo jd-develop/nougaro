@@ -2,6 +2,8 @@
 ## English description
  A programming language. Interpreter written in Python.
  
+ Needs the `colorama` module (`pip install colorama`)
+ 
  Execute the shell with `python3 shell.py`. Open files with `python3 shell.py (filename.extension)`
 
  The code is compiled for Windows and Linux. Check it out in the [releases](https://github.com/jd-develop/nougaro/releases/) tab!
@@ -12,6 +14,8 @@
 
 ## French description
  Un langage de programmation. Interpréteur écrit en Python.
+ 
+ Nécessite le module `colorama` (`pip install colorama`)
  
  Exécutez le shell avec `python3 shell.py`. Ouvrez des fichiers avec `python3 shell.py (filename.extension)`
  

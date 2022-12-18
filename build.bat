@@ -24,7 +24,7 @@ pause
 
 rem We update pip and nuitka
 rem We use ordered-set to have a bast compilation time
-python -m pip install --upgrade pip nuitka wheel ordered-set
+python -m pip install --upgrade pip nuitka wheel ordered-set colorama
 
 rem We delete useless files and directories
 for %%y in (.\.gitignore, .\.gitattributes, example_file, grammar.txt, tests.noug, todo.md) do if exist %%y (del %%y)

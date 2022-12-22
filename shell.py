@@ -130,6 +130,9 @@ def main():
                         if should_print:  # if we should print, we print
                             print(result)
                 else:  # the result is not a Nougaro List. If you know when that happens, tell me, please.
+                    print("WARNING: Looks like something went wrong. Don't panic, and just report this bug at:\n"
+                          "https://jd-develop.github.io/nougaro/bugreport.html."
+                          "Error details: result from src.nougaro.run in shell is not a List.")
                     continue
             else:  # there is no error nor result. If you know when that happens, tell me, please.
                 continue

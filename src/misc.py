@@ -41,14 +41,14 @@ def is_num(value: Any): return isinstance(value, int) or isinstance(value, float
 #                                                                                    python int or float
 
 
-def does_tok_type_exist(tok_type: str):  # indev
-    """Return true if the token type exists (e.g. 'TT_EQ' exists, but 'TT_FOO' does not)"""
+def does_tok_type_exist(tok_type: str):
+    """Return True if the token type exists (e.g. 'TT_EQ' exists, but 'TT_FOO' does not)"""
     from src.token_types import TT
     return tok_type in TT
 
 
 def is_keyword(word: str):
-    """Return true if the str is a valid nougaro keyword, such as 'import' or 'if'."""
+    """Return True if the str is a valid Nougaro keyword, such as 'import' or 'if'."""
     from src.token_types import KEYWORDS
     return word in KEYWORDS
 
@@ -58,9 +58,7 @@ def is_keyword(word: str):
 # thanks to lancelote (https://github.com/lancelote) that works at JetBrains for these tricks
 # ##########
 class CustomBuiltInFuncMethod(Protocol):
-    """
-        Just a class for typing the methods `execute_{name}` in BuiltInFunction
-    """
+    """The type of the methods `execute_{name}` in BuiltInFunction"""
     # This class was made to bypass a pycharm bug.
     param_names: list[str]
     optional_params: list[str]
@@ -71,9 +69,7 @@ class CustomBuiltInFuncMethod(Protocol):
 
 
 class CustomBuiltInFuncMethodWithRunParam(CustomBuiltInFuncMethod):
-    """
-        Just a class for typing the methods `execute_{name}` with `run` parameter in BuiltInFunction
-    """
+    """The type of the methods `execute_{name}` with `run` parameter in BuiltInFunction"""
     # This class was made to bypass a pycharm bug.
 
     def __call__(self, exec_context: Context = None, run=None) -> Any:
@@ -84,9 +80,7 @@ class CustomBuiltInFuncMethodWithRunParam(CustomBuiltInFuncMethod):
 # CUSTOM INTERPRETER VISIT METHOD
 # ##########
 class CustomInterpreterVisitMethod(Protocol):
-    """
-        Just a class for typing the methods `visit_{name}` in Interpreter
-    """
+    """The type of the methods `visit_{name}` in Interpreter"""
     # This class was made to bypass a pycharm bug.
     def __call__(self, exec_context: Context = None, node=None) -> Any:
         ...

@@ -235,11 +235,19 @@ assert random_choice(for i = 1 to 5 then i) in (for i = 1 to 5 then i)
 
 import statistics
 assert statistics_mean([8, 16, 15, 17, 18, 20, 25]) == 17
-assert statistics_geometric_mean([50.3, 55.7, 57.1, 54.9, 60.1]) == 55.526617820569356
-assert statistics_harmonic_mean([50.3, 55.7, 57.1, 54.9, 60.1]) == 55.43173136736931
-assert statistics_median([50.3, 55.7, 57.1, 54.9, 60.1]) == 55.7
-assert statistics_quantiles([50.3, 55.7, 57.1, 54.9, 60.1]) == [52.599999999999994, 55.7, 58.6]
-assert statistics_quantiles([50.3, 55.7, 57.1, 54.9, 60.1], 3, 'inclusive') == [55.166666666666664, 56.63333333333333]
+var example_list = [50.3, 55.7, 57.1, 54.9, 60.1]
+assert statistics_geometric_mean(example_list) == 55.526617820569356
+assert statistics_harmonic_mean(example_list) == 55.43173136736931
+assert statistics_median(example_list) == 55.7
+assert statistics_quantiles(example_list) == [52.599999999999994, 55.7, 58.6]
+assert statistics_quantiles(example_list, 3, 'inclusive') == [55.166666666666664, 56.63333333333333]
+assert statistics_scope(example_list) == max(example_list) - min(example_list)
+var example_list += 57.1
+assert statistics_mode(example_list) == 57.1
+assert statistics_multimode("Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch") == ["l"]
+assert statistics_multimode("Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch          ") == ["l", " "]
+
+print("Please test 'time' module")
 
 # everything is fine in this file
 print("Everything seems fine!")

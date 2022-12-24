@@ -535,10 +535,8 @@ class Statistics(Module):
             raise NotImplementedError("How the f*** did this error happened? This is not possible!")
 
         multimode = statistics.multimode(data_)  # we calculate the multimode
-        multimode_ = []
-        for e in multimode:
-            multimode_.append(py2noug(e))  # it converts python types to nougaro values
-        return RTResult().success(List(multimode_))
+        new_multimode = [py2noug(e) for e in multimode]
+        return RTResult().success(List(new_multimode))
 
     execute_statistics_multimode.param_names = ['data']
     execute_statistics_multimode.optional_params = []

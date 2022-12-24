@@ -354,7 +354,7 @@ class Statistics(Module):
         # * n
         # * method
 
-        # By default n=4 and method='exclusive'
+        # By default, n=4 and method='exclusive'
 
         data = exec_ctx.symbol_table.get('data')  # we get the data
         if not isinstance(data, List):  # the data must be a list
@@ -425,10 +425,11 @@ class Statistics(Module):
                 "lib_.statistics_.Statistics.execute_statistics_quantiles"
             ))
 
-        return RTResult().success(List(quantiles_))
+        new_quantiles = [py2noug(q) for q in quantiles_]
+        return RTResult().success(List(new_quantiles))
 
     execute_statistics_quantiles.param_names = ['data']
-    execute_statistics_quantiles.optional_params = []
+    execute_statistics_quantiles.optional_params = ['n', 'method']
     execute_statistics_quantiles.should_respect_args_number = True
     
     def execute_statistics_scope(self, exec_ctx: Context):

@@ -429,22 +429,7 @@ class List(Value):
                 return False
             else:
                 for index, element in enumerate(self.elements):
-                    if isinstance(element, Number) and isinstance(other.elements[index], Number):
-                        if element.value == other.elements[index].value:
-                            continue
-                        else:
-                            return False
-                    elif isinstance(element, String) and isinstance(other.elements[index], String):
-                        if element.value == other.elements[index].value:
-                            continue
-                        else:
-                            return False
-                    elif isinstance(element, List) and isinstance(other.elements[index], List):
-                        if element.is_eq(other.elements[index]):
-                            continue
-                        else:
-                            return False
-                    elif isinstance(element, NoneValue) and isinstance(other.elements[index], NoneValue):
+                    if element.get_comparison_eq(other.elements[index]):
                         continue
                     else:
                         return False

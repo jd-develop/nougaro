@@ -204,10 +204,10 @@ assert (do assert True then loop while False) == [None]
 
 # files
 assert (read "test_file.noug" 2) == "# comment\n"
-assert (write "# hey" !>> "test_file.noug" 2) == "# hey"
-assert (read "test_file.noug" 2) == "# hey\n"
-assert (write "# comment" !>> "test_file.noug" 2) == "# comment"
-assert (read "test_file.noug" 2) == "# comment\n"
+assert (write "hey" !>> "example_file" 2) == "hey"
+assert (read "example_file" 2) == "hey\n"
+assert (write "Hello world!" !>> "example_file" 2) == "Hello world!"
+assert (read "example_file" 2) == "Hello world!\n"
 
 # libs
 import hello
@@ -230,11 +230,16 @@ assert math_e == 2.718281828459045
 
 import random
 assert 0 <= random_random() <= 1
-assert random_randint(1, 5) in (for i = 1 to 5 then i)
+assert random_randint(1, 4) in (for i = 1 to 5 then i)  # in the list definition, 5 is excluded !
 assert random_choice(for i = 1 to 5 then i) in (for i = 1 to 5 then i)
 
 import statistics
-assert statistics_mean([0, 20]) == 10
+assert statistics_mean([8, 16, 15, 17, 18, 20, 25]) == 17
+assert statistics_geometric_mean([50.3, 55.7, 57.1, 54.9, 60.1]) == 55.526617820569356
+assert statistics_harmonic_mean([50.3, 55.7, 57.1, 54.9, 60.1]) == 55.43173136736931
+assert statistics_median([50.3, 55.7, 57.1, 54.9, 60.1]) == 55.7
+assert statistics_quantiles([50.3, 55.7, 57.1, 54.9, 60.1]) == [52.599999999999994, 55.7, 58.6]
+assert statistics_quantiles([50.3, 55.7, 57.1, 54.9, 60.1], 3, 'inclusive') == [55.166666666666664, 56.63333333333333]
 
 # everything is fine in this file
 print("Everything seems fine!")

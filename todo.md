@@ -1,6 +1,5 @@
 # TODO list before releasing beta:
 * fix #6
-* finish `test_file.noug`
 * write CONTRIBUTING.md
 * add '\xXX' and '\uXXXX' support
 

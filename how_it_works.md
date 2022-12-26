@@ -25,16 +25,16 @@
 
  Let's take the tokens from the previous example and put them into the parser. We get this:
 
-    list:([(bin_op_comp:(while:(bin_op_comp:(var_access:([identifier:a]), !=, num:int:10) then:var_assign:([identifier:a] += [bin_op_comp:(num:int:1)]))), False)])
+    list:[(bin_op_comp:(while:(bin_op_comp:(var_access:[identifier:"a"], !=, num:int:10) then:var_assign:([identifier:"a"] += [bin_op_comp:(num:int:1)]))), False)]
 
  Ouch... Let's organise this mess to explain it easier.
 
-    list:(
-      [(
+    list:[
+      (
          bin_op_comp:(
             while:(
                bin_op_comp:(
-                  var_access:([identifier:a]),
+                  var_access:[identifier:"a"],
                   !=,
                   num:int:10
                ) 
@@ -44,8 +44,8 @@
                )
             )
          ), False
-      )]
-    )
+      )
+    ]
 
  First, we have a `ListNode`. It contains only one other node, but if the code to execute had more lines, there would be more nodes.
 
@@ -53,7 +53,7 @@
  
  The node inside the `ListNode` is a `WhileNode` that is split into two parts: the `while` part including the condition, and the `then` part containing the body.
 
- The condition is a `BinOpNode`: `var_access:([identifier:a]), !=, num:int:10`: first we have a `VarAccessNode`, with the identifier `a`. It means that user wants to access to the value of the variable `a`. Then, there is a NE (not equal) token, and, finally, a `NumberNode` with an INT (int) token, with a value of 10. So we have our `a != 10` condition from the line!
+ The condition is a `BinOpNode`: `var_access:[identifier:"a"], !=, num:int:10`: first we have a `VarAccessNode`, with the identifier `a`. It means that user wants to access to the value of the variable `a`. Then, there is a NE (not equal) token, and, finally, a `NumberNode` with an INT (int) token, with a value of 10. So we have our `a != 10` condition from the line!
 
  After the `then`, we have the "body node". Here, the body node is just a `VarAssignNode`, that contains the identifier (`a`), the PLUSEQ (+=) token, and then a NumberNode with an INT (int) token. So here again we have our `var a += 1` from the example line!
 
@@ -71,7 +71,7 @@
        "parent": None,
        "symbols": {
           "a": 10,
-          "builtin_function": <built-in function "built-in function">,
+          "some_builtin_function": <built-in function "some_builtin_function">,
        }
     }
 
@@ -85,5 +85,6 @@
  `src/nougaro.py` have also important roles: it sets the symbol table by calling the function in [src/set_symbol_table.py](src/set_symbol_table.py), it sends the code to the lexer, the parser and then the interpreter, by checking at every step if there is any error to return to The shell.
 
 # You don't find what you're looking for?
- Open an [issue](https://github.com/jd-develop/nougaro/issues/new/choose)
+ Open an [issue](https://github.com/jd-develop/nougaro/issues/new/choose).
+ 
  If you can not open an issue, consider [emailing me](mailto://jd-dev@laposte.net), so I can update this file :) (You can also send me a Discord message, if you have my discord)

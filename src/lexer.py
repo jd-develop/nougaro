@@ -37,7 +37,7 @@ class Lexer:
         self.file_name: str = file_name  # name of the file we're executing
         self.text: str = text  # raw code we have to execute
         self.pos: Position = Position(-1, 0, -1, file_name, text)  # actual position of the lexer
-        self.current_char: str = None  # current char
+        self.current_char: str | None = None  # current char
         self.advance()
 
     def advance(self):
@@ -478,7 +478,7 @@ class Lexer:
             )
 
         if _0prefixes and num_str == '0':
-            prefixes: dict[tuple[str, str, str]] = {
+            prefixes: dict[str, tuple[str, str]] = {
                 "x": ("012334567898ABCDEF"+"abcdef", "hex"),
                 "X": ("012334567898ABCDEF"+"abcdef", "hex"),
                 "o": ("01234567", "oct"),

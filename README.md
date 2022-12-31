@@ -8,9 +8,9 @@
 
  The code is compiled for Windows and Linux. Check it out in the [releases](https://github.com/jd-develop/nougaro/releases/) tab!
  
- Minimum : python 3.9
+ Minimum : Python 3.10
  
- Supports python 3.10 and python 3.11
+ Supports Python 3.11
 
 ## French description
  Un langage de programmation. Interpréteur écrit en Python.
@@ -21,9 +21,9 @@
  
  Le code est compilé pour Windows et Linux. Disponible dans l'onglet [releases](https://github.com/jd-develop/nougaro/releases/) !
  
- Minimum : python 3.9
+ Minimum : Python 3.10
  
- Prend en charge python 3.10 et python 3.11
+ Prend en charge Python 3.11
 
 # Documentation
  Please refer to the [wiki](https://github.com/jd-develop/nougaro/wiki/) for documentation.

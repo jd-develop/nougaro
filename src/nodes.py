@@ -22,7 +22,7 @@
 from src.token import Token
 from src.token_types import TT
 # built-in python imports
-from typing import Union
+# no imports
 
 
 # ##########
@@ -165,7 +165,7 @@ class BinOpCompNode(Node):
     But IDK who makes that, because results of 'read' statement are often put into a variable...
     """
     def __init__(self, nodes_and_tokens_list):
-        self.nodes_and_tokens_list: list[Union[Node, Token]] = nodes_and_tokens_list
+        self.nodes_and_tokens_list: list[Node | Token] = nodes_and_tokens_list
 
         self.pos_start = self.nodes_and_tokens_list[0].pos_start
         self.pos_end = self.nodes_and_tokens_list[-1].pos_end
@@ -285,7 +285,7 @@ class ForNodeList(Node):
         list_node is a VarAccessNode (identifier: b)
         should_return_none is a bool
     """
-    def __init__(self, var_name_token: Token, body_node: Node, list_node: Union[Node, ListNode],
+    def __init__(self, var_name_token: Token, body_node: Node, list_node: Node | ListNode,
                  should_return_none: bool):
         # if list = [1, 2, 3]
         # for var in list is same as for var = 1 to 3 (step 1)
@@ -313,7 +313,7 @@ class WhileNode(Node):
     def __init__(self, condition_node: Node, body_node: Node, should_return_none: bool):
         self.condition_node: Node = condition_node
         self.body_node: Node = body_node
-        self.should_return_none: Node = should_return_none
+        self.should_return_none: bool = should_return_none
 
         self.pos_start = self.condition_node.pos_start
         self.pos_end = self.body_node.pos_end
@@ -459,12 +459,12 @@ class WriteNode(Node):
     Note that when interpreting, if to_token type is TT_TO_AND_OVERWRITE, it overwrites one line if a line number is
         given, and all the file if it isn't the case.
     """
-    def __init__(self, expr_to_write: Node, file_name_expr: Node, to_token: Token, line_number: Union[str, int],
+    def __init__(self, expr_to_write: Node, file_name_expr: Node, to_token: Token, line_number: str | int,
                  pos_start, pos_end):
         self.expr_to_write: Node = expr_to_write
         self.file_name_expr: Node = file_name_expr
         self.to_token: Token = to_token
-        self.line_number: Union[str, int] = line_number
+        self.line_number: str | int = line_number
 
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -493,10 +493,10 @@ class ReadNode(Node):
               line_number is Python int 6
 
     """
-    def __init__(self, file_name_expr: Node, identifier: Token, line_number: Union[int, str], pos_start, pos_end):
+    def __init__(self, file_name_expr: Node, identifier: Token, line_number: int | str, pos_start, pos_end):
         self.file_name_expr: Node = file_name_expr
         self.identifier: Token = identifier
-        self.line_number: Union[int, str] = line_number
+        self.line_number: int | str = line_number
 
         self.pos_start = pos_start
         self.pos_end = pos_end

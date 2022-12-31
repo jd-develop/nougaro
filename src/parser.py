@@ -24,7 +24,7 @@ from src.errors import InvalidSyntaxError
 from src.parse_result import ParseResult
 from src.nodes import *  # src.tokens.Token is imported in src.nodes
 # built-in python imports
-from typing import Any, Union
+from typing import Any
 
 
 # ##########
@@ -38,7 +38,7 @@ class Parser:
     def __init__(self, tokens: list):
         self.tokens: list = tokens  # tokens from the lexer
         self.token_index = -1  # we start at -1, because we advance 2 lines after, so the index will be 0
-        self.current_token: Token = None  # Token is imported in src.nodes
+        self.current_token: Token | None = None  # Token is imported in src.nodes
         self.advance()
 
     def parse(self):
@@ -72,7 +72,7 @@ class Parser:
 
     # GRAMMARS ATOMS (AST) :
 
-    def statements(self, stop: list[Union[tuple[(str, Any)], str]] = None) -> ParseResult:
+    def statements(self, stop: list[tuple[Any, str] | str] = None) -> ParseResult:
         """
         statements : NEWLINE* statement (NEWLINE+ statement)* NEWLINE
 

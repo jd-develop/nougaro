@@ -1,6 +1,6 @@
 @echo off
 rem Nougaro : a python-interpreted high-level programming language
-rem Copyright (C) 2021-2022  Jean Dubois (https://github.com/jd-develop) jd-dev@laposte.net
+rem Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) jd-dev@laposte.net
 rem
 rem This program is free software: you can redistribute it and/or modify
 rem it under the terms of the GNU General Public License as published by

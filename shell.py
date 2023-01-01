@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Actually running with Python 3.9, works with Python 3.10 and 3.11
+# Works with Python 3.10 and 3.11
 
 # IMPORTS
 # nougaro modules imports

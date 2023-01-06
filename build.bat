@@ -33,6 +33,7 @@ for %%y in (.\.git, .\.github, .\.vscode, .\.idea, .\__pycache__, src\__pycache_
 
 rem Then we ask for the version
 set /p NOUGVERSION="Nougaro version: "
+set /p NOUGPHASE="Phase: ""
 
 rem We build
 python -m nuitka --standalone --windows-company-name=Nougaro --windows-product-name=Nougaro --windows-product-version=%NOUGVERSION% --include-package=lib_ shell.py
@@ -43,4 +44,4 @@ for %%y in (example.noug "highlight theme for NPP.xml" LICENSE noug_version.json
 for %%y in (examples lib_ src config) do xcopy /s /i %%y shell.dist\%%y
 
 rem Then we rename our directory
-RENAME shell.dist nougaro-"%NOUGVERSION%"-alpha-windows-exe
+RENAME shell.dist nougaro-"%NOUGVERSION%"-%NOUGPHASE%-windows-exe

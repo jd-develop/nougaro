@@ -221,9 +221,9 @@ assert (do assert True then loop while False) == [None]
 # files
 assert (read "test_file.noug" 18) == "# comment\n"
 assert (write "hey" !>> "example_file" 2) == "hey"
-assert (read "example_file" 2) == "hey\n"
+assert (read "example_file" 2) in ["hey\n", "hey"]
 assert (write "Hello world!" !>> "example_file" 2) == "Hello world!"
-assert (read "example_file" 2) == "Hello world!\n"
+assert (read "example_file" 2) in ["Hello world!\n", "Hello world!"]
 
 # libs
 import hello

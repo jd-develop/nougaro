@@ -24,7 +24,8 @@ from src.errors import InvalidSyntaxError
 from src.parse_result import ParseResult
 from src.nodes import *  # src.tokens.Token is imported in src.nodes
 # built-in python imports
-from typing import Any
+from typing import Any, Iterable
+from types import FunctionType
 
 
 # ##########
@@ -589,10 +590,24 @@ class Parser:
 
     def power(self) -> ParseResult:
         """
-        power      : call (POW factor)*
+        power      : call (DOT call)?* (POW factor)*
         """
-        # call (POW factor)*
-        return self.bin_op(self.call, (TT["POW"],), self.factor)  # do not remove the comma after 'TT["POW"]' !!
+        # call (DOT call)?*
+        result = ParseResult()
+        value = result.register(self.call())
+        if result.error is not None:
+            return result
+        values_list = [value]
+
+        while self.current_token.type == TT["DOT"]:
+            result.register_advancement()
+            self.advance()
+            value = result.register(self.call())
+            if result.error is not None:
+                return result
+            values_list.append(value)
+
+        return self.bin_op(values_list, (TT["POW"],), self.factor)  # do not remove the comma after 'TT["POW"]' !!
 
     def call(self) -> ParseResult:
         """
@@ -689,7 +704,6 @@ class Parser:
         result = ParseResult()
         token = self.current_token
 
-        # (INT|FLOAT)(E_INFIX INT)?|(STRING (STRING)?*)|(IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*)
         # (INT|FLOAT)(E_INFIX INT)?
         if token.type in (TT["INT"], TT["FLOAT"]):
             # we advance
@@ -742,7 +756,7 @@ class Parser:
             to_return_tok.value = to_return_str
             return result.success(StringNode(to_return_tok))
 
-        # IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER)?*
+        # IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*
         elif token.type == TT["IDENTIFIER"]:
             # the identifier is in the token in 'token'
             # we advance
@@ -1535,37 +1549,55 @@ class Parser:
             False
         ))
 
-    def bin_op(self, func_a, ops, func_b=None, left_has_priority: bool = True) -> ParseResult:
+    def bin_op(
+            self,
+            func_a: FunctionType | list[Node],
+            ops: Iterable[str | tuple[str, Any]],
+            func_b: FunctionType | list[Node] = None,
+            left_has_priority: bool = True
+    ) -> ParseResult:
         """Binary operator such as 1+1 or 3==2"""
-        # TODO: comment this method (first by understanding each line)
+        # if any func is a list, like [foo, bar()], the func is foo.bar()
         # param left_has_priority is used to know if we have to parse (for exemple) 3==3==3 into
         # ((int:3, ==, int:3), ==, int:3) (True) or (int:3, ==, int:3, ==, int:3) (False)
-        if func_b is None:
-            func_b = func_a
+        # ops is possible ops in a list
         result = ParseResult()
-        left = result.register(func_a())
-        if result.error is not None:
-            return result
+        if not isinstance(func_a, list):  # we check if the value 'a' is a list or a function
+            if func_b is None:  # func_b is None
+                func_b = func_a
+            left = result.register(func_a())  # we register func_a as the left operand
+            if result.error is not None:
+                return result
+        else:
+            left = func_a  # func_a is a list : this is the left operand
 
         if left_has_priority:
             while self.current_token.type in ops or (self.current_token.type, self.current_token.value) in ops:
-                op_token = self.current_token
-                result.register_advancement()
+                op_token = self.current_token  # operator token
+                result.register_advancement()  # we advance
                 self.advance()
-                right = result.register(func_b())
-                if result.error is not None:
-                    return result
-                left = BinOpNode(left, op_token, right)
+                if not isinstance(func_b, list):  # we check if func_b is a list or a function
+                    right = result.register(func_b())
+                    if result.error is not None:
+                        return result
+                else:
+                    right = func_b  # it is a list
+                left = BinOpNode(left, op_token, right)  # we update our left, and we loop to the next operand
             return result.success(left)
         else:
             nodes_and_tokens_list = [left]
             while self.current_token.type in ops or (self.current_token.type, self.current_token.value) in ops:
+                # check comments above
                 op_token = self.current_token
                 result.register_advancement()
                 self.advance()
-                right = result.register(func_b())
-                if result.error is not None:
-                    return result
+                if not isinstance(func_b, list):
+                    right = result.register(func_b())
+                    if result.error is not None:
+                        return result
+                else:
+                    right = func_b
+                # we add our operator and operand to our list
                 nodes_and_tokens_list.append(op_token)
                 nodes_and_tokens_list.append(right)
             return result.success(BinOpCompNode(nodes_and_tokens_list))

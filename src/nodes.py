@@ -143,6 +143,9 @@ class BinOpNode(Node):
                                        op_token is Token(TT_FLOORDIV)
                                        right_node is a VarAccessNode which his var_name_tokens_list is\
                                                                                         [Token(TT_IDENTIFIER, 'bar')]
+        in the binary op `foo.bar ^ 2`, left_node is this python list: [TT_IDENTIFIER:foo, TT_IDENTIFIER:bar]
+                                        op_token is Token(TT_POW)
+                                        right_node is a Number node with value INT:2
     """
     def __init__(self, left_node, op_token, right_node):
         self.left_node = left_node
@@ -165,10 +168,14 @@ class BinOpCompNode(Node):
     But IDK who makes that, because results of 'read' statement are often put into a variable...
     """
     def __init__(self, nodes_and_tokens_list):
-        self.nodes_and_tokens_list: list[Node | Token] = nodes_and_tokens_list
+        self.nodes_and_tokens_list: list[Node | Token | list[Node | Token]] = nodes_and_tokens_list
 
-        self.pos_start = self.nodes_and_tokens_list[0].pos_start
-        self.pos_end = self.nodes_and_tokens_list[-1].pos_end
+        if isinstance(self.nodes_and_tokens_list[0], list):
+            self.pos_start = self.nodes_and_tokens_list[0][0].pos_start
+            self.pos_end = self.nodes_and_tokens_list[-1][-1].pos_end
+        else:
+            self.pos_start = self.nodes_and_tokens_list[0].pos_start
+            self.pos_end = self.nodes_and_tokens_list[-1].pos_end
 
     def __repr__(self):
         return f'bin_op_comp:({", ".join([str(x) for x in self.nodes_and_tokens_list])})'

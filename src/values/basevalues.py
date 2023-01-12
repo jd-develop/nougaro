@@ -34,9 +34,6 @@ class String(Value):
         super().__init__()
         self.value = value
         self.type_ = "str"
-        self.attributes = {  # as I said in values.py, THIS IS A MESSY DRAFT
-            # "type": String("str")  # recursion error x)
-        }
 
     def __repr__(self):
         return f'"{self.value}"'
@@ -469,6 +466,48 @@ class List(Value):
     def copy(self):
         """Return a copy of self"""
         copy = List(self.elements)
+        copy.set_pos(self.pos_start, self.pos_end)
+        copy.set_context(self.context)
+        return copy
+
+
+class Constructor(Value):
+    def __init__(self, name, properties):
+        super().__init__()
+        self.name = name
+        self.properties = properties
+
+    def __repr__(self):
+        return f"<class {self.name}>"
+
+    def is_true(self):
+        return False
+
+    def copy(self):
+        """Return a copy of self"""
+        copy = Constructor(self.name, self.properties)
+        copy.set_pos(self.pos_start, self.pos_end)
+        copy.set_context(self.context)
+        return copy
+
+
+class Object(Value):
+    def __init__(self, properties):
+        super().__init__()
+        self.properties = properties
+        try:
+            constructor = self.properties['__constructor__']
+        except KeyError:
+            constructor = self.properties['__constructor__'] = Constructor("Object", self.properties)
+        constructor: Constructor
+        self.type_ = constructor.name
+
+    def __repr__(self):
+        return f"<{self.type_} object>"
+
+    def copy(self):
+        """Return a copy of self"""
+        copy = Object(self.properties)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
         return copy

@@ -464,11 +464,7 @@ class Lexer:
             )
 
         if num_str == '.':
-            return None, InvalidSyntaxError(
-                pos_start, self.pos,
-                "no digit in number '.'.",
-                "src.lexer.Lexer.make_number"
-            )
+            return Token(TT["DOT"], pos_start=pos_start, pos_end=self.pos), None
 
         if num_str == '':
             return None, InvalidSyntaxError(

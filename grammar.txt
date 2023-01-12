@@ -25,11 +25,13 @@ term       : factor ((MUL|DIV|PERC|FLOORDIV) factor)*
 factor     : (PLUS|MINUS) factor
            : power
 
-power      : call (POW factor)*
+power      : call (DOT call)?* (POW factor)*
 
 call       : atom (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
 
-atom       : (INT|FLOAT)(E_INFIX INT)?|(STRING (STRING)?*)|(IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*)
+atom       : (INT|FLOAT)(E_INFIX INT)?
+           : STRING (STRING)?*
+           : IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*
            : LPAREN expr RPAREN
            : list_expr
            : if_expr

@@ -25,11 +25,12 @@ from src.values.functions.function import Function
 from src.values.functions.base_function import BaseFunction
 from src.constants import PROTECTED_VARS
 from src.nodes import *
-from src.errors import RTNotDefinedError, RunTimeError, RTIndexError, RTTypeError, RTFileNotFoundError, RTAssertionError
+from src.errors import *
 from src.token_types import TT
 from src.runtime_result import RTResult
 from src.context import Context
 from src.misc import CustomInterpreterVisitMethod
+from src.symbol_table import SymbolTable
 # built-in python imports
 from inspect import signature
 import os.path
@@ -118,12 +119,42 @@ class Interpreter:
     def visit_BinOpNode(self, node: BinOpNode, ctx: Context) -> RTResult:
         """Visit BinOpNode"""
         res = RTResult()
-        left = res.register(self.visit(node.left_node, ctx))  # left term/factor/etc.
-        if res.should_return():  # check for errors
-            return res
-        right = res.register(self.visit(node.right_node, ctx))  # right term/factor/etc.
-        if res.should_return():  # check for errors
-            return res
+        if not isinstance(node.left_node, list):
+            left = res.register(self.visit(node.left_node, ctx))  # left term/factor/etc.
+            if res.should_return():  # check for errors
+                return res
+        else:
+            value: Value = res.register(self.visit(node.left_node[0], ctx))
+            if res.should_return():
+                return res
+            if len(node.left_node) != 1:
+                for node_ in node.left_node[1:]:
+                    new_ctx = Context(display_name=value.__repr__())
+                    new_ctx.symbol_table = SymbolTable()
+                    new_ctx.symbol_table.set_whole_table(value.attributes)
+                    attr_ = res.register(self.visit(node_, new_ctx))
+                    if res.should_return():
+                        return res
+                    value = attr_
+            left = value
+        if not isinstance(node.right_node, list):
+            right = res.register(self.visit(node.right_node, ctx))  # right term/factor/etc.
+            if res.should_return():  # check for errors
+                return res
+        else:
+            value: Value = res.register(self.visit(node.right_node[0], ctx))
+            if res.should_return():
+                return res
+            if len(node.right_node) != 1:
+                for node_ in node.right_node[1:]:
+                    new_ctx = Context(display_name=value.__repr__())
+                    new_ctx.symbol_table = SymbolTable()
+                    new_ctx.symbol_table.set_whole_table(value.attributes)
+                    attr_ = res.register(self.visit(node_, new_ctx))
+                    if res.should_return():
+                        return res
+                    value = attr_
+            right = value
 
         # we check for what is the operator token, then we execute the corresponding method
         if node.op_token.type == TT["PLUS"]:
@@ -179,10 +210,11 @@ class Interpreter:
 
     def visit_BinOpCompNode(self, node: BinOpCompNode, ctx: Context) -> RTResult:
         """Visit BinOpCompNode"""
+        # todo: implémenter les attributes ici (visit_list not defined)
         res = RTResult()
         nodes_and_tokens_list = node.nodes_and_tokens_list
         if len(nodes_and_tokens_list) == 1:  # there is no comparison
-            return self.visit(nodes_and_tokens_list[0], ctx)
+            return self.visit(nodes_and_tokens_list[0], ctx)  # VISIT_LIST NOT DEFINED
         visited_nodes_and_tokens_list = []
 
         # just list of visited nodes

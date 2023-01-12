@@ -33,7 +33,7 @@ class Value:
         self.set_pos()
         self.set_context()
         self.type_ = "BaseValue"
-        self.attributes = {}
+        self.attributes: dict = {}
 
     def __repr__(self):
         return "BaseValue"
@@ -312,11 +312,6 @@ class Value:
             self.context, origin_file="src.values.value.Value.can_not_be_in"
         )
 
-    # =================
-    # DANGER ZONE : DRAFT FOR ATTRIBUTES
-    # DOESN'T WORK NOW
-    # IN DEVELOPMENT
-    # =================
     def set_attr(self, attribute: str, value):
         self.attributes[attribute] = value
 
@@ -325,10 +320,6 @@ class Value:
 
     def get_attr(self, attribute: str):
         return self.attributes[attribute]
-
-    # =================
-    # YOU ARE EXITING THE DANGER ZONE
-    # =================
 
     def copy(self):
         """Return a copy of self"""

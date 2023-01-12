@@ -48,6 +48,9 @@ class SymbolTable:
     def set(self, name, value):
         self.symbols[name] = value
 
+    def set_whole_table(self, new_table: dict):
+        self.symbols = new_table.copy()
+
     def remove(self, name):
         del self.symbols[name]
 

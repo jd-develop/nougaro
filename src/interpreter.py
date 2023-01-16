@@ -132,6 +132,8 @@ class Interpreter:
                     new_ctx = Context(display_name=value.__repr__())
                     new_ctx.symbol_table = SymbolTable()
                     new_ctx.symbol_table.set_whole_table(value.attributes)
+                    if isinstance(node_, VarAccessNode):
+                        node_.attr = True
                     attr_ = res.register(self.visit(node_, new_ctx))
                     if res.should_return():
                         return res
@@ -150,6 +152,8 @@ class Interpreter:
                     new_ctx = Context(display_name=value.__repr__())
                     new_ctx.symbol_table = SymbolTable()
                     new_ctx.symbol_table.set_whole_table(value.attributes)
+                    if isinstance(node_, VarAccessNode):
+                        node_.attr = True
                     attr_ = res.register(self.visit(node_, new_ctx))
                     if res.should_return():
                         return res
@@ -224,6 +228,8 @@ class Interpreter:
                         new_ctx = Context(display_name=value.__repr__())
                         new_ctx.symbol_table = SymbolTable()
                         new_ctx.symbol_table.set_whole_table(value.attributes)
+                        if isinstance(node_, VarAccessNode):
+                            node_.attr = True
                         attr_ = res.register(self.visit(node_, new_ctx))
                         if res.should_return():
                             return res
@@ -248,6 +254,8 @@ class Interpreter:
                             new_ctx = Context(display_name=value.__repr__())
                             new_ctx.symbol_table = SymbolTable()
                             new_ctx.symbol_table.set_whole_table(value.attributes)
+                            if isinstance(node_, VarAccessNode):
+                                node_.attr = True
                             attr_ = res.register(self.visit(node_, new_ctx))
                             if res.should_return():
                                 return res
@@ -308,7 +316,9 @@ class Interpreter:
                 print(ctx)
                 print(
                     f"NOUGARO INTERNAL ERROR : len(node.node) != 1 in src.interpreter.Interpreter.visit_UnaryOpNode.\n"
-                    f"{node.node=}")
+                    f"{node.node=}\n"
+                    f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
+                    f"information below.")
                 raise Exception("len(node.node) != 1 in src.interpreter.Interpreter.visit_UnaryOpNode.")
         else:
             number = result.register(self.visit(node.node, ctx))
@@ -331,10 +341,7 @@ class Interpreter:
 
     def visit_VarAccessNode(self, node: VarAccessNode, ctx: Context) -> RTResult:
         """Visit VarAccessNode"""
-        if node.attr:
-            error_to_call = RTAttributeError
-        else:
-            error_to_call = RTNotDefinedError
+        attribute_error = node.attr
         result = RTResult()
         var_names_list = node.var_name_tokens_list  # there is a list because it can be `a ? b ? c`
         value = None
@@ -354,37 +361,69 @@ class Interpreter:
                 if (var_name.value == "eexit" or var_name.value == "exxit" or var_name.value == "exiit" or
                         var_name.value == "exitt") and 'exit' in ctx.symbol_table.symbols.keys():
                     # my keyboard is sh*tty, so sometimes it types a letter twice...
-                    return result.failure(
-                        error_to_call(
-                            node.pos_start, node.pos_end,
-                            f"name '{var_name.value}' is not defined. Did you mean 'exit'?",
-                            ctx, "src.interpreter.Interpreter.visit_varAccessNode"
-                        )
-                    )
-                else:
-                    if ctx.symbol_table.exists(f'__{var_name.value}__'):
-                        # e.g. the user typed symbol_table instead of __symbol_table__
+                    if not attribute_error:
                         return result.failure(
-                            error_to_call(
+                            RTNotDefinedError(
                                 node.pos_start, node.pos_end,
-                                f"name '{var_name.value}' is not defined. Did you mean '__{var_name.value}__'?",
+                                f"name '{var_name.value}' is not defined. Did you mean 'exit'?",
                                 ctx, "src.interpreter.Interpreter.visit_varAccessNode"
                             )
                         )
-                    else:  # not defined at all
+                    else:
                         return result.failure(
-                            error_to_call(
-                                node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined.", ctx,
+                            RTAttributeError(
+                                node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
                                 "src.interpreter.Interpreter.visit_varAccessNode"
                             )
                         )
+                else:
+                    if ctx.symbol_table.exists(f'__{var_name.value}__'):
+                        # e.g. the user typed symbol_table instead of __symbol_table__
+                        if not attribute_error:
+                            return result.failure(
+                                RTNotDefinedError(
+                                    node.pos_start, node.pos_end,
+                                    f"name '{var_name.value}' is not defined. Did you mean '__{var_name.value}__'?",
+                                    ctx, "src.interpreter.Interpreter.visit_varAccessNode"
+                                )
+                            )
+                        else:
+                            return result.failure(
+                                RTAttributeError(
+                                    node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
+                                    "src.interpreter.Interpreter.visit_varAccessNode"
+                                )
+                            )
+                    else:  # not defined at all
+                        if not attribute_error:
+                            return result.failure(
+                                RTNotDefinedError(
+                                    node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined.", ctx,
+                                    "src.interpreter.Interpreter.visit_varAccessNode"
+                                )
+                            )
+                        else:
+                            return result.failure(
+                                RTAttributeError(
+                                    node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
+                                    "src.interpreter.Interpreter.visit_varAccessNode"
+                                )
+                            )
             else:  # none of the identifiers is defined
-                return result.failure(
-                    error_to_call(
-                        node.pos_start, node.pos_end, f"none of the given identifiers is defined.", ctx,
-                        "src.interpreter.Interpreter.visit_varAccessNode"
+                if not attribute_error:
+                    return result.failure(
+                        RTNotDefinedError(
+                            node.pos_start, node.pos_end, f"none of the given identifiers is defined.", ctx,
+                            "src.interpreter.Interpreter.visit_varAccessNode"
+                        )
                     )
-                )
+                else:
+                    return result.failure(
+                        RTAttributeError(
+                            node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
+                            "src.interpreter.Interpreter.visit_varAccessNode"
+                        )
+                    )
 
         # we get the value
         value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(ctx)

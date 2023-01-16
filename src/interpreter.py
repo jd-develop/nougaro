@@ -351,8 +351,8 @@ class Interpreter:
 
         if value is None:  # the variable is not defined
             if len(var_names_list) == 1:
-                if var_name.value == "eexit" or var_name.value == "exxit" or var_name.value == "exiit" or \
-                        var_name.value == "exitt" and 'exit' in ctx.symbol_table.symbols.keys():
+                if (var_name.value == "eexit" or var_name.value == "exxit" or var_name.value == "exiit" or
+                        var_name.value == "exitt") and 'exit' in ctx.symbol_table.symbols.keys():
                     # my keyboard is sh*tty, so sometimes it types a letter twice...
                     return result.failure(
                         error_to_call(

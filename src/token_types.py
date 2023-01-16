@@ -169,7 +169,8 @@ TOKENS_TO_QUOTE = [  # list of all the tokens that needs a quote ("'") when ther
     TT["LTEQ"],
     TT["GTEQ"],
     TT["TO"],
-    TT["TO_AND_OVERWRITE"]
+    TT["TO_AND_OVERWRITE"],
+    TT["DOT"]
 ]
 
 EQUALS = [  # all the assignation tokens ('=', '+=', ...) but not the equal tokens for tests ('==', '!=', ...)

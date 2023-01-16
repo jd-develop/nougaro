@@ -106,17 +106,19 @@ class VarAssignNode(Node):
 
 class VarAccessNode(Node):
     """Node for variable access
+    attr parameter is True when the var we try to access is an attribute, False if it is a global or local variable
     example: `foo`: var_name_tokens_list is [Token(TT_IDENTIFIER, 'foo')]
     example 2: `foo ? bar`: var_name_tokens_list is [Token(TT_IDENTIFIER, 'foo'), Token(TT_IDENTIFIER, 'bar')]
     """
-    def __init__(self, var_name_tokens_list: list[Token]):
+    def __init__(self, var_name_tokens_list: list[Token], attr: bool = False):
         self.var_name_tokens_list = var_name_tokens_list
+        self.attr = attr
 
         self.pos_start = self.var_name_tokens_list[0].pos_start
         self.pos_end = self.var_name_tokens_list[-1].pos_end
 
     def __repr__(self):
-        return f'var_access:{self.var_name_tokens_list}'
+        return f'var_access:{self.var_name_tokens_list}({self.attr})'
 
 
 class VarDeleteNode(Node):

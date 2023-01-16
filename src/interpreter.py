@@ -331,6 +331,10 @@ class Interpreter:
 
     def visit_VarAccessNode(self, node: VarAccessNode, ctx: Context) -> RTResult:
         """Visit VarAccessNode"""
+        if node.attr:
+            error_to_call = RTNotDefinedError
+        else:
+            error_to_call = RTAttributeError
         result = RTResult()
         var_names_list = node.var_name_tokens_list  # there is a list because it can be `a ? b ? c`
         value = None
@@ -348,10 +352,10 @@ class Interpreter:
         if value is None:  # the variable is not defined
             if len(var_names_list) == 1:
                 if var_name.value == "eexit" or var_name.value == "exxit" or var_name.value == "exiit" or \
-                        var_name.value == "exitt":
+                        var_name.value == "exitt" and 'exit' in ctx.symbol_table.symbols.keys():
                     # my keyboard is sh*tty, so sometimes it types a letter twice...
                     return result.failure(
-                        RTNotDefinedError(
+                        error_to_call(
                             node.pos_start, node.pos_end,
                             f"name '{var_name.value}' is not defined. Did you mean 'exit'?",
                             ctx, "src.interpreter.Interpreter.visit_varAccessNode"
@@ -361,7 +365,7 @@ class Interpreter:
                     if ctx.symbol_table.exists(f'__{var_name.value}__'):
                         # e.g. the user typed symbol_table instead of __symbol_table__
                         return result.failure(
-                            RTNotDefinedError(
+                            error_to_call(
                                 node.pos_start, node.pos_end,
                                 f"name '{var_name.value}' is not defined. Did you mean '__{var_name.value}__'?",
                                 ctx, "src.interpreter.Interpreter.visit_varAccessNode"
@@ -369,14 +373,14 @@ class Interpreter:
                         )
                     else:  # not defined at all
                         return result.failure(
-                            RTNotDefinedError(
+                            error_to_call(
                                 node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined.", ctx,
                                 "src.interpreter.Interpreter.visit_varAccessNode"
                             )
                         )
             else:  # none of the identifiers is defined
                 return result.failure(
-                    RTNotDefinedError(
+                    error_to_call(
                         node.pos_start, node.pos_end, f"none of the given identifiers is defined.", ctx,
                         "src.interpreter.Interpreter.visit_varAccessNode"
                     )

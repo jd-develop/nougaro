@@ -332,9 +332,9 @@ class Interpreter:
     def visit_VarAccessNode(self, node: VarAccessNode, ctx: Context) -> RTResult:
         """Visit VarAccessNode"""
         if node.attr:
-            error_to_call = RTNotDefinedError
-        else:
             error_to_call = RTAttributeError
+        else:
+            error_to_call = RTNotDefinedError
         result = RTResult()
         var_names_list = node.var_name_tokens_list  # there is a list because it can be `a ? b ? c`
         value = None

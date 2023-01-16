@@ -178,7 +178,7 @@ class RTAssertionError(RunTimeError):
 
 class RTAttributeError(RunTimeError):
     """Object 'obj' has no attribute 'attr'."""
-    # todo: check if this is really necessary
+    # todo: check if this is really necessary after having implemented attributes
     def __init__(self, pos_start, pos_end, obj_type, attr_name, context: Context, origin_file: str = "(undetermined)"):
         errmsg = f"object '{obj_type}' has no attribute '{attr_name}."
         super().__init__(pos_start, pos_end, errmsg, context, rt_error=False, error_name="AssertionError",

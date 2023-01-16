@@ -210,19 +210,49 @@ class Interpreter:
 
     def visit_BinOpCompNode(self, node: BinOpCompNode, ctx: Context) -> RTResult:
         """Visit BinOpCompNode"""
-        # todo: implémenter les attributes ici (visit_list not defined)
         res = RTResult()
         nodes_and_tokens_list = node.nodes_and_tokens_list
         if len(nodes_and_tokens_list) == 1:  # there is no comparison
-            return self.visit(nodes_and_tokens_list[0], ctx)  # VISIT_LIST NOT DEFINED
+            if not isinstance(nodes_and_tokens_list[0], list):
+                return self.visit(nodes_and_tokens_list[0], ctx)
+            else:
+                value: Value = res.register(self.visit(node.nodes_and_tokens_list[0][0], ctx))
+                if res.should_return():
+                    return res
+                if len(node.nodes_and_tokens_list[0]) != 1:
+                    for node_ in node.nodes_and_tokens_list[0][1:]:
+                        new_ctx = Context(display_name=value.__repr__())
+                        new_ctx.symbol_table = SymbolTable()
+                        new_ctx.symbol_table.set_whole_table(value.attributes)
+                        attr_ = res.register(self.visit(node_, new_ctx))
+                        if res.should_return():
+                            return res
+                        value = attr_
+                return res.success(value)
+
         visited_nodes_and_tokens_list = []
 
         # just list of visited nodes
         for index, element in enumerate(nodes_and_tokens_list):
             if index % 2 == 0:  # we take only nodes and not ops
-                visited_nodes_and_tokens_list.append(res.register(self.visit(element, ctx)))
-                if res.should_return():
-                    return res
+                if not isinstance(element, list):
+                    visited_nodes_and_tokens_list.append(res.register(self.visit(element, ctx)))
+                    if res.should_return():
+                        return res
+                else:
+                    value: Value = res.register(self.visit(element[0], ctx))
+                    if res.should_return():
+                        return res
+                    if len(element) != 1:
+                        for node_ in element[1:]:
+                            new_ctx = Context(display_name=value.__repr__())
+                            new_ctx.symbol_table = SymbolTable()
+                            new_ctx.symbol_table.set_whole_table(value.attributes)
+                            attr_ = res.register(self.visit(node_, new_ctx))
+                            if res.should_return():
+                                return res
+                            value = attr_
+                    visited_nodes_and_tokens_list.append(value)
             else:
                 visited_nodes_and_tokens_list.append(element)
 
@@ -271,7 +301,17 @@ class Interpreter:
     def visit_UnaryOpNode(self, node: UnaryOpNode, ctx: Context) -> RTResult:
         """Visit UnaryOpNode (-x, not x, ~x)"""
         result = RTResult()
-        number = result.register(self.visit(node.node, ctx))
+        if isinstance(node.node, list):
+            if len(node.node) == 1:
+                number = result.register(self.visit(node.node[0], ctx))
+            else:
+                print(ctx)
+                print(
+                    f"NOUGARO INTERNAL ERROR : len(node.node) != 1 in src.interpreter.Interpreter.visit_UnaryOpNode.\n"
+                    f"{node.node=}")
+                raise Exception("len(node.node) != 1 in src.interpreter.Interpreter.visit_UnaryOpNode.")
+        else:
+            number = result.register(self.visit(node.node, ctx))
         if result.should_return():
             return result
 

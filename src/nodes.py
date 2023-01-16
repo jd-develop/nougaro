@@ -152,8 +152,14 @@ class BinOpNode(Node):
         self.op_token = op_token
         self.right_node = right_node
 
-        self.pos_start = self.left_node.pos_start
-        self.pos_end = self.right_node.pos_end
+        if isinstance(self.left_node, list):
+            self.pos_start = self.left_node[0].pos_start
+        else:
+            self.pos_start = self.left_node.pos_start
+        if isinstance(self.right_node, list):
+            self.pos_end = self.right_node[-1].pos_end
+        else:
+            self.pos_end = self.right_node.pos_end
 
     def __repr__(self):
         return f'bin_op:({self.left_node}, {self.op_token}, {self.right_node})'
@@ -172,9 +178,12 @@ class BinOpCompNode(Node):
 
         if isinstance(self.nodes_and_tokens_list[0], list):
             self.pos_start = self.nodes_and_tokens_list[0][0].pos_start
-            self.pos_end = self.nodes_and_tokens_list[-1][-1].pos_end
         else:
             self.pos_start = self.nodes_and_tokens_list[0].pos_start
+
+        if isinstance(self.nodes_and_tokens_list[-1], list):
+            self.pos_end = self.nodes_and_tokens_list[-1][-1].pos_end
+        else:
             self.pos_end = self.nodes_and_tokens_list[-1].pos_end
 
     def __repr__(self):
@@ -202,7 +211,10 @@ class UnaryOpNode(Node):
         self.node = node
 
         self.pos_start = self.op_token.pos_start
-        self.pos_end = self.node.pos_end
+        if isinstance(self.node, list):
+            self.pos_end = self.node[-1].pos_end
+        else:
+            self.pos_end = self.node.pos_end
 
     def __repr__(self):
         return f'unary_op:({self.op_token}, {self.node})'

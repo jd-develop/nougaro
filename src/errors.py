@@ -27,8 +27,8 @@ import pathlib
 
 
 # parent twice (this file.parent = src, src.parent = nougaro root
-noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.absolute())
-with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug:
+_noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.absolute())
+with open(os.path.abspath(_noug_dir + "/config/debug.conf")) as debug:
     _PRINT_ORIGIN_FILE = bool(int(debug.read()))
     debug.close()
 

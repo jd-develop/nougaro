@@ -24,8 +24,7 @@ from src.errors import InvalidSyntaxError
 from src.parse_result import ParseResult
 from src.nodes import *  # src.tokens.Token is imported in src.nodes
 # built-in python imports
-from typing import Any, Iterable
-from types import FunctionType
+from typing import Any, Iterable, Callable
 
 
 # ##########
@@ -1551,9 +1550,9 @@ class Parser:
 
     def bin_op(
             self,
-            func_a: FunctionType | list[Node],
+            func_a: Callable | list[Node],
             ops: Iterable[str | tuple[str, Any]],
-            func_b: FunctionType | list[Node] = None,
+            func_b: Callable | list[Node] = None,
             left_has_priority: bool = True
     ) -> ParseResult:
         """Binary operator such as 1+1 or 3==2"""

@@ -40,7 +40,7 @@ class ModuleFunction(BaseBuiltInFunction):
     def __repr__(self):
         return f'<built-in lib function {self.module_name}_{self.name}>'
 
-    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>"):
+    def execute(self, args, interpreter_, run, noug_dir_, exec_from: str = "<invalid>"):
         # execute a function of the 'math' module
         # create the result
         result = RTResult()

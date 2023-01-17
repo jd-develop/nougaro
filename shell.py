@@ -72,7 +72,8 @@ def main():
     else:  # there is no file given, so we have to open the shell
         path = "<stdin>"
 
-    with open(os.path.abspath(noug_dir + "/config/noug_version.json")) as ver_json:  # we load the nougaro version stored in noug_version.json
+    with open(os.path.abspath(noug_dir + "/config/noug_version.json")) as ver_json:
+        # we load the nougaro version stored in noug_version.json
         ver_json_loaded = json.load(ver_json)
         version = ver_json_loaded.get("phase") + " " + ver_json_loaded.get("noug_version")
 

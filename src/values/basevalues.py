@@ -471,11 +471,31 @@ class List(Value):
         return copy
 
 
-class Constructor(Value):
-    def __init__(self, name, properties):
+class Module(Value):
+    def __init__(self, name, functions_and_constants: dict):
         super().__init__()
         self.name = name
-        self.properties = properties
+        self.attributes = functions_and_constants.copy()
+
+    def __repr__(self):
+        return f"<module {self.name}>"
+
+    def is_true(self):
+        return False
+
+    def copy(self):
+        """Return a copy of self"""
+        copy = Module(self.name, self.attributes)
+        copy.set_pos(self.pos_start, self.pos_end)
+        copy.set_context(self.context)
+        return copy
+
+
+class Constructor(Value):
+    def __init__(self, name, attributes: dict):
+        super().__init__()
+        self.name = name
+        self.attributes = attributes.copy()
 
     def __repr__(self):
         return f"<class {self.name}>"
@@ -485,20 +505,20 @@ class Constructor(Value):
 
     def copy(self):
         """Return a copy of self"""
-        copy = Constructor(self.name, self.properties)
+        copy = Constructor(self.name, self.attributes)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
         return copy
 
 
 class Object(Value):
-    def __init__(self, properties):
+    def __init__(self, attributes: dict):
         super().__init__()
-        self.properties = properties
+        self.attributes = attributes.copy()
         try:
-            constructor = self.properties['__constructor__']
+            constructor = self.attributes['__constructor__']
         except KeyError:
-            constructor = self.properties['__constructor__'] = Constructor("Object", self.properties)
+            constructor = self.attributes['__constructor__'] = Constructor("Object", self.attributes)
         constructor: Constructor
         self.type_ = constructor.name
 
@@ -507,7 +527,7 @@ class Object(Value):
 
     def copy(self):
         """Return a copy of self"""
-        copy = Object(self.properties)
+        copy = Object(self.attributes)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
         return copy

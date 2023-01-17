@@ -229,39 +229,39 @@ assert (read "example_file" 2) in ["Hello world!\n", "Hello world!"]
 import hello
 
 import math
-assert math_sqrt_pi == math_sqrt(math_pi)
-assert math_root(8, 3) == 2
-assert math_degrees(math_pi) == 180
-assert math_radians(180) == math_pi
-assert round(math_sin(math_pi), 5) == 0
-assert round(math_cos(math_pi), 5) == -1
-assert round(math_tan(math_pi), 5) == 0
-assert round(math_tan(2*math_pi), 5) == round(math_tan(0), 5)
-assert math_asin(0) == 0
-assert round(math_acos(-1), 9) == round(math_pi, 9)
-assert math_abs(10) == 10
-assert math_abs(-10) == 10
-assert round(math_log(12, 2), 9) == round(math_log2(12), 9)
-assert math_e == 2.718281828459045
+assert math.sqrt_pi == math.sqrt(math.pi)
+assert math.root(8, 3) == 2
+assert math.degrees(math.pi) == 180
+assert math.radians(180) == math.pi
+assert round(math.sin(math.pi), 5) == 0
+assert round(math.cos(math.pi), 5) == -1
+assert round(math.tan(math.pi), 5) == 0
+assert round(math.tan(2*math.pi), 5) == round(math.tan(0), 5)
+assert math.asin(0) == 0
+assert round(math.acos(-1), 9) == round(math.pi, 9)
+assert math.abs(10) == 10
+assert math.abs(-10) == 10
+assert round(math.log(12, 2), 9) == round(math.log2(12), 9)
+assert math.e == 2.718281828459045
 
 import random
-assert 0 <= random_random() <= 1
-assert random_randint(1, 4) in (for i = 1 to 5 then i)  # in the list definition, 5 is excluded !
-assert random_choice(for i = 1 to 5 then i) in (for i = 1 to 5 then i)
+assert 0 <= random.random() <= 1
+assert random.randint(1, 4) in (for i = 1 to 5 then i)  # in the list definition, 5 is excluded !
+assert random.choice(for i = 1 to 5 then i) in (for i = 1 to 5 then i)
 
 import statistics
-assert statistics_mean([8, 16, 15, 17, 18, 20, 25]) == 17
+assert statistics.mean([8, 16, 15, 17, 18, 20, 25]) == 17
 var example_list = [50.3, 55.7, 57.1, 54.9, 60.1]
-assert statistics_geometric_mean(example_list) == 55.526617820569356
-assert statistics_harmonic_mean(example_list) == 55.43173136736931
-assert statistics_median(example_list) == 55.7
-assert statistics_quantiles(example_list) == [52.599999999999994, 55.7, 58.6]
-assert statistics_quantiles(example_list, 3, 'inclusive') == [55.166666666666664, 56.63333333333333]
-assert statistics_scope(example_list) == max(example_list) - min(example_list)
+assert statistics.geometric_mean(example_list) == 55.526617820569356
+assert statistics.harmonic_mean(example_list) == 55.43173136736931
+assert statistics.median(example_list) == 55.7
+assert statistics.quantiles(example_list) == [52.599999999999994, 55.7, 58.6]
+assert statistics.quantiles(example_list, 3, 'inclusive') == [55.166666666666664, 56.63333333333333]
+assert statistics.scope(example_list) == max(example_list) - min(example_list)
 var example_list += 57.1
-assert statistics_mode(example_list) == 57.1
-assert statistics_multimode("Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch") == ["l"]
-assert statistics_multimode("Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch          ") == ["l", " "]
+assert statistics.mode(example_list) == 57.1
+assert statistics.multimode("Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch") == ["l"]
+assert statistics.multimode("Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch          ") == ["l", " "]
 
 print("Please test 'time' module")
 

@@ -19,7 +19,7 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.values.basevalues import Number, String, List, NoneValue, Value
+from src.values.basevalues import Number, String, List, NoneValue, Value, Module
 from src.values.specific_values.number import FALSE
 from src.values.functions.function import Function
 from src.values.functions.base_function import BaseFunction
@@ -45,14 +45,18 @@ class Interpreter:
     def __init__(self, run):
         self.run = run
 
-    def visit(self, node, ctx):
+    def visit(self, node: Node, ctx: Context, other_ctx: Context = None):
         """Visit a node."""
         method_name = f'visit_{type(node).__name__}'
         method: CustomInterpreterVisitMethod = getattr(self, method_name, self.no_visit_method)
+        if other_ctx is None:
+            other_ctx = ctx.copy()
 
         signature_ = signature(method)
         if len(signature_.parameters) <= 1:  # def method(self) is 1 param, def staticmethod() is 0 param
             return method()
+        elif len(signature_.parameters) == 3:
+            return method(node, ctx, other_ctx)
 
         return method(node, ctx)
 
@@ -134,7 +138,7 @@ class Interpreter:
                     new_ctx.symbol_table.set_whole_table(value.attributes)
                     if isinstance(node_, VarAccessNode):
                         node_.attr = True
-                    attr_ = res.register(self.visit(node_, new_ctx))
+                    attr_ = res.register(self.visit(node_, new_ctx, ctx))
                     if res.should_return():
                         return res
                     value = attr_
@@ -154,7 +158,7 @@ class Interpreter:
                     new_ctx.symbol_table.set_whole_table(value.attributes)
                     if isinstance(node_, VarAccessNode):
                         node_.attr = True
-                    attr_ = res.register(self.visit(node_, new_ctx))
+                    attr_ = res.register(self.visit(node_, new_ctx, ctx))
                     if res.should_return():
                         return res
                     value = attr_
@@ -230,7 +234,7 @@ class Interpreter:
                         new_ctx.symbol_table.set_whole_table(value.attributes)
                         if isinstance(node_, VarAccessNode):
                             node_.attr = True
-                        attr_ = res.register(self.visit(node_, new_ctx))
+                        attr_ = res.register(self.visit(node_, new_ctx, ctx))
                         if res.should_return():
                             return res
                         value = attr_
@@ -256,7 +260,7 @@ class Interpreter:
                             new_ctx.symbol_table.set_whole_table(value.attributes)
                             if isinstance(node_, VarAccessNode):
                                 node_.attr = True
-                            attr_ = res.register(self.visit(node_, new_ctx))
+                            attr_ = res.register(self.visit(node_, new_ctx, ctx))
                             if res.should_return():
                                 return res
                             value = attr_
@@ -804,12 +808,12 @@ class Interpreter:
 
         return result.success(func_value)  # we return our Function value
 
-    def visit_CallNode(self, node: CallNode, ctx: Context) -> RTResult:
+    def visit_CallNode(self, node: CallNode, node_to_call_context: Context, outer_context: Context) -> RTResult:
         """Visit CallNode"""
         result = RTResult()
         args = []
 
-        value_to_call = result.register(self.visit(node.node_to_call, ctx))  # we get the value to call
+        value_to_call = result.register(self.visit(node.node_to_call, node_to_call_context))  # we get the value to call
         if result.should_return():  # check for errors
             return result
         value_to_call = value_to_call.copy().set_pos(node.pos_start, node.pos_end)  # we copy it and set a new pos
@@ -818,17 +822,17 @@ class Interpreter:
             # call the function
             for arg_node, mul in node.arg_nodes:  # we check the arguments
                 if not mul:
-                    args.append(result.register(self.visit(arg_node, ctx)))
+                    args.append(result.register(self.visit(arg_node, outer_context)))
                     if result.should_return():  # check for errors
                         return result
                 else:
-                    list_: Value = result.register(self.visit(arg_node, ctx))
+                    list_: Value = result.register(self.visit(arg_node, outer_context))
                     if not isinstance(list_, List):
                         return result.failure(
                             RTTypeError(
                                 list_.pos_start, list_.pos_end,
                                 f"expected a list value after '*', but got '{list_.type_}.",
-                                ctx,
+                                outer_context,
                                 origin_file="src.interpreter.Interpreter.visit_CallNode"
                             )
                         )
@@ -836,20 +840,20 @@ class Interpreter:
 
             try:  # we try to execute it
                 return_value = result.register(value_to_call.execute(args, Interpreter, self.run,
-                                                                     exec_from=f"{ctx.display_name} from"
-                                                                               f" {ctx.parent.display_name}"))
+                                                                     exec_from=f"{outer_context.display_name} from"
+                                                                               f" {outer_context.parent.display_name}"))
             except Exception:  # we try to execute it with different exec_from context
                 return_value = result.register(value_to_call.execute(args, Interpreter, self.run,
-                                                                     exec_from=f"{ctx.display_name}"))
+                                                                     exec_from=f"{outer_context.display_name}"))
             if result.should_return():  # check for errors
                 return result
-            return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(ctx)
+            return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(outer_context)
             return result.success(return_value)
 
         elif isinstance(value_to_call, List):  # the value is a list
             # get the element at the given index
             if len(node.arg_nodes) == 1:  # there is only one index given
-                index = result.register(self.visit(node.arg_nodes[0][0], ctx))
+                index = result.register(self.visit(node.arg_nodes[0][0], outer_context))
                 if isinstance(index, Number):  # the index should be a number
                     index = index.value
                     try:  # we try to return the value at the index
@@ -860,19 +864,19 @@ class Interpreter:
                             RTIndexError(
                                 node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
                                 f'list index {index} out of range.',
-                                ctx, "src.interpreter.Interpreter.visit_CallNode"
+                                outer_context, "src.interpreter.Interpreter.visit_CallNode"
                             )
                         )
                 else:  # the index is not a number
                     return result.failure(RunTimeError(
                         node.pos_start, node.pos_end,
                         f"indexes must be integers, not {index.type_}.",
-                        ctx, origin_file="src.interpreter.Interpreter.visit_CallNode"
+                        outer_context, origin_file="src.interpreter.Interpreter.visit_CallNode"
                     ))
             elif len(node.arg_nodes) > 1:  # there is more than one index given
                 return_value = []
                 for arg_node in node.arg_nodes:  # for every index
-                    index = result.register(self.visit(arg_node[0], ctx))
+                    index = result.register(self.visit(arg_node[0], outer_context))
                     if isinstance(index, Number):  # the index should be a number
                         index = index.value
                         try:  # we try to return the value at the given index
@@ -882,27 +886,29 @@ class Interpreter:
                                 RTIndexError(
                                     arg_node[0].pos_start, arg_node[0].pos_end,
                                     f'list index {index} out of range.',
-                                    ctx, "src.interpreter.Interpreter.Visit_CallNode"
+                                    outer_context, "src.interpreter.Interpreter.Visit_CallNode"
                                 )
                             )
                     else:  # the index is not a number
                         return result.failure(RunTimeError(
                             arg_node[0].pos_start, arg_node[0].pos_end,
                             f"indexes must be integers, not {index.type_}.",
-                            ctx, origin_file="src.interpreter.Interpreter.Visit_CallNode"
+                            outer_context, origin_file="src.interpreter.Interpreter.Visit_CallNode"
                         ))
-                return result.success(List(return_value).set_context(ctx).set_pos(node.pos_start, node.pos_end))
+                return result.success(
+                    List(return_value).set_context(outer_context).set_pos(node.pos_start, node.pos_end)
+                )
             else:  # there is no index given
                 return result.failure(RunTimeError(
                     node.pos_start, node.pos_end,
                     f"please give at least one index.",
-                    ctx, origin_file="src.interpreter.Interpreter.Visit_CallNode"
+                    outer_context, origin_file="src.interpreter.Interpreter.Visit_CallNode"
                 ))
         else:  # the object is not callable
             return result.failure(RunTimeError(
                 node.pos_start, node.pos_end,
                 f"{value_to_call.type_} is not callable.",
-                ctx, origin_file="src.interpreter.Interpreter.Visit_CallNode"
+                outer_context, origin_file="src.interpreter.Interpreter.Visit_CallNode"
             ))
 
     def visit_ReturnNode(self, node: ReturnNode, ctx: Context) -> RTResult:
@@ -954,11 +960,10 @@ class Interpreter:
                 )
             )
 
-        what_to_import = module.WHAT_TO_IMPORT
-        for key in what_to_import.keys():  # we import each element of the module
-            ctx.symbol_table.set(f"{name_to_import}_{key}", what_to_import[key])
+        module_value = Module(name_to_import, module.WHAT_TO_IMPORT)
+        ctx.symbol_table.set(name_to_import, module_value)
 
-        return result.success(NoneValue(False))
+        return result.success(module_value)
 
     def visit_WriteNode(self, node: WriteNode, ctx: Context) -> RTResult:
         """Visit WriteNode"""

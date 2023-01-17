@@ -239,7 +239,7 @@ class Value:
         """
         return None, self.illegal_operation()
 
-    def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
+    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>"):
         """Execute the function.
         Returns a result"""
         return RTResult().failure(self.illegal_operation())

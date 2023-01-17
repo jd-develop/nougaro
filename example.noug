@@ -32,7 +32,7 @@ print(3-4)
 print(2*3)
 print(6/2)
 print(3^2)  # this is the power
-print(math_abs(-5))  # the absolute value
+print(math.abs(-5))  # the absolute value
 print(1e10)  # 1*10^10
 print()
 
@@ -161,7 +161,7 @@ print()
 
 print("max of the list is " + str(max(list_, True)))
 print("min of the list is " + str(min(list_, True)))
-print("scope of the list is " + str(statistics_scope([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])))  # 10-1 = 9 :)
+print("scope of the list is " + str(statistics.scope([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])))  # 10-1 = 9 :)
 print()
 
 void()  # Does ABSOLUTELY nothing... (in fact, returns None...)
@@ -172,15 +172,15 @@ print(chr(128512))  # prints the character for this ord
 
 
 # math functions
-print(math_sqrt(math_pi) == math_sqrt_pi)  # True
-print(math_root(27, 3))  # returns x with x^3 = 27, so 3
-print(math_degrees(12))  # radians -> degrees
-print(math_radians(math_degrees(12)))  # 12 :)
-print(math_log(3))  # log_e(3)
-print(math_log(3, 4))  # log_4(3)
-print(math_log2(3))  # log_2(3)
-# math_sin, math_cos, math_tan, math_asin, math_acos, math_atan...
-print(math_e)  # euler's number
+print(math.sqrt(math.pi) == math.sqrt_pi)  # True
+print(math.root(27, 3))  # returns x with x^3 = 27, so 3
+print(math.degrees(12))  # radians -> degrees
+print(math.radians(math.degrees(12)))  # 12 :)
+print(math.log(3))  # log_e(3)
+print(math.log(3, 4))  # log_4(3)
+print(math.log2(3))  # log_2(3)
+# math.sin, math.cos, math.tan, math.asin, math.acos, math.atan...
+print(math.e)  # euler's number
 print()
 
 # loops
@@ -233,7 +233,7 @@ print()
 
 # time sleep
 print("wait a second...")
-time_sleep(1)  # literally a second
+time.sleep(1)  # literally a second
 print("thank you :)")  # you're welcome ^^
 print()
 

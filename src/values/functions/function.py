@@ -37,13 +37,13 @@ class Function(BaseFunction):
     def __repr__(self):
         return f'<function {self.name}>'
 
-    def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
+    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>"):
         # execute a function of the 'math' module
         # create the result
         result = RTResult()
 
         # create an interpreter to run the code inside the function
-        interpreter = interpreter_(run)
+        interpreter = interpreter_(run, noug_dir)
 
         # generate the context and update symbol table
         exec_context = self.generate_new_context()

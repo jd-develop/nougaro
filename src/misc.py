@@ -73,7 +73,15 @@ class CustomBuiltInFuncMethodWithRunParam(CustomBuiltInFuncMethod):
     """The type of the methods `execute_{name}` with `run` parameter in BuiltInFunction"""
     # This class was made to bypass a pycharm bug.
 
-    def __call__(self, exec_context: Context = None, run=None) -> Any:
+    def __call__(self, exec_context: Context = None, run=None, noug_dir: str = None) -> Any:
+        ...
+
+
+class CustomBuiltInFuncMethodWithNougDirButNotRun(CustomBuiltInFuncMethod):
+    """The type of the methods `execute_{name}` with `run` parameter in BuiltInFunction"""
+    # This class was made to bypass a pycharm bug.
+
+    def __call__(self, exec_context: Context = None, noug_dir: str = None) -> Any:
         ...
 
 

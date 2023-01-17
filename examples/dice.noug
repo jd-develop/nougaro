@@ -6,5 +6,5 @@ var faces = input_int('How many faces do your dice have? ')
 while True then
     var input_ = input("'exit' to exit, anything else to roll the dice: ")
     if input_ == 'exit' then break
-    print(random_randint(1, faces))
+    print(random.randint(1, faces))
 end

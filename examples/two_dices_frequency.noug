@@ -5,7 +5,7 @@ print("This program prints the frequencies of the sums of two dices launched 100
 def tdf(l)
 	var list_ = [0]*12
 	for i = 0 to l-1 then
-		var dice_sum = random_randint(1, 6) + random_randint(1, 6)
+		var dice_sum = random.randint(1, 6) + random.randint(1, 6)
 		var actual_sum_in_list = list_(dice_sum-1)
 		replace(list_, dice_sum-1, actual_sum_in_list+1)
 	end

@@ -27,15 +27,18 @@ from src.values.basevalues import List, NoneValue
 # built in python imports
 import json
 import sys
-import os.path
+import os
 import platform
+import pathlib
 
 
 def main():
-    with open("config/debug.conf") as debug_f:
+    noug_dir = os.path.abspath(pathlib.Path(__file__).parent.absolute())
+
+    with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug_f:
         debug_on = bool(int(debug_f.read()))
 
-    with open("config/print_context.conf") as print_context_f:
+    with open(os.path.abspath(noug_dir + "/config/print_context.conf")) as print_context_f:
         print_context = bool(int(print_context_f.read()))
 
     # message for PR-makers: if you have a better idea to how to do these things with CLI arguments, make a PR :)
@@ -69,7 +72,7 @@ def main():
     else:  # there is no file given, so we have to open the shell
         path = "<stdin>"
 
-    with open("config/noug_version.json") as ver_json:  # we load the nougaro version stored in noug_version.json
+    with open(os.path.abspath(noug_dir + "/config/noug_version.json")) as ver_json:  # we load the nougaro version stored in noug_version.json
         ver_json_loaded = json.load(ver_json)
         version = ver_json_loaded.get("phase") + " " + ver_json_loaded.get("noug_version")
 
@@ -97,7 +100,7 @@ def main():
                 result, error = None, None
             else:  # there's an input
                 try:  # we try to run it
-                    result, error = nougaro.run('<stdin>', text, version)
+                    result, error = nougaro.run('<stdin>', text, noug_dir, version)
                 except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
                     print_in_red("KeyboardInterrupt")
                     continue  # continue the `while True` loop
@@ -143,7 +146,7 @@ def main():
             result, error = None, None
         else:  # the file isn't empty, let's run it !
             try:
-                result, error = nougaro.run('<stdin>', file_content, version)
+                result, error = nougaro.run('<stdin>', file_content, noug_dir, version)
             except KeyboardInterrupt:  # if CTRL+C, just exit the Nougaro shell
                 print_in_red("KeyboardInterrupt")
                 sys.exit()

@@ -42,8 +42,9 @@ import importlib
 # ##########
 # noinspection PyPep8Naming
 class Interpreter:
-    def __init__(self, run):
+    def __init__(self, run, noug_dir_):
         self.run = run
+        self.noug_dir = noug_dir_
 
     def visit(self, node: Node, ctx: Context, other_ctx: Context = None):
         """Visit a node."""
@@ -347,7 +348,7 @@ class Interpreter:
         """Visit VarAccessNode"""
         attribute_error = node.attr
         result = RTResult()
-        var_names_list = node.var_name_tokens_list  # there is a list because it can be `a ? b ? c`
+        var_names_list: list[Token | Node] = node.var_name_tokens_list  # there is a list because it can be `a ? b ? c`
         value = None
         var_name = var_names_list[0]  # first we take the first identifier
         for i, var_name in enumerate(var_names_list):  # we check for all the identifiers
@@ -356,6 +357,7 @@ class Interpreter:
                 if value is not None:  # if the variable is defined, we can stop here
                     break
             else:
+                var_name: Node
                 value = result.register(self.visit(var_name, ctx))  # here var_name is an expr
                 if not result.should_return():
                     break
@@ -839,11 +841,11 @@ class Interpreter:
                     args.extend(list_.elements)
 
             try:  # we try to execute it
-                return_value = result.register(value_to_call.execute(args, Interpreter, self.run,
+                return_value = result.register(value_to_call.execute(args, Interpreter, self.run, self.noug_dir,
                                                                      exec_from=f"{outer_context.display_name} from"
                                                                                f" {outer_context.parent.display_name}"))
             except Exception:  # we try to execute it with different exec_from context
-                return_value = result.register(value_to_call.execute(args, Interpreter, self.run,
+                return_value = result.register(value_to_call.execute(args, Interpreter, self.run, self.noug_dir,
                                                                      exec_from=f"{outer_context.display_name}"))
             if result.should_return():  # check for errors
                 return result
@@ -940,10 +942,11 @@ class Interpreter:
         identifier: Token = node.identifier  # we get the module identifier token
         name_to_import = identifier.value  # we get the module identifier
 
-        if os.path.exists(f"lib_/{name_to_import}.noug"):
-            with open(f"lib_/{name_to_import}.noug") as lib_:
+        if os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}.noug")):
+            with open(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}.noug")) as lib_:
                 text = lib_.read()
-            value, error = self.run(file_name=f"{name_to_import} (lib)", text=text, exec_from=ctx.display_name)
+            value, error = self.run(file_name=f"{name_to_import} (lib)", text=text, noug_dir=self.noug_dir,
+                                    exec_from=ctx.display_name)
             if error is not None:
                 return result.failure(error)
             if result.should_return():

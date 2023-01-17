@@ -23,7 +23,8 @@ from src.values.functions.base_function import BaseFunction
 from src.context import Context
 from src.values.basevalues import *
 from src.values.specific_values.number import *
-from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam, is_keyword, does_tok_type_exist
+from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam
+from src.misc import CustomBuiltInFuncMethodWithNougDirButNotRun, is_keyword, does_tok_type_exist
 from src.errors import RTFileNotFoundError, RTTypeError
 # built-in python imports
 from os import system as os_system, name as os_name
@@ -41,7 +42,7 @@ class BaseBuiltInFunction(BaseFunction):
     def __repr__(self):
         return f'<built-in function {self.name}>'
 
-    def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
+    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>"):
         return RTResult().success(NoneValue(False))
 
     def no_visit_method(self, exec_context: Context):
@@ -66,7 +67,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     def __init__(self, name):
         super().__init__(name)
 
-    def execute(self, args, interpreter_, run, exec_from: str = "<invalid>"):
+    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>"):
         # execute a built-in function
         # create the result
         result = RTResult()
@@ -95,7 +96,17 @@ class BuiltInFunction(BaseBuiltInFunction):
         # special built-in functions that needs the 'run' function (in nougaro.py) in their arguments
         if method_name in ['execute_run', 'execute_example', 'execute___test__']:
             method: CustomBuiltInFuncMethodWithRunParam  # re-define the custom type
-            return_value = result.register(method(exec_context, run))
+            return_value = result.register(method(exec_context, run, noug_dir))
+
+            # if there is any error
+            if result.should_return():
+                return result
+            return result.success(return_value)
+
+        # special built-in functions that needs the 'noug_dir' value
+        if method_name in ['execute___how_many_lines_of_code__']:
+            method: CustomBuiltInFuncMethodWithNougDirButNotRun  # re-define the custom type
+            return_value = result.register(method(exec_context, noug_dir))
 
             # if there is any error
             if result.should_return():
@@ -881,7 +892,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_rickroll.optional_params = []
     execute_rickroll.should_respect_args_number = False
 
-    def execute_run(self, exec_ctx: Context, run):
+    def execute_run(self, exec_ctx: Context, run, noug_dir):
         """Run code from another file. Param 'run' is the 'run' function in nougaro.py"""
         # Params :
         # * file_name
@@ -901,11 +912,23 @@ class BuiltInFunction(BaseBuiltInFunction):
                 script = file.read()
                 file.close()
         except FileNotFoundError:
-            return RTResult().failure(RTFileNotFoundError(
-                self.pos_start, self.pos_end,
-                file_name,
-                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_run"
-            ))
+            try:
+                with open(os.path.abspath(noug_dir + '/' + file_name), 'r+', encoding='UTF-8') as file:
+                    script = file.read()
+                    file.close()
+            except FileNotFoundError:
+                return RTResult().failure(RTFileNotFoundError(
+                    self.pos_start, self.pos_end,
+                    file_name,
+                    exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_run"
+                ))
+            except Exception as e:
+                return RTResult().failure(RunTimeError(
+                    self.pos_start, self.pos_end,
+                    f"failed to load script '{file_name}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'"
+                    f".",
+                    exec_ctx, origin_file="src.values.function.builtin_function.BuiltInFunction.execute_run"
+                ))
         except Exception as e:
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
@@ -914,7 +937,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         # we run the script
-        value, error = run(file_name, script, exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
+        value, error = run(file_name, script, noug_dir,
+                           exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
                            actual_context=f"{exec_ctx.parent.display_name}")
 
         # we check for errors
@@ -927,7 +951,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_run.optional_params = []
     execute_run.should_respect_args_number = True
 
-    def execute_example(self, exec_ctx: Context, run):
+    def execute_example(self, exec_ctx: Context, run, noug_dir):
         """Run code from an example file. Param 'run' is the 'run' function in nougaro.py"""
         # Params :
         # * example_name
@@ -955,7 +979,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         return_example_value = bool(return_example_value.value)
 
-        file_name = "examples/" + example_name.value + ".noug"  # we put the right extension
+        file_name = os.path.abspath(noug_dir + "/examples/" + example_name.value + ".noug")
 
         try:  # we try to open the example file
             with open(file_name, 'r+', encoding='UTF-8') as file:
@@ -975,7 +999,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         # then we execute the file
-        value, error = run(file_name, script, exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
+        value, error = run(file_name, script, noug_dir,
+                           exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
                            actual_context=f"{exec_ctx.parent.display_name}")
 
         if error is not None:  # we check for errors
@@ -1188,19 +1213,19 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute___is_valid_token_type__.optional_params = []
     execute___is_valid_token_type__.should_respect_args_number = True
 
-    def execute___test__(self, exec_ctx: Context, run):
+    def execute___test__(self, exec_ctx: Context, run, noug_dir):
         """Execute the test file."""
         # optional params:
         # * return
         should_i_return = exec_ctx.symbol_table.get("return")
         if should_i_return is None:
             should_i_return = FALSE.copy()
-        exec_ctx.symbol_table.set("file_name", String("test_file.noug"))
+        exec_ctx.symbol_table.set("file_name", String(os.path.abspath(noug_dir + "/test_file.noug")))
 
         if should_i_return.is_true():
-            return self.execute_run(exec_ctx, run)
+            return self.execute_run(exec_ctx, run, noug_dir)
         else:
-            self.execute_run(exec_ctx, run)
+            self.execute_run(exec_ctx, run, noug_dir)
             return RTResult().success(NoneValue(False))
 
     execute___test__.param_names = []
@@ -1275,7 +1300,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_chr.optional_params = []
     execute_chr.should_respect_args_number = True
 
-    def execute___how_many_lines_of_code__(self, exec_ctx):
+    def execute___how_many_lines_of_code__(self, exec_ctx, noug_dir):
         """Return the number of lines of code in the Nougaro Interpreter"""
         total = 0
         all_files = {}
@@ -1289,7 +1314,9 @@ class BuiltInFunction(BaseBuiltInFunction):
         if print_:
             print("Computing...")
 
-        folders = ['.', 'lib_', 'src', 'src/values', 'src/values/functions', 'src/values/specific_values']
+        folders = [os.path.abspath(noug_dir + f) for f in
+                   ['/', '/lib_', '/src', '/src/values', '/src/values/functions', '/src/values/specific_values']
+                   ]
         for folder in folders:
             for file_dir in os.listdir(folder):
                 if file_dir != "example.noug" and (file_dir.endswith(".py") or file_dir.endswith(".noug")):

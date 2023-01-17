@@ -1190,12 +1190,21 @@ class BuiltInFunction(BaseBuiltInFunction):
 
     def execute___test__(self, exec_ctx: Context, run):
         """Execute the test file."""
-        # no params
+        # optional params:
+        # * return
+        should_i_return = exec_ctx.symbol_table.get("return")
+        if should_i_return is None:
+            should_i_return = FALSE.copy()
         exec_ctx.symbol_table.set("file_name", String("test_file.noug"))
-        return self.execute_run(exec_ctx, run)
+
+        if should_i_return.is_true():
+            return self.execute_run(exec_ctx, run)
+        else:
+            self.execute_run(exec_ctx, run)
+            return RTResult().success(NoneValue(False))
 
     execute___test__.param_names = []
-    execute___test__.optional_params = []
+    execute___test__.optional_params = ["return"]
     execute___test__.should_respect_args_number = True
 
     def execute_ord(self, exec_ctx: Context):

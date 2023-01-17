@@ -20,6 +20,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.context import Context
+from src.nodes import Node
 # built-in python imports
 from typing import Protocol, Any
 from colorama import init as colorama_init, Fore
@@ -82,5 +83,5 @@ class CustomBuiltInFuncMethodWithRunParam(CustomBuiltInFuncMethod):
 class CustomInterpreterVisitMethod(Protocol):
     """The type of the methods `visit_{name}` in Interpreter"""
     # This class was made to bypass a pycharm bug.
-    def __call__(self, exec_context: Context = None, node=None) -> Any:
+    def __call__(self, node: Node = None, exec_context: Context = None, other_context: Context = None) -> Any:
         ...

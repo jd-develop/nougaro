@@ -30,8 +30,8 @@ from lib_.lib_to_make_libs import *
 import random
 
 
-class Random(Module):
-    """ Random Module """
+class Random(ModuleFunction):
+    """ Random module """
     def __init__(self, name):
         super().__init__("random", name)
 

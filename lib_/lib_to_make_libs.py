@@ -29,7 +29,7 @@ from src.errors import *
 # no imports
 
 
-class Module(BaseBuiltInFunction):
+class ModuleFunction(BaseBuiltInFunction):
     """ Parent class for all the modules """
     def __init__(self, module_name, function_name,
                  link_for_bug_report: str = "https://jd-develop.github.io/nougaro/bugreport.html"):
@@ -86,7 +86,7 @@ class Module(BaseBuiltInFunction):
 
     def copy(self):
         """Return a copy of self"""
-        copy = Module(self.module_name, self.name, self.link_for_bug_report)
+        copy = ModuleFunction(self.module_name, self.name, self.link_for_bug_report)
         return self.set_context_and_pos_to_a_copy(copy)
 
     def set_context_and_pos_to_a_copy(self, copy):

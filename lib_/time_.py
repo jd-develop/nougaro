@@ -33,8 +33,8 @@ import time
 TIMEZONE = Number(time.timezone)
 
 
-class Time(Module):
-    """Time Module"""
+class Time(ModuleFunction):
+    """ Time module """
     def __init__(self, name):
         super().__init__('time', name)
 

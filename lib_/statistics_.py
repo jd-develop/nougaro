@@ -38,8 +38,8 @@ class RTStatisticsError(RunTimeError):
         self.context = context
 
 
-class Statistics(Module):
-    """ Module Statistics """
+class Statistics(ModuleFunction):
+    """ Statistics module """
     def __init__(self, name):
         super().__init__("statistics", name)
 

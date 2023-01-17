@@ -37,8 +37,8 @@ SQRT_PI = Number(math_sqrt(pi))
 E = Number(e)
 
 
-class Math(Module):
-    """ Math Module """
+class Math(ModuleFunction):
+    """ Math module """
     def __init__(self, name):
         super().__init__("math", name)
 

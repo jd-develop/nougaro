@@ -16,8 +16,8 @@
 
 # Debug: some debug tools
 
-var _CONF_DEBUG_FILE = "config/debug.conf"
-var _PRINT_CONTEXT_CONF_DEBUG_FILE = "config/print_context.conf"
+var _CONF_DEBUG_FILE = __noug_dir__ + "/config/debug.conf"
+var _PRINT_CONTEXT_CONF_DEBUG_FILE = __noug_dir__ + "/config/print_context.conf"
 
 var is_debug_enabled = int(read _CONF_DEBUG_FILE)
 var should_print_context = int(read _PRINT_CONTEXT_CONF_DEBUG_FILE)

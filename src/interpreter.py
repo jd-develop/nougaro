@@ -1115,7 +1115,7 @@ class Interpreter:
             except FileNotFoundError:  # file not found
                 return result.failure(
                     RTFileNotFoundError(
-                        node.pos_start, node.pos_end, f"file '{file_name_value}' does not exist.", ctx,
+                        node.pos_start, node.pos_end, file_name_value, ctx,
                         "src.interpreter.Interpreter.visit_ReadNode"
                     )
                 )

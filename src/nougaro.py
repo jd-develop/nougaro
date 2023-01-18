@@ -42,18 +42,18 @@ set_symbol_table(global_symbol_table)  # This function is in src.set_symbol_tabl
 # ##########
 # RUN
 # ##########
-def run(file_name: str, text: str, noug_dir_: str, version: str = None, exec_from: str = "(shell)",
+def run(file_name: str, text: str, noug_dir: str, version: str = None, exec_from: str = "(shell)",
         actual_context: str = "<program>"):
     """Run the given code.
     The code is given through the `text` argument."""
-    with open(os.path.abspath(noug_dir_ + "/config/debug.conf")) as debug_f:
+    with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug_f:
         debug_on = bool(int(debug_f.read()))
 
-    with open(os.path.abspath(noug_dir_ + "/config/print_context.conf")) as print_context:
+    with open(os.path.abspath(noug_dir + "/config/print_context.conf")) as print_context:
         print_context = bool(int(print_context.read()))
 
     if version is None:
-        with open(os.path.abspath(noug_dir_ + "/config/noug_version.json")) as ver_json:
+        with open(os.path.abspath(noug_dir + "/config/noug_version.json")) as ver_json:
             # we get the nougaro version from noug_version.json
             ver_json_loaded = json.load(ver_json)
             version = ver_json_loaded.get("phase") + " " + ver_json_loaded.get("noug_version")
@@ -62,6 +62,7 @@ def run(file_name: str, text: str, noug_dir_: str, version: str = None, exec_fro
     global_symbol_table.set("__noug_version__", String(version))
     global_symbol_table.set("__exec_from__", String(exec_from))
     global_symbol_table.set("__actual_context__", String(actual_context))
+    global_symbol_table.set("__noug_dir__", String(noug_dir))
 
     # we make tokens with the Lexer
     lexer = Lexer(file_name, text)
@@ -80,7 +81,7 @@ def run(file_name: str, text: str, noug_dir_: str, version: str = None, exec_fro
         print(ast)
 
     # run the code (interpreter)
-    interpreter = src.interpreter.Interpreter(run, noug_dir_)
+    interpreter = src.interpreter.Interpreter(run, noug_dir)
     context = Context('<program>')  # create the context of the interpreter
     # don't forget to change the context symbol table to the global symbol table
     context.symbol_table = global_symbol_table

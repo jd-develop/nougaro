@@ -30,6 +30,11 @@ import sys
 import os
 import platform
 import pathlib
+if platform.system() in ["Linux", "Darwin"] or "BSD" in platform.system():
+    try:
+        import readline  # browse command history
+    except ImportError:
+        pass
 
 
 def main():
@@ -96,6 +101,9 @@ def main():
             except KeyboardInterrupt:  # if CTRL+C, exit the shell
                 print_in_red("\nKeyboardInterrupt")
                 break  # breaks the `while True` loop to the end of the file
+            except EOFError:
+                print_in_red("\nEOF")
+                break  # breaks the `while True` loop to the end of the file
                 
             if str(text) == "" or text is None:  # nothing was entered: we don't do anything
                 result, error = None, None
@@ -105,6 +113,9 @@ def main():
                 except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
                     print_in_red("\nKeyboardInterrupt")
                     continue  # continue the `while True` loop
+                except EOFError:
+                    print_in_red("\nEOF")
+                    break  # breaks the `while True` loop to the end of the file
 
             if error is not None:  # there is an error, we print it in RED because OMG AN ERROR
                 print_in_red(error.as_string())
@@ -150,6 +161,9 @@ def main():
                 result, error = nougaro.run('<stdin>', file_content, noug_dir, version)
             except KeyboardInterrupt:  # if CTRL+C, just exit the Nougaro shell
                 print_in_red("\nKeyboardInterrupt")
+                sys.exit()
+            except EOFError:
+                print_in_red("\nEOF")
                 sys.exit()
         if error is not None:  # there is an error, so before exiting we have to say "OH NO IT'S BROKEN"
             print_in_red(error.as_string())

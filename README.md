@@ -2,9 +2,16 @@
 ## English description
  A programming language. Interpreter written in Python.
  
- Needs the `colorama` module (`pip install colorama`)
- 
- Execute the shell with `python3 shell.py`. Open files with `python3 shell.py (filename.extension)`
+### Third-party modules
+ Python builtins that are not always builtin (why?):
+  * `colorama` (`pip install colorama`)
+
+ Under Linux (optional):
+  * `readline` (`pip install readline`)
+
+### Run
+ Execute the shell with `python3 shell.py`. Open files with `python3 shell.py filename.extension`
+ Generally, we use `.noug` as extension for Nougaro files.
 
  The code is compiled for Windows and Linux. Check it out in the [releases](https://github.com/jd-develop/nougaro/releases/) tab!
  
@@ -14,10 +21,17 @@
 
 ## French description
  Un langage de programmation. Interpréteur écrit en Python.
+
+### Modules tiers
+ Modules pas toujours fournis avec Python (pourquoi ?):
+  * `colorama` (`pip install colorama`)
+
+ Sous Linux (optionnel):
+  * `readline` (`pip install readline`)
  
- Nécessite le module `colorama` (`pip install colorama`)
- 
- Exécutez le shell avec `python3 shell.py`. Ouvrez des fichiers avec `python3 shell.py (filename.extension)`
+### Exécuter
+ Exécutez le shell avec `python3 shell.py`. Ouvrez des fichiers avec `python3 shell.py nomdufichier.extention`.
+ Généralement, on utilise l'extension `.noug` pour les fichiers Nougaro.
  
  Le code est compilé pour Windows et Linux. Disponible dans l'onglet [releases](https://github.com/jd-develop/nougaro/releases/) !
  

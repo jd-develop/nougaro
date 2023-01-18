@@ -33,7 +33,7 @@ for %%y in (.\.git, .\.github, .\.vscode, .\.idea, .\__pycache__, src\__pycache_
 
 rem Then we ask for the version
 set /p NOUGVERSION="Nougaro version: "
-set /p NOUGPHASE="Phase: ""
+set /p NOUGPHASE="Phase: "
 
 rem We build
 python -m nuitka --standalone --windows-company-name=Nougaro --windows-product-name=Nougaro --windows-product-version=%NOUGVERSION% --include-package=lib_ shell.py

@@ -94,7 +94,7 @@ def main():
             try:  # we ask for an input to be interpreted
                 text = input("nougaro> ")
             except KeyboardInterrupt:  # if CTRL+C, exit the shell
-                print_in_red("KeyboardInterrupt")
+                print_in_red("\nKeyboardInterrupt")
                 break  # breaks the `while True` loop to the end of the file
                 
             if str(text) == "" or text is None:  # nothing was entered: we don't do anything
@@ -103,7 +103,7 @@ def main():
                 try:  # we try to run it
                     result, error = nougaro.run('<stdin>', text, noug_dir, version)
                 except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
-                    print_in_red("KeyboardInterrupt")
+                    print_in_red("\nKeyboardInterrupt")
                     continue  # continue the `while True` loop
 
             if error is not None:  # there is an error, we print it in RED because OMG AN ERROR
@@ -149,7 +149,7 @@ def main():
             try:
                 result, error = nougaro.run('<stdin>', file_content, noug_dir, version)
             except KeyboardInterrupt:  # if CTRL+C, just exit the Nougaro shell
-                print_in_red("KeyboardInterrupt")
+                print_in_red("\nKeyboardInterrupt")
                 sys.exit()
         if error is not None:  # there is an error, so before exiting we have to say "OH NO IT'S BROKEN"
             print_in_red(error.as_string())

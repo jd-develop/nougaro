@@ -104,7 +104,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return result.success(return_value)
 
         # special built-in functions that needs the 'noug_dir' value
-        if method_name in ['execute___how_many_lines_of_code__']:
+        if method_name in ['execute___how_many_lines_of_code__', 'execute___gpl__']:
             method: CustomBuiltInFuncMethodWithNougDirButNotRun  # re-define the custom type
             return_value = result.register(method(exec_context, noug_dir))
 
@@ -1116,7 +1116,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_nougaro.optional_params = ["song"]
     execute_nougaro.should_respect_args_number = True
 
-    def execute___gpl__(self, exec_ctx: Context):
+    def execute___gpl__(self, exec_ctx: Context, noug_dir: str):
         """Open or print the GNU GPL 3.0."""
         # Optional params :
         # * print_in_term
@@ -1132,14 +1132,14 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute___gpl__"
             ))
 
-        if not os.path.exists("LICENSE"):  # the GPL3 file is not found
+        if not os.path.exists(os.path.abspath(noug_dir + "/LICENSE")):  # the GPL3 file is not found
             print("A problem occurred while opening or printing the license.\n"
                   "You can read the license online by following this link :\n"
                   "https://www.gnu.org/licenses/gpl-3.0.txt")
             return RTResult().success(NoneValue(False))
 
         if print_in_term.is_true():  # we print the GPL3 in the terminal
-            with open("LICENSE", 'r+') as license_file:
+            with open(os.path.abspath(noug_dir + "/LICENSE"), 'r+') as license_file:
                 print(license_file.read())
                 license_file.close()
                 return RTResult().success(NoneValue(False))
@@ -1149,14 +1149,14 @@ class BuiltInFunction(BaseBuiltInFunction):
             if system == "Darwin":  # macOS
                 import subprocess
 
-                subprocess.call(('open', "LICENSE"))
+                subprocess.call(('open', os.path.abspath(noug_dir + "/LICENSE")))
             elif system == 'Windows':  # Windows
                 print("Make sure to select a *text editor/reader* (like notepad or n++) in the list that will pop :)")
-                os.startfile(os.path.realpath("LICENSE"))
+                os.startfile(os.path.realpath(noug_dir + "/LICENSE"))
             elif system == "Linux":  # Linux
                 import subprocess
 
-                subprocess.call(('xdg-open', "LICENSE"))
+                subprocess.call(('xdg-open', os.path.abspath(noug_dir + "/LICENSE")))
             else:
                 print(f"<built-in function __gpl__> said:\n"
                       f"Sorry, your OS is not recognized. (platform.system() is '{system}')\n"

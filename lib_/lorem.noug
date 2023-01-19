@@ -1,0 +1,54 @@
+# Nougaro : a python-interpreted high-level programming language
+# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# Lorem: a lorem ipsum library
+import random
+
+def lorem_ipsum(paragraphs)
+    assert is_int(paragraphs), "first argument of function 'lorem_ipsum' SHOULD be an integer."
+    assert paragraphs > 0, "first argument of function 'lorem_ipsum' SHOULD be greater than 0."
+    var lorem_sentences = [\
+        "Quisque vitae varius ex, eu volutpat orci.",\
+        "Aenean ullamcorper orci et vulputate fermentum.",\
+        "Cras erat dui, finibus vel lectus ac, pharetra dictum odio.",\
+        "Nullam tempus scelerisque purus, sed mattis elit condimentum nec.",\
+        "Etiam risus sapien, auctor eu volutpat sit amet, porta in nunc.",\
+        "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.",\
+        "Proin ipsum purus, laoreet quis dictum a, laoreet sed ligula.",\
+        "Integer ultricies malesuada quam.",\
+        "Cras vel elit sed mi placerat pharetra eget vel odio.",\
+        "Duis ac nulla varius diam ultrices rutrum."\
+    ]
+    var text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+    var last_paragraph_first_sentence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    var last_sentence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    for i = 0 to paragraphs then
+        var paragraph = ""
+        var sentence = ""
+        for j = 0 to random.randint(5, 10) then
+            if j == 0 and i != 0 then
+                do var sentence = random.choice(lorem_sentences) then loop while sentence == last_sentence or sentence == last_paragraph_first_sentence
+            end
+            do var sentence = random.choice(lorem_sentences) then loop while sentence == last_sentence
+            var last_sentence = sentence
+            if i != 0 and j ==0 then var last_paragraph_first_sentence = sentence
+            var paragraph += sentence + ' '
+        end
+        var text += paragraph
+        if i != paragraphs-1 then var text += "\n\n"
+    end
+    return text
+end

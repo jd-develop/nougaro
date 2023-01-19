@@ -47,7 +47,7 @@ class Lexer:
         self.current_char = self.text[self.pos.index] if self.pos.index < len(self.text) else None
 
     def next_char(self):
-        """Returns the next char"""
+        """Returns the next char without advancing"""
         new_pos = self.pos.copy().advance(self.current_char)
         # get the next char in the code (or None if this is EOF (end of file))
         next_char = self.text[new_pos.index] if new_pos.index < len(self.text) else None
@@ -66,6 +66,9 @@ class Lexer:
             elif self.current_char == '#':  # for comments
                 there_is_a_space_or_a_tab_or_a_comment = True
                 self.skip_comment()
+            elif self.current_char == '\\' and self.next_char() is not None and self.next_char() in ';\n':
+                self.advance()
+                self.advance()
             elif self.current_char in ';\n':  # semicolons and new lines
                 there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(Token(TT["NEWLINE"], pos_start=self.pos))

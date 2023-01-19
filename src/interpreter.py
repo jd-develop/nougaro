@@ -560,7 +560,7 @@ class Interpreter:
     def visit_IfNode(self, node: IfNode, ctx: Context) -> RTResult:
         """Visit IfNode"""
         result = RTResult()
-        for condition, expr, should_return_none in node.cases:  # all the possible cases
+        for condition, expr in node.cases:  # all the possible cases
             condition_value = result.register(self.visit(condition, ctx))  # we register the condition
             if result.should_return():  # check for errors
                 return result
@@ -569,14 +569,14 @@ class Interpreter:
                 expr_value = result.register(self.visit(expr, ctx))
                 if result.should_return():  # check for errors
                     return result
-                return result.success(NoneValue(False) if should_return_none else expr_value)
+                return result.success(expr_value)
 
         if node.else_case is not None:  # if none of the if elif cases are true, we check for an else case
-            expr, should_return_none = node.else_case
+            expr = node.else_case
             else_value = result.register(self.visit(expr, ctx))
             if result.should_return():  # check for errors
                 return result
-            return result.success(NoneValue(False) if should_return_none else else_value)
+            return result.success(else_value)
 
         return result.success(NoneValue(False))
 
@@ -652,7 +652,6 @@ class Interpreter:
             elements.append(value)
 
         return result.success(
-            NoneValue(False) if node.should_return_none else
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
         )
 
@@ -684,7 +683,6 @@ class Interpreter:
                 elements.append(value)
 
             return result.success(
-                NoneValue(False) if node.should_return_none else
                 List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
             )
         elif isinstance(iterable_, String):
@@ -706,7 +704,6 @@ class Interpreter:
                 elements.append(value)
 
             return result.success(
-                NoneValue(False) if node.should_return_none else
                 List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
             )
         else:  # this is not a list nor a str
@@ -743,7 +740,6 @@ class Interpreter:
             elements.append(value)
 
         return result.success(
-            NoneValue(False) if node.should_return_none else
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
         )
 
@@ -784,7 +780,6 @@ class Interpreter:
                 elements.append(value)
 
         return result.success(
-            NoneValue(False) if node.should_return_none else
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
         )
 

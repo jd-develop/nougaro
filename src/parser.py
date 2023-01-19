@@ -990,7 +990,7 @@ class Parser:
                 statements = result.register(self.statements(stop=[(TT["KEYWORD"], 'end')]))
                 if result.error is not None:
                     return result
-                else_case = (statements, True)
+                else_case = statements
 
                 if self.current_token.matches(TT["KEYWORD"], 'end'):
                     # we advance
@@ -1011,7 +1011,7 @@ class Parser:
                 expr = result.register(self.statement())
                 if result.error is not None:
                     return result
-                else_case = (expr, False)
+                else_case = expr
 
         return result.success(else_case)
 
@@ -1073,7 +1073,7 @@ class Parser:
                                                                (TT["KEYWORD"], 'end')]))
             if result.error is not None:
                 return result
-            cases.append((condition, statements, True))
+            cases.append((condition, statements))
 
             if self.current_token.matches(TT["KEYWORD"], 'end'):
                 result.register_advancement()
@@ -1089,7 +1089,7 @@ class Parser:
             expr = result.register(self.statement())
             if result.error is not None:
                 return result
-            cases.append((condition, expr, False))
+            cases.append((condition, expr))
 
             # (if_expr_b|if_expr_c?)*?
             all_cases = result.register(self.if_expr_b_or_c())
@@ -1177,14 +1177,14 @@ class Parser:
                 result.register_advancement()
                 self.advance()
 
-                return result.success(ForNodeList(var_name, body, iterable_, True))
+                return result.success(ForNodeList(var_name, body, iterable_))
 
             # statement
             body = result.register(self.statement())
             if result.error is not None:
                 return result
 
-            return result.success(ForNodeList(var_name, body, iterable_, False))
+            return result.success(ForNodeList(var_name, body, iterable_))
         elif self.current_token.type != TT["EQ"]:
             if self.current_token.type not in TOKENS_TO_QUOTE:
                 error_msg = f"expected 'in' or '=', but got {self.current_token.type}."
@@ -1258,14 +1258,14 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            return result.success(ForNode(var_name, start_value, end_value, step_value, body, True))
+            return result.success(ForNode(var_name, start_value, end_value, step_value, body))
 
         # statement
         body = result.register(self.statement())
         if result.error is not None:
             return result
 
-        return result.success(ForNode(var_name, start_value, end_value, step_value, body, False))
+        return result.success(ForNode(var_name, start_value, end_value, step_value, body))
 
     def while_expr(self) -> ParseResult:
         result = ParseResult()
@@ -1311,14 +1311,14 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            return result.success(WhileNode(condition, body, True))
+            return result.success(WhileNode(condition, body))
 
         # statement
         body = result.register(self.statement())
         if result.error is not None:
             return result
 
-        return result.success(WhileNode(condition, body, False))
+        return result.success(WhileNode(condition, body))
 
     def do_expr(self) -> ParseResult:
         """
@@ -1342,15 +1342,11 @@ class Parser:
             body = result.register(self.statements(stop=[(TT["KEYWORD"], 'then')]))
             if result.error is not None:
                 return result
-
-            should_return_none = True
         else:
             # statement
             body = result.register(self.statement())
             if result.error is not None:
                 return result
-
-            should_return_none = False
 
         # KEYWORD:THEN
         if not self.current_token.matches(TT["KEYWORD"], 'then'):
@@ -1387,7 +1383,7 @@ class Parser:
         if result.error is not None:
             return result
 
-        return result.success(DoWhileNode(body, condition, should_return_none))
+        return result.success(DoWhileNode(body, condition))
 
     def func_def(self) -> ParseResult:
         """

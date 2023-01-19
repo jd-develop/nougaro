@@ -225,16 +225,20 @@ class UnaryOpNode(Node):
 # TEST NODES
 class IfNode(Node):
     """Node for the 'if' structure. All the cases except the else case are in 'cases'.
-    A case is a tuple under this form: (condition, expression if the condition is true, should_return_none)
+    A case is a tuple under this form: (condition, expression if the condition is true)
     condition and expression are both Nodes, and should_return_node is a bool
-    A else case is a tuple under this form: (expression: Node, should_return_none: bool)
+    An else case is a Node
     """
-    def __init__(self, cases, else_case):
-        self.cases: list[tuple[Node, Node, bool]] = cases
-        self.else_case: tuple[Node, bool] = else_case
+    def __init__(self, cases: list[tuple[Node, Node]], else_case: Node, debug: bool = False):
+        self.cases: list[tuple[Node, Node]] = cases
+        self.else_case: Node = else_case
 
         self.pos_start = self.cases[0][0].pos_start
-        self.pos_end = (self.else_case or self.cases[len(self.cases) - 1])[0].pos_end
+
+        if debug:
+            print(f"else_case : type {type(self.else_case)}, value " + str(self.else_case))
+            print(f"cases[-1][0] : type {type(self.cases[-1][0])}, value " + str(self.cases[-1][0]))
+        self.pos_end = (self.else_case or self.cases[-1][0]).pos_end
 
     def __repr__(self):
         return f'if {self.cases[0][0]} then {self.cases[0][1]} ' \
@@ -271,7 +275,6 @@ class ForNode(Node):
         end_value_node is a VarAccessNode (identifier: c)
         step_value_node is None or a VarAccessNode (identifier: d)
         body_node is the node after the 'then'
-        should_return_none is a bool
     """
     def __init__(
             self,
@@ -280,7 +283,6 @@ class ForNode(Node):
             end_value_node: Node,
             step_value_node: Node,
             body_node: Node,
-            should_return_none: bool
     ):
         # by default step_value_node is None
         self.var_name_token: Token = var_name_token
@@ -288,7 +290,6 @@ class ForNode(Node):
         self.end_value_node: Node = end_value_node
         self.step_value_node: Node = step_value_node
         self.body_node: Node = body_node
-        self.should_return_none: bool = should_return_none
 
         self.pos_start = self.var_name_token.pos_start
         self.pos_end = self.body_node.pos_end
@@ -304,17 +305,14 @@ class ForNodeList(Node):
         var_name_tok is Token(TT_IDENTIFIER, 'a')
         body_node is the node after the 'then'
         list_node is a VarAccessNode (identifier: b)
-        should_return_none is a bool
     """
-    def __init__(self, var_name_token: Token, body_node: Node, list_node: Node | ListNode,
-                 should_return_none: bool):
+    def __init__(self, var_name_token: Token, body_node: Node, list_node: Node | ListNode):
         # if list = [1, 2, 3]
         # for var in list is same as for var = 1 to 3 (step 1)
 
         self.var_name_token: Token = var_name_token
         self.body_node = body_node
         self.list_node = list_node
-        self.should_return_none = should_return_none
 
         # Position
         self.pos_start = self.var_name_token.pos_start
@@ -329,12 +327,10 @@ class WhileNode(Node):
     Example: while True then foo()
     Here, condition_node is a VarAccessNode (identifier: True)
           body_node is a CallNode (identifier: foo, no args)*
-    should_return_none is a bool
     """
-    def __init__(self, condition_node: Node, body_node: Node, should_return_none: bool):
+    def __init__(self, condition_node: Node, body_node: Node):
         self.condition_node: Node = condition_node
         self.body_node: Node = body_node
-        self.should_return_none: bool = should_return_none
 
         self.pos_start = self.condition_node.pos_start
         self.pos_end = self.body_node.pos_end
@@ -348,12 +344,10 @@ class DoWhileNode(Node):
     Example: do foo() then loop while True
     Here, body_node is a CallNode (identifier: foo, no args)
           condition_node is a VarAccessNode (identifier: True)
-    should_return_none is a bool
     """
-    def __init__(self, body_node, condition_node, should_return_none: bool):
+    def __init__(self, body_node, condition_node):
         self.body_node = body_node
         self.condition_node = condition_node
-        self.should_return_none = should_return_none
 
         self.pos_start = self.condition_node.pos_start
         self.pos_end = self.body_node.pos_end

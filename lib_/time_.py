@@ -54,7 +54,7 @@ class Time(ModuleFunction):
         if not isinstance(seconds, Number):  # we check if it is a number
             return RTResult().failure(RTTypeError(
                 seconds.pos_start, seconds.pos_end,
-                f"first argument of built-in module function 'time_sleep' must be a number, not {seconds.type_}.",
+                f"first argument of the built-in function 'time.sleep' must be a number, not {seconds.type_}.",
                 exec_ctx, "lib_.time_.Time.execute_time_sleep"
             ))
 
@@ -73,7 +73,7 @@ class Time(ModuleFunction):
         if not isinstance(milliseconds, Number):  # we check if it is a number
             return RTResult().failure(RTTypeError(
                 milliseconds.pos_start, milliseconds.pos_end,
-                f"first argument of built-in module function 'time_sleep_milliseconds' must be an integer, not"
+                f"first argument of the built-in function 'time.sleep_milliseconds' must be an integer, not"
                 f" {milliseconds.type_}.",
                 exec_ctx, "lib_.time_.Time.execute_time_sleep_milliseconds"
             ))
@@ -81,7 +81,7 @@ class Time(ModuleFunction):
         if milliseconds.is_float():  # we do not want a float
             return RTResult().failure(RTTypeError(
                 milliseconds.pos_start, milliseconds.pos_end,
-                "first argument of built-in module function 'time_sleep_milliseconds' must be an integer, not float.",
+                "first argument of the built-in function 'time.sleep_milliseconds' must be an integer, not float.",
                 exec_ctx, "lib_.time_.Time.execute_time_sleep_milliseconds"
             ))
 

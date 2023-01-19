@@ -54,33 +54,33 @@ class Random(ModuleFunction):
         if not isinstance(a, Number):  # we check if 'a' is a number
             return RTResult().failure(RTTypeError(
                 a.pos_start, a.pos_end,
-                "first argument of built-in module function 'random_randint' must be an int.",
+                "first argument of the built-in function 'random.randint' must be an int.",
                 exec_ctx, "lib_.random_.Random.execute_random_randint"
             ))
         if a.type_ != 'int':  # we check if 'a' is an int
             return RTResult().failure(RTTypeError(
                 a.pos_start, a.pos_end,
-                "first argument of built-in module function 'random_randint' must be an int.",
+                "first argument of the built-in function 'random.randint' must be an int.",
                 exec_ctx, "lib_.random_.Random.execute_random_randint"
             ))
 
         if not isinstance(b, Number):  # we check if 'b' is a number
             return RTResult().failure(RTTypeError(
                 b.pos_start, b.pos_end,
-                "second argument of built-in module function 'random_randint' must be an int.",
+                "second argument of the built-in function 'random.randint' must be an int.",
                 exec_ctx, "lib_.random_.Random.execute_random_randint"
             ))
         if b.type_ != 'int':  # we check if 'b' is an int
             return RTResult().failure(RTTypeError(
                 b.pos_start, b.pos_end,
-                "second argument of built-in module function 'random_randint' must be an int.",
+                "second argument of the built-in function 'random.randint' must be an int.",
                 exec_ctx, "lib_.random_.Random.execute_random_randint"
             ))
 
         if a.value > b.value:  # e.g. randint(4, -3) : it does not make ANY sense x)
             return RTResult().failure(RunTimeError(
                 a.pos_start, b.pos_end,
-                "first argument of built-in module function 'random_randint' MUST be less than or equal to its second"
+                "first argument of the built-in function 'random.randint' MUST be less than or equal to its second"
                 " argument.",
                 exec_ctx, origin_file="lib_.random_.Random.execute_random_randint"
             ))
@@ -109,7 +109,7 @@ class Random(ModuleFunction):
         if not isinstance(list_, List):  # we check if it is a list
             return RTResult().failure(RTTypeError(
                 list_.pos_start, list_.pos_end,
-                "first argument of built-in module function 'random_choice' must be a list.",
+                "first argument of the built-in function 'random.choice' must be a list.",
                 exec_ctx, "lib_.random_.Random.execute_random_choice"
             ))
         if len(list_.elements) == 0:  # if the list is empty, we raise an error

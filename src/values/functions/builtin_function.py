@@ -384,7 +384,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         if not isinstance(list_, List):  # we check if the list is a list
             return RTResult().failure(RTTypeError(
                 list_.pos_start, list_.pos_end,
-                "first argument of built-in function 'append' must be a list.",
+                "first argument of the built-in function 'append' must be a list.",
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_append"
             ))
 
@@ -408,7 +408,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         if not isinstance(list_, List):  # we check if the list is a list
             return RTResult().failure(RTTypeError(
                 list_.pos_start, list_.pos_end,
-                "first argument of built-in function 'pop' must be a list.",
+                "first argument of the built-in function 'pop' must be a list.",
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_pop"
             ))
 
@@ -417,7 +417,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         if not isinstance(index, Number):  # we check if the index is a number
             return RTResult().failure(RTTypeError(
                 index.pos_start, index.pos_end,
-                "second argument of built-in function 'pop' must be a number.",
+                "second argument of the built-in function 'pop' must be a number.",
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_pop"
             ))
 
@@ -450,7 +450,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         if not isinstance(list_, List):
             return RTResult().failure(RTTypeError(
                 list_.pos_start, list_.pos_end,
-                "first argument of built-in function 'insert' must be a list.",
+                "first argument of the built-in function 'insert' must be a list.",
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_insert"
             ))
 
@@ -460,7 +460,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         if not isinstance(index, Number):
             return RTResult().failure(RTTypeError(
                 index.pos_start, index.pos_end,
-                "third argument of built-in function 'insert' must be a number.",
+                "third argument of the built-in function 'insert' must be a number.",
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_insert"
             ))
 
@@ -488,14 +488,14 @@ class BuiltInFunction(BaseBuiltInFunction):
         if not isinstance(list1, List):
             return RTResult().failure(RTTypeError(
                 list1.pos_start, list1.pos_end,
-                "first argument of built-in function 'extend' must be a list.",
+                "first argument of the built-in function 'extend' must be a list.",
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_extend"
             ))
 
         if not isinstance(list2, List):
             return RTResult().failure(RTTypeError(
                 list2.pos_start, list2.pos_end,
-                "second argument of built-in function 'extend' must be a list.",
+                "second argument of the built-in function 'extend' must be a list.",
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_extend"
             ))
 
@@ -504,7 +504,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             if not isinstance(delete_duplicates, Number):
                 return RTResult().failure(RTTypeError(
                     list2.pos_start, list2.pos_end,
-                    "third argument of built-in function 'extend' must be a number.",
+                    "third argument of the built-in function 'extend' must be a number.",
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_extend"
                 ))
             if delete_duplicates.value != FALSE.value:  # we have to delete duplicates
@@ -545,7 +545,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(
                 RTTypeError(
                     list_.pos_start, list_.pos_end,
-                    "first argument of built-in function 'get' must be a list.",
+                    "first argument of the built-in function 'get' must be a list.",
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_get"
                 )
             )
@@ -554,7 +554,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(
                 RTTypeError(
                     index_.pos_start, index_.pos_end,
-                    "second argument of built-in function 'get' must be an int.",
+                    "second argument of the built-in function 'get' must be an int.",
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_get"
                 )
             )
@@ -588,7 +588,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(
                 RTTypeError(
                     list_.pos_start, list_.pos_end,
-                    "first argument of built-in function 'replace' must be a list.",
+                    "first argument of the built-in function 'replace' must be a list.",
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_replace"
                 )
             )
@@ -597,7 +597,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(
                 RTTypeError(
                     index_.pos_start, index_.pos_end,
-                    "second argument of built-in function 'replace' must be an int.",
+                    "second argument of the built-in function 'replace' must be an int.",
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_replace"
                 )
             )
@@ -868,7 +868,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         if not isinstance(value_, List) and not isinstance(value_, String):
             return RTResult().failure(RTTypeError(
                 value_.pos_start, value_.pos_end,
-                "first argument of built-in function 'len' must be a list or a str.",
+                "first argument of the built-in function 'len' must be a list or a str.",
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_len"
             ))
 
@@ -901,7 +901,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         if not isinstance(file_name, String):  # we check if the file name's a str
             return RTResult().failure(RTTypeError(
                 file_name.pos_start, file_name.pos_end,
-                "first argument of built-in function 'run' must be a str.",
+                "first argument of the built-in function 'run' must be a str.",
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_run"
             ))
 
@@ -962,7 +962,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         if not isinstance(example_name, String):  # we check if it is a str
             return RTResult().failure(RTTypeError(
                 example_name.pos_start, example_name.pos_end,
-                "first argument of built-in function 'example' must be a str.",
+                "first argument of the built-in function 'example' must be a str.",
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_example"
             ))
 
@@ -973,7 +973,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         if not isinstance(return_example_value, Number):
             return RTResult().failure(RTTypeError(
                 return_example_value.pos_start, return_example_value.pos_end,
-                "second argument of built-in function 'example' must be a number.",
+                "second argument of the built-in function 'example' must be a number.",
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_example"
             ))
 

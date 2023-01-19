@@ -59,14 +59,14 @@ class Math(ModuleFunction):
         if not isinstance(value, Number):  # we check if the value is a number
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_sqrt' must be a number.",
+                "first argument of the built-in function 'math.sqrt' must be a number.",
                 exec_context, "lib_.math_.Math.execute_math_sqrt"
             ))
 
         if value.value < 0:  # we check if the value is greater than (or equal to) 0
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_sqrt' must be greater than (or equal to) 0.",
+                "first argument of the built-in function 'math.sqrt' must be greater than (or equal to) 0.",
                 exec_context, "lib_.math_.Math.execute_math_sqrt"
             ))
 
@@ -88,14 +88,14 @@ class Math(ModuleFunction):
         if not isinstance(value, Number):  # we check if the value is a number
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_math_root' must be a number.",
+                "first argument of the built-in function 'math.math_root' must be a number.",
                 exec_context, "lib_.math_.Math.execute_math_root"
             ))
 
         if value.value < 0:  # we check if the value is greater than (or equal to) 0
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_math_root' must be greater than (or equal to) 0.",
+                "first argument of the built-in function 'math.math_root' must be greater than (or equal to) 0.",
                 exec_context, "lib_.math_.Math.execute_math_root"
             ))
 
@@ -106,7 +106,7 @@ class Math(ModuleFunction):
         if not isinstance(n, Number):  # we check if 'n' is a number
             return RTResult().failure(RTTypeError(
                 n.pos_start, n.pos_end,
-                "second argument of built-in module function 'math_math_root' must be a number.",
+                "second argument of the built-in function 'math.math_root' must be a number.",
                 exec_context, "lib_.math_.Math.execute_math_root"
             ))
 
@@ -126,7 +126,7 @@ class Math(ModuleFunction):
         if not isinstance(value, Number):  # we check if the value is a number
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_degrees' must be a number (angle in radians).",
+                "first argument of the built-in function 'math.degrees' must be a number (angle in radians).",
                 exec_context, "lib_.math_.Math.execute_math_degrees"
             ))
         degrees = math_degrees(value.value)
@@ -144,7 +144,7 @@ class Math(ModuleFunction):
         if not isinstance(value, Number):  # we check if the value is a number
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_radians' must be a number (angle in degrees).",
+                "first argument of the built-in function 'math.radians' must be a number (angle in degrees).",
                 exec_context, "lib_.math_.Math.execute_math_radians"
             ))
         radians = math_radians(value.value)
@@ -162,7 +162,7 @@ class Math(ModuleFunction):
         if not isinstance(value, Number):  # we check if the value is a number
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_sin' must be a number (angle in radians).",
+                "first argument of the built-in function 'math.sin' must be a number (angle in radians).",
                 exec_context, "lib_.math_.Math.execute_math_sin"
             ))
         sin = math_sin(value.value)
@@ -180,7 +180,7 @@ class Math(ModuleFunction):
         if not isinstance(value, Number):  # we check if the value is a number
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_cos' must be a number (angle in radians).",
+                "first argument of the built-in function 'math.cos' must be a number (angle in radians).",
                 exec_context, "lib_.math_.Math.execute_math_cos"
             ))
         cos = math_cos(value.value)
@@ -198,7 +198,7 @@ class Math(ModuleFunction):
         if not isinstance(value, Number):  # we check if the value is a number
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_tan' must be a number (angle in radians).",
+                "first argument of the built-in function 'math.tan' must be a number (angle in radians).",
                 exec_context, "lib_.math_.Math.execute_math_tan"
             ))
         tan = math_tan(value.value)
@@ -216,7 +216,7 @@ class Math(ModuleFunction):
         if not isinstance(value, Number):  # we check if the value is a number
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_asin' must be a number.",
+                "first argument of the built-in function 'math.asin' must be a number.",
                 exec_context, "lib_.math_.Math.execute_math_asin"
             ))
         try:
@@ -224,7 +224,7 @@ class Math(ModuleFunction):
         except ValueError:
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_asin' must be a number between -1 and 1.",
+                "first argument of the built-in function 'math.asin' must be a number between -1 and 1.",
                 exec_context, "lib_.math_.Math.execute_math_asin"
             ))
         return RTResult().success(Number(asin))
@@ -241,7 +241,7 @@ class Math(ModuleFunction):
         if not isinstance(value, Number):  # we check if the value is a number
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_acos' must be a number.",
+                "first argument of the built-in function 'math.acos' must be a number.",
                 exec_context, "lib_.math_.Math.execute_math_acos"
             ))
         try:
@@ -249,7 +249,7 @@ class Math(ModuleFunction):
         except ValueError:  # 1 < value or value < -1
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_acos' must be a number between -1 and 1.",
+                "first argument of the built-in function 'math.acos' must be a number between -1 and 1.",
                 exec_context, "lib_.math_.Math.execute_math_acos"
             ))
         return RTResult().success(Number(acos))
@@ -266,7 +266,7 @@ class Math(ModuleFunction):
         if not isinstance(value, Number):  # we check if the value is a number
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_atan' must be a number.",
+                "first argument of the built-in function 'math.atan' must be a number.",
                 exec_context, "lib_.math_.Math.execute_math_atan"
             ))
         atan = math_atan(value.value)
@@ -284,7 +284,7 @@ class Math(ModuleFunction):
         if not isinstance(value, Number):  # we check if the value is a number
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_abs' must be a number.",
+                "first argument of the built-in function 'math.abs' must be a number.",
                 exec_context, "lib_.math_.Math.execute_math_abs"
             ))
 
@@ -306,7 +306,7 @@ class Math(ModuleFunction):
         if not isinstance(value, Number):  # we check if the value is a number
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_log' must be a number.",
+                "first argument of the built-in function 'math.log' must be a number.",
                 exec_context, "lib_.math_.Math.execute_math_log"
             ))
 
@@ -317,7 +317,7 @@ class Math(ModuleFunction):
             if not isinstance(base, Number):  # we check if the base is a number
                 return RTResult().failure(RTTypeError(
                     base.pos_start, base.pos_end,
-                    "second argument of built-in module function 'math_log' must be a number.",
+                    "second argument of the built-in function 'math.log' must be a number.",
                     exec_context, "lib_.math_.Math.execute_math_log"
                 ))
             value_to_return = Number(log(value.value, base.value))
@@ -336,7 +336,7 @@ class Math(ModuleFunction):
         if not isinstance(value, Number):  # we check if the value is a number
             return RTResult().failure(RTTypeError(
                 value.pos_start, value.pos_end,
-                "first argument of built-in module function 'math_log2' must be a number.",
+                "first argument of the built-in function 'math.log2' must be a number.",
                 exec_context, "lib_.math_.Math.execute_math_log2"
             ))
 

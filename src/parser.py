@@ -175,6 +175,7 @@ class Parser:
         """
         statement  : KEYWORD:RETURN expr?
                    : KEYWORD:IMPORT IDENTIFIER
+                   : KEYWORD:EXPORT IDENTIFIER
                    : KEYWORD:CONTINUE
                    : KEYWORD:BREAK
                    : expr
@@ -218,6 +219,28 @@ class Parser:
             self.advance()
 
             return result.success(ImportNode(identifier, pos_start, self.current_token.pos_start.copy()))
+
+        if self.current_token.matches(TT["KEYWORD"], 'export'):
+            # we advance
+            result.register_advancement()
+            self.advance()
+
+            # we check for identifier
+            if self.current_token.type != TT["IDENTIFIER"]:
+                return result.failure(
+                    InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        "expected identifier after 'export'.",
+                        "src.parser.Parser.statement"
+                    )
+                )
+
+            identifier = self.current_token
+
+            result.register_advancement()
+            self.advance()
+
+            return result.success(ExportNode(identifier, pos_start, self.current_token.pos_start.copy()))
 
         # KEYWORD:CONTINUE
         if self.current_token.matches(TT["KEYWORD"], 'continue'):

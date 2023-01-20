@@ -808,14 +808,16 @@ class Interpreter:
     def visit_CallNode(self, node: CallNode, node_to_call_context: Context, outer_context: Context) -> RTResult:
         """Visit CallNode"""
         result = RTResult()
-        args = []
 
+        args = []
         value_to_call = result.register(self.visit(node.node_to_call, node_to_call_context))  # we get the value to call
         if result.should_return():  # check for errors
             return result
-        value_to_call = value_to_call.copy().set_pos(node.pos_start, node.pos_end)  # we copy it and set a new pos
+        # we copy it and set a new pos
+        value_to_call: Value = value_to_call.copy().set_pos(node.pos_start, node.pos_end)
 
         if isinstance(value_to_call, BaseFunction):  # if the value is a function
+            call_with_module_context: bool = value_to_call.call_with_module_context
             # call the function
             for arg_node, mul in node.arg_nodes:  # we check the arguments
                 if not mul:
@@ -835,15 +837,28 @@ class Interpreter:
                         )
                     args.extend(list_.elements)
 
-            try:  # we try to execute it
-                return_value = result.register(value_to_call.execute(args, Interpreter, self.run, self.noug_dir,
-                                                                     exec_from=f"{outer_context.display_name} from"
-                                                                               f" {outer_context.parent.display_name}"))
-            except Exception:  # we try to execute it with different exec_from context
-                return_value = result.register(value_to_call.execute(args, Interpreter, self.run, self.noug_dir,
-                                                                     exec_from=f"{outer_context.display_name}"))
+            if call_with_module_context:
+                if outer_context.parent is None:
+                    return_value = result.register(value_to_call.execute(
+                        args, Interpreter, self.run, self.noug_dir, exec_from=f"{outer_context.display_name}",
+                        use_context=value_to_call.module_context))
+                else:
+                    return_value = result.register(value_to_call.execute(
+                        args, Interpreter, self.run, self.noug_dir, exec_from=f"{outer_context.display_name} from "
+                                                                              f"{outer_context.parent.display_name}",
+                        use_context=value_to_call.module_context))
+            else:
+                if outer_context.parent is None:
+                    return_value = result.register(value_to_call.execute(
+                        args, Interpreter, self.run, self.noug_dir, exec_from=f"{outer_context.display_name}"))
+                else:
+                    return_value = result.register(value_to_call.execute(
+                        args, Interpreter, self.run, self.noug_dir, exec_from=f"{outer_context.display_name} from "
+                                                                              f"{outer_context.parent.display_name}"))
+
             if result.should_return():  # check for errors
                 return result
+
             return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(outer_context)
             return result.success(return_value)
 
@@ -940,12 +955,16 @@ class Interpreter:
         if os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}.noug")):
             with open(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}.noug")) as lib_:
                 text = lib_.read()
+
             value, error = self.run(file_name=f"{name_to_import} (lib)", text=text, noug_dir=self.noug_dir,
-                                    exec_from=ctx.display_name)
+                                    exec_from=ctx.display_name, use_default_symbol_table=True)
+            value: Value
             if error is not None:
                 return result.failure(error)
             if result.should_return():
                 return result
+
+            ctx.symbol_table.symbols.update(value.context.what_to_export.symbols)
             return result.success(NoneValue(False))
 
         try:
@@ -962,6 +981,28 @@ class Interpreter:
         ctx.symbol_table.set(name_to_import, module_value)
 
         return result.success(module_value)
+
+    @staticmethod
+    def visit_ExportNode(node: ExportNode, ctx: Context) -> RTResult:
+        """Visit ExportNode"""
+        identifier: Token = node.identifier
+        name_to_export = identifier.value
+        value_to_export = ctx.symbol_table.get(name_to_export)
+        if value_to_export is None:
+            return RTResult().failure(
+                RTNotDefinedError(
+                    identifier.pos_start, identifier.pos_end, f"name '{name_to_export}' is not defined.", ctx,
+                    "src.interpreter.Interpreter.visit_ExportNode"
+                )
+            )
+        if isinstance(value_to_export, BaseFunction):
+            value_to_export.call_with_module_context = True
+            value_to_export.module_context = ctx.copy()
+            ctx.what_to_export.set(name_to_export, value_to_export)
+        else:
+            ctx.what_to_export.set(name_to_export, value_to_export)
+
+        return RTResult().success(NoneValue(False))
 
     def visit_WriteNode(self, node: WriteNode, ctx: Context) -> RTResult:
         """Visit WriteNode"""

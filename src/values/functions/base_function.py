@@ -30,13 +30,15 @@ from src.symbol_table import SymbolTable
 
 class BaseFunction(Value):
     """Parent class for all the function classes (Function, BaseBuiltinFunction and its children)"""
-    def __init__(self, name):
+    def __init__(self, name, call_with_module_context=False):
         super().__init__()
         self.name = name if name is not None else '<function>'  # if 'name' is None, we have something like `def()->foo`
         self.type_ = 'BaseFunction'
+        self.call_with_module_context: bool = call_with_module_context
 
     def generate_new_context(self):
         """Generates a new context with the right name, the right parent context and the right position"""
+        # print(self.context)
         new_context = Context(self.name, self.context, self.pos_start)
         # set the symbol table to the parent one
         new_context.symbol_table = SymbolTable(new_context.parent.symbol_table)

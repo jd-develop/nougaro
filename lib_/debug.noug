@@ -57,3 +57,12 @@ def debug_stop_print_context()
     write "0" !>> _PRINT_CONTEXT_CONF_DEBUG_FILE
     print("Please restart the Nougaro interpreter to disable PRINT CONTEXT debug option.")
 end
+
+export is_debug_enabled
+export should_print_context
+export debug_enable_all
+export debug_disable_all
+export debug_mode_enable
+export debug_mode_disable
+export debug_print_context
+export debug_stop_print_context

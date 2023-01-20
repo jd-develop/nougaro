@@ -29,7 +29,7 @@ import pprint
 # ##########
 class Context:
     """Class for the interpreter Context"""
-    def __init__(self, display_name, parent=None, parent_entry_pos=None):
+    def __init__(self, display_name: str, parent=None, parent_entry_pos=None):
         self.display_name = display_name  # name of the function we are in
         self.parent: Context = parent  # parent context
         self.parent_entry_pos = parent_entry_pos  # pos_start of the parent context, used in errors tracebacks
@@ -38,6 +38,7 @@ class Context:
         # The entry pos seems to be the pos start of a context, but... Well, I don't know....
         # TODO: find what tf is self.parent_entry_pos
         self.symbol_table: SymbolTable | None = None
+        self.what_to_export: SymbolTable = SymbolTable()
 
     def dict_(self) -> dict:
         """Repr the context under a dict form."""

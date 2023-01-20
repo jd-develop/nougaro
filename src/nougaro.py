@@ -37,13 +37,14 @@ import os.path
 # we create a symbol table, then we define base things a symbol table needs
 global_symbol_table = SymbolTable()
 set_symbol_table(global_symbol_table)  # This function is in src.set_symbol_table
+default_symbol_table = global_symbol_table.copy()
 
 
 # ##########
 # RUN
 # ##########
 def run(file_name: str, text: str, noug_dir: str, version: str = None, exec_from: str = "(shell)",
-        actual_context: str = "<program>"):
+        actual_context: str = "<program>", use_default_symbol_table: bool = False, use_context: Context | None = None):
     """Run the given code.
     The code is given through the `text` argument."""
     with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug_f:
@@ -82,9 +83,19 @@ def run(file_name: str, text: str, noug_dir: str, version: str = None, exec_from
 
     # run the code (interpreter)
     interpreter = src.interpreter.Interpreter(run, noug_dir)
-    context = Context('<program>')  # create the context of the interpreter
-    # don't forget to change the context symbol table to the global symbol table
-    context.symbol_table = global_symbol_table
+    if use_context is None:
+        context = Context('<program>')  # create the context of the interpreter
+        # don't forget to change the context symbol table to the global symbol table
+        if use_default_symbol_table:
+            context.symbol_table = default_symbol_table.copy()
+            context.symbol_table.set("__noug_version__", String(version))
+            context.symbol_table.set("__exec_from__", String(exec_from))
+            context.symbol_table.set("__actual_context__", String(actual_context))
+            context.symbol_table.set("__noug_dir__", String(noug_dir))
+        else:
+            context.symbol_table = global_symbol_table
+    else:
+        context = use_context  # do not .copy() here
     result = interpreter.visit(ast.node, context)  # visit the main node of the AST with the created context
     if print_context:
         print(context.__str__())

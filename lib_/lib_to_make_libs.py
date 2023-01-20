@@ -40,7 +40,8 @@ class ModuleFunction(BaseBuiltInFunction):
     def __repr__(self):
         return f'<built-in lib function {self.module_name}_{self.name}>'
 
-    def execute(self, args, interpreter_, run, noug_dir_, exec_from: str = "<invalid>"):
+    def execute(self, args, interpreter_, run, noug_dir_, exec_from: str = "<invalid>",
+                use_context: Context | None = None):
         # execute a function of the 'math' module
         # create the result
         result = RTResult()
@@ -87,6 +88,7 @@ class ModuleFunction(BaseBuiltInFunction):
     def copy(self):
         """Return a copy of self"""
         copy = ModuleFunction(self.module_name, self.name, self.link_for_bug_report)
+        copy.module_context = self.module_context
         return self.set_context_and_pos_to_a_copy(copy)
 
     def set_context_and_pos_to_a_copy(self, copy):

@@ -52,3 +52,6 @@ def lorem_ipsum(paragraphs)
     end
     return text
 end
+
+
+export lorem_ipsum

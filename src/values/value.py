@@ -34,6 +34,8 @@ class Value:
         self.set_context()
         self.type_ = "BaseValue"
         self.attributes: dict = {}
+        self.call_with_module_context = False
+        self.module_context = None
 
     def __repr__(self):
         return "BaseValue"
@@ -239,7 +241,8 @@ class Value:
         """
         return None, self.illegal_operation()
 
-    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>"):
+    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
+                use_context: Context | None = None):
         """Execute the function.
         Returns a result"""
         return RTResult().failure(self.illegal_operation())

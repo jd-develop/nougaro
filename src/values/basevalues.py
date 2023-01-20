@@ -118,6 +118,7 @@ class String(Value):
         copy = String(self.value)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
+        copy.module_context = self.module_context
         return copy
 
 
@@ -343,6 +344,7 @@ class Number(Value):
         copy = Number(self.value)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
+        copy.module_context = self.module_context
         return copy
 
 
@@ -468,6 +470,7 @@ class List(Value):
         copy = List(self.elements)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
+        copy.module_context = self.module_context
         return copy
 
 
@@ -488,6 +491,7 @@ class Module(Value):
         copy = Module(self.name, self.attributes)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
+        copy.module_context = self.module_context
         return copy
 
 
@@ -508,6 +512,7 @@ class Constructor(Value):
         copy = Constructor(self.name, self.attributes)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
+        copy.module_context = self.module_context
         return copy
 
 
@@ -530,6 +535,7 @@ class Object(Value):
         copy = Object(self.attributes)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
+        copy.module_context = self.module_context
         return copy
 
 
@@ -588,4 +594,5 @@ class NoneValue(Value):
         copy = NoneValue(self.should_print)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
+        copy.module_context = self.module_context
         return copy

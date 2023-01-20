@@ -119,6 +119,7 @@ KEYWORDS = [                        # List of all the keywords (TT["KEYWORD)
     'return',
     # modules
     'import',
+    'export',
     # files
     'write',
     'read',

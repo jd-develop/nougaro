@@ -4,6 +4,7 @@ statements : NEWLINE* statement (NEWLINE+ statement)* NEWLINE
 
 statement  : KEYWORD:RETURN expr?
            : KEYWORD:IMPORT IDENTIFIER
+           : KEYWORD:EXPORT IDENTIFIER
            : KEYWORD:CONTINUE
            : KEYWORD:BREAK
            : expr

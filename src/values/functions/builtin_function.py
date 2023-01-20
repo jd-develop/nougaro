@@ -35,14 +35,15 @@ import sys
 
 class BaseBuiltInFunction(BaseFunction):
     """Parent class for all the built-in function classes (even in modules)"""
-    def __init__(self, name):
-        super().__init__(name)
+    def __init__(self, name, call_with_module_context=False):
+        super().__init__(name, call_with_module_context)
         self.type_ = 'built-in func'
 
     def __repr__(self):
         return f'<built-in function {self.name}>'
 
-    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>"):
+    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
+                use_context: Context | None = None):
         return RTResult().success(NoneValue(False))
 
     def no_visit_method(self, exec_context: Context):
@@ -60,14 +61,16 @@ class BaseBuiltInFunction(BaseFunction):
         copy = BaseBuiltInFunction(self.name)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
+        copy.module_context = self.module_context
         return copy
 
 
 class BuiltInFunction(BaseBuiltInFunction):
-    def __init__(self, name):
-        super().__init__(name)
+    def __init__(self, name, call_with_module_context=False):
+        super().__init__(name, call_with_module_context)
 
-    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>"):
+    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
+                use_context: Context | None = None):
         # execute a built-in function
         # create the result
         result = RTResult()

@@ -144,6 +144,11 @@ class Interpreter:
                         return res
                     value = attr_
             left = value
+
+        if node.op_token.matches(TT["KEYWORD"], 'and') and not left.is_true():
+            # operator is "and" and the value is false
+            return res.success(FALSE.copy().set_pos(node.pos_start, node.pos_end))
+
         if not isinstance(node.right_node, list):
             right = res.register(self.visit(node.right_node, ctx))  # right term/factor/etc.
             if res.should_return():  # check for errors
@@ -298,7 +303,7 @@ class Interpreter:
                     print(
                         f"NOUGARO INTERNAL ERROR : Result is not defined after executing "
                         f"src.interpreter.Interpreter.visit_BinOpCompNode because of an invalid token.\n"
-                        f"Note for devs : the actual invalid token is {op_token.type}.\n"
+                        f"Note for devs : the actual invalid token is {op_token.type}:{op_token.value}.\n"
                         f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
                         f"information below")
                     raise Exception("Result is not defined after executing "

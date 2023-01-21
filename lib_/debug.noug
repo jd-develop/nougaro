@@ -37,25 +37,25 @@ end
 
 def debug_mode_enable()
 	write "1" !>> _CONF_DEBUG_FILE
-	print("Please restart the Nougaro interpreter to enable DEBUG mode.")
+	print("DEBUG mode is now ENABLED.")
 end
 
 
 def debug_mode_disable()
 	write "0" !>> _CONF_DEBUG_FILE
-	print("Please restart the Nougaro interpreter to disable DEBUG mode.")
+	print("DEBUG mode is now DISABLED.")
 end
 
 
 def debug_print_context()
     write "1" !>> _PRINT_CONTEXT_CONF_DEBUG_FILE
-    print("Please restart the Nougaro interpreter to enable PRINT CONTEXT debug option.")
+    print("PRINT CONTEXT debug option is now ENABLED.")
 end
 
 
 def debug_stop_print_context()
     write "0" !>> _PRINT_CONTEXT_CONF_DEBUG_FILE
-    print("Please restart the Nougaro interpreter to disable PRINT CONTEXT debug option.")
+    print("PRINT CONTEXT debug option is now DISABLED.")
 end
 
 export is_debug_enabled

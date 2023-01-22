@@ -10,7 +10,7 @@
   * `readline` (`pip install readline`)
 
 ### Run
- Execute the shell with `python3 shell.py`. Open files with `python3 shell.py filename.extension`
+ Execute the shell with `python3 shell.py`. Open files with `python3 shell.py filename.extension`.
  Generally, we use `.noug` as extension for Nougaro files.
 
  The code is compiled for Windows and Linux. Check it out in the [releases](https://github.com/jd-develop/nougaro/releases/) tab!

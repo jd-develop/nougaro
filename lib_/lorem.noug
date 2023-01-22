@@ -35,21 +35,30 @@ def lorem_ipsum(paragraphs)
     var text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
     var last_paragraph_first_sentence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     var last_sentence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    
     for i = 0 to paragraphs then
         var paragraph = ""
         var sentence = ""
+        
         for j = 0 to random.randint(5, 10) then
             if j == 0 and i != 0 then
-                do var sentence = random.choice(lorem_sentences) then loop while sentence == last_sentence or sentence == last_paragraph_first_sentence
+                do var sentence = random.choice(lorem_sentences)\
+                    then loop while sentence == last_sentence or sentence == last_paragraph_first_sentence
+            else
+                do var sentence = random.choice(lorem_sentences)\
+                    then loop while sentence == last_sentence
             end
-            do var sentence = random.choice(lorem_sentences) then loop while sentence == last_sentence
+            
             var last_sentence = sentence
             if i != 0 and j ==0 then var last_paragraph_first_sentence = sentence
+            
             var paragraph += sentence + ' '
         end
+        
         var text += paragraph
         if i != paragraphs-1 then var text += "\n\n"
     end
+    
     return text
 end
 

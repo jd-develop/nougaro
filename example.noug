@@ -71,7 +71,7 @@ assert True
 # assert False, "you can also put an error message"  # Uncomment this line to see what happens ;)
 
 # Input and tests
-var name = input("Whats your name? ")
+var name = input("What's your name? ")
 if name == "Jean Dubois" then
     print("You are the creator of this language! Amazing!")
 elif name != "mrlulu51" then

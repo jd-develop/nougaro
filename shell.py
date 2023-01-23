@@ -56,8 +56,9 @@ def main():
 
     # Uncomment 3 last lines to understand the following code.
     # Tested on Windows and in WSL. Tested after compiling with Nuitka on Windows.
-    if 'shell' in args[0] or 'nougaro' in args[0]:  # shell.py, shell.exe, nougaro.exe, etc.
-        del args[0]
+    # if 'shell' in args[0] or 'nougaro' in args[0]:  # shell.py, shell.exe, nougaro.exe, etc.
+    #     del args[0]
+    del args[0]
 
     # print(args)
 

@@ -35,6 +35,7 @@ from src.symbol_table import SymbolTable
 from inspect import signature
 import os.path
 import importlib
+import pprint
 
 
 # ##########
@@ -45,6 +46,13 @@ class Interpreter:
     def __init__(self, run, noug_dir_):
         self.run = run
         self.noug_dir = noug_dir_
+
+    @staticmethod
+    def update_symbol_table(ctx: Context):
+        symbols_copy: dict = ctx.symbol_table.symbols.copy()
+        if '__symbol_table__' in symbols_copy.keys():
+            del symbols_copy['__symbol_table__']
+        ctx.symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
 
     def visit(self, node: Node, ctx: Context, other_ctx: Context = None):
         """Visit a node."""
@@ -540,12 +548,13 @@ class Interpreter:
                                                    f"can not create or edit a variable with builtin name '{var_name}'.",
                                                    ctx, origin_file="src.interpreter.Interpreter.visit_VarAssignNode"))
             final_values.append(final_value)
+
+        self.update_symbol_table(ctx)
         return result.success(
             List(final_values).set_pos(node.pos_start, node.pos_end) if len(final_values) != 1 else final_values[0]
         )  # we return the (new) value(s) of the variable(s).
 
-    @staticmethod
-    def visit_VarDeleteNode(node: VarDeleteNode, ctx: Context) -> RTResult:
+    def visit_VarDeleteNode(self, node: VarDeleteNode, ctx: Context) -> RTResult:
         """Visit VarDeleteNode"""
         result = RTResult()
         var_name = node.var_name_token.value  # we get the var name
@@ -560,6 +569,8 @@ class Interpreter:
             return result.failure(RunTimeError(node.pos_start, node.pos_end,
                                                f"can not delete value assigned to builtin name '{var_name}'.",
                                                ctx, origin_file="src.interpreter.Interpreter.visit_VarDeleteNode"))
+
+        self.update_symbol_table(ctx)
         return result.success(NoneValue(False))
 
     def visit_IfNode(self, node: IfNode, ctx: Context) -> RTResult:
@@ -641,6 +652,7 @@ class Interpreter:
 
         while condition():
             ctx.symbol_table.set(node.var_name_token.value, Number(i))  # we set the iterating variable
+            self.update_symbol_table(ctx)
             i += step_value.value  # we add up the step value to the iterating variable
 
             value = result.register(self.visit(node.body_node, ctx))  # we execute code in the body node
@@ -673,6 +685,7 @@ class Interpreter:
             for e in iterable_.elements:
                 # we set the in-game... wait, the in-code 'e' variable to the actual list element
                 ctx.symbol_table.set(node.var_name_token.value, e)
+                self.update_symbol_table(ctx)
                 value = result.register(self.visit(node.body_node, ctx))  # we execute the body node
                 if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
                     # error or 'return' statement
@@ -694,6 +707,7 @@ class Interpreter:
             for e in iterable_.to_str():
                 # we set the in-game... wait, the in-code 'e' variable to the actual str char
                 ctx.symbol_table.set(node.var_name_token.value, String(e))
+                self.update_symbol_table(ctx)
                 value = result.register(self.visit(node.body_node, ctx))  # we execute the body node
                 if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
                     # error or 'return' statement
@@ -788,8 +802,7 @@ class Interpreter:
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
         )
 
-    @staticmethod
-    def visit_FuncDefNode(node: FuncDefNode, ctx: Context) -> RTResult:
+    def visit_FuncDefNode(self, node: FuncDefNode, ctx: Context) -> RTResult:
         """Visit FuncDefNode"""
         result = RTResult()
         # if there is no name given -> None
@@ -803,6 +816,7 @@ class Interpreter:
         if node.var_name_token is not None:  # the function have a name
             if func_name not in PROTECTED_VARS:  # if the name isn't protected, we can set it in the symbol table
                 ctx.symbol_table.set(func_name, func_value)
+                self.update_symbol_table(ctx)
             else:  # the name is protected
                 return result.failure(RunTimeError(node.pos_start, node.pos_end,
                                                    f"can not create a function with builtin name '{func_name}'.",
@@ -984,6 +998,7 @@ class Interpreter:
 
         module_value = Module(name_to_import, module.WHAT_TO_IMPORT)
         ctx.symbol_table.set(name_to_import, module_value)
+        self.update_symbol_table(ctx)
 
         return result.success(module_value)
 
@@ -1174,6 +1189,7 @@ class Interpreter:
         if identifier is not None:  # an identifier is given
             if identifier.value not in PROTECTED_VARS:  # the identifier is not protected
                 ctx.symbol_table.set(identifier.value, String(file_str))
+                self.update_symbol_table(ctx)
             else:
                 return result.failure(
                     RunTimeError(

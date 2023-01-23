@@ -27,6 +27,7 @@ from src.constants import PROTECTED_VARS
 # built-in python imports
 import platform
 import sys
+import pprint
 
 
 def set_symbol_table(symbol_table: SymbolTable):
@@ -120,7 +121,11 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("__test__", TEST)
     symbol_table.set("__how_many_lines_of_code__", HOW_MANY_LINES_OF_CODE)
 
-    # symbol_table.set('__symbol_table__', String(pprint.pformat(symbol_table.symbols)))
+    symbols_copy: dict = symbol_table.symbols.copy()
+    if '__symbol_table__' in symbols_copy.keys():
+        del symbols_copy['__symbol_table__']
+    symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
+
     # test_protected_vars(symbol_table)
 
 

@@ -69,7 +69,10 @@ BUILTIN_FUNCTIONS = [
     'ord',
     'nougaro',
     '__gpl__',
-    'round'
+    'round',
+    "__test__",
+    '__is_keyword__',
+    '__is_valid_token_type__'
 ]
 PROTECTED_VARS = [  # finally, the list with all the names that can't be defined by the user
     "null",
@@ -85,8 +88,6 @@ PROTECTED_VARS = [  # finally, the list with all the names that can't be defined
     '__os_version__',
     '__base_value__',
     '__disclaimer_of_warranty__',
-    '__is_keyword__',
-    '__does_tok_type_exist__',
     '__noug_dir__',
     'answerToTheLifeTheUniverseAndEverything',
     *KEYWORDS,  # all the keywords

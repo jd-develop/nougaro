@@ -23,15 +23,15 @@ var is_debug_enabled = int(read _CONF_DEBUG_FILE)
 var should_print_context = int(read _PRINT_CONTEXT_CONF_DEBUG_FILE)
 
 
-def debug_enable_all()
+def enable_all()
     debug_mode_enable()
-    debug_print_context()
+    print_context()
 end
 
 
-def debug_disable_all()
+def disable_all()
     debug_mode_disable()
-    debug_stop_print_context()
+    stop_print_context()
 end
 
 
@@ -47,22 +47,22 @@ def debug_mode_disable()
 end
 
 
-def debug_print_context()
+def print_context()
     write "1" !>> _PRINT_CONTEXT_CONF_DEBUG_FILE
     print("PRINT CONTEXT debug option is now ENABLED.")
 end
 
 
-def debug_stop_print_context()
+def stop_print_context()
     write "0" !>> _PRINT_CONTEXT_CONF_DEBUG_FILE
     print("PRINT CONTEXT debug option is now DISABLED.")
 end
 
 export is_debug_enabled
 export should_print_context
-export debug_enable_all
-export debug_disable_all
+export enable_all
+export disable_all
 export debug_mode_enable
 export debug_mode_disable
-export debug_print_context
-export debug_stop_print_context
+export print_context
+export stop_print_context

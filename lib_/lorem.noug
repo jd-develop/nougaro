@@ -17,7 +17,7 @@
 # Lorem: a lorem ipsum library
 import random
 
-def lorem_ipsum(paragraphs)
+def ipsum(paragraphs)
     assert is_int(paragraphs), "first argument of function 'lorem_ipsum' SHOULD be an integer."
     assert paragraphs > 0, "first argument of function 'lorem_ipsum' SHOULD be greater than 0."
     var lorem_sentences = [\
@@ -64,4 +64,4 @@ def lorem_ipsum(paragraphs)
 end
 
 
-export lorem_ipsum
+export ipsum

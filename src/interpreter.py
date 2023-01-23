@@ -983,20 +983,21 @@ class Interpreter:
             if result.should_return():
                 return result
 
-            ctx.symbol_table.symbols.update(value.context.what_to_export.symbols)
-            return result.success(NoneValue(False))
-
-        try:
-            module = importlib.import_module(f"lib_.{name_to_import}_")
-        except ImportError:
-            return result.failure(
-                RTNotDefinedError(
-                    identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
-                    "src.interpreter.Interpreter.visit_ImportNode (troubleshooting: do python importlib is working?)"
+            what_to_import = value.context.what_to_export.symbols
+        else:
+            try:
+                module = importlib.import_module(f"lib_.{name_to_import}_")
+                what_to_import = module.WHAT_TO_IMPORT
+            except ImportError:
+                return result.failure(
+                    RTNotDefinedError(
+                        identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
+                        "src.interpreter.Interpreter.visit_ImportNode\n"
+                        "(troubleshooting: do python importlib is working?)"
+                    )
                 )
-            )
 
-        module_value = Module(name_to_import, module.WHAT_TO_IMPORT)
+        module_value = Module(name_to_import, what_to_import)
         ctx.symbol_table.set(name_to_import, module_value)
         self.update_symbol_table(ctx)
 

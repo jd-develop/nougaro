@@ -40,7 +40,8 @@ def lorem_ipsum(paragraphs)
         var paragraph = ""
         var sentence = ""
         
-        for j = 0 to random.randint(5, 10) then
+        var sentences = random.randint(5, 10)
+        for j = 0 to sentences then
             if j == 0 and i != 0 then
                 do var sentence = random.choice(lorem_sentences)\
                     then loop while sentence == last_sentence or sentence == last_paragraph_first_sentence
@@ -52,7 +53,7 @@ def lorem_ipsum(paragraphs)
             var last_sentence = sentence
             if i != 0 and j ==0 then var last_paragraph_first_sentence = sentence
             
-            var paragraph += sentence + ' '
+            var paragraph += sentence + if j != sentences-1 then ' ' else ''
         end
         
         var text += paragraph

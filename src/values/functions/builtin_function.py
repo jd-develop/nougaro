@@ -375,6 +375,8 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_is_none.optional_params = []
     execute_is_none.should_respect_args_number = True
 
+    # todo: add execute_is_module here and in the documentation
+
     def execute_append(self, exec_context: Context):
         """Append 'value' to 'list'"""
         # Params:

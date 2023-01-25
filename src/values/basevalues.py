@@ -94,13 +94,33 @@ class String(Value):
         if isinstance(other, String):
             return Number(int(self.value == other.value)).set_context(self.context), None
         else:
-            return None, self.can_not_compare(other)
+            return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_ne(self, other):
         if isinstance(other, String):
             return Number(int(self.value != other.value)).set_context(self.context), None
         else:
-            return None, self.can_not_compare(other)
+            return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_gt(self, other): return Number.FALSE.copy().set_context(self.context), None
+    def get_comparison_gte(self, other): return Number.FALSE.copy().set_context(self.context), None
+    def get_comparison_lt(self, other): return Number.FALSE.copy().set_context(self.context), None
+    def get_comparison_lte(self, other): return Number.FALSE.copy().set_context(self.context), None
+
+    def and_(self, other: Value):
+        return Number(int(self.is_true() and other.is_true())), None
+
+    def or_(self, other):
+        return Number(int(self.is_true() or other.is_true())), None
+
+    def xor_(self, other: Value):
+        """ Exclusive or (xor) """
+        if not self.is_true() and other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
+        if self.is_true() and not other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
+        else:
+            return Number.FALSE.copy().set_context(self.context), None
 
     def is_in(self, other):
         if isinstance(other, List):
@@ -205,61 +225,52 @@ class Number(Value):
         if isinstance(other, Number):
             return Number(int(self.value == other.value)).set_context(self.context), None
         else:
-            return None, self.can_not_compare(other)
+            return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_ne(self, other):
         if isinstance(other, Number):
             return Number(int(self.value != other.value)).set_context(self.context), None
         else:
-            return None, self.can_not_compare(other)
+            return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_lt(self, other):
         if isinstance(other, Number):
             return Number(int(self.value < other.value)).set_context(self.context), None
         else:
-            return None, self.can_not_compare(other)
+            return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_gt(self, other):
         if isinstance(other, Number):
             return Number(int(self.value > other.value)).set_context(self.context), None
         else:
-            return None, self.can_not_compare(other)
+            return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_lte(self, other):
         if isinstance(other, Number):
             return Number(int(self.value <= other.value)).set_context(self.context), None
         else:
-            return None, self.can_not_compare(other)
+            return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_gte(self, other):
         if isinstance(other, Number):
             return Number(int(self.value >= other.value)).set_context(self.context), None
         else:
-            return None, self.can_not_compare(other)
+            return Number.FALSE.copy().set_context(self.context), None
 
-    def and_(self, other):
-        if isinstance(other, Number):
-            return Number(int(self.value and other.value)).set_context(self.context), None
-        else:
-            return None, self.illegal_operation(other)
+    def and_(self, other: Value):
+        return Number(int(self.is_true() and other.is_true())), None
 
     def or_(self, other):
-        if isinstance(other, Number):
-            return Number(int(self.value or other.value)).set_context(self.context), None
-        else:
-            return None, self.illegal_operation(other)
+        return Number(int(self.is_true() or other.is_true())), None
 
-    def xor_(self, other):
+    def xor_(self, other: Value):
         """ Exclusive or (xor) """
-        if isinstance(other, Number):
-            if self.value == 0 and other.value != 0:
-                return Number(1).set_context(self.context), None
-            if self.value != 0 and other.value == 0:
-                return Number(1).set_context(self.context), None
-            else:
-                return Number(0).set_context(self.context), None
+        if not self.is_true() and other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
+        if self.is_true() and not other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
         else:
-            return None, self.illegal_operation(other)
+            return Number.FALSE.copy().set_context(self.context), None
 
     def not_(self):
         return Number(1 if self.value == 0 else 0).set_context(self.context), None
@@ -454,6 +465,33 @@ class List(Value):
         else:
             return Number.TRUE.copy().set_context(self.context), None
 
+    def get_comparison_gt(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_gte(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_lt(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_lte(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def and_(self, other: Value):
+        return Number(int(self.is_true() and other.is_true())), None
+
+    def or_(self, other):
+        return Number(int(self.is_true() or other.is_true())), None
+
+    def xor_(self, other: Value):
+        """ Exclusive or (xor) """
+        if not self.is_true() and other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
+        if self.is_true() and not other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
+        else:
+            return Number.FALSE.copy().set_context(self.context), None
+
     def is_in(self, other):
         if isinstance(other, List):
             return Number(int(self.elements in other.elements)).set_context(self.context), None
@@ -478,6 +516,7 @@ class Module(Value):
     def __init__(self, name, functions_and_constants: dict):
         super().__init__()
         self.name = name
+        self.type_ = "module"
         self.attributes = functions_and_constants.copy()
 
     def __repr__(self):
@@ -485,6 +524,33 @@ class Module(Value):
 
     def is_true(self):
         return False
+
+    def get_comparison_gt(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_gte(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_lt(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_lte(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def and_(self, other: Value):
+        return Number(int(self.is_true() and other.is_true())), None
+
+    def or_(self, other):
+        return Number(int(self.is_true() or other.is_true())), None
+
+    def xor_(self, other: Value):
+        """ Exclusive or (xor) """
+        if not self.is_true() and other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
+        if self.is_true() and not other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
+        else:
+            return Number.FALSE.copy().set_context(self.context), None
 
     def copy(self):
         """Return a copy of self"""
@@ -500,12 +566,40 @@ class Constructor(Value):
         super().__init__()
         self.name = name
         self.attributes = attributes.copy()
+        self.type_ = "constructor"
 
     def __repr__(self):
         return f"<class {self.name}>"
 
     def is_true(self):
         return False
+
+    def get_comparison_gt(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_gte(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_lt(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_lte(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def and_(self, other: Value):
+        return Number(int(self.is_true() and other.is_true())), None
+
+    def or_(self, other):
+        return Number(int(self.is_true() or other.is_true())), None
+
+    def xor_(self, other: Value):
+        """ Exclusive or (xor) """
+        if not self.is_true() and other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
+        if self.is_true() and not other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
+        else:
+            return Number.FALSE.copy().set_context(self.context), None
 
     def copy(self):
         """Return a copy of self"""
@@ -529,6 +623,33 @@ class Object(Value):
 
     def __repr__(self):
         return f"<{self.type_} object>"
+
+    def get_comparison_gt(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_gte(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_lt(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_lte(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def and_(self, other: Value):
+        return Number(int(self.is_true() and other.is_true())), None
+
+    def or_(self, other):
+        return Number(int(self.is_true() or other.is_true())), None
+
+    def xor_(self, other: Value):
+        """ Exclusive or (xor) """
+        if not self.is_true() and other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
+        if self.is_true() and not other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
+        else:
+            return Number.FALSE.copy().set_context(self.context), None
 
     def copy(self):
         """Return a copy of self"""
@@ -565,6 +686,33 @@ class NoneValue(Value):
             return Number.FALSE.copy(), None
         else:
             return Number.TRUE.copy(), None
+
+    def get_comparison_gt(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_gte(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_lt(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_lte(self, other):
+        return Number.FALSE.copy().set_context(self.context), None
+
+    def and_(self, other: Value):
+        return Number(int(self.is_true() and other.is_true())), None
+
+    def or_(self, other):
+        return Number(int(self.is_true() or other.is_true())), None
+
+    def xor_(self, other: Value):
+        """ Exclusive or (xor) """
+        if not self.is_true() and other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
+        if self.is_true() and not other.is_true():
+            return Number.TRUE.copy().set_context(self.context), None
+        else:
+            return Number.FALSE.copy().set_context(self.context), None
 
     def to_str_(self):
         return String('None').set_context(self.context), None

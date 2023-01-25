@@ -18,16 +18,51 @@ while True then
     
     # tokenize
     var tokens = []
+    var floating_point = 0
     for char in calcul then
+        var old_floating_point = floating_point
         var current_tok = char
         if char in "0123456789" then
-            if len(tokens) != 0 and not is_int(tokens(-1)) then
-                append(tokens, int(char))
-            elif len(tokens) != 0 then
-                replace(tokens, -1, tokens(-1)*10 + int(char))
+            if len(tokens) != 0 and not is_num(tokens(-1)) then
+                if tokens(-1) == "-" then
+                    pop(tokens, -1)
+                    append(tokens, -int(char))
+                elif tokens(-1) == '.' then
+                    pop(tokens, -1)
+                    var floating_point += 1
+                    if tokens(-1) >= 0 then
+                        replace(tokens, -1, float(tokens(-1)) + float(char)/10)
+                    else
+                        replace(tokens, -1, float(tokens(-1)) - float(char)/10)
+                    end
+                else
+                    append(tokens, int(char))
+                end
+            elif len(tokens) != 0 then  # last token is num
+                if tokens(-1) >= 0 then
+                    if is_int(tokens(-1)) then
+                        replace(tokens, -1, tokens(-1)*10 + int(char))
+                    else  # float
+                        var floating_point += 1
+                        replace(tokens, -1, round(tokens(-1) + float(char)/round(10 ^ floating_point),\
+                                                               floating_point)\
+                               )
+                    end
+                else
+                    if is_int(tokens(-1)) then
+                        replace(tokens, -1, tokens(-1)*10 - int(char))
+                    else  # float
+                        var floating_point += 1
+                        replace(tokens, -1, round(tokens(-1) - float(char)/(10 ^ floating_point),\
+                                                               floating_point)\
+                               )
+                    end
+                end
             else
                 append(tokens, int(char))
             end
+        elif char == '.' then
+            append(tokens, '.')
         elif char == " " then
             append(tokens, "space")
         elif char in "+-*/^" then
@@ -37,6 +72,7 @@ while True then
             var should_continue = True
             break
         end
+        if old_floating_point == floating_point then var floating_point = var old_floating_point = 0
     end
         
     if should_continue then continue
@@ -44,34 +80,40 @@ while True then
     # parse
     var stack = []
     for token in tokens then
-        if is_int(token) then
+        if is_num(token) then
             append(stack, token)
         elif token == "space" then
             void()
         else
-            if token == "+" then
-                var result = stack(-2) + stack(-1)
-            elif token == "-" then
-                var result = stack(-2) - stack(-1)
-            elif token == '/' then
-                if len(stack) != 0 and stack(-1) == 0 then
-                    print("Error: can not divide by 0")
+            if len(stack) >= 2 then
+                if token == "+" then
+                    var result = stack(-2) + stack(-1)
+                elif token == "-" then
+                    var result = stack(-2) - stack(-1)
+                elif token == '/' then
+                    if len(stack) != 0 and stack(-1) == 0 then
+                        print("Error: can not divide by 0")
+                        var should_continue = True
+                        break
+                    end
+                    var result = stack(-2) / stack(-1)
+                elif token == "*" then
+                    var result = stack(-2) * stack(-1)
+                elif token == "^" then
+                    var result = stack(-2) ^ stack(-1)
+                else
+                    print("Error")
                     var should_continue = True
                     break
                 end
-                var result = stack(-2) / stack(-1)
-            elif token == "*" then
-                var result = stack(-2) * stack(-1)
-            elif token == "^" then
-                var result = stack(-2) ^ stack(-1)
+                pop(stack, -1)
+                pop(stack, -1)
+                append(stack, result)
             else
                 print("Error")
                 var should_continue = True
                 break
             end
-            pop(stack, -1)
-            pop(stack, -1)
-            append(stack, result)
         end
     end
     

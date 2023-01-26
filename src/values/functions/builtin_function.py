@@ -286,7 +286,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         else:
             is_int = False
         # TRUE and FALSE are defined in src/values/specific_values/number.py
-        return RTResult().success(TRUE if is_int else FALSE)
+        return RTResult().success(TRUE.copy() if is_int else FALSE.copy())
 
     execute_is_int.param_names = ['value']
     execute_is_int.optional_params = []
@@ -306,7 +306,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         else:
             is_float = False
         # TRUE and FALSE are defined in src/values/specific_values/number.py
-        return RTResult().success(TRUE if is_float else FALSE)
+        return RTResult().success(TRUE.copy() if is_float else FALSE.copy())
 
     execute_is_float.param_names = ['value']
     execute_is_float.optional_params = []
@@ -319,7 +319,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         value = exec_context.symbol_table.get('value')  # we get the value
         is_number = isinstance(value, Number)  # we check if the value is a number
         # TRUE and FALSE are defined in src/values/specific_values/number.py
-        return RTResult().success(TRUE if is_number else FALSE)
+        return RTResult().success(TRUE.copy() if is_number else FALSE.copy())
 
     execute_is_num.param_names = ['value']
     execute_is_num.optional_params = []
@@ -331,7 +331,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         is_list = isinstance(exec_context.symbol_table.get('value'), List)  # we get the value and check if it is a list
         # TRUE and FALSE are defined in src/values/specific_values/number.py
-        return RTResult().success(TRUE if is_list else FALSE)
+        return RTResult().success(TRUE.copy() if is_list else FALSE.copy())
 
     execute_is_list.param_names = ['value']
     execute_is_list.optional_params = []
@@ -343,7 +343,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         is_str = isinstance(exec_context.symbol_table.get('value'), String)  # we get the value and check if it is a str
         # TRUE and FALSE are defined in src/values/specific_values/number.py
-        return RTResult().success(TRUE if is_str else FALSE)
+        return RTResult().success(TRUE.copy() if is_str else FALSE.copy())
 
     execute_is_str.param_names = ['value']
     execute_is_str.optional_params = []
@@ -356,7 +356,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         is_func = isinstance(exec_context.symbol_table.get('value'), BaseFunction)  # we get the value and check if it
         #                                                                             is a function
         # TRUE and FALSE are defined in src/values/specific_values/number.py
-        return RTResult().success(TRUE if is_func else FALSE)
+        return RTResult().success(TRUE.copy() if is_func else FALSE.copy())
 
     execute_is_func.param_names = ['value']
     execute_is_func.optional_params = []
@@ -369,13 +369,24 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we get the value and check if it is None
         is_none = isinstance(exec_context.symbol_table.get('value'), NoneValue)
         # TRUE and FALSE are defined in src/values/specific_values/number.py
-        return RTResult().success(TRUE if is_none else FALSE)
+        return RTResult().success(TRUE.copy() if is_none else FALSE.copy())
 
     execute_is_none.param_names = ['value']
     execute_is_none.optional_params = []
     execute_is_none.should_respect_args_number = True
 
-    # todo: add execute_is_module here and in the documentation
+    def execute_is_module(self, exec_ctx: Context):
+        """Check if 'value' is a Module"""
+        # Params:
+        # * value
+        # we get the value and check if it is a module
+        is_none = isinstance(exec_ctx.symbol_table.get('value'), Module)
+        # TRUE and FALSE are defined in src/values/specific_values/number.py
+        return RTResult().success(TRUE.copy() if is_none else FALSE.copy())
+
+    execute_is_module.param_names = ['value']
+    execute_is_module.optional_params = []
+    execute_is_module.should_respect_args_number = True
 
     def execute_append(self, exec_context: Context):
         """Append 'value' to 'list'"""
@@ -394,6 +405,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         list_.elements.append(value)  # we append the element to the list (changes in the symbol table too)
+        list_.update_should_print()
         return RTResult().success(list_)
 
     execute_append.param_names = ['list', 'value']
@@ -428,6 +440,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         try:  # we try to pop the element
             list_.elements.pop(index.value)
+            list_.update_should_print()
         except Exception:  # except if the index is out of range
             return RTResult().failure(RTIndexError(
                 list_.pos_start, index.pos_end,
@@ -471,6 +484,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         # if everything ok, we insert the element to the list at the right index
         list_.elements.insert(index.value, value)
+        list_.update_should_print()
         return RTResult().success(list_)
 
     execute_insert.param_names = ['list', 'value']
@@ -532,6 +546,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 return RTResult().success(List(final_list))
 
         list1.elements.extend(list2.elements)  # we finally extend
+        list1.update_should_print()
         return RTResult().success(list1)
 
     execute_extend.param_names = ['list1', 'list2']
@@ -610,6 +625,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # everything ok : we replace the element
         try:
             list_.elements[index_.value] = value
+            list_.update_should_print()
         except IndexError:  # except if the index is out of range
             return RTResult().failure(RTIndexError(
                 list_.pos_start, index_.pos_end,

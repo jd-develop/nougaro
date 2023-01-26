@@ -123,32 +123,24 @@ def main():
             elif result is not None:  # there is no error, but there is a result
                 if isinstance(result, List):  # the result is always a nougaro List value
                     if len(result.elements) == 1:  # there is one single result, let's print it without the "[]".
-                        if not isinstance(result.elements[0], NoneValue):  # result is not a Nougaro NoneValue
+                        if result.elements[0].should_print:  # if the value should be printed, let's print it!
                             print(result.elements[0])
-                        else:  # result is a Nougaro NoneValue
-                            if result.elements[0].should_print:  # if the NoneValue should be printed, let's print it!
-                                print(result.elements[0])
                     else:  # there is multiple results, when there is multi-line statements (like `print(a);var a+=1`)
                         # this code is to know what the list contains
                         # if the list contains only NoneValues that shouldn't be printed, we don't print it
                         # in any other case, we do.
                         should_print = False
                         for e in result.elements:
-                            if not isinstance(e, NoneValue):
+                            if e.should_print:
                                 should_print = True
-                                # no need to continue looping : it takes a long time, and it's useless because we have
-                                # to print anything, so we break this
-                                break
-                            else:
-                                if e.should_print:
-                                    should_print = True
-                                    break  # same here
+                                break  # same here
                         if should_print:  # if we should print, we print
                             print(result)
                 else:  # the result is not a Nougaro List. If you know when that happens, tell me, please.
                     print("WARNING: Looks like something went wrong. Don't panic, and just report this bug at:\n"
-                          "https://jd-develop.github.io/nougaro/bugreport.html."
+                          "https://jd-develop.github.io/nougaro/bugreport.html.\n"
                           "Error details: result from src.nougaro.run in shell is not a List.")
+                    print(f"The actual result is {result}, error is {error}.")
                     continue
             else:  # there is no error nor result. If you know when that happens, tell me, please.
                 continue

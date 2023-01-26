@@ -369,6 +369,7 @@ class List(Value):
         super().__init__()
         self.elements: list = elements
         self.type_ = 'list'
+        self.update_should_print()
 
     def __repr__(self):
         return f'[{", ".join([x.__str__() for x in self.elements])}]'
@@ -376,6 +377,19 @@ class List(Value):
     def __getitem__(self, item):
         """If there is foo[bar] in the python code and that foo is a Nougaro List, it works ^^ !!"""
         return self.elements.__getitem__(item)
+
+    def update_should_print(self):
+        should_print = False
+
+        if len(self.elements) == 0:
+            should_print = True
+        else:
+            for e in self.elements:
+                if e.should_print:
+                    should_print = True
+                    break
+
+        self.should_print = should_print
 
     def added_to(self, other):
         new_list = self.copy()

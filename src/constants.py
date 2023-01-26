@@ -43,6 +43,7 @@ BUILTIN_FUNCTIONS = [
     "is_str",
     "is_list",
     "is_func",
+    "is_module",
     "is_none",
     "append",
     "pop",

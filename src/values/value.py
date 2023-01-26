@@ -36,6 +36,7 @@ class Value:
         self.attributes: dict = {}
         self.call_with_module_context = False
         self.module_context = None
+        self.should_print = True
 
     def __repr__(self):
         return "BaseValue"

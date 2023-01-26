@@ -2,6 +2,7 @@
 
 print()
 print("Welcome to the Nougaro calculator!")
+print("Enter 'exit' to exit.")
 print("This calculator uses the Reverse Polish Notation.")
 print("Examples:")
 print()

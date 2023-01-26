@@ -162,7 +162,7 @@ class Parser:
                     return result.failure(
                         InvalidSyntaxError(
                             self.then_s[-1][0], self.then_s[-1][1],
-                            "this was never closed (by 'end')",
+                            "'end' expected to close a statement, surely this one.",
                             "src.parser.Parser.statements"
                         )
                     )
@@ -1456,6 +1456,7 @@ class Parser:
                     "expected 'def'.", "src.parser.Parser.func_def"
                 )
             )
+        def_tok = self.current_token.copy()
 
         result.register_advancement()
         self.advance()
@@ -1574,6 +1575,8 @@ class Parser:
 
         result.register_advancement()
         self.advance()
+
+        self.then_s.append((def_tok.pos_start, def_tok.pos_end))
 
         # statements
         body = result.register(self.statements(stop=[(TT["KEYWORD"], 'end')]))

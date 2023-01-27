@@ -935,6 +935,62 @@ class Interpreter:
                     f"please give at least one index.",
                     outer_context, origin_file="src.interpreter.Interpreter.Visit_CallNode"
                 ))
+        elif isinstance(value_to_call, String):  # the value is a string
+            # get the element at the given index
+            if len(node.arg_nodes) == 1:  # there is only one index given
+                index = result.register(self.visit(node.arg_nodes[0][0], outer_context))
+                if isinstance(index, Number):  # the index should be a number
+                    index = index.value
+                    try:  # we try to return the value at the index
+                        return_value = String(value_to_call.value[index]).set_context(outer_context).set_pos(
+                            node.pos_start, node.pos_end
+                        )
+                        return result.success(return_value)
+                    except Exception:  # index error
+                        return result.failure(
+                            RTIndexError(
+                                node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
+                                f'string index {index} out of range.',
+                                outer_context, "src.interpreter.Interpreter.visit_CallNode"
+                            )
+                        )
+                else:  # the index is not a number
+                    return result.failure(RunTimeError(
+                        node.pos_start, node.pos_end,
+                        f"indexes must be integers, not {index.type_}.",
+                        outer_context, origin_file="src.interpreter.Interpreter.visit_CallNode"
+                    ))
+            elif len(node.arg_nodes) > 1:  # there is more than one index given
+                return_value = ""
+                for arg_node in node.arg_nodes:  # for every index
+                    index = result.register(self.visit(arg_node[0], outer_context))
+                    if isinstance(index, Number):  # the index should be a number
+                        index = index.value
+                        try:  # we try to return the value at the given index
+                            return_value += value_to_call.value[index]
+                        except Exception:  # index error
+                            return result.failure(
+                                RTIndexError(
+                                    arg_node[0].pos_start, arg_node[0].pos_end,
+                                    f'string index {index} out of range.',
+                                    outer_context, "src.interpreter.Interpreter.Visit_CallNode"
+                                )
+                            )
+                    else:  # the index is not a number
+                        return result.failure(RunTimeError(
+                            arg_node[0].pos_start, arg_node[0].pos_end,
+                            f"indexes must be integers, not {index.type_}.",
+                            outer_context, origin_file="src.interpreter.Interpreter.Visit_CallNode"
+                        ))
+                return result.success(
+                    String(return_value).set_context(outer_context).set_pos(node.pos_start, node.pos_end)
+                )
+            else:  # there is no index given
+                return result.failure(RunTimeError(
+                    node.pos_start, node.pos_end,
+                    f"please give at least one index.",
+                    outer_context, origin_file="src.interpreter.Interpreter.Visit_CallNode"
+                ))
         else:  # the object is not callable
             return result.failure(RunTimeError(
                 node.pos_start, node.pos_end,

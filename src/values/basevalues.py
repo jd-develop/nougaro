@@ -32,7 +32,7 @@ from src.errors import RunTimeError, RTArithmeticError, RTIndexError
 class String(Value):
     def __init__(self, value):
         super().__init__()
-        self.value = value
+        self.value: str = value
         self.type_ = "str"
 
     def __repr__(self):

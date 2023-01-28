@@ -19,18 +19,18 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.values.basevalues import Number, String, List, NoneValue, Value, Module
-from src.values.specific_values.number import FALSE
+from src.values.basevalues.basevalues import Number, String, List, NoneValue, Value, Module
+from src.values.defined_values.number import FALSE
 from src.values.functions.function import Function
 from src.values.functions.base_function import BaseFunction
 from src.constants import PROTECTED_VARS
-from src.nodes import *
+from src.parser.nodes import *
 from src.errors import *
-from src.token_types import TT
-from src.runtime_result import RTResult
-from src.context import Context
+from src.lexer.token_types import TT
+from src.runtime.runtime_result import RTResult
+from src.runtime.context import Context
 from src.misc import CustomInterpreterVisitMethod
-from src.symbol_table import SymbolTable
+from src.runtime.symbol_table import SymbolTable
 # built-in python imports
 from inspect import signature
 import os.path

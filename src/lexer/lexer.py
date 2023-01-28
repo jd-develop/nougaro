@@ -20,8 +20,8 @@
 # IMPORTS
 # nougaro modules imports
 from src.position import Position
-from src.token import Token
-from src.token_types import *
+from src.lexer.token import Token
+from src.lexer.token_types import *
 from src.constants import DIGITS, LETTERS, LETTERS_DIGITS
 from src.errors import *
 # built-in python imports

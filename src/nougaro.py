@@ -20,13 +20,13 @@ import os.path
 
 # IMPORTS
 # nougaro modules imports
-from src.lexer import Lexer
-from src.parser import Parser
-import src.interpreter
-from src.symbol_table import SymbolTable
-from src.set_symbol_table import set_symbol_table
+from src.lexer.lexer import Lexer
+from src.parser.parser import Parser
+import src.runtime.interpreter
+from src.runtime.symbol_table import SymbolTable
+from src.runtime.set_symbol_table import set_symbol_table
 from src.errors import *
-from src.values.basevalues import String
+from src.values.basevalues.basevalues import String
 # built-in python imports
 import json
 import os.path
@@ -82,7 +82,7 @@ def run(file_name: str, text: str, noug_dir: str, version: str = None, exec_from
         print(ast)
 
     # run the code (interpreter)
-    interpreter = src.interpreter.Interpreter(run, noug_dir)
+    interpreter = src.runtime.interpreter.Interpreter(run, noug_dir)
     if use_context is None:
         context = Context('<program>')  # create the context of the interpreter
         # don't forget to change the context symbol table to the global symbol table

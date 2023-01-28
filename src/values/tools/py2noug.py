@@ -20,7 +20,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.misc import is_num
-from src.values.basevalues import *
+from src.values.basevalues.basevalues import *
 # built-in python imports
 from typing import Any
 

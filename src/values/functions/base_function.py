@@ -19,11 +19,11 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.values.value import Value
-from src.runtime_result import RTResult
+from src.values.basevalues.value import Value
+from src.runtime.runtime_result import RTResult
 from src.errors import RunTimeError
-from src.context import Context
-from src.symbol_table import SymbolTable
+from src.runtime.context import Context
+from src.runtime.symbol_table import SymbolTable
 # built-in python imports
 # no imports
 

@@ -19,8 +19,8 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.context import Context
-from src.runtime_result import RTResult
+from src.runtime.context import Context
+from src.runtime.runtime_result import RTResult
 from src.errors import RunTimeError
 # built-in python imports
 # no imports

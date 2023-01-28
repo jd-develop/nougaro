@@ -19,7 +19,7 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.token_types import KEYWORDS
+from src.lexer.token_types import KEYWORDS
 # built-in python imports
 import string
 

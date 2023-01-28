@@ -19,10 +19,11 @@
 
 # IMPORTS
 # nougaro modules imports
+from src.values.functions.base_builtin_func import BaseBuiltInFunction
 from src.values.functions.base_function import BaseFunction
-from src.context import Context
-from src.values.basevalues import *
-from src.values.specific_values.number import *
+from src.runtime.context import Context
+from src.values.basevalues.basevalues import *
+from src.values.defined_values.number import *
 from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam
 from src.misc import CustomBuiltInFuncMethodWithNougDirButNotRun, is_keyword, does_tok_type_exist
 from src.errors import RTFileNotFoundError, RTTypeError
@@ -31,38 +32,6 @@ from os import system as os_system, name as os_name
 import os.path
 import random
 import sys
-
-
-class BaseBuiltInFunction(BaseFunction):
-    """Parent class for all the built-in function classes (even in modules)"""
-    def __init__(self, name, call_with_module_context=False):
-        super().__init__(name, call_with_module_context)
-        self.type_ = 'built-in func'
-
-    def __repr__(self):
-        return f'<built-in function {self.name}>'
-
-    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
-                use_context: Context | None = None):
-        return RTResult().success(NoneValue(False))
-
-    def no_visit_method(self, exec_context: Context):
-        """Method called when the func name given through self.name is not defined"""
-        print(exec_context)
-        print(f"NOUGARO INTERNAL ERROR : No execute_{self.name} method defined in "
-              f"src.values.functions.builtin_function.BaseBuiltInFunction.\n"
-              f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all informations "
-              f"above.")
-        raise Exception(f'No execute_{self.name} method defined in '
-                        f'src.values.functions.builtin_function.BaseBuiltInFunction.')
-
-    def copy(self):
-        """Return a copy of self"""
-        copy = BaseBuiltInFunction(self.name)
-        copy.set_context(self.context)
-        copy.set_pos(self.pos_start, self.pos_end)
-        copy.module_context = self.module_context
-        return copy
 
 
 class BuiltInFunction(BaseBuiltInFunction):
@@ -285,7 +254,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 is_int = False
         else:
             is_int = False
-        # TRUE and FALSE are defined in src/values/specific_values/number.py
+        # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_int else FALSE.copy())
 
     execute_is_int.param_names = ['value']
@@ -305,7 +274,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 is_float = False
         else:
             is_float = False
-        # TRUE and FALSE are defined in src/values/specific_values/number.py
+        # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_float else FALSE.copy())
 
     execute_is_float.param_names = ['value']
@@ -318,7 +287,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         value = exec_context.symbol_table.get('value')  # we get the value
         is_number = isinstance(value, Number)  # we check if the value is a number
-        # TRUE and FALSE are defined in src/values/specific_values/number.py
+        # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_number else FALSE.copy())
 
     execute_is_num.param_names = ['value']
@@ -330,7 +299,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # Params:
         # * value
         is_list = isinstance(exec_context.symbol_table.get('value'), List)  # we get the value and check if it is a list
-        # TRUE and FALSE are defined in src/values/specific_values/number.py
+        # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_list else FALSE.copy())
 
     execute_is_list.param_names = ['value']
@@ -342,7 +311,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # Params:
         # * value
         is_str = isinstance(exec_context.symbol_table.get('value'), String)  # we get the value and check if it is a str
-        # TRUE and FALSE are defined in src/values/specific_values/number.py
+        # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_str else FALSE.copy())
 
     execute_is_str.param_names = ['value']
@@ -355,7 +324,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         is_func = isinstance(exec_context.symbol_table.get('value'), BaseFunction)  # we get the value and check if it
         #                                                                             is a function
-        # TRUE and FALSE are defined in src/values/specific_values/number.py
+        # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_func else FALSE.copy())
 
     execute_is_func.param_names = ['value']
@@ -368,7 +337,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         # we get the value and check if it is None
         is_none = isinstance(exec_context.symbol_table.get('value'), NoneValue)
-        # TRUE and FALSE are defined in src/values/specific_values/number.py
+        # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_none else FALSE.copy())
 
     execute_is_none.param_names = ['value']
@@ -381,7 +350,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         # we get the value and check if it is a module
         is_none = isinstance(exec_ctx.symbol_table.get('value'), Module)
-        # TRUE and FALSE are defined in src/values/specific_values/number.py
+        # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_none else FALSE.copy())
 
     execute_is_module.param_names = ['value']
@@ -1336,7 +1305,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             print("Computing...")
 
         folders = [os.path.abspath(noug_dir + f) for f in
-                   ['/', '/lib_', '/src', '/src/values', '/src/values/functions', '/src/values/specific_values']
+                   ['/', '/lib_', '/src', '/src/values', '/src/values/functions', '/src/values/defined_values']
                    ]
         for folder in folders:
             for file_dir in os.listdir(folder):

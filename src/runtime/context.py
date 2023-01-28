@@ -19,7 +19,7 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.symbol_table import SymbolTable
+from src.runtime.symbol_table import SymbolTable
 # built-in python imports
 import pprint
 

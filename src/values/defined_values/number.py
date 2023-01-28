@@ -19,7 +19,7 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.values.basevalues import Number
+from src.values.basevalues.basevalues import Number
 # built-in python imports
 # no imports
 

@@ -19,8 +19,8 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.token import Token
-from src.token_types import TT
+from src.lexer.token import Token
+from src.lexer.token_types import TT
 # built-in python imports
 # no imports
 

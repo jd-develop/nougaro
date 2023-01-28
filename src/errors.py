@@ -20,7 +20,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.strings_with_arrows import string_with_arrows
-from src.context import Context
+from src.runtime.context import Context
 # built-in python imports
 import os
 import pathlib

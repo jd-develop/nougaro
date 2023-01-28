@@ -19,8 +19,8 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.context import Context
-from src.nodes import Node
+from src.runtime.context import Context
+from src.parser.nodes import Node
 # built-in python imports
 from typing import Protocol, Any
 from colorama import init as colorama_init, Fore
@@ -44,13 +44,13 @@ def is_num(value: Any): return isinstance(value, int) or isinstance(value, float
 
 def does_tok_type_exist(tok_type: str):
     """Return True if the token type exists (e.g. 'TT_EQ' exists, but 'TT_FOO' does not)"""
-    from src.token_types import TT
+    from src.lexer.token_types import TT
     return tok_type in TT
 
 
 def is_keyword(word: str):
     """Return True if the str is a valid Nougaro keyword, such as 'import' or 'if'."""
-    from src.token_types import KEYWORDS
+    from src.lexer.token_types import KEYWORDS
     return word in KEYWORDS
 
 

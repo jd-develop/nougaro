@@ -36,7 +36,7 @@ def string_with_arrows(text: str, pos_start, pos_end) -> str:
     """
     result = ''
 
-    # Calculate indices
+    # Calculate indexes
     idx_start = max(text.rfind('\n', 0, pos_start.index), 0)
     idx_end = text.find('\n', idx_start + 1)
     if idx_end < 0:
@@ -54,7 +54,7 @@ def string_with_arrows(text: str, pos_start, pos_end) -> str:
         result += line + '\n'
         result += ' ' * col_start + '^' * (col_end - col_start)
 
-        # Re-calculate indices
+        # Re-calculate indexes
         idx_start = idx_end
         idx_end = text.find('\n', idx_start + 1)
         if idx_end < 0:

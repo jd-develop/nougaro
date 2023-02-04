@@ -21,7 +21,7 @@
 # nougaro modules imports
 from src.values.basevalues.value import Value
 from src.runtime.runtime_result import RTResult
-from src.errors import RunTimeError, RTArithmeticError, RTIndexError
+from src.errors.errors import RunTimeError, RTArithmeticError, RTIndexError
 # built-in python imports
 # no imports
 

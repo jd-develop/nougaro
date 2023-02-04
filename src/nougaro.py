@@ -25,7 +25,7 @@ from src.parser.parser import Parser
 import src.runtime.interpreter
 from src.runtime.symbol_table import SymbolTable
 from src.runtime.set_symbol_table import set_symbol_table
-from src.errors import *
+from src.errors.errors import *
 from src.values.basevalues.basevalues import String
 # built-in python imports
 import json

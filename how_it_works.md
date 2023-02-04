@@ -16,7 +16,7 @@
 
     KEYWORD, IDENTIFIER, NE, INT, KEYWORD, KEYWORD, IDENTIFIER, PLUSEQ, INT, EOF
 
- The lexer uses the [position class](src/position.py) to do not lose itself in the raw code.
+ The lexer uses the [position class](src/lexer/position.py) to do not lose itself in the raw code.
 
 ### Parser
  After the lexer, the [parser](src/parser/parser.py) converts the tokens into [nodes](src/parser/nodes.py), following some [grammar rules](grammar.txt). Nodes are bigger parts of the code, such as function definitions or binary operators.

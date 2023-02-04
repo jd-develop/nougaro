@@ -26,7 +26,7 @@ from src.values.basevalues.basevalues import *
 from src.values.defined_values.number import *
 from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam
 from src.misc import CustomBuiltInFuncMethodWithNougDirButNotRun, is_keyword, does_tok_type_exist
-from src.errors import RTFileNotFoundError, RTTypeError
+from src.errors.errors import RTFileNotFoundError, RTTypeError
 # built-in python imports
 from os import system as os_system, name as os_name
 import os.path

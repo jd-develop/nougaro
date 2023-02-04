@@ -19,7 +19,7 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.strings_with_arrows import string_with_arrows
+from src.errors.strings_with_arrows import string_with_arrows
 from src.runtime.context import Context
 # built-in python imports
 import os
@@ -27,7 +27,7 @@ import pathlib
 
 
 # parent twice (this file.parent = src, src.parent = nougaro root
-_noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.absolute())
+_noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.parent.absolute())
 with open(os.path.abspath(_noug_dir + "/config/debug.conf")) as debug:
     _PRINT_ORIGIN_FILE = bool(int(debug.read()))
     debug.close()

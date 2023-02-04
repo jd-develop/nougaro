@@ -25,7 +25,7 @@ from src.values.functions.function import Function
 from src.values.functions.base_function import BaseFunction
 from src.constants import PROTECTED_VARS
 from src.parser.nodes import *
-from src.errors import *
+from src.errors.errors import *
 from src.lexer.token_types import TT
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context

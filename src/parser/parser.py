@@ -20,10 +20,10 @@
 # IMPORTS
 # nougaro modules imports
 from src.lexer.token_types import *
-from src.errors import InvalidSyntaxError
+from src.errors.errors import InvalidSyntaxError
 from src.parser.parse_result import ParseResult
 from src.parser.nodes import *  # src.tokens.Token is imported in src.nodes
-from src.position import Position
+from src.lexer.position import Position
 # built-in python imports
 from typing import Any, Iterable, Callable
 

@@ -23,7 +23,7 @@
 # nougaro modules imports
 from src.values.functions.builtin_function import *
 from src.values.tools.py2noug import *
-from src.errors import *
+from src.errors.errors import *
 # Above line : Context, RTResult, errors and values are imported in builtin_function.py
 # built-in python imports
 # no imports

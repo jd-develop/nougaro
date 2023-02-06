@@ -16,6 +16,7 @@ while True then
     var should_continue = False
     
     if calcul == "exit" then break
+    if calcul == "" then continue
     
     # tokenize
     var tokens = []

@@ -681,10 +681,7 @@ class NoneValue(Value):
         self.should_print = should_print
 
     def __repr__(self):
-        if self.should_print:
-            return 'None'
-        else:
-            return None
+        return 'None'
 
     def __str__(self):
         return 'None'

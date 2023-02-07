@@ -52,6 +52,8 @@ class Interpreter:
         symbols_copy: dict = ctx.symbol_table.symbols.copy()
         if '__symbol_table__' in symbols_copy.keys():
             del symbols_copy['__symbol_table__']
+        # print(type(symbols_copy))
+        # print(str(symbols_copy))
         ctx.symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
 
     def visit(self, node: Node, ctx: Context, other_ctx: Context = None):
@@ -467,6 +469,8 @@ class Interpreter:
             )
 
         final_values = []
+        # print(len(final_values))
+        # print(final_values)
         for i, var_name in enumerate(var_names):
             if var_name not in PROTECTED_VARS:  # this constant is the list of all var names you can't modify
                 #                                 (unless you want to break nougaro)

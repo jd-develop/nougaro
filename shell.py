@@ -23,7 +23,7 @@
 # nougaro modules imports
 import src.nougaro as nougaro
 from src.misc import print_in_red
-from src.values.basevalues.basevalues import List
+from src.runtime.values.basevalues.basevalues import List
 # built in python imports
 import json
 import sys

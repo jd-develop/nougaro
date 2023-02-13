@@ -19,10 +19,10 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.values.basevalues.basevalues import Number, String, List, NoneValue, Value, Module
-from src.values.defined_values.number import FALSE
-from src.values.functions.function import Function
-from src.values.functions.base_function import BaseFunction
+from src.runtime.values.basevalues.basevalues import Number, String, List, NoneValue, Value, Module
+from src.runtime.values.defined_values.number import FALSE
+from src.runtime.values.functions.function import Function
+from src.runtime.values.functions.base_function import BaseFunction
 from src.constants import PROTECTED_VARS
 from src.parser.nodes import *
 from src.errors.errors import *

@@ -19,10 +19,10 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.values.functions.base_function import BaseFunction
+from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.context import Context
 from src.runtime.runtime_result import RTResult
-from src.values.basevalues.basevalues import NoneValue
+from src.runtime.values.basevalues.basevalues import NoneValue
 # built-in python imports
 # no imports
 

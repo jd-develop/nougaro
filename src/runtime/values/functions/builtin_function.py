@@ -19,11 +19,11 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.values.functions.base_builtin_func import BaseBuiltInFunction
-from src.values.functions.base_function import BaseFunction
+from src.runtime.values.functions.base_builtin_func import BaseBuiltInFunction
+from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.context import Context
-from src.values.basevalues.basevalues import *
-from src.values.defined_values.number import *
+from src.runtime.values.basevalues.basevalues import *
+from src.runtime.values.defined_values.number import *
 from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam
 from src.misc import CustomBuiltInFuncMethodWithNougDirButNotRun, is_keyword, does_tok_type_exist
 from src.errors.errors import RTFileNotFoundError, RTTypeError
@@ -1304,9 +1304,22 @@ class BuiltInFunction(BaseBuiltInFunction):
         if print_:
             print("Computing...")
 
-        folders = [os.path.abspath(noug_dir + f) for f in
-                   ['/', '/lib_', '/src', '/src/values', '/src/values/functions', '/src/values/defined_values']
-                   ]
+        folders = [
+            os.path.abspath(noug_dir + f) for f in [
+                '/',
+                '/lib_',
+                '/src',
+                '/src/errors',
+                '/src/lexer',
+                '/src/parser',
+                *[
+                    '/src/runtime' + g for g in [
+                        '', '/values', '/values/basevalues', '/values/defined_values', '/values/functions',
+                        '/values/tools'
+                    ]
+                ]
+            ]
+        ]
         for folder in folders:
             for file_dir in os.listdir(folder):
                 if file_dir != "example.noug" and (file_dir.endswith(".py") or file_dir.endswith(".noug")):

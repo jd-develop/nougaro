@@ -19,7 +19,7 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.values.functions.builtin_function import BuiltInFunction
+from src.runtime.values.functions.builtin_function import BuiltInFunction
 # built-in python imports
 # no imports
 

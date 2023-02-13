@@ -20,9 +20,9 @@
 # IMPORTS
 # nougaro modules imports
 from src.runtime.symbol_table import SymbolTable
-from src.values.defined_values.number import *
-from src.values.basevalues.basevalues import String, Value, NoneValue
-from src.values.defined_values.builtin_function import *
+from src.runtime.values.defined_values.number import *
+from src.runtime.values.basevalues.basevalues import String, Value, NoneValue
+from src.runtime.values.defined_values.builtin_function import *
 from src.constants import PROTECTED_VARS
 # built-in python imports
 import platform

@@ -101,6 +101,7 @@ def set_symbol_table(symbol_table: SymbolTable):
                          str(sys.version_info[0]) + "." + str(sys.version_info[1]) + "." + str(sys.version_info[2])
                      ))
     # platform.system() may be 'Linux', 'Windows', 'Darwin', 'Java', etc. according to Python doc
+    # it can also be 'FreeBSD', 'OpenBSD', [add here other OSes where you tested platform.system()]
     symbol_table.set('__base_value__', Value())
 
     # GPL

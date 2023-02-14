@@ -55,7 +55,7 @@ def main():
     #     print(f"Argument {i:>6}: {arg}")
 
     # Uncomment 3 last lines to understand the following code.
-    # Tested on Windows and in WSL. Tested after compiling with Nuitka on Windows.
+    # Tested on Windows and Linux. Tested after compiling with Nuitka on Windows and Linux.
     # if 'shell' in args[0] or 'nougaro' in args[0]:  # shell.py, shell.exe, nougaro.exe, etc.
     #     del args[0]
     del args[0]

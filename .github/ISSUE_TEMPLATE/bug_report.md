@@ -24,9 +24,9 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Your setup (please complete the following information):**
- - OS: [e.g. Ubuntu, Windows...]
- - OS version: [e.g. 22.10, 22.04 LTS, 10 22H2]
- - Nougaro version [e.g. beta 0.12]
+ - OS: [e.g. Ubuntu, Windows, FreeBSD...]
+ - OS version: [e.g. 22.10, 22.04 LTS, 10 22H2, 13]
+ - Nougaro version [e.g. beta 0.13.1]
 
 **Additional context**
 Add any other context about the problem here.

@@ -32,6 +32,7 @@ from os import system as os_system, name as os_name
 import os.path
 import random
 import sys
+import subprocess
 
 
 class BuiltInFunction(BaseBuiltInFunction):
@@ -232,7 +233,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # No params.
         # depends on the os
         # if windows -> 'cls'
-        # if Linux or MacOS -> 'clear'
+        # if Linux, MacOS or UNIX -> 'clear'
         # TODO: find more OSes to include here OR find another way to clear the screen
         os_system('cls' if (os_name.lower() == "nt" or os_name.lower().startswith("windows")) else 'clear')
         return RTResult().success(NoneValue(False))
@@ -1134,19 +1135,29 @@ class BuiltInFunction(BaseBuiltInFunction):
                 license_file.close()
                 return RTResult().success(NoneValue(False))
         else:  # we open the GPL3 in the default system app
+            # todo: test on Linux, MacOS and BSD
+            # tested on Windows
             import platform
             system = platform.system()
             if system == "Darwin":  # macOS
-                import subprocess
-
-                subprocess.call(('open', os.path.abspath(noug_dir + "/LICENSE")))
+                subprocess.run(('open', os.path.abspath(noug_dir + "/LICENSE")))
             elif system == 'Windows':  # Windows
                 print("Make sure to select a *text editor/reader* (like notepad or n++) in the list that will pop :)")
                 os.startfile(os.path.realpath(noug_dir + "/LICENSE"))
             elif system == "Linux":  # Linux
-                import subprocess
-
-                subprocess.call(('xdg-open', os.path.abspath(noug_dir + "/LICENSE")))
+                subprocess.run(('xdg-open', os.path.abspath(noug_dir + "/LICENSE")))
+            elif system == "FreeBSD" or system == "OpenBSD":
+                text_editor = input("Choose your text editor [ee/vi/vim/gedit/cancel] ")
+                if text_editor == "ee":
+                    subprocess.run(('ee', os.path.abspath(noug_dir + "/LICENSE")))
+                elif text_editor == "vi":
+                    subprocess.run(("vi", os.path.abspath(noug_dir + "/LICENSE")))
+                elif text_editor == "vim":
+                    subprocess.run(("vim", os.path.abspath(noug_dir + "/LICENSE")))
+                elif text_editor == "gedit":
+                    subprocess.run(("gedit", os.path.abspath(noug_dir + "/LICENSE")))
+                else:
+                    pass
             else:
                 print(f"<built-in function __gpl__> said:\n"
                       f"Sorry, your OS is not recognized. (platform.system() is '{system}')\n"
@@ -1155,6 +1166,10 @@ class BuiltInFunction(BaseBuiltInFunction):
                       f"To read the license, you can use __gpl__(False) or read it online."
                       f"To read the license online, follow this link:\n"
                       f"https://www.gnu.org/licenses/gpl-3.0.txt")
+                print("However, you can enter the command to open your text editor, the argument of the file will be "
+                      "automatically added.")
+                command = input("Enter the command of your text editor (example: nano, vim, ee): ")
+                subprocess.run((command, os.path.abspath(noug_dir + "/LICENSE")))
             return RTResult().success(NoneValue(False))
 
     execute___gpl__.param_names = []

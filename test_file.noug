@@ -220,7 +220,14 @@ assert __how_many_lines_of_code__(False) != 0
 assert __how_many_lines_of_code__(False) > 10000  # yes I know, I write a lot of code ;)
 
 # builtin variables
-assert __os_name__ in ["Windows", "Linux", "Darwin", "Java"], "Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html"
+assert __os_name__ in [\
+    "Windows",\
+    "Linux",\
+    "Darwin",\
+    "Java",\
+    "OpenBSD",\
+    "FreeBSD"],\
+"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html"
 
 # lists
 var list_ = [3, 4]

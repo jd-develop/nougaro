@@ -29,7 +29,7 @@ python -m pip install --upgrade pip nuitka wheel ordered-set colorama
 rem We delete useless files and directories
 for %%y in (.\.gitignore, .\.gitattributes, example_file, grammar.txt, tests.noug, todo.md) do if exist %%y (del %%y)
 
-for %%y in (.\.git, .\.github, .\.vscode, .\.idea, .\__pycache__, src\__pycache__, src\values\__pycache__, src\values\functions\__pycache__, src\values\specific_values\__pycache__, lib_\__pycache__, sandbox) do if exist %%y (rmdir /s /q %%y)
+for %%y in (.\.git, .\.github, .\.vscode, .\.idea, .\__pycache__, src\__pycache__, src\errors\__pycache__, src\lexer\__pycache__, src\parser\__pycache__, src\runtime\__pycache__, src\values\__pycache__, src\values\basevalues\__pycache__, src\values\defined_values\__pycache__, src\values\functions\__pycache__, lib_\tools\__pycache__, sandbox) do if exist %%y (rmdir /s /q %%y)
 
 rem Then we ask for the version
 set /p NOUGVERSION="Nougaro version: "

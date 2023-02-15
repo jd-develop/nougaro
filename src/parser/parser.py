@@ -883,6 +883,12 @@ class Parser:
             if result.error is not None:  # We check for errors
                 return result
             return result.success(func_def)
+        # class_def
+        elif token.matches(TT["KEYWORD"], 'class'):
+            class_def = result.register(self.class_def())
+            if result.error is not None:  # We check for errors
+                return result
+            return result.success(class_def)
 
         if self.current_token.matches(TT["KEYWORD"], "else"):
             return result.failure(
@@ -1601,6 +1607,119 @@ class Parser:
             param_names_tokens,
             body,
             False
+        ))
+
+    def class_def(self) -> ParseResult:
+        """
+            KEYWORD:CLASS IDENTIFIER?
+            (LPAREN IDENTIFIER? RPAREN)?
+            (ARROW expr)
+          | (NEWLINE statements KEYWORD:END)
+        """
+        result = ParseResult()
+
+        if not self.current_token.matches(TT["KEYWORD"], 'class'):
+            return result.failure(
+                InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected 'class'.", "src.parser.Parser.class_def"
+                )
+            )
+        class_tok = self.current_token.copy()
+
+        result.register_advancement()
+        self.advance()
+
+        # IDENTIFIER?
+        if self.current_token.type == TT["IDENTIFIER"]:
+            var_name_token = self.current_token
+            result.register_advancement()
+            self.advance()
+        else:
+            var_name_token = None
+
+        # (LPAREN IDENTIFIER? RPAREN)?
+        # LPAREN
+        if self.current_token.type == TT["LPAREN"]:
+            result.register_advancement()
+            self.advance()
+
+            # IDENTIFIER?
+            if self.current_token.type == TT["IDENTIFIER"]:
+                parent_var_name_tok = self.current_token
+                result.register_advancement()
+                self.advance()
+            else:
+                parent_var_name_tok = None
+
+            # RPAREN
+            if self.current_token.type != TT["RPAREN"]:
+                return result.failure(
+                    InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        "expected ')'.", "src.parser.Parser.class_def"
+                    )
+                )
+
+            result.register_advancement()
+            self.advance()
+        else:
+            parent_var_name_tok = None
+
+        # ARROW expr
+        if self.current_token.type == TT["ARROW"]:
+            result.register_advancement()
+            self.advance()
+
+            # expr
+            body = result.register(self.expr())
+            if result.error is not None:
+                return result
+
+            return result.success(ClassNode(
+                var_name_token,
+                parent_var_name_tok,
+                body,
+                should_auto_return=True
+            ))
+
+        # NEWLINE statements KEYWORD:END
+        if self.current_token.type != TT["NEWLINE"]:
+            return result.failure(
+                InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected '->' or new line.", "src.parser.Parser.func_def"
+                )
+            )
+
+        result.register_advancement()
+        self.advance()
+
+        self.then_s.append((class_tok.pos_start, class_tok.pos_end))
+
+        # statements
+        body = result.register(self.statements(stop=[(TT["KEYWORD"], 'end')]))
+        if result.error is not None:
+            return result
+
+        # KEYWORD:END
+        if not self.current_token.matches(TT["KEYWORD"], 'end'):
+            return result.failure(
+                InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected 'end'.", "src.parser.Parser.func_def"
+                )
+            )
+        del self.then_s[-1]
+
+        result.register_advancement()
+        self.advance()
+
+        return result.success(ClassNode(
+            var_name_token,
+            parent_var_name_tok,
+            body,
+            should_auto_return=False
         ))
 
     def bin_op(

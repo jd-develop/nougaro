@@ -40,6 +40,7 @@ atom       : (INT|FLOAT)(E_INFIX INT)?
            : while_expr
            : do_expr
            : func_def
+           : class_def
 
 list_expr  : LSQUARE (MUL? expr (COMMA MUL? expr)?*)? RSQUARE
 
@@ -67,5 +68,10 @@ do_expr    : KEYWORD:DO (statement | (NEWLINE statements NEWLINE)) KEYWORD:THEN 
 
 func_def   : KEYWORD:DEF IDENTIFIER?
              LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
+             (ARROW expr)
+           | (NEWLINE statements KEYWORD:END)
+
+class_def  : KEYWORD:CLASS IDENTIFIER?
+             (LPAREN IDENTIFIER? RPAREN)?
              (ARROW expr)
            | (NEWLINE statements KEYWORD:END)

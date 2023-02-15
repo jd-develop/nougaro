@@ -117,6 +117,8 @@ KEYWORDS = [                        # List of all the keywords (TT["KEYWORD)
     # functions
     'def',
     'return',
+    # classes
+    'class',
     # modules
     'import',
     'export',

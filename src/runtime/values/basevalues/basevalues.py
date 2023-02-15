@@ -576,10 +576,12 @@ class Module(Value):
 
 
 class Constructor(Value):
-    def __init__(self, name, attributes: dict):
+    def __init__(self, name, body_node, attributes: dict, parent=None):
         super().__init__()
-        self.name = name
+        self.name = name if name is not None else '<class>'
+        self.body_node = body_node
         self.attributes = attributes.copy()
+        self.parent = parent
         self.type_ = "constructor"
 
     def __repr__(self):
@@ -617,7 +619,7 @@ class Constructor(Value):
 
     def copy(self):
         """Return a copy of self"""
-        copy = Constructor(self.name, self.attributes)
+        copy = Constructor(self.name, self.body_node, self.attributes, self.parent)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
         copy.module_context = self.module_context
@@ -628,10 +630,7 @@ class Object(Value):
     def __init__(self, attributes: dict):
         super().__init__()
         self.attributes = attributes.copy()
-        try:
-            constructor = self.attributes['__constructor__']
-        except KeyError:
-            constructor = self.attributes['__constructor__'] = Constructor("Object", self.attributes)
+        constructor = self.attributes['__constructor__']
         constructor: Constructor
         self.type_ = constructor.name
 

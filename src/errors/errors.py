@@ -39,6 +39,8 @@ class Error:
         """Returns a printable clean error message with all the information.
         It includes the file name, the problematic line number and the line itself, the error name and the details.
         """
+        assert self.pos_start is not None, f"error from {self.origin_file}, {self.details=}"
+        assert self.pos_end is not None, f"error from {self.origin_file}, {self.details=}"
         string_line = string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end)
         while string_line[0] in " ":
             # delete spaces at the start of the str.
@@ -90,6 +92,8 @@ class RunTimeError(Error):
         It includes a traceback with the file(s) name, the line(s) number with and the line itself,
         the error name and the details.
         """
+        assert self.pos_start is not None, f"error from {self.origin_file}, {self.details=}"
+        assert self.pos_end is not None, f"error from {self.origin_file}, {self.details=}"
         string_line = string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end)
         while string_line[0] in " ":
             # delete spaces at the start of the str.

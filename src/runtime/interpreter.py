@@ -338,7 +338,9 @@ class Interpreter:
         error = None
 
         if node.op_token.type == TT["MINUS"]:
-            value, error = value.multiplied_by(Number(-1))  # -x is like x*-1
+            value, error = value.multiplied_by(
+                Number(-1).set_pos(node.op_token.pos_start, node.op_token.pos_end)
+            )  # -x is like x*-1
         elif node.op_token.matches(TT["KEYWORD"], 'not'):
             value = FALSE if value.is_true() else TRUE
         elif node.op_token.type == TT["BITWISENOT"]:

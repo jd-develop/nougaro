@@ -286,11 +286,14 @@ class Value:
 
     def illegal_operation(self, other=None):
         """Returns a RunTimeError with message 'illegal operation (with self/between self and other)"""
+        assert self.pos_start is not None
         if other is None:
+            assert self.pos_end is not None
             return RunTimeError(
                 self.pos_start, self.pos_end, f'illegal operation with {self.type_}.', self.context,
                 origin_file="src.values.value.Value.illegal_operation"
             )
+        assert other.pos_end is not None
         return RunTimeError(
             self.pos_start, other.pos_end, f'illegal operation between {self.type_} and {other.type_}.', self.context,
             origin_file="src.values.value.Value.illegal_operation"

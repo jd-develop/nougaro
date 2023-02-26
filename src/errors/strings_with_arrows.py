@@ -6,6 +6,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+from src.lexer.position import Position
+
 
 def string_with_arrows(text: str, pos_start, pos_end) -> str:
     """Generate a string with arrows under it.
@@ -24,6 +26,8 @@ def string_with_arrows(text: str, pos_start, pos_end) -> str:
     :param pos_end: position end
     :return: str as defined above
     """
+    assert isinstance(pos_start, Position), f"pos_start is not a Position object. {text=}. Please report this bug."
+    assert isinstance(pos_end, Position), f"pos_end is not a Position object. {text=}. Please report this bug."
     result = ''
 
     # Calculate indexes

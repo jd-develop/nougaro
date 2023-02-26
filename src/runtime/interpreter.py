@@ -662,7 +662,10 @@ class Interpreter:
             if result.loop_should_break:
                 break  # will break the 'while condition()' -> the interpreted 'for' loop is break
 
-            elements.append(value)
+            if not isinstance(value, NoneValue):
+                elements.append(value)
+            elif value.should_print:
+                elements.append(value)
 
         return result.success(
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
@@ -694,7 +697,10 @@ class Interpreter:
                 if result.loop_should_break:
                     break  # will break the 'for e in iterable_.elements' -> the interpreted 'for' loop is break
 
-                elements.append(value)
+                if not isinstance(value, NoneValue):
+                    elements.append(value)
+                elif value.should_print:
+                    elements.append(value)
 
             return result.success(
                 List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
@@ -716,7 +722,10 @@ class Interpreter:
                 if result.loop_should_break:
                     break  # will break the 'for e in iterable_.to_str()' -> the interpreted 'for' loop is break
 
-                elements.append(value)
+                if not isinstance(value, NoneValue):
+                    elements.append(value)
+                elif value.should_print:
+                    elements.append(value)
 
             return result.success(
                 List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
@@ -752,7 +761,10 @@ class Interpreter:
             if result.loop_should_break:
                 break  # will break the 'while True' -> the interpreted 'while' loop is break
 
-            elements.append(value)
+            if not isinstance(value, NoneValue):
+                elements.append(value)
+            elif value.should_print:
+                elements.append(value)
 
         return result.success(
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
@@ -792,7 +804,10 @@ class Interpreter:
                 if result.loop_should_break:
                     break  # will break the 'while True' -> the interpreted 'while' loop is break
 
-                elements.append(value)
+                if not isinstance(value, NoneValue):
+                    elements.append(value)
+                elif value.should_print:
+                    elements.append(value)
 
         return result.success(
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)

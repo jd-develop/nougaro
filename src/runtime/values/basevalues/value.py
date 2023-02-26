@@ -280,6 +280,10 @@ class Value:
         """Return PYTHON BOOLEAN True or False depending on if the value is the NOUGARO VALUE for True or not"""
         return False
 
+    def is_false(self):
+        """Return PYTHON BOOLEAN True or False depending on if the value is the NOUGARO VALUE for False or not"""
+        return not self.is_true()
+
     def illegal_operation(self, other=None):
         """Returns a RunTimeError with message 'illegal operation (with self/between self and other)"""
         if other is None:

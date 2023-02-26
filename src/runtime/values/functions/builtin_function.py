@@ -1220,7 +1220,9 @@ class BuiltInFunction(BaseBuiltInFunction):
         if should_i_return.is_true():
             return self.execute_run(exec_ctx, run, noug_dir)
         else:
-            self.execute_run(exec_ctx, run, noug_dir)
+            result = self.execute_run(exec_ctx, run, noug_dir)
+            if result.error is not None:
+                return result
             return RTResult().success(NoneValue(False))
 
     execute___test__.param_names = []

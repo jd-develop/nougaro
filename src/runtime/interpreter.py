@@ -10,7 +10,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.runtime.values.basevalues.basevalues import Number, String, List, NoneValue, Value, Module, Constructor, Object
-from src.runtime.values.defined_values.number import FALSE
+from src.runtime.values.defined_values.number import FALSE, TRUE
 from src.runtime.values.functions.function import Function
 from src.runtime.values.functions.base_function import BaseFunction
 from src.constants import PROTECTED_VARS
@@ -321,7 +321,7 @@ class Interpreter:
         result = RTResult()
         if isinstance(node.node, list):
             if len(node.node) == 1:
-                number = result.register(self.visit(node.node[0], ctx))
+                value = result.register(self.visit(node.node[0], ctx))
             else:
                 print(ctx)
                 print(
@@ -331,23 +331,23 @@ class Interpreter:
                     f"information below.")
                 raise Exception("len(node.node) != 1 in src.interpreter.Interpreter.visit_UnaryOpNode.")
         else:
-            number = result.register(self.visit(node.node, ctx))
+            value = result.register(self.visit(node.node, ctx))
         if result.should_return():
             return result
 
         error = None
 
         if node.op_token.type == TT["MINUS"]:
-            number, error = number.multiplied_by(Number(-1))  # -x is like x*-1
+            value, error = value.multiplied_by(Number(-1))  # -x is like x*-1
         elif node.op_token.matches(TT["KEYWORD"], 'not'):
-            number, error = number.not_()
+            value = FALSE if value.is_true() else TRUE
         elif node.op_token.type == TT["BITWISENOT"]:
-            number, error = number.bitwise_not()
+            value, error = value.bitwise_not()
 
         if error is not None:  # there is an error
             return result.failure(error)
         else:
-            return result.success(number.set_pos(node.pos_start, node.pos_end))
+            return result.success(value.set_pos(node.pos_start, node.pos_end))
 
     def visit_VarAccessNode(self, node: VarAccessNode, ctx: Context) -> RTResult:
         """Visit VarAccessNode"""
@@ -609,7 +609,7 @@ class Interpreter:
                 ctx, "src.interpreter.Interpreter.visit_Assert_Node"
             ))
 
-        if not assertion.is_true():  # the assertion is not true, we return an error
+        if assertion.is_false():  # the assertion is not true, we return an error
             return result.failure(RTAssertionError(
                 assertion.pos_start, assertion.pos_end,
                 errmsg.value,

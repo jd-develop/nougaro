@@ -11,7 +11,7 @@
 # nougaro modules imports
 from src.runtime.values.basevalues.value import Value
 from src.runtime.runtime_result import RTResult
-from src.errors.errors import RunTimeError, RTArithmeticError, RTIndexError
+from src.errors.errors import RunTimeError, RTArithmeticError, RTIndexError, RTOverflowError
 # built-in python imports
 # no imports
 
@@ -152,8 +152,8 @@ class Number(Value):
             try:
                 return Number(self.value + other.value).set_context(self.context), None
             except OverflowError as e:
-                return None, RunTimeError(self.pos_start, self.pos_end, f"overflow: {e}", self.context,
-                                          origin_file="src.values.basevalues.Number.added_to")
+                return None, RTOverflowError(self.pos_start, self.pos_end, e, self.context,
+                                             origin_file="src.values.basevalues.Number.added_to")
         else:
             return None, self.illegal_operation(other)
 
@@ -182,7 +182,13 @@ class Number(Value):
                     other.pos_start, other.pos_end, 'division by zero is not possible.', self.context,
                     "src.values.basevalues.Number.dived_by"
                 )
-            return Number(self.value / other.value).set_context(self.context), None
+            try:
+                return Number(self.value / other.value).set_context(self.context), None
+            except OverflowError as e:  # I hate python
+                return None, RTOverflowError(
+                    self.pos_start, other.pos_end, e, self.context,
+                    "src.values.basevalues.Number.dived_by"
+                )
         else:
             return None, self.illegal_operation(other)
 

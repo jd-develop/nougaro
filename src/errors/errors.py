@@ -180,3 +180,11 @@ class RTAttributeError(RunTimeError):
         super().__init__(pos_start, pos_end, errmsg, context, rt_error=False, error_name="AttributeError",
                          origin_file=origin_file)
         self.context = context
+
+
+class RTOverflowError(RunTimeError):
+    """OverflowError."""
+    def __init__(self, pos_start, pos_end, errmsg, context: Context, origin_file: str = "(undetermined)"):
+        super().__init__(pos_start, pos_end, errmsg, context, rt_error=False, error_name="OverflowError",
+                         origin_file=origin_file)
+        self.context = context

@@ -142,7 +142,10 @@ class Number(Value):
             self.type_ = 'float'
 
     def __repr__(self):
-        return str(self.value)
+        try:
+            return str(self.value)
+        except ValueError:
+            return "This number can not be displayed. However, Nougaro can deal with it."
 
     def added_to(self, other):  # ADDITION
         if isinstance(other, Number):
@@ -293,7 +296,7 @@ class Number(Value):
         return Number(abs(self.value))
 
     def to_str_(self):
-        return String(str(self.value)).set_context(self.context), None
+        return String(self.__repr__()).set_context(self.context), None
 
     def to_int_(self):
         return Number(int(self.value)).set_context(self.context), None

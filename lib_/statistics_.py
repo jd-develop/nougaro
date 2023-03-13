@@ -18,6 +18,7 @@ from lib_.lib_to_make_libs import *
 # Comment about the above line : Context, RTResult and values are imported in lib_to_make_libs.py
 # built-in python imports
 import statistics
+from typing import Literal
 
 
 class RTStatisticsError(RunTimeError):
@@ -383,12 +384,14 @@ class Statistics(ModuleFunction):
                 exec_ctx, "lib_.statistics_.Statistics.execute_statistics_quantiles"
             ))
 
-        if method.value not in ['exclusive', 'inclusive']:  # the method should be "inclusive" or "exclusive"
+        method_name = method.value
+        if method_name not in ['exclusive', 'inclusive']:  # the method should be "inclusive" or "exclusive"
             return RTResult().failure(RTStatisticsError(
                 method.pos_start, method.pos_end,
                 f"unknown method: {method.value}.",
                 exec_ctx, "lib_.statistics_.Statistics.execute_statistics_quantiles"
             ))
+        method_name: Literal["inclusive", "exclusive"]
 
         data_ = []
         for e in data.elements:

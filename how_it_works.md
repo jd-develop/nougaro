@@ -27,7 +27,7 @@
 
     list:[(bin_op_comp:(while:(bin_op_comp:(var_access:[identifier:"a"], !=, num:int:10) then:var_assign:([identifier:"a"] += [bin_op_comp:(num:int:1)]))), False)]
 
- Ouch... Let's organise this mess to explain it easier.
+ Ouch... Let's organize this mess to explain it easier.
 
     list:[
       (

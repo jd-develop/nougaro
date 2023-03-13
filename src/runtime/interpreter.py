@@ -989,7 +989,7 @@ class Interpreter:
                     try:  # we try to return the value at the index
                         return_value = value_to_call[index]
                         return result.success(return_value)
-                    except Exception:  # index error
+                    except IndexError:  # index error
                         return result.failure(
                             RTIndexError(
                                 node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
@@ -1011,7 +1011,7 @@ class Interpreter:
                         index = index.value
                         try:  # we try to return the value at the given index
                             return_value.append(value_to_call[index])
-                        except Exception:  # index error
+                        except IndexError:  # index error
                             return result.failure(
                                 RTIndexError(
                                     arg_node[0].pos_start, arg_node[0].pos_end,
@@ -1046,7 +1046,7 @@ class Interpreter:
                             node.pos_start, node.pos_end
                         )
                         return result.success(return_value)
-                    except Exception:  # index error
+                    except IndexError:  # index error
                         return result.failure(
                             RTIndexError(
                                 node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
@@ -1068,7 +1068,7 @@ class Interpreter:
                         index = index.value
                         try:  # we try to return the value at the given index
                             return_value += value_to_call.value[index]
-                        except Exception:  # index error
+                        except IndexError:  # index error
                             return result.failure(
                                 RTIndexError(
                                     arg_node[0].pos_start, arg_node[0].pos_end,

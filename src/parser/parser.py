@@ -101,7 +101,7 @@ class Parser:
 
             # we check if we have to stop parsing
             # in stop there can be tok types or tuples like (tok_type, tok_value)
-            # I made a HUGE optimisation here: there was a 'for' loop (git blame for date)
+            # I made a HUGE optimization here: there was a 'for' loop (git blame for date)
             if self.current_token.type in stop or (self.current_token.type, self.current_token.value) in stop:
                 break
             else:

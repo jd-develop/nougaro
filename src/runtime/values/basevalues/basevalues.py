@@ -13,7 +13,7 @@ from src.runtime.values.basevalues.value import Value
 from src.runtime.runtime_result import RTResult
 from src.errors.errors import RunTimeError, RTArithmeticError, RTIndexError, RTOverflowError
 # built-in python imports
-# no imports
+from typing import Literal
 
 
 # IMPORTANT NOTE : THE DOC FOR ALL THE FUNCTIONS IN THIS FILE ARE IN value.py :)
@@ -22,7 +22,7 @@ from src.errors.errors import RunTimeError, RTArithmeticError, RTIndexError, RTO
 class String(Value):
     def __init__(self, value):
         super().__init__()
-        self.value: str = value
+        self.value: str | Literal = value
         self.type_ = "str"
 
     def __repr__(self):
@@ -401,7 +401,7 @@ class List(Value):
             try:
                 new_list.elements.pop(other.value)
                 return new_list, None
-            except Exception:
+            except IndexError:
                 return None, RTIndexError(
                     other.pos_start, other.pos_end,
                     f'pop index {other.value} out of range.',
@@ -429,7 +429,7 @@ class List(Value):
         if isinstance(other, Number):
             try:
                 return self.elements[other.value], None
-            except Exception:
+            except IndexError:
                 return None, RTIndexError(
                     other.pos_start, other.pos_end,
                     f'list index {other.value} out of range.',

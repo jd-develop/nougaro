@@ -49,7 +49,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             result.register(self.check_and_populate_args(method.param_names, args, exec_context,
                                                          optional_params=method.optional_params,
                                                          should_respect_args_number=method.should_respect_args_number))
-        except Exception:  # it is self.no_visit_method :)
+        except AttributeError:  # it is self.no_visit_method :)
             method(exec_context)
 
         # if there is an error
@@ -127,7 +127,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         if value is not None:  # if the value is defined
             try:
                 print(value.to_str())
-            except Exception:
+            except AttributeError:
                 print(str(value))
         else:  # the value is not defined, we just print a new line like in regular print() python builtin func
             print()
@@ -146,7 +146,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             try:
                 print(value.to_str())
                 return RTResult().success(String(value.to_str()))
-            except Exception:
+            except AttributeError:
                 print(str(value))
                 return RTResult().success(String(str(value)))
         else:
@@ -401,7 +401,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         try:  # we try to pop the element
             list_.elements.pop(index.value)
             list_.update_should_print()
-        except Exception:  # except if the index is out of range
+        except IndexError:  # except if the index is out of range
             return RTResult().failure(RTIndexError(
                 list_.pos_start, index.pos_end,
                 f'pop index {index.value} out of range.',
@@ -424,7 +424,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         value = exec_context.symbol_table.get('value')
         index = exec_context.symbol_table.get('index')
 
-        # we check if everything ok
+        # we check if everything OK
         if not isinstance(list_, List):
             return RTResult().failure(RTTypeError(
                 list_.pos_start, list_.pos_end,
@@ -442,7 +442,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_insert"
             ))
 
-        # if everything ok, we insert the element to the list at the right index
+        # if everything OK, we insert the element to the list at the right index
         list_.elements.insert(index.value, value)
         list_.update_should_print()
         return RTResult().success(list_)
@@ -541,7 +541,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         try:
             return RTResult().success(list_[index_.value])  # we return the element at the index
-        except Exception:  # except if the index is out of range
+        except IndexError:  # except if the index is out of range
             return RTResult().failure(RTIndexError(
                 list_.pos_start, index_.pos_end,
                 f'list index {index_.value} out of range.',
@@ -582,7 +582,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 )
             )
 
-        # everything ok : we replace the element
+        # everything OK : we replace the element
         try:
             list_.elements[index_.value] = value
             list_.update_should_print()

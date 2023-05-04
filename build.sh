@@ -10,10 +10,18 @@
 
 echo "WARNING: please execute this script ONLY in a safe environnement, like in a sandbox directory."
 echo "WARNING: this script may use Internet connection, and having an Internet connection is recommended. However, you can execute the script without any Internet connection."
-read -p "Continue? [y/n] " -r c
+read -p "Continue? [y/N] " -r c
 
-if [[ $c == [Yy] ]]; then
-    python3 -m pip install --upgrade pip wheel colorama nuitka
+echo "WARNING: a pip command will be executed (see below) and may (in edge cases) break your python installation or your OS (it won't)"
+echo "WARNING: this is the command : 'python3 -m pip install --upgrade pip wheel colorama nuitka --break-system-packages'"
+read -p "Continue? [y/N] " -r d
+
+echo "WARNING: please make sure patchelf is installed on your system."
+echo "WARNING: to install it, execute 'apt/dnf/yum install patchelf'"
+read -p "Continue? [y/N] " -r d
+
+if [[ $c == [Yy] && $d == [Yy] ]]; then
+    python3 -m pip install --upgrade pip wheel colorama nuitka --break-system-packages
 
     read -p "Nougaro version: " -r nougversion
     read -p "Phase (beta for example): " -r nougphase

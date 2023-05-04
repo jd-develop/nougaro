@@ -223,7 +223,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # No params.
         # depends on the os
         # if windows -> 'cls'
-        # if Linux, MacOS or UNIX -> 'clear'
+        # if Linux, macOS or UNIX -> 'clear'
         # TODO: find more OSes to include here OR find another way to clear the screen
         os_system('cls' if (os_name.lower() == "nt" or os_name.lower().startswith("windows")) else 'clear')
         return RTResult().success(NoneValue(False))
@@ -1125,8 +1125,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                 license_file.close()
                 return RTResult().success(NoneValue(False))
         else:  # we open the GPL3 in the default system app
-            # todo: test on Linux, MacOS and BSD
-            # tested on Windows
+            # todo: test on macOS and BSD
+            # tested on Windows, Linux
             import platform
             system = platform.system()
             if system == "Darwin":  # macOS

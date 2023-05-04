@@ -1,4 +1,5 @@
 # a simple Reverse Polish Notation calculator
+import math
 
 print()
 print("Welcome to the Nougaro calculator!")
@@ -67,18 +68,34 @@ while True then
             end
         elif char == '.' then
             append(tokens, '.')
-        elif char == " " then
+        elif char == " " or char == chr(8239) or char == chr(160) then  # the 2 others are NNBSP and NBSP
             append(tokens, "space")
         elif char in "+-*/^" then
             append(tokens, char)
         elif char == 'a' then
             append(tokens, char)
-        elif char == 'n' and tokens(-1) == "a" then
+        elif char == 'n' and len(tokens) > 0 and tokens(-1) == "a" then
             replace(tokens, -1, 'an')
-        elif char == 's' and tokens(-1) == "an" then
+        elif char == 's' and len(tokens) > 0 and tokens(-1) == "an" then
             replace(tokens, -1, 'ans')
+        elif char == 's' then
+            append(tokens, char)
+        elif char == 'q' and len(tokens) > 0 and tokens(-1) == "s" then
+            replace(tokens, -1, "sq")
+        elif char == "r" and len(tokens) > 0 and tokens(-1) == "sq" then
+            replace(tokens, -1, "sqr")
+        elif char == "t" and len(tokens) > 0 and tokens(-1) == "sqr" then
+            replace(tokens, -1, "sqrt")
+        elif char == "p" then
+            append(tokens, char)
+        elif char == "i" and len(tokens) > 0 and tokens(-1) == "p" then
+            replace(tokens, -1, "pi")
+        elif char == "\t" then
+            print("Error: use spaces instead of tabulations.")
+            var should_continue = True
+            break
         else
-            print("Error: illegal char " + char)
+            print("Error: illegal char: " + char)
             var should_continue = True
             break
         end
@@ -92,6 +109,16 @@ while True then
     for token in tokens then
         if is_num(token) then
             append(stack, token)
+        elif token == "sqrt" and len(stack) > 0 and is_num(stack(-1)) then
+            if stack(-1) >= 0 then
+                replace(stack, -1, math.sqrt(stack(-1)))
+            else
+                print("Error: a negative number (" + str(stack(-1)) + ") doesn't have a square root.")
+                var should_continue = True
+                break
+           end
+        elif token == "pi" then
+           append(stack, math.pi)
         elif token == "ans" then
             append(stack, answer)
         elif token == "space" then
@@ -121,6 +148,10 @@ while True then
                 pop(stack, -1)
                 pop(stack, -1)
                 append(stack, result)
+            elif token == "a" or token == "s" or token == "p" then
+                print("Error: illegal char: " + token)
+                var should_continue = True
+                break
             else
                 print("Error")
                 var should_continue = True

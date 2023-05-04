@@ -385,7 +385,7 @@ class Lexer:
         while self.current_char != quote or escape_character:
             if self.current_char is None:  # EOF: the string was not closed.
                 return None, InvalidSyntaxError(
-                    pos_start, self.pos,
+                    pos_start, pos_start.copy().advance(),
                     f"{other_quote}{quote}{other_quote} was never closed.",
                     "src.lexer.Lexer.make_string"
                 )

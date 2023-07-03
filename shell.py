@@ -140,7 +140,7 @@ def main():
                     print("WARNING: Looks like something went wrong. Don't panic, and just report this bug at:\n"
                           "https://jd-develop.github.io/nougaro/bugreport.html.\n"
                           "Error details: result from src.nougaro.run in shell is not a List.")
-                    print(f"The actual result is {result}, error is {error}.")
+                    print(f"The actual result is {result}, of type {type(result)}, error is {error}.")
                     continue
             else:  # there is no error nor result. If you know when that happens, tell me, please.
                 continue
@@ -162,5 +162,5 @@ def main():
             print_in_red(error.as_string())
 
 
-if __name__ == '__main__':  # ond day, someone told me that it was good to do that
+if __name__ == '__main__':  # SOMEBODY ONCE TOLD ME it was good to do that
     main()

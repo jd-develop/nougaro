@@ -22,7 +22,7 @@ from src.errors.errors import *
 # LEXER
 # ##########
 class Lexer:
-    """Transforms code into a list of tokens -lexical units-"""
+    """Transforms code into a list of tokens (lexical units)"""
     def __init__(self, file_name: str, text: str):
         self.file_name: str = file_name  # name of the file we're executing
         self.text: str = text  # raw code we have to execute

@@ -23,7 +23,7 @@
  Un langage de programmation. Interpréteur écrit en Python.
 
 ### Modules tiers
- Modules pas toujours fournis avec Python (pourquoi ?):
+ Modules pas toujours fournis avec Python (pourquoi ?):
   * `colorama` (`pip install colorama`)
 
  Sous Linux (optionnel):
@@ -33,7 +33,7 @@
  Exécutez le shell avec `python3 shell.py`. Ouvrez des fichiers avec `python3 shell.py nomdufichier.extention`.
  Généralement, on utilise l'extension `.noug` pour les fichiers Nougaro.
  
- Le code est compilé pour Windows et Linux. Disponible dans l'onglet [releases](https://github.com/jd-develop/nougaro/releases/) !
+ Le code est compilé pour Windows et Linux. Disponible dans l'onglet [releases](https://github.com/jd-develop/nougaro/releases/) !
  
  Minimum : Python 3.10
  

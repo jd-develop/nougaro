@@ -91,6 +91,12 @@ while True then
             append(tokens, char)
         elif char == "i" and len(tokens) > 0 and tokens(-1) == "p" then
             replace(tokens, -1, "pi")
+        elif char == "m" then
+            append(tokens, char)
+        elif char == "o" and len(tokens) > 0 and tokens(-1) == "m" then
+            replace(tokens, -1, "mo")
+        elif char == "d" and len(tokens) > 0 and tokens(-1) == "mo" then
+            replace(tokens, -1, "mod")
         elif char == "\t" then
             print("Error: use spaces instead of tabulations.")
             var should_continue = True
@@ -122,6 +128,13 @@ while True then
            append(stack, math.pi)
         elif token == "ans" then
             append(stack, answer)
+        elif token == "mod" and len(stack) > 1 and is_num(stack(-1)) and is_num(stack(-2)) then
+            var num1 = stack(-2)
+            var num2 = stack(-1)
+            var mod = num1 % num2
+            pop(stack, -1)
+            pop(stack, -1)
+            append(stack, mod)
         elif token == "space" then
             void()
         else

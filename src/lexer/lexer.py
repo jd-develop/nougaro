@@ -559,7 +559,7 @@ class Lexer:
                 return None, InvalidSyntaxError(
                     pos_start,
                     self.pos,
-                    f"expected '=' after '<<', got '{self.current_char}.",
+                    f"expected '=' after '<<', got '{self.current_char}'.",
                     "src.lexer.Lexer.make_less_than"
                 )
 

@@ -8,8 +8,8 @@
 import random
 
 def ipsum(paragraphs)
-    assert is_int(paragraphs), "first argument of function 'lorem_ipsum' SHOULD be an integer."
-    assert paragraphs > 0, "first argument of function 'lorem_ipsum' SHOULD be greater than 0."
+    assert is_int(paragraphs), "first argument of function 'lorem.ipsum' SHOULD be an integer."
+    assert paragraphs > 0, "first argument of function 'lorem.ipsum' SHOULD be greater than 0."
     var lorem_sentences = [\
         "Quisque vitae varius ex, eu volutpat orci.",\
         "Aenean ullamcorper orci et vulputate fermentum.",\
@@ -41,7 +41,7 @@ def ipsum(paragraphs)
             end
             
             var last_sentence = sentence
-            if i != 0 and j ==0 then var last_paragraph_first_sentence = sentence
+            if i != 0 and j == 0 then var last_paragraph_first_sentence = sentence
             
             var paragraph += sentence + if j != sentences-1 then ' ' else ''
         end

@@ -391,10 +391,10 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         if index is None:
             index = Number(-1)
-        if not isinstance(index, Number):  # we check if the index is a number
+        if not isinstance(index, Number) or index.type_ != "int":  # we check if the index is an int
             return RTResult().failure(RTTypeError(
                 index.pos_start, index.pos_end,
-                "second argument of the built-in function 'pop' must be a number.",
+                "second argument of the built-in function 'pop' must be an integer.",
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_pop"
             ))
 

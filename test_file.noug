@@ -112,6 +112,8 @@ assert not (False and True)
 assert False xor True
 assert not (True xor True)
 assert not False
+assert True or 1/0
+assert not (False and 1/0)
 var a = 1
 assert (is_int(a) and round(a)) == True
 var a = "str"
@@ -221,7 +223,8 @@ print("OK builtin funcs 5")
 
 assert ord('a') == 0x61
 assert chr(0x61) == 'a'
-assert chr(0x48) + chr(0b1100101) + 2*chr(0o154) + chr(111) + chr(32) + chr(84) + chr(111) + chr(117) + chr(108) + chr(111) + chr(117) + chr(115) + chr(101) + chr(33) == hello
+assert chr(0x48) + chr(0b1100101) + 2*chr(0o154) + chr(111) + chr(32) + chr(84) + chr(111) + chr(117) + chr(108) + \
+  chr(111) + chr(117) + chr(115) + chr(101) + chr(33) == hello
 
 print("OK builtin funcs 6")
 

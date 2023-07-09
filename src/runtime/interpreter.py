@@ -110,7 +110,7 @@ class Interpreter:
                     return result.failure(
                         RTTypeError(
                             list_.pos_start, list_.pos_end,
-                            f"expected a list value after '*', but got '{list_.type_}.",
+                            f"expected a list value after '*', but got {list_.type_}.",
                             ctx,
                             origin_file="src.interpreter.Interpreter.visit_ListNode"
                         )
@@ -150,6 +150,10 @@ class Interpreter:
         if node.op_token.matches(TT["KEYWORD"], 'and') and not left.is_true():
             # operator is "and" and the value is false
             return res.success(FALSE.copy().set_pos(node.pos_start, node.pos_end))
+
+        if node.op_token.matches(TT["KEYWORD"], 'or') and left.is_true():
+            # operator is "or" and the value is true
+            return res.success(TRUE.copy().set_pos(node.pos_start, node.pos_end))
 
         if not isinstance(node.right_node, list):
             right = res.register(self.visit(node.right_node, ctx))  # right term/factor/etc.
@@ -216,7 +220,7 @@ class Interpreter:
             print("NOUGARO INTERNAL ERROR : Result is not defined after executing "
                   "src.interpreter.Interpreter.visit_BinOpNode because of an invalid token.\n"
                   "Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the information "
-                  "below")
+                  "above")
             raise Exception("Result is not defined after executing src.interpreter.Interpreter.visit_BinOpNode")
 
         if error is not None:  # there is an error
@@ -307,7 +311,7 @@ class Interpreter:
                         f"src.interpreter.Interpreter.visit_BinOpCompNode because of an invalid token.\n"
                         f"Note for devs : the actual invalid token is {op_token.type}:{op_token.value}.\n"
                         f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
-                        f"information below")
+                        f"information above")
                     raise Exception("Result is not defined after executing "
                                     "src.interpreter.Interpreter.visit_BinOpCompNode")
                 if error is not None:  # there is an error
@@ -330,7 +334,7 @@ class Interpreter:
                     f"NOUGARO INTERNAL ERROR : len(node.node) != 1 in src.interpreter.Interpreter.visit_UnaryOpNode.\n"
                     f"{node.node=}\n"
                     f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
-                    f"information below.")
+                    f"information above.")
                 raise Exception("len(node.node) != 1 in src.interpreter.Interpreter.visit_UnaryOpNode.")
         else:
             value = result.register(self.visit(node.node, ctx))
@@ -511,9 +515,9 @@ class Interpreter:
                         elif equal == TT["GTEEQ"]:
                             final_value, error = var_actual_value.get_comparison_gte(values[i])
                         else:  # this is not supposed to happen
-                            print(f"Note: it was a problem in src.interpreter.Interpreter.visit_VarAssignNode. Please"
-                                  f" report this error at https://jd-develop.github.io/nougaro/bugreport.html with all"
-                                  f" infos.\n"
+                            print(f"Note: there was a problem in src.interpreter.Interpreter.visit_VarAssignNode.\n"
+                                  f"Please report this error at https://jd-develop.github.io/nougaro/bugreport.html "
+                                  f"with all infos.\n"
                                   f"For the dev: equal token '{equal}' is in EQUALS but not planned in "
                                   f"visit_VarAssignNode")
                             error = None
@@ -565,7 +569,7 @@ class Interpreter:
             ctx.symbol_table.remove(var_name)
         else:  # the variable is protected
             return result.failure(RunTimeError(node.pos_start, node.pos_end,
-                                               f"can not delete value assigned to builtin name '{var_name}'.",
+                                               f"can not delete builtin name '{var_name}'.",
                                                ctx, origin_file="src.interpreter.Interpreter.visit_VarDeleteNode"))
 
         self.update_symbol_table(ctx)
@@ -849,7 +853,7 @@ class Interpreter:
                 return result.failure(
                     RTNotDefinedError(
                         node.parent_var_name_token.pos_start, node.parent_var_name_token.pos_end,
-                        f"name {parent_var_name} is not defined.",
+                        f"name '{parent_var_name}' is not defined.",
                         ctx,
                         origin_file="src.runtime.interpreter.visit_ClassNode"
                     )
@@ -879,7 +883,7 @@ class Interpreter:
                 self.update_symbol_table(ctx)
             else:  # the name is protected
                 return result.failure(RunTimeError(node.pos_start, node.pos_end,
-                                                   f"can not create a function with builtin name '{class_name}'.",
+                                                   f"can not create a class with builtin name '{class_name}'.",
                                                    ctx, origin_file="src.interpreter.Interpreter.visit_ClassNode"))
 
         return result.success(class_value)  # we return our Function value
@@ -909,7 +913,7 @@ class Interpreter:
                         return result.failure(
                             RTTypeError(
                                 list_.pos_start, list_.pos_end,
-                                f"expected a list value after '*', but got '{list_.type_}.",
+                                f"expected a list value after '*', but got {list_.type_}.",
                                 outer_context,
                                 origin_file="src.interpreter.Interpreter.visit_CallNode"
                             )
@@ -1337,7 +1341,7 @@ class Interpreter:
             except Exception as e:  # other python error
                 return result.failure(
                     RunTimeError(
-                        node.pos_start, node.pos_end, f"unable to write in file '{file_name_value}'. "
+                        node.pos_start, node.pos_end, f"unable to read file '{file_name_value}'. "
                                                       f"More info : Python{e.__class__.__name__}: {e}", ctx,
                         origin_file="src.interpreter.Interpreter.visit_ReadNode"
                     )

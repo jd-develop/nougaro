@@ -70,7 +70,7 @@ class String(Value):
             return Number(float(self.value)).set_context(self.context), None
         except ValueError:
             return None, RTResult().failure(RunTimeError(self.pos_start, self.pos_end,
-                                                         f"str '{self.value}' can not be converted to int.",
+                                                         f"str '{self.value}' can not be converted to float.",
                                                          self.context,
                                                          origin_file="src.values.basevalues.String.to_float"))
 

@@ -28,7 +28,7 @@ class ModuleFunction(BaseBuiltInFunction):
         self.link_for_bug_report: str = link_for_bug_report
 
     def __repr__(self):
-        return f'<built-in lib function {self.module_name}_{self.name}>'
+        return f'<built-in lib function {self.module_name}.{self.name}>'
 
     def execute(self, args, interpreter_, run, noug_dir_, exec_from: str = "<invalid>",
                 use_context: Context | None = None):

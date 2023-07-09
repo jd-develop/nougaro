@@ -104,6 +104,8 @@ class Interpreter:
         for element_node, mul in node.element_nodes:  # we visit every node from the list
             if mul:
                 list_: Value = result.register(self.visit(element_node, ctx))
+                if result.should_return():  # if there is an error
+                    return result
                 if not isinstance(list_, List):
                     return result.failure(
                         RTTypeError(

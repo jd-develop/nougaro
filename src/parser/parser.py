@@ -39,7 +39,7 @@ class Parser:
         if result.error is not None and self.current_token.type != TT["EOF"]:
             return result.failure(
                 InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                   "expected '+', '-', '*', '/', '//', '%', 'and', 'or' or 'xor'.",
+                                   "invalid syntax.",
                                    "src.parser.Parser.parse")
             )
         return result

@@ -62,19 +62,27 @@ def main():
 
     # print(args)
 
+    line_to_exec = None
     if len(args) != 0:  # there is a file to exec
-        if not os.path.exists(args[0]):  # we check if the file exist, if not we quit with an error message
-            print_in_red(f"[nougaro] file '{args[0]}' does not exist.")
-            sys.exit(-1)  # DO NOT USE exit() OR quit() PYTHON BUILTINS !!!
-        elif args[0] in ["<stdin>", "<stdout>"]:
-            # these names can not be files : <stdin> is the shell input and <stdout> is his output
-            print_in_red(f"[nougaro] file '{args[0]}' can not be used by Nougaro because this name is used internally."
-                         f"\n"
-                         f"[nougaro] This is not an unexpected error, you do not need to open an issue on the GitHub.\n"
-                         f"[nougaro] Note that the Nougaro shell will open.")
-            path = "<stdin>"  # this opens the shell
-        else:  # valid file :)
-            path = args[0]
+        if args[0] == "-c" or args[0] == "-cd":
+            path = "<commandline>"
+            line_to_exec = ' '.join(sys.argv[1:])
+            assert isinstance(line_to_exec, str), "please report this bug on GitHub: https://github.com/" \
+                                                  "jd-develop/nougaro"
+        else:
+            if not os.path.exists(args[0]):  # we check if the file exist, if not we quit with an error message
+                print_in_red(f"[nougaro] file '{args[0]}' does not exist.")
+                sys.exit(-1)  # DO NOT USE exit() OR quit() PYTHON BUILTINS !!!
+            elif args[0] in ["<stdin>", "<stdout>", "<commandline>"]:
+                # these names can not be files : <stdin> is the shell input and <stdout> is his output
+                print_in_red(f"[nougaro] file '{args[0]}' can not be used by Nougaro because this name is used "
+                             f"internally.\n"
+                             f"[nougaro] This is not an unexpected error, you do not need to open an issue on "
+                             f"GitHub.\n"
+                             f"[nougaro] Note that the Nougaro shell will open.")
+                path = "<stdin>"  # this opens the shell
+            else:  # valid file :)
+                path = args[0]
     else:  # there is no file given, so we have to open the shell
         path = "<stdin>"
 
@@ -105,7 +113,7 @@ def main():
             except EOFError:
                 print_in_red("\nEOF")
                 break  # breaks the `while True` loop to the end of the file
-                
+
             if str(text) == "" or text is None:  # nothing was entered: we don't do anything
                 result, error = None, None
             else:  # there's an input
@@ -144,6 +152,44 @@ def main():
                     continue
             else:  # there is no error nor result. If you know when that happens, tell me, please.
                 continue
+    elif path == "<commandline>":
+        if line_to_exec == "":
+            sys.exit()
+
+        try:  # we try to run it
+            result, error = nougaro.run('<commandline>', line_to_exec, noug_dir, version)
+        except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
+            print_in_red("\nKeyboardInterrupt")
+            sys.exit()
+        except EOFError:
+            print_in_red("\nEOF")
+            sys.exit()
+
+        if error is not None:  # there is an error, we print it in RED because OMG AN ERROR
+            print_in_red(error.as_string())
+        elif result is not None:  # there is no error, but there is a result
+            if args[0] != "-cd":
+                if isinstance(result, List):  # the result is always a nougaro List value
+                    if len(result.elements) == 1:  # there is one single result, let's print it without the "[]".
+                        if result.elements[0].should_print:  # if the value should be printed, let's print it!
+                            print(result.elements[0])
+                    else:  # there is multiple results, when there is multi-line statements (like `print(a);var a+=1`)
+                        # this code is to know what the list contains
+                        # if the list contains only NoneValues that shouldn't be printed, we don't print it
+                        # in any other case, we do.
+                        should_print = False
+                        for e in result.elements:
+                            if e.should_print:
+                                should_print = True
+                                break  # same here
+                        if should_print:  # if we should print, we print
+                            print(result)
+                else:  # the result is not a Nougaro List. If you know when that happens, tell me, please.
+                    print("WARNING: Looks like something went wrong. Don't panic, and just report this bug at:\n"
+                          "https://jd-develop.github.io/nougaro/bugreport.html.\n"
+                          "Error details: result from src.nougaro.run in shell is not a List.")
+                    print(f"The actual result is {result}, of type {type(result)}, error is {error}.")
+
     else:  # we don't open the shell because we have to run a file.
         with open(path, encoding="UTF-8") as file:
             file_content = str(file.read())

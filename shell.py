@@ -67,6 +67,8 @@ def main():
         if args[0] == "-c" or args[0] == "-cd":
             path = "<commandline>"
             line_to_exec = ' '.join(sys.argv[1:])
+            # note that bash, zsh and fiSH automatically delete quotes.
+            # TODO: test in windows cmd and powershell
             assert isinstance(line_to_exec, str), "please report this bug on GitHub: https://github.com/" \
                                                   "jd-develop/nougaro"
         else:

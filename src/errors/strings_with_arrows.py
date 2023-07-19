@@ -26,8 +26,12 @@ def string_with_arrows(text: str, pos_start, pos_end) -> str:
     :param pos_end: position end
     :return: str as defined above
     """
-    assert isinstance(pos_start, Position), f"pos_start is not a Position object. {text=}. Please report this bug."
-    assert isinstance(pos_end, Position), f"pos_end is not a Position object. {text=}. Please report this bug."
+    assert isinstance(pos_start, Position), f"pos_start is not a Position object, but of type {type(pos_start)}. " \
+                                            f"{text=}. Please report this bug at " \
+                                            f"https://jd-develop.github.io/nougaro/bugreport."
+    assert isinstance(pos_end, Position), f"pos_end is not a Position object, but of type {type(pos_end)}. " \
+                                          f"{text=}. Please report this bug at " \
+                                          f"https://jd-develop.github.io/nougaro/bugreport."
     result = ''
 
     # Calculate indexes

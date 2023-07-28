@@ -1,0 +1,144 @@
+# A console Tic Tac Toe
+
+
+def changeCell(grid_, i, j, newState)
+    # Returns [grid or None, error (0 or 1)]
+    if grid_(i)(j) == 0 then
+        replace(grid_(i), j, newState)
+        return [grid_, False]
+    else
+        print("Sorry, you can’t play in this cell.")
+        return [None, True]
+    end
+end
+
+
+def checkLine(grid_)
+    # Returns 0 if nobody won, 1 if 1s won, 2 if 2s won (checks lines only)
+    for line in grid_ then
+       if line(0) == line(1) == line(2) then
+           if line(0) == 1 then; return 1
+           elif line(0) == 2 then; return 2;
+           end
+       end
+    end
+    return 0
+end
+
+
+def checkColumn(grid_)
+    # Returns 0 if nobody won, 1 if 1s won, 2 if 2s won (checks for columns only)
+    for j = 0 to 3 then
+        if grid_(0)(j) == grid_(1)(j) == grid_(2)(j) then
+            if grid_(0)(j) == 1 then; return 1
+            elif grid_(0)(j) == 2 then; return 2;
+            end
+        end
+    end
+    return 0
+end
+
+
+def checkDiagonal(grid_)
+    # Returns 0 if nobody won, 1 if 1s won, 2 if 2s won (checks for diagonals only)
+    if grid_(0)(0) == grid_(1)(1) == grid_(2)(2) then
+        if grid_(0)(0) == 1 then; return 1
+        elif grid_(0)(0) == 2 then; return 2;
+        end
+    end
+    if grid_(0)(2) == grid_(1)(1) == grid_(2)(0) then
+        if grid_(0)(2) == 1 then; return 1
+        elif grid_(0)(2) == 2 then; return 2;
+        end
+    end
+    return 0
+end
+
+
+def checkWinner(grid_)
+    var line, column, diagonal = checkLine(grid_), checkColumn(grid_), checkDiagonal(grid_)
+    if line then return line
+    if column then return column
+    if diagonal then return diagonal
+    return 0
+end
+
+
+def checkTie(grid_)
+   for line in grid_ then
+       for cell in line then
+           if cell == 0 then return 0
+       end
+   end
+   # at this point we know the grid is full
+   return not checkWinner(grid_)
+end
+
+
+def displayGrid(grid_)
+    print()
+    print("   012")
+    print()
+    var i = 0
+    for line in grid_ then
+        print(" " + str(i) + " " + (if line(0) == 0 then " " elif line(0) == 1 then "X" else "O") + \
+                                   (if line(1) == 0 then " " elif line(1) == 1 then "X" else "O") + \
+                                   (if line(2) == 0 then " " elif line(2) == 1 then "X" else "O"))
+        var i += 1
+    end
+    print()
+end
+
+# tests
+assert changeCell([[0, 0, 0], [0, 0, 0], [0, 0, 0]], 1, 1, 1) == \
+    [[[0, 0, 0], [0, 1, 0], [0, 0, 0]], 0], "test for function changeCell did not work…"
+
+assert checkLine([[1, 2, 0], [0, 0, 1], [2, 2, 0]]) == 0, "test for function checkLine did not work…"
+assert checkLine([[1, 2, 0], [0, 0, 0], [2, 2, 0]]) == 0, "test for function checkLine did not work…"
+assert checkLine([[1, 2, 0], [1, 1, 1], [2, 2, 0]]) == 1, "test for function checkLine did not work…"
+assert checkLine([[1, 2, 0], [0, 0, 1], [2, 2, 2]]) == 2, "test for function checkLine did not work…"
+
+assert checkColumn([[1, 2, 0], [0, 0, 1], [2, 2, 1]]) == 0, "test for function checkColumn did not work…"
+assert checkColumn([[1, 2, 0], [0, 0, 0], [2, 2, 2]]) == 0, "test for function checkColumn did not work…"
+assert checkColumn([[1, 2, 0], [1, 0, 1], [1, 2, 0]]) == 1, "test for function checkColumn did not work…"
+assert checkColumn([[1, 2, 0], [0, 2, 1], [2, 2, 0]]) == 2, "test for function checkColumn did not work…"
+
+assert checkDiagonal([[1, 2, 0], [0, 0, 1], [2, 2, 1]]) == 0, "test for function checkDiagonal did not work…"
+assert checkDiagonal([[1, 2, 0], [0, 0, 0], [0, 2, 2]]) == 0, "test for function checkDiagonal did not work…"
+assert checkDiagonal([[1, 2, 0], [1, 1, 0], [1, 2, 1]]) == 1, "test for function checkDiagonal did not work…"
+assert checkDiagonal([[1, 2, 2], [0, 2, 1], [2, 2, 0]]) == 2, "test for function checkDiagonal did not work…"
+
+var player = 1
+var grid = for i = 0 to 3 then for j = 0 to 3 then 0
+displayGrid(grid)
+print("Player 1")
+while True then
+    do
+        do
+            var picked_line = input_int("Player " + str(player) + ", pick a line: ")
+        then loop while not 0 <= picked_line <= 2
+        do
+            var picked_col = input_int("Player " + str(player) + ", pick a column: ")
+        then loop while not 0 <= picked_col <= 2
+
+        var chgCellRes = changeCell(grid, picked_line, picked_col, player)
+    then loop while chgCellRes(1)
+
+    var grid = chgCellRes(0)
+    displayGrid(grid)
+
+    var winner = checkWinner(grid)
+    if winner then
+        print("Player " + str(winner) + " won!")
+        break
+    end
+
+    var tie = checkTie(grid)
+    if tie then
+        print("Tie!")
+        break
+    end
+
+    var player = 3 - player
+    print("Player " + str(player))
+end

@@ -13,16 +13,24 @@ from src.runtime.context import Context
 from src.parser.nodes import Node
 # built-in python imports
 from typing import Protocol, Any
-from colorama import init as colorama_init, Fore
+try:
+    from colorama import init as colorama_init, Fore
+    colorama_installed = True
+except ModuleNotFoundError:
+    colorama_installed = False
 
-colorama_init()
+if colorama_installed:
+    colorama_init()
 
 
 # ##########
 # COLORS
 # ##########
 # prints text in red.
-def print_in_red(txt): print(Fore.RED + txt + Fore.RESET)
+if colorama_installed:
+    def print_in_red(txt): print(Fore.RED + txt + Fore.RESET)
+else:
+    print_in_red = print
 
 
 # ##########

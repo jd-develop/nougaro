@@ -53,7 +53,6 @@ class BaseFunction(Value):
 
         # check if there is too few params
         if len(args) < len(param_names) and should_respect_args_number:
-            print("coucou")
             return result.failure(
                 RunTimeError(
                     self.pos_start, self.pos_end,
@@ -65,12 +64,13 @@ class BaseFunction(Value):
         return result.success(None)  # if there is the right number of params
 
     @staticmethod
-    def populate_args(param_names, args, exec_context: Context, optional_params: list = None,
+    def populate_args(param_names: list[str], args, exec_context: Context, optional_params: list[str] = None,
                       should_respect_args_number: bool = True):
         """Make the args match to the param names in the symbol table"""
         # We need the context for the symbol table :)
         if optional_params is None:  # there is no optional params
             optional_params = []
+
         if should_respect_args_number:  # the number of args SHOULD be equal to the number of params
             for i in range(len(args)):
                 if i < len(param_names):  # the argument is in the non-optional parameters list

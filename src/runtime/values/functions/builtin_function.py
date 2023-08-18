@@ -724,7 +724,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(
                 RTTypeError(
                     self.pos_start, self.pos_end,
-                    "first argument of builtin function 'split' must be a str.",
+                    f"first argument of builtin function 'split' must be a str, not {str_.type_}.",
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_split"
                 )
             )
@@ -734,7 +734,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(
                 RTTypeError(
                     self.pos_start, self.pos_end,
-                    "second argument of builtin function 'split' must be a str or None.",
+                    f"second argument of builtin function 'split' must be a str or None, not {char.type_}.",
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_split"
                 )
             )

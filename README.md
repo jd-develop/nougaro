@@ -4,7 +4,7 @@
  
 ### Third-party modules
  Python builtins that are not always builtin (why?):
-  * `colorama` (`pip install colorama`)
+  * `colorama` (`pip install colorama`, optional)
 
  Under Linux (optional):
   * `readline` (`pip install readline`)
@@ -24,7 +24,7 @@
 
 ### Modules tiers
  Modules pas toujours fournis avec Python (pourquoi ?):
-  * `colorama` (`pip install colorama`)
+  * `colorama` (`pip install colorama`, optionnel)
 
  Sous Linux (optionnel):
   * `readline` (`pip install readline`)

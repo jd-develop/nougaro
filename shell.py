@@ -96,7 +96,7 @@ def main():
     if path == "<stdin>":  # we open the shell
         # this text is always printed when we start the shell
         print(f"Welcome to Nougaro {version} on {platform.system()}! "
-              f"Contribute : https://github.com/jd-develop/nougaro/")
+              f"Contribute: https://github.com/jd-develop/nougaro/")
         print("This program is under GPL license. For more details, type __gpl__() or __gpl__(1) to stay in terminal.\n"
               "This program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.")
         print("Found a bug? Feel free to report it at https://jd-develop.github.io/nougaro/bugreport.html")

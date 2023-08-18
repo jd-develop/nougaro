@@ -29,10 +29,10 @@ class SymbolTable:
     def __repr__(self) -> str:
         return pprint.pformat(self.dict_())
 
-    def get(self, name):
+    def get(self, name, get_in_parent: bool = True, get_in_grandparent: bool = True):
         value = self.symbols.get(name, None)
-        if value is None and self.parent is not None:
-            return self.parent.get(name)
+        if get_in_parent and value is None and self.parent is not None:
+            return self.parent.get(name, get_in_grandparent)
         return value
 
     def set(self, name, value):

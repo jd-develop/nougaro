@@ -589,7 +589,7 @@ class Interpreter:
                     return result
                 return result.success(expr_value)
 
-        if node.else_case is not None:  # if none of the if elif cases are true, we check for an else case
+        if node.else_case is not None:  # if none of the ‘if’ or ‘elif’ cases are true, we check for an ‘else’ case
             expr = node.else_case
             else_value = result.register(self.visit(expr, ctx))
             if result.should_return():  # check for errors

@@ -17,7 +17,7 @@
 # ##########
 class Token:
     """Token class.
-    A token have a type (keyboard, int, str, statement,..) and sometimes a value ("foo", 123, break)"""
+    A token have a type (keyboard, int, str, statement, ...) and sometimes a value ("foo", 123, break)"""
     def __init__(self, type_, value=None, pos_start=None, pos_end=None):
         self.type = type_  # type
         self.value = value  # value

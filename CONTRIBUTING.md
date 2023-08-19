@@ -11,7 +11,7 @@ Hello! If you're here, I assume you want to contribute to the Nougaro programmin
 * [Styleguides](#styleguides)
   * [Code](#code)
   * [Git Commit Messages](#git-commit-messages)
-* [Thank you + questions](#thank-you-)
+* [Thank you + questions](#thank-you)
 
 ## Code of conduct
 The project and everyone participating in it is governed by the [Code of Conduct](CODE_OF_CONDUCT.md).

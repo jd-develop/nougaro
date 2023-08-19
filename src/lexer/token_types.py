@@ -79,7 +79,7 @@ TT = {
     "EOF": 'end of file',        # end of file
 }
 
-KEYWORDS = [                        # List of all the keywords (TT["KEYWORD)
+KEYWORDS = [                        # List of all the keywords (TT["KEYWORD"])
     # basic keywords
     'var',
     'del',

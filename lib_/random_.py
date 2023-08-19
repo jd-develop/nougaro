@@ -39,30 +39,17 @@ class Random(ModuleFunction):
         # * a
         # * b
         # we get 'a' and 'b' values
-        a = exec_ctx.symbol_table.get("a")
-        b = exec_ctx.symbol_table.get("b")
-        if not isinstance(a, Number):  # we check if 'a' is a number
-            return RTResult().failure(RTTypeError(
-                a.pos_start, a.pos_end,
-                "first argument of the built-in function 'random.randint' must be an int.",
-                exec_ctx, "lib_.random_.Random.execute_random_randint"
-            ))
-        if a.type_ != 'int':  # we check if 'a' is an int
-            return RTResult().failure(RTTypeError(
-                a.pos_start, a.pos_end,
-                "first argument of the built-in function 'random.randint' must be an int.",
+        a = exec_ctx.symbol_table.getf("a")
+        b = exec_ctx.symbol_table.getf("b")
+        if not isinstance(a, Number) or not a.is_int():  # we check if 'a' is an integer
+            return RTResult().failure(RTTypeErrorF(
+                a.pos_start, a.pos_end, "first", "random.randint", "int", a,
                 exec_ctx, "lib_.random_.Random.execute_random_randint"
             ))
 
-        if not isinstance(b, Number):  # we check if 'b' is a number
-            return RTResult().failure(RTTypeError(
-                b.pos_start, b.pos_end,
-                "second argument of the built-in function 'random.randint' must be an int.",
-                exec_ctx, "lib_.random_.Random.execute_random_randint"
-            ))
-        if b.type_ != 'int':  # we check if 'b' is an int
-            return RTResult().failure(RTTypeError(
-                b.pos_start, b.pos_end,
+        if not isinstance(b, Number) or not b.is_int():  # we check if 'b' is an integer
+            return RTResult().failure(RTTypeErrorF(
+                b.pos_start, b.pos_end, "second", "random.randint", "int", b,
                 "second argument of the built-in function 'random.randint' must be an int.",
                 exec_ctx, "lib_.random_.Random.execute_random_randint"
             ))
@@ -95,11 +82,10 @@ class Random(ModuleFunction):
         """Return a random element of a list"""
         # Params:
         # * list_
-        list_ = exec_ctx.symbol_table.get("list_")  # we get the 'list' argument
+        list_ = exec_ctx.symbol_table.getf("list_")  # we get the 'list' argument
         if not isinstance(list_, List):  # we check if it is a list
-            return RTResult().failure(RTTypeError(
-                list_.pos_start, list_.pos_end,
-                "first argument of the built-in function 'random.choice' must be a list.",
+            return RTResult().failure(RTTypeErrorF(
+                list_.pos_start, list_.pos_end, "first", "random.choice", "list", list_,
                 exec_ctx, "lib_.random_.Random.execute_random_choice"
             ))
         if len(list_.elements) == 0:  # if the list is empty, we raise an error

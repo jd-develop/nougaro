@@ -16,7 +16,7 @@ from src.runtime.values.basevalues.basevalues import *
 from src.runtime.values.defined_values.number import *
 from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam
 from src.misc import CustomBuiltInFuncMethodWithNougDirButNotRun, is_keyword, does_tok_type_exist
-from src.errors.errors import RTFileNotFoundError, RTTypeError
+from src.errors.errors import RTFileNotFoundError, RTTypeError, RTTypeErrorF
 # built-in python imports
 from os import system as os_system, name as os_name
 import os.path
@@ -123,7 +123,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Print 'value'"""
         # Optional params:
         # * value
-        value = exec_context.symbol_table.get('value')
+        value = exec_context.symbol_table.getf('value')
         if value is not None:  # if the value is defined
             try:
                 print(value.to_str())
@@ -141,7 +141,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Print 'value' and returns 'value'"""
         # Optional params:
         # * value
-        value = exec_context.symbol_table.get('value')
+        value = exec_context.symbol_table.getf('value')
         if value is not None:  # if the value is defined
             try:
                 print(value.to_str())
@@ -163,7 +163,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Basic input (str)"""
         # Optional params:
         # * text_to_display
-        text_to_display = exec_context.symbol_table.get('text_to_display')  # we get the text to display
+        text_to_display = exec_context.symbol_table.getf('text_to_display')  # we get the text to display
         if isinstance(text_to_display, String) or isinstance(text_to_display, Number):
             text = input(text_to_display.value)
         else:  # other types and not defined
@@ -178,7 +178,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Basic input (int). Repeat while entered value is not an int."""
         # Optional params:
         # * text_to_display
-        text_to_display = exec_context.symbol_table.get('text_to_display')  # we get the text to display
+        text_to_display = exec_context.symbol_table.getf('text_to_display')  # we get the text to display
         while True:
             if isinstance(text_to_display, String) or isinstance(text_to_display, Number):
                 text = input(text_to_display.value)
@@ -200,7 +200,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Basic input (int or float). Repeat while entered value is not a num."""
         # Optional params:
         # * text_to_display
-        text_to_display = exec_context.symbol_table.get('text_to_display')  # we get the text to display
+        text_to_display = exec_context.symbol_table.getf('text_to_display')  # we get the text to display
         while True:
             if isinstance(text_to_display, String) or isinstance(text_to_display, Number):
                 text = input(text_to_display.value)
@@ -236,7 +236,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Check if 'value' is an integer"""
         # Params:
         # * value
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         is_number = isinstance(value, Number)  # we check if the value is a number
         if is_number:
             if value.type_ == 'int':  # then we check if the number is an integer
@@ -256,7 +256,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Check if 'value' is a float"""
         # Params:
         # * value
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         is_number = isinstance(value, Number)  # we check if the value is a number
         if is_number:
             if value.type_ == 'float':  # then we check if the number is a float
@@ -276,7 +276,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Check if 'value' is an int or a float"""
         # Params:
         # * value
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         is_number = isinstance(value, Number)  # we check if the value is a number
         # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_number else FALSE.copy())
@@ -289,7 +289,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Check if 'value' is a List"""
         # Params:
         # * value
-        is_list = isinstance(exec_context.symbol_table.get('value'), List)  # we get the value and check if it is a list
+        # we get the value and check if it is a list
+        is_list = isinstance(exec_context.symbol_table.getf('value'), List)
         # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_list else FALSE.copy())
 
@@ -301,7 +302,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Check if 'value' is a String"""
         # Params:
         # * value
-        is_str = isinstance(exec_context.symbol_table.get('value'), String)  # we get the value and check if it is a str
+        # we get the value and check if it is a str
+        is_str = isinstance(exec_context.symbol_table.getf('value'), String)
         # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_str else FALSE.copy())
 
@@ -313,7 +315,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Check if 'value' is a BaseFunction"""
         # Params:
         # * value
-        is_func = isinstance(exec_context.symbol_table.get('value'), BaseFunction)  # we get the value and check if it
+        is_func = isinstance(exec_context.symbol_table.getf('value'), BaseFunction)  # we get the value and check if it
         #                                                                             is a function
         # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_func else FALSE.copy())
@@ -327,7 +329,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # Params:
         # * value
         # we get the value and check if it is None
-        is_none = isinstance(exec_context.symbol_table.get('value'), NoneValue)
+        is_none = isinstance(exec_context.symbol_table.getf('value'), NoneValue)
         # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_none else FALSE.copy())
 
@@ -340,7 +342,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # Params:
         # * value
         # we get the value and check if it is a module
-        is_none = isinstance(exec_ctx.symbol_table.get('value'), Module)
+        is_none = isinstance(exec_ctx.symbol_table.getf('value'), Module)
         # TRUE and FALSE are defined in src/values/defined_values/number.py
         return RTResult().success(TRUE.copy() if is_none else FALSE.copy())
 
@@ -354,13 +356,12 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * list
         # * value
         # we get list and value
-        list_ = exec_context.symbol_table.get('list')
-        value = exec_context.symbol_table.get('value')
+        list_ = exec_context.symbol_table.getf('list')
+        value = exec_context.symbol_table.getf('value')
 
         if not isinstance(list_, List):  # we check if the list is a list
-            return RTResult().failure(RTTypeError(
-                list_.pos_start, list_.pos_end,
-                "first argument of the built-in function 'append' must be a list.",
+            return RTResult().failure(RTTypeErrorF(
+                list_.pos_start, list_.pos_end, "first", "append", "list", list_,
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_append"
             ))
 
@@ -379,22 +380,20 @@ class BuiltInFunction(BaseBuiltInFunction):
         # Optional params:
         # * index
         # we get the list and the index
-        list_ = exec_context.symbol_table.get('list')
-        index = exec_context.symbol_table.get('index')
+        list_ = exec_context.symbol_table.getf('list')
+        index = exec_context.symbol_table.getf('index')
 
         if not isinstance(list_, List):  # we check if the list is a list
-            return RTResult().failure(RTTypeError(
-                list_.pos_start, list_.pos_end,
-                "first argument of the built-in function 'pop' must be a list.",
+            return RTResult().failure(RTTypeErrorF(
+                list_.pos_start, list_.pos_end, "first", "pop", "list", list_,
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_pop"
             ))
 
         if index is None:
             index = Number(-1)
-        if not isinstance(index, Number) or index.type_ != "int":  # we check if the index is an int
-            return RTResult().failure(RTTypeError(
-                index.pos_start, index.pos_end,
-                "second argument of the built-in function 'pop' must be an integer.",
+        if not isinstance(index, Number) or not index.is_int():  # we check if the index is an int
+            return RTResult().failure(RTTypeErrorF(
+                index.pos_start, index.pos_end, "second", "pop", "integer", index,
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_pop"
             ))
 
@@ -420,25 +419,23 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         # * index
         # we get all we need
-        list_ = exec_context.symbol_table.get('list')
-        value = exec_context.symbol_table.get('value')
-        index = exec_context.symbol_table.get('index')
+        list_ = exec_context.symbol_table.getf('list')
+        value = exec_context.symbol_table.getf('value')
+        index = exec_context.symbol_table.getf('index')
 
         # we check if everything OK
         if not isinstance(list_, List):
-            return RTResult().failure(RTTypeError(
-                list_.pos_start, list_.pos_end,
-                "first argument of the built-in function 'insert' must be a list.",
+            return RTResult().failure(RTTypeErrorF(
+                list_.pos_start, list_.pos_end, "first", "insert", "list", list_,
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_insert"
             ))
 
         if index is None:
             index = Number(len(list_.elements))
 
-        if not isinstance(index, Number):
-            return RTResult().failure(RTTypeError(
-                index.pos_start, index.pos_end,
-                "third argument of the built-in function 'insert' must be a number.",
+        if not isinstance(index, Number) or not index.is_int():
+            return RTResult().failure(RTTypeErrorF(
+                index.pos_start, index.pos_end, "third", "insert", "integer", index,
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_insert"
             ))
 
@@ -459,34 +456,31 @@ class BuiltInFunction(BaseBuiltInFunction):
         # Optional params:
         # * delete_duplicates
         # we get our arguments
-        list1 = exec_context.symbol_table.get('list1')
-        list2 = exec_context.symbol_table.get('list2')
-        delete_duplicates = exec_context.symbol_table.get('delete_duplicates')
+        list1 = exec_context.symbol_table.getf('list1')
+        list2 = exec_context.symbol_table.getf('list2')
+        delete_duplicates = exec_context.symbol_table.getf('delete_duplicates')
 
         # we check the types
         if not isinstance(list1, List):
-            return RTResult().failure(RTTypeError(
-                list1.pos_start, list1.pos_end,
-                "first argument of the built-in function 'extend' must be a list.",
+            return RTResult().failure(RTTypeErrorF(
+                list1.pos_start, list1.pos_end, "first", "extend", "list", list1,
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_extend"
             ))
 
         if not isinstance(list2, List):
-            return RTResult().failure(RTTypeError(
-                list2.pos_start, list2.pos_end,
-                "second argument of the built-in function 'extend' must be a list.",
+            return RTResult().failure(RTTypeErrorF(
+                list2.pos_start, list2.pos_end, "second", "extend", "list", list2,
                 exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_extend"
             ))
 
         # if delete_duplicates is defined
         if delete_duplicates is not None:
             if not isinstance(delete_duplicates, Number):
-                return RTResult().failure(RTTypeError(
-                    list2.pos_start, list2.pos_end,
-                    "third argument of the built-in function 'extend' must be a number.",
+                return RTResult().failure(RTTypeErrorF(
+                    list2.pos_start, list2.pos_end, "third", "extend", "number", delete_duplicates,
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_extend"
                 ))
-            if delete_duplicates.value != FALSE.value:  # we have to delete duplicates
+            if delete_duplicates.is_true():  # we have to delete duplicates
                 list1_e = list1.elements
                 list2_e = list2.elements
                 final_list = list1_e.copy()  # we append all the elements of the first list to the final one
@@ -518,23 +512,21 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * list
         # * index
         # we get the list and the index
-        list_ = exec_context.symbol_table.get('list')
-        index_ = exec_context.symbol_table.get('index')
+        list_ = exec_context.symbol_table.getf('list')
+        index_ = exec_context.symbol_table.getf('index')
 
         if not isinstance(list_, List):  # we check if the list is a list
             return RTResult().failure(
-                RTTypeError(
-                    list_.pos_start, list_.pos_end,
-                    "first argument of the built-in function 'get' must be a list.",
+                RTTypeErrorF(
+                    list_.pos_start, list_.pos_end, "first", "get", "list", list_,
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_get"
                 )
             )
 
-        if not isinstance(index_, Number):  # we check if the index is a number
+        if not isinstance(index_, Number) or not index_.is_int():  # we check if the index is a number
             return RTResult().failure(
-                RTTypeError(
-                    index_.pos_start, index_.pos_end,
-                    "second argument of the built-in function 'get' must be an int.",
+                RTTypeErrorF(
+                    index_.pos_start, index_.pos_end, "second", "get", "integer", index_,
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_get"
                 )
             )
@@ -559,25 +551,23 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * index
         # * value
         # we get our args
-        list_ = exec_context.symbol_table.get("list")
-        index_ = exec_context.symbol_table.get('index')
-        value = exec_context.symbol_table.get('value')
+        list_ = exec_context.symbol_table.getf("list")
+        index_ = exec_context.symbol_table.getf('index')
+        value = exec_context.symbol_table.getf('value')
 
         # we check the values
         if not isinstance(list_, List):
             return RTResult().failure(
-                RTTypeError(
-                    list_.pos_start, list_.pos_end,
-                    "first argument of the built-in function 'replace' must be a list.",
+                RTTypeErrorF(
+                    list_.pos_start, list_.pos_end, "first", "replace", "list", list_,
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_replace"
                 )
             )
 
-        if not isinstance(index_, Number):
+        if not isinstance(index_, Number) or not index_.is_int():
             return RTResult().failure(
-                RTTypeError(
-                    index_.pos_start, index_.pos_end,
-                    "second argument of the built-in function 'replace' must be an int.",
+                RTTypeErrorF(
+                    index_.pos_start, index_.pos_end, "second", "replace", "integer", index_,
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_replace"
                 )
             )
@@ -607,36 +597,34 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * ignore_not_num (default False)
 
         # first we get the list
-        list_ = exec_context.symbol_table.get('list')
+        list_ = exec_context.symbol_table.getf('list')
         if not isinstance(list_, List):
             return RTResult().failure(
-                RTTypeError(
-                    list_.pos_start, list_.pos_end,
-                    "first argument of builtin function 'max' must be a list.",
+                RTTypeErrorF(
+                    list_.pos_start, list_.pos_end, "first", "max", "list", list_,
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_max"
                 )
             )
 
         # then we get "ignore_not_num"
-        ignore_not_num = exec_context.symbol_table.get('ignore_not_num')
+        ignore_not_num = exec_context.symbol_table.getf('ignore_not_num')
         if ignore_not_num is None:
-            ignore_not_num = FALSE
+            ignore_not_num = FALSE.copy()
         if not isinstance(ignore_not_num, Number):
             return RTResult().failure(
-                RTTypeError(
-                    ignore_not_num.pos_start, ignore_not_num.pos_end,
-                    "second argument of builtin function 'max' must be a number.",
+                RTTypeErrorF(
+                    ignore_not_num.pos_start, ignore_not_num.pos_end, "second", "max", "number", ignore_not_num,
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_max"
                 )
             )
 
         # then we check if the list is good
-        if ignore_not_num.value == FALSE.value:
+        if ignore_not_num.is_false():
             if any(not isinstance(e, Number) for e in list_.elements):
                 return RTResult().failure(
                     RTTypeError(
                         list_.pos_start, list_.pos_end,
-                        "first argument of builtin function 'max' must be a list containing only numbers. "
+                        "first argument of builtin function `max` must be a list containing only numbers. "
                         "You can execute the function with True as the second argument to avoid this error.",
                         exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_max"
                     )
@@ -663,36 +651,34 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * ignore_not_num (default False)
 
         # first we get the list
-        list_ = exec_context.symbol_table.get('list')
+        list_ = exec_context.symbol_table.getf('list')
         if not isinstance(list_, List):
             return RTResult().failure(
-                RTTypeError(
-                    list_.pos_start, list_.pos_end,
-                    "first argument of builtin function 'min' must be a list.",
+                RTTypeErrorF(
+                    list_.pos_start, list_.pos_end, "first", "min", "list", list_,
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_min"
                 )
             )
 
         # then we get "ignore_not_num"
-        ignore_not_num = exec_context.symbol_table.get('ignore_not_num')
+        ignore_not_num = exec_context.symbol_table.getf('ignore_not_num')
         if ignore_not_num is None:
-            ignore_not_num = FALSE
+            ignore_not_num = FALSE.copy()
         if not isinstance(ignore_not_num, Number):
             return RTResult().failure(
-                RTTypeError(
-                    ignore_not_num.pos_start, ignore_not_num.pos_end,
-                    "second argument of builtin function 'min' must be a number.",
+                RTTypeErrorF(
+                    ignore_not_num.pos_start, ignore_not_num.pos_end, "second", "min", "number", ignore_not_num,
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_min"
                 )
             )
 
         # then we check if the list is good
-        if ignore_not_num.value == FALSE.value:
+        if ignore_not_num.is_false():
             if any(not isinstance(e, Number) for e in list_.elements):
                 return RTResult().failure(
                     RTTypeError(
                         list_.pos_start, list_.pos_end,
-                        "first argument of builtin function 'min' must be a list containing only numbers. "
+                        "first argument of builtin function `min` must be a list containing only numbers. "
                         "You can execute the function with True as the second argument to avoid this error.",
                         exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_min"
                     )
@@ -716,15 +702,14 @@ class BuiltInFunction(BaseBuiltInFunction):
         # Optional params:
         # * char
         # we get our args
-        str_ = exec_context.symbol_table.get('str')
-        char = exec_context.symbol_table.get('char')
+        str_ = exec_context.symbol_table.getf('str')
+        char = exec_context.symbol_table.getf('char')
 
         # we check the types
         if not isinstance(str_, String):
             return RTResult().failure(
-                RTTypeError(
-                    self.pos_start, self.pos_end,
-                    f"first argument of builtin function 'split' must be a str, not {str_.type_}.",
+                RTTypeErrorF(
+                    self.pos_start, self.pos_end, "first", "split", "str", str_,
                     exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_split"
                 )
             )
@@ -732,10 +717,9 @@ class BuiltInFunction(BaseBuiltInFunction):
             char = String(' ')  # if there is no split char given, we split at the spaces
         if not isinstance(char, String):
             return RTResult().failure(
-                RTTypeError(
-                    self.pos_start, self.pos_end,
-                    f"second argument of builtin function 'split' must be a str or None, not {char.type_}.",
-                    exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_split"
+                RTTypeErrorF(
+                    self.pos_start, self.pos_end, "second", "split", "str", char,
+                    exec_context, "src.values.functions.builtin_function.BuiltInFunction.execute_split", or_="None"
                 )
             )
         # we split and make the list that we return
@@ -755,7 +739,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Stops the Nougaro Interpreter"""
         # Optional params:
         # * code
-        code = exec_context.symbol_table.get('code')
+        code = exec_context.symbol_table.getf('code')
         if isinstance(code, Number) or isinstance(code, String):
             sys.exit(code.value)  # !!!!!!!!!!!!!!! ALWAYS USE sys.exit() INSTEAD OF exit() OR quit() !!!!!!!!!!!!!!!
         sys.exit()
@@ -768,7 +752,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Get the type of 'value'"""
         # Params :
         # * value
-        value_to_get_type = exec_context.symbol_table.get('value')  # we get the value
+        value_to_get_type = exec_context.symbol_table.getf('value')  # we get the value
         return RTResult().success(String(value_to_get_type.type_))  # we return its type
 
     execute_type.param_names = ['value']
@@ -780,7 +764,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # Params :
         # * value
         result = RTResult()
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         str_value, error = value.to_str_()  # we convert
         if error is not None:
             return error  # error is already an RTResult in convert methods in all Value classes
@@ -796,7 +780,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # Params :
         # * value
         result = RTResult()
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         int_value, error = value.to_int_()  # we convert
         if error is not None:
             return error  # error is already an RTResult in convert methods in all Value classes
@@ -812,7 +796,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # Params :
         # * value
         result = RTResult()
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         float_value, error = value.to_float_()  # we convert
         if error is not None:
             return error  # error is already an RTResult in convert methods in all Value classes
@@ -828,7 +812,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # Params :
         # * value
         result = RTResult()
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         list_value, error = value.to_list_()  # we convert
         if error is not None:
             return error  # error is already an RTResult in convert methods in all Value classes
@@ -843,14 +827,13 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Returns the length of a list or a str"""
         # Params :
         # * list
-        value_ = exec_ctx.symbol_table.get('value')  # we get the value
+        value_ = exec_ctx.symbol_table.getf('value')  # we get the value
 
         # we check if the value is a list or a str
         if not isinstance(value_, List) and not isinstance(value_, String):
-            return RTResult().failure(RTTypeError(
-                value_.pos_start, value_.pos_end,
-                "first argument of the built-in function 'len' must be a list or a str.",
-                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_len"
+            return RTResult().failure(RTTypeErrorF(
+                value_.pos_start, value_.pos_end, "first", "len", "list", value_,
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_len", or_="str"
             ))
 
         if isinstance(value_, List):
@@ -877,12 +860,11 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Run code from another file. Param 'run' is the 'run' function in nougaro.py"""
         # Params :
         # * file_name
-        file_name = exec_ctx.symbol_table.get("file_name")  # we get the file name
+        file_name = exec_ctx.symbol_table.getf("file_name")  # we get the file name
 
         if not isinstance(file_name, String):  # we check if the file name's a str
-            return RTResult().failure(RTTypeError(
-                file_name.pos_start, file_name.pos_end,
-                "first argument of the built-in function 'run' must be a str.",
+            return RTResult().failure(RTTypeErrorF(
+                file_name.pos_start, file_name.pos_end, "first", "run", "str", file_name,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_run"
             ))
 
@@ -936,29 +918,28 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Run code from an example file. Param 'run' is the 'run' function in nougaro.py"""
         # Params :
         # * example_name
-        example_name = exec_ctx.symbol_table.get("example_name")  # we get the example name
+        example_name = exec_ctx.symbol_table.getf("example_name")  # we get the example name
         if example_name is None:
             example_name = String("../example")
 
         if not isinstance(example_name, String):  # we check if it is a str
-            return RTResult().failure(RTTypeError(
-                example_name.pos_start, example_name.pos_end,
-                "first argument of the built-in function 'example' must be a str.",
+            return RTResult().failure(RTTypeErrorF(
+                example_name.pos_start, example_name.pos_end, "first", "example", "str", example_name,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_example"
             ))
 
-        return_example_value = exec_ctx.symbol_table.get("return_example_value")
+        return_example_value = exec_ctx.symbol_table.getf("return_example_value")
         if return_example_value is None:
             return_example_value = FALSE
 
         if not isinstance(return_example_value, Number):
-            return RTResult().failure(RTTypeError(
+            return RTResult().failure(RTTypeErrorF(
                 return_example_value.pos_start, return_example_value.pos_end,
-                "second argument of the built-in function 'example' must be a number.",
+                "second", "example", "number", return_example_value,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_example"
             ))
 
-        return_example_value = bool(return_example_value.value)
+        return_example_value = return_example_value.is_true()
 
         file_name = os.path.abspath(noug_dir + "/examples/" + example_name.value + ".noug")
 
@@ -999,11 +980,10 @@ class BuiltInFunction(BaseBuiltInFunction):
         """System call. e.g. system_call('ls') lists the directory on bash."""
         # Params :
         # * cmd
-        cmd = exec_ctx.symbol_table.get("cmd")  # we get the command
+        cmd = exec_ctx.symbol_table.getf("cmd")  # we get the command
         if not isinstance(cmd, String):  # we check if it is a string
-            return RTResult().failure(RTTypeError(
-                cmd.pos_start, cmd.pos_end,
-                f"first argument of builtin function 'system_call' must be a str.",
+            return RTResult().failure(RTTypeErrorF(
+                cmd.pos_start, cmd.pos_end, "first", "system_call", "str", cmd,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_system_call"
             ))
 
@@ -1025,11 +1005,10 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Return lower-cased string. e.g. lower('NOUGARO') returns 'nougaro'."""
         # Params :
         # * value
-        value = exec_ctx.symbol_table.get("value")  # we get the value
+        value = exec_ctx.symbol_table.getf("value")  # we get the value
         if not isinstance(value, String):  # we check if it is a string
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                f"first argument of builtin function 'lower' must be a str.",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "lower", "str", value,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_lower"
             ))
         return RTResult().success(String(value.value.lower()))  # we return the lower str
@@ -1042,11 +1021,10 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Return upper-cased string. e.g. upper('nougaro') returns 'NOUGARO'."""
         # Params :
         # * value
-        value = exec_ctx.symbol_table.get("value")  # we get the value
+        value = exec_ctx.symbol_table.getf("value")  # we get the value
         if not isinstance(value, String):  # we check if it is a string
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                f"first argument of builtin function 'upper' must be a str.",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "upper", "str", value,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_upper"
             ))
         return RTResult().success(String(value.value.upper()))  # we return the upper str
@@ -1059,7 +1037,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Open a random song of Claude Nougaro. If argument 'song' is filled, open this song (if in database)."""
         # Optional params :
         # * song
-        song = exec_ctx.symbol_table.get("song")  # we get the song name
+        song = exec_ctx.symbol_table.getf("song")  # we get the song name
         songs = {
             "Toulouse": "https://www.youtube.com/watch?v=wehrXJTA3vI",
             "Armstrong": "https://www.youtube.com/watch?v=Dkqsh0kkjFw",
@@ -1072,9 +1050,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             webbrowser.open(songs[song], new=2)
             return RTResult().success(String(song))
         if not isinstance(song, String):  # we check if the song is a str
-            return RTResult().failure(RTTypeError(
-                song.pos_start, song.pos_end,
-                f"first argument of builtin function 'nougaro' must be a str.",
+            return RTResult().failure(RTTypeErrorF(
+                song.pos_start, song.pos_end, "first", "nougaro", "str", song,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_nougaro"
             ))
 
@@ -1102,14 +1079,14 @@ class BuiltInFunction(BaseBuiltInFunction):
         # Optional params :
         # * print_in_term
 
-        print_in_term = exec_ctx.symbol_table.get("print_in_term")  # we get 'print_in_term' value
+        print_in_term = exec_ctx.symbol_table.getf("print_in_term")  # we get 'print_in_term' value
         if print_in_term is None:  # if print_in_term is None, we put it false
             print_in_term = FALSE
 
         if not isinstance(print_in_term, Number):  # we check if it is a number
-            return RTResult().failure(RTTypeError(
+            return RTResult().failure(RTTypeErrorF(
                 print_in_term.pos_start, print_in_term.pos_end,
-                f"first argument of builtin function '__gpl__' must be an int.",
+                "first", "__gpl__", "number", print_in_term,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute___gpl__"
             ))
 
@@ -1172,11 +1149,10 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * word
 
         # we get the word
-        word = exec_ctx.symbol_table.get("word")
+        word = exec_ctx.symbol_table.getf("word")
         if not isinstance(word, String):  # we check if it is a string
-            return RTResult().failure(RTTypeError(
-                word.pos_start, word.pos_end,
-                f"first argument of builtin function '__is_keyword__' must be a str.",
+            return RTResult().failure(RTTypeErrorF(
+                word.pos_start, word.pos_end, "first", "__is_keyword__", "str", word,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute___is_keyword__"
             ))
         result = RTResult()
@@ -1193,11 +1169,10 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * type
 
         # we get the type to check
-        type_ = exec_ctx.symbol_table.get("type")
+        type_ = exec_ctx.symbol_table.getf("type")
         if not isinstance(type_, String):  # we check if it is a string
-            return RTResult().failure(RTTypeError(
-                type_.pos_start, type_.pos_end,
-                f"first argument of builtin function '__is_valid_token_type__' must be a str.",
+            return RTResult().failure(RTTypeErrorF(
+                type_.pos_start, type_.pos_end, "first", "__is_valid_token_type__", "str", type_,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute___is_valid_token_type__"
             ))
         result = RTResult()
@@ -1212,7 +1187,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Execute the test file."""
         # optional params:
         # * return
-        should_i_return = exec_ctx.symbol_table.get("return")
+        should_i_return = exec_ctx.symbol_table.getf("return")
         if should_i_return is None:
             should_i_return = FALSE.copy()
         exec_ctx.symbol_table.set("file_name", String(os.path.abspath(noug_dir + "/test_file.noug")))
@@ -1233,11 +1208,10 @@ class BuiltInFunction(BaseBuiltInFunction):
         """like python ord"""
         # params:
         # * chr
-        chr_ = exec_ctx.symbol_table.get("chr")  # we get the char
+        chr_ = exec_ctx.symbol_table.getf("chr")  # we get the char
         if not isinstance(chr_, String):  # we check if it is a string
-            return RTResult().failure(RTTypeError(
-                chr_.pos_start, chr_.pos_end,
-                f"first argument of builtin function 'ord' must be a str.",
+            return RTResult().failure(RTTypeErrorF(
+                chr_.pos_start, chr_.pos_end, "first", "ord", "str", chr_,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_ord"
             ))
 
@@ -1267,11 +1241,10 @@ class BuiltInFunction(BaseBuiltInFunction):
         """like python chr"""
         # params:
         # * ord
-        ord_ = exec_ctx.symbol_table.get("ord")  # we get the char
+        ord_ = exec_ctx.symbol_table.getf("ord")  # we get the char
         if not isinstance(ord_, Number):  # we check if it is a string
-            return RTResult().failure(RTTypeError(
-                ord_.pos_start, ord_.pos_end,
-                f"first argument of builtin function 'chr' must be an int.",
+            return RTResult().failure(RTTypeErrorF(
+                ord_.pos_start, ord_.pos_end, "first", "chr", "int", ord_,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_chr"
             ))
 
@@ -1302,7 +1275,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         total = 0
         all_files = {}
 
-        print_values = exec_ctx.symbol_table.get("print_values")
+        print_values = exec_ctx.symbol_table.getf("print_values")
         print_ = True
         if print_values:
             if isinstance(print_values, Number):
@@ -1356,27 +1329,18 @@ class BuiltInFunction(BaseBuiltInFunction):
 
     def execute_round(self, exec_ctx: Context):
         """Like python 'round'"""
-        number = exec_ctx.symbol_table.get("number")
-        n_digits = exec_ctx.symbol_table.get("n_digits")
+        number = exec_ctx.symbol_table.getf("number")
+        n_digits = exec_ctx.symbol_table.getf("n_digits")
 
         if not isinstance(number, Number):
-            return RTResult().failure(RTTypeError(
-                number.pos_start, number.pos_end,
-                f"first argument of builtin function 'round' must be a number.",
+            return RTResult().failure(RTTypeErrorF(
+                number.pos_start, number.pos_end, "first", "round", "number", number,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_round"
             ))
 
-        if not isinstance(n_digits, Number) and n_digits is not None:
-            return RTResult().failure(RTTypeError(
-                n_digits.pos_start, n_digits.pos_end,
-                f"second argument of builtin function 'round' must be an int.",
-                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_round"
-            ))
-
-        if n_digits is not None and not n_digits.is_int():
-            return RTResult().failure(RTTypeError(
-                n_digits.pos_start, n_digits.pos_end,
-                f"second argument of builtin function 'round' must be an int.",
+        if n_digits is not None and (not isinstance(n_digits, Number) or not n_digits.is_float()):
+            return RTResult().failure(RTTypeErrorF(
+                n_digits.pos_start, n_digits.pos_end, "second", "round", "int", n_digits,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_round"
             ))
 

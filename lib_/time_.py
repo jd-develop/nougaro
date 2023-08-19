@@ -40,11 +40,10 @@ class Time(ModuleFunction):
         """Like python time.sleep()"""
         # Params:
         # * seconds
-        seconds = exec_ctx.symbol_table.get('seconds')  # we get the number of seconds we have to sleep
+        seconds = exec_ctx.symbol_table.getf('seconds')  # we get the number of seconds we have to sleep
         if not isinstance(seconds, Number):  # we check if it is a number
-            return RTResult().failure(RTTypeError(
-                seconds.pos_start, seconds.pos_end,
-                f"first argument of the built-in function 'time.sleep' must be a number, not {seconds.type_}.",
+            return RTResult().failure(RTTypeErrorF(
+                seconds.pos_start, seconds.pos_end, "first", "time.sleep", "number", seconds,
                 exec_ctx, "lib_.time_.Time.execute_time_sleep"
             ))
 
@@ -59,19 +58,11 @@ class Time(ModuleFunction):
         """Like python time.sleep() but the value is in milliseconds"""
         # Params:
         # * milliseconds
-        milliseconds = exec_ctx.symbol_table.get('milliseconds')  # we get the number of milliseconds we have to sleep
-        if not isinstance(milliseconds, Number):  # we check if it is a number
-            return RTResult().failure(RTTypeError(
-                milliseconds.pos_start, milliseconds.pos_end,
-                f"first argument of the built-in function 'time.sleep_milliseconds' must be an integer, not"
-                f" {milliseconds.type_}.",
-                exec_ctx, "lib_.time_.Time.execute_time_sleep_milliseconds"
-            ))
-
-        if milliseconds.is_float():  # we do not want a float
-            return RTResult().failure(RTTypeError(
-                milliseconds.pos_start, milliseconds.pos_end,
-                "first argument of the built-in function 'time.sleep_milliseconds' must be an integer, not float.",
+        milliseconds = exec_ctx.symbol_table.getf('milliseconds')  # we get the number of milliseconds we have to sleep
+        if not isinstance(milliseconds, Number) or not milliseconds.is_int():  # we check if it is a number
+            return RTResult().failure(RTTypeErrorF(
+                milliseconds.pos_start, milliseconds.pos_end, "first", "time.sleep_milliseconds", "integer",
+                milliseconds,
                 exec_ctx, "lib_.time_.Time.execute_time_sleep_milliseconds"
             ))
 

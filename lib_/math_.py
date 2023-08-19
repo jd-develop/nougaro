@@ -45,11 +45,10 @@ class Math(ModuleFunction):
         It returns the same as math_root(value, 2) or """
         # Params:
         # * value
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.sqrt' must be a number.",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.sqrt", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_sqrt"
             ))
 
@@ -74,29 +73,27 @@ class Math(ModuleFunction):
         # * value
         # Optional params:
         # * n
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.math_root' must be a number.",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.root", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_root"
             ))
 
         if value.value < 0:  # we check if the value is greater than (or equal to) 0
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.math_root' must be greater than (or equal to) 0.",
+                "first argument of the built-in function ‘math.root’ must be greater than (or equal to) 0.",
                 exec_context, "lib_.math_.Math.execute_math_root"
             ))
 
-        n = exec_context.symbol_table.get('n')  # we get 'n'
+        n = exec_context.symbol_table.getf('n')  # we get 'n'
         if n is None:  # if 'n' parameter is not filled, we set it to 2
             n = Number(2).set_pos(value.pos_end, self.pos_end)
 
         if not isinstance(n, Number):  # we check if 'n' is a number
-            return RTResult().failure(RTTypeError(
-                n.pos_start, n.pos_end,
-                "second argument of the built-in function 'math.math_root' must be a number.",
+            return RTResult().failure(RTTypeErrorF(
+                n.pos_start, n.pos_end, "second", "math.root", "number", n,
                 exec_context, "lib_.math_.Math.execute_math_root"
             ))
 
@@ -112,11 +109,10 @@ class Math(ModuleFunction):
         """Converts 'value' (radians) to degrees"""
         # Params:
         # * value
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.degrees' must be a number (angle in radians).",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.degrees", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_degrees"
             ))
         degrees = math_degrees(value.value)
@@ -130,11 +126,10 @@ class Math(ModuleFunction):
         """Converts 'value' (degrees) to radians"""
         # Params:
         # * value
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.radians' must be a number (angle in degrees).",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.radians", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_radians"
             ))
         radians = math_radians(value.value)
@@ -148,11 +143,10 @@ class Math(ModuleFunction):
         """Calculates sin('value')"""
         # Params:
         # * value
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.sin' must be a number (angle in radians).",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.sin", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_sin"
             ))
         sin = math_sin(value.value)
@@ -166,11 +160,10 @@ class Math(ModuleFunction):
         """Calculates cos('value')"""
         # Params:
         # * value
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.cos' must be a number (angle in radians).",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.cos", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_cos"
             ))
         cos = math_cos(value.value)
@@ -184,11 +177,10 @@ class Math(ModuleFunction):
         """Calculates tan('value')"""
         # Params:
         # * value
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.tan' must be a number (angle in radians).",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.tan", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_tan"
             ))
         tan = math_tan(value.value)
@@ -202,11 +194,10 @@ class Math(ModuleFunction):
         """Calculates asin('value')"""
         # Params:
         # * value
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.asin' must be a number.",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.asin", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_asin"
             ))
         try:
@@ -214,7 +205,7 @@ class Math(ModuleFunction):
         except ValueError:
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.asin' must be a number between -1 and 1.",
+                "first argument of the built-in function ‘math.asin’ must be a number between -1 and 1.",
                 exec_context, "lib_.math_.Math.execute_math_asin"
             ))
         return RTResult().success(Number(asin))
@@ -227,11 +218,10 @@ class Math(ModuleFunction):
         """Calculates acos('value')"""
         # Params:
         # * value
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.acos' must be a number.",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.acos", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_acos"
             ))
         try:
@@ -239,7 +229,7 @@ class Math(ModuleFunction):
         except ValueError:  # 1 < value or value < -1
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.acos' must be a number between -1 and 1.",
+                "first argument of the built-in function ‘math.acos’ must be a number between -1 and 1.",
                 exec_context, "lib_.math_.Math.execute_math_acos"
             ))
         return RTResult().success(Number(acos))
@@ -252,11 +242,10 @@ class Math(ModuleFunction):
         """Calculates atan('value')"""
         # Params:
         # * value
-        value = exec_context.symbol_table.get('value')  # we get the value
+        value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.atan' must be a number.",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.atan", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_atan"
             ))
         atan = math_atan(value.value)
@@ -270,11 +259,10 @@ class Math(ModuleFunction):
         """Exactly like python `abs()` (absolute value)"""
         # Params:
         # * value
-        value: Value = exec_context.symbol_table.get('value')  # we get the value
+        value: Value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.abs' must be a number.",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.abs", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_abs"
             ))
 
@@ -292,22 +280,20 @@ class Math(ModuleFunction):
         # * value
         # Optional params:
         # * base
-        value: Value = exec_context.symbol_table.get('value')  # we get the value
+        value: Value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.log' must be a number.",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.log", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_log"
             ))
 
-        base: Value = exec_context.symbol_table.get('base')  # we get the base
+        base: Value = exec_context.symbol_table.getf('base')  # we get the base
         if base is None:
             value_to_return = Number(log(value.value))
         else:
             if not isinstance(base, Number):  # we check if the base is a number
-                return RTResult().failure(RTTypeError(
-                    base.pos_start, base.pos_end,
-                    "second argument of the built-in function 'math.log' must be a number.",
+                return RTResult().failure(RTTypeErrorF(
+                    base.pos_start, base.pos_end, "second", "math.log", "number", base,
                     exec_context, "lib_.math_.Math.execute_math_log"
                 ))
             value_to_return = Number(log(value.value, base.value))
@@ -322,11 +308,10 @@ class Math(ModuleFunction):
         """Exactly like python 'log2()', is log(n, 2)"""
         # Params:
         # * value
-        value: Value = exec_context.symbol_table.get('value')  # we get the value
+        value: Value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
-            return RTResult().failure(RTTypeError(
-                value.pos_start, value.pos_end,
-                "first argument of the built-in function 'math.log2' must be a number.",
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.log2", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_log2"
             ))
 

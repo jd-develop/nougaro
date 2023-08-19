@@ -344,7 +344,7 @@ class Number(Value):
             return None, self.can_not_be_in(other)
 
     def is_int(self):
-        return True if self.type_ == 'int' else False
+        return self.type_ == 'int'
 
     def is_float(self):
         return not self.is_int()

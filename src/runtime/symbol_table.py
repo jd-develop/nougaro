@@ -35,6 +35,10 @@ class SymbolTable:
             return self.parent.get(name, get_in_grandparent)
         return value
 
+    def getf(self, name):
+        """Like get, but with get_in_(grand)parent to False. For builtin functions and modules."""
+        return self.get(name, False, False)
+
     def set(self, name, value):
         self.symbols[name] = value
 

@@ -1338,7 +1338,13 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_round"
             ))
 
-        if n_digits is not None and (not isinstance(n_digits, Number) or not n_digits.is_float()):
+        if n_digits is not None and not isinstance(n_digits, Number):
+            return RTResult().failure(RTTypeErrorF(
+                n_digits.pos_start, n_digits.pos_end, "second", "round", "int", n_digits,
+                exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_round"
+            ))
+
+        if n_digits is not None and not n_digits.is_int():
             return RTResult().failure(RTTypeErrorF(
                 n_digits.pos_start, n_digits.pos_end, "second", "round", "int", n_digits,
                 exec_ctx, "src.values.functions.builtin_function.BuiltInFunction.execute_round"

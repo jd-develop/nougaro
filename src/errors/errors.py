@@ -161,7 +161,7 @@ class RTTypeErrorF(RTTypeError):
     def __init__(self, pos_start, pos_end, arg_num: str, func_name: str, type_: str, value, context: Context,
                  origin_file: str = "(undetermined)", or_: str = None):
         super().__init__(pos_start, pos_end, f"type of the {arg_num} argument of builtin function ‘{func_name}’ "
-                                             f"should be ‘{type_}’ {f'or ‘{or_}’' if or_ is not None else ''}, "
+                                             f"should be ‘{type_}’{f' or ‘{or_}’' if or_ is not None else ''}, "
                                              f"got ‘{value.type_}’ instead.", context,
                          origin_file=origin_file)
         self.context = context

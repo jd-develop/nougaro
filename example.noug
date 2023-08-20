@@ -4,7 +4,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# This file was made in Nougaro beta 0.13.1 version.
+# This file was made in Nougaro beta 0.14 version.
 import math
 import statistics
 import time

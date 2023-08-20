@@ -77,7 +77,7 @@ def main():
                 "If you want some help about programming in nougaro, visit https://github.com/jd-develop/nougaro/wiki"
             )
             print()
-            print("Usage (assuming the command to run Nougaro is `nougaro`:")
+            print("Usage (assuming the command to run Nougaro is `nougaro`):")
             print("nougaro ([filename]) (-c(d) \"[command]\") (--help)")
             print()
             print("Arguments:")

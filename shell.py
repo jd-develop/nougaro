@@ -71,6 +71,24 @@ def main():
             # TODO: test in windows cmd and powershell
             assert isinstance(line_to_exec, str), "please report this bug on GitHub: https://github.com/" \
                                                   "jd-develop/nougaro"
+        elif args[0] == "--help":
+            print("The Nougaro programming language interpreter.")
+            print(
+                "If you want some help about programming in nougaro, visit https://github.com/jd-develop/nougaro/wiki"
+            )
+            print()
+            print("Usage (assuming the command to run Nougaro is `nougaro`:")
+            print("nougaro ([filename]) (-c(d) \"[command]\") (--help)")
+            print()
+            print("Arguments:")
+            print(" (nothing)       - open the shell")
+            print(" [filename]      - run a file")
+            print()
+            print("Options:")
+            print(" -c \"command\"    - run a command with shell output")
+            print(" -cd \"command\"   - run a command without shell output")
+            print(" --help          - show this message and exit.")
+            sys.exit()
         else:
             if not os.path.exists(args[0]):  # we check if the file exist, if not we quit with an error message
                 print_in_red(f"[nougaro] file '{args[0]}' does not exist.")

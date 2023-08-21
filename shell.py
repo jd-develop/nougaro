@@ -88,6 +88,14 @@ def main():
             print(" -c \"command\"    - run a command with shell output")
             print(" -cd \"command\"   - run a command without shell output")
             print(" --help          - show this message and exit.")
+            print(" --version -V    - print version and quits.")
+            sys.exit()
+        elif args[0] == "--version" or args[0] == "-V":
+            with open(os.path.abspath(noug_dir + "/config/noug_version.json")) as ver_json:
+                # we get the nougaro version from noug_version.json
+                ver_json_loaded = json.load(ver_json)
+                version = ver_json_loaded.get("phase") + " " + ver_json_loaded.get("noug_version")
+            print(version)
             sys.exit()
         else:
             if not os.path.exists(args[0]):  # we check if the file exist, if not we quit with an error message

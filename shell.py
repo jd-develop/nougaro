@@ -88,7 +88,7 @@ def main():
             print(" -c \"command\"    - run a command with shell output")
             print(" -cd \"command\"   - run a command without shell output")
             print(" --help          - show this message and exit.")
-            print(" --version -V    - print version and quits.")
+            print(" --version -V    - print version and exit.")
             sys.exit()
         elif args[0] == "--version" or args[0] == "-V":
             with open(os.path.abspath(noug_dir + "/config/noug_version.json")) as ver_json:

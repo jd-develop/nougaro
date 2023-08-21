@@ -75,3 +75,22 @@ class Function(BaseFunction):
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
         return copy
+
+
+class Method(Function):
+    """Parent class for methods (functions in classes)"""
+    def __init__(self, name, body_node, param_names, should_auto_return,
+                 call_with_module_context: bool = False):
+        super().__init__(name, body_node, param_names, should_auto_return, call_with_module_context)
+        self.type_ = "method"
+        self.object_ = None
+
+    def copy(self):
+        """Return a copy of self"""
+        copy = Method(self.name, self.body_node, self.param_names, self.should_auto_return,
+                      self.call_with_module_context)
+        copy.object_ = self.object_
+        copy.module_context = self.module_context
+        copy.set_context(self.context)
+        copy.set_pos(self.pos_start, self.pos_end)
+        return copy

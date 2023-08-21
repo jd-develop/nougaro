@@ -110,7 +110,10 @@ class RunTimeError(Error):
         ctx = self.context
 
         while ctx is not None:
-            result = f' In file {pos.file_name}, line {pos.line_number + 1}, in {ctx.display_name} :\n' + result
+            if pos is not None:
+                result = f' In file {pos.file_name}, line {pos.line_number + 1}, in {ctx.display_name}:\n' + result
+            else:
+                result = f' In file (unknown), line (unknown), in {ctx.display_name}:\n' + result
             pos = ctx.parent_entry_pos
             ctx = ctx.parent
 

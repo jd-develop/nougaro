@@ -51,6 +51,10 @@ class SymbolTable:
     def exists(self, name):
         return name in self.symbols
 
+    def set_parent(self, parent):
+        self.parent = parent
+        return self
+
     def copy(self):
         new_symbol_table = SymbolTable(self.parent)
         new_symbol_table.symbols = self.symbols.copy()

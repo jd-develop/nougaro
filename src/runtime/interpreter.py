@@ -11,7 +11,7 @@
 # nougaro modules imports
 from src.runtime.values.basevalues.basevalues import Number, String, List, NoneValue, Value, Module, Constructor, Object
 from src.runtime.values.defined_values.number import FALSE, TRUE
-from src.runtime.values.functions.function import Function
+from src.runtime.values.functions.function import Function, Method
 from src.runtime.values.functions.base_function import BaseFunction
 from src.constants import PROTECTED_VARS
 from src.parser.nodes import *
@@ -46,7 +46,7 @@ class Interpreter:
         # print(str(symbols_copy))
         ctx.symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
 
-    def visit(self, node: Node, ctx: Context, other_ctx: Context = None):
+    def visit(self, node: Node, ctx: Context, other_ctx: Context = None, methods_instead_of_funcs: bool = True):
         """Visit a node."""
         method_name = f'visit_{type(node).__name__}'
         method: CustomInterpreterVisitMethod = getattr(self, method_name, self.no_visit_method)
@@ -57,7 +57,10 @@ class Interpreter:
         if len(signature_.parameters) <= 1:  # def method(self) is 1 param, def staticmethod() is 0 param
             return method()
         elif len(signature_.parameters) == 3:
-            return method(node, ctx, other_ctx)
+            if "outer_context" in signature_.parameters.keys():
+                return method(node, ctx, other_ctx)
+            else:
+                return method(node, ctx, methods_instead_of_funcs)
 
         return method(node, ctx)
 
@@ -374,6 +377,8 @@ class Interpreter:
                 value = result.register(self.visit(var_name, ctx))  # here var_name is an expr
                 if not result.should_return():
                     break
+                else:
+                    return result
 
         if value is None:  # the variable is not defined
             if len(var_names_list) == 1:
@@ -819,16 +824,23 @@ class Interpreter:
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
         )
 
-    def visit_FuncDefNode(self, node: FuncDefNode, ctx: Context) -> RTResult:
+    def visit_FuncDefNode(self, node: FuncDefNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit FuncDefNode"""
         result = RTResult()
         # if there is no name given -> None
         func_name = node.var_name_token.value if node.var_name_token is not None else None
         body_node = node.body_node
         param_names = [param_name.value for param_name in node.param_names_tokens]
-        func_value = Function(func_name, body_node, param_names, node.should_auto_return).set_context(ctx).set_pos(
-            node.pos_start, node.pos_end
-        )  # we already create the Function value, but we'll maybe not return it
+
+        # we already create the Function value, but we'll maybe not return it
+        if not methods_instead_of_funcs:
+            func_value = Function(func_name, body_node, param_names, node.should_auto_return).set_context(ctx).set_pos(
+                node.pos_start, node.pos_end
+            )
+        else:
+            func_value = Method(func_name, body_node, param_names, node.should_auto_return).set_context(ctx).set_pos(
+                node.pos_start, node.pos_end
+            )
 
         if node.var_name_token is not None:  # the function have a name
             if func_name not in PROTECTED_VARS:  # if the name isn't protected, we can set it in the symbol table
@@ -873,7 +885,13 @@ class Interpreter:
                     )
         else:
             parent = None
-        class_value = Constructor(class_name, body_node, {}, parent).set_context(ctx).set_pos(
+
+        class_ctx = Context(class_name, ctx).set_symbol_table(SymbolTable())
+        result.register(self.visit(body_node, class_ctx, methods_instead_of_funcs=True))
+        if result.should_return():
+            return result
+
+        class_value = Constructor(class_name, class_ctx.symbol_table, {}, parent).set_context(ctx).set_pos(
             node.pos_start, node.pos_end
         )  # we already create the Class value, but we'll maybe not return it
 
@@ -905,8 +923,6 @@ class Interpreter:
             for arg_node, mul in node.arg_nodes:  # we check the arguments
                 if not mul:
                     args.append(result.register(self.visit(arg_node, outer_context)))
-                    if result.should_return():  # check for errors
-                        return result
                 else:
                     list_: Value = result.register(self.visit(arg_node, outer_context))
                     if not isinstance(list_, List):
@@ -919,6 +935,8 @@ class Interpreter:
                             )
                         )
                     args.extend(list_.elements)
+                if result.should_return():  # check for errors
+                    return result
 
             if call_with_module_context:
                 if outer_context.parent is None:
@@ -930,6 +948,18 @@ class Interpreter:
                         args, Interpreter, self.run, self.noug_dir, exec_from=f"{outer_context.display_name} from "
                                                                               f"{outer_context.parent.display_name}",
                         use_context=value_to_call.module_context))
+            elif isinstance(value_to_call, Method):
+                outer_context.symbol_table.set("this", value_to_call.object_)
+                self.update_symbol_table(outer_context)
+                if outer_context.parent is None:
+                    return_value = result.register(value_to_call.execute(
+                        args, Interpreter, self.run, self.noug_dir, exec_from=f"{outer_context.display_name}",
+                        use_context=outer_context))
+                else:
+                    return_value = result.register(value_to_call.execute(
+                        args, Interpreter, self.run, self.noug_dir, exec_from=f"{outer_context.display_name} from "
+                                                                              f"{outer_context.parent.display_name}",
+                        use_context=outer_context))
             else:
                 if outer_context.parent is None:
                     return_value = result.register(value_to_call.execute(
@@ -948,40 +978,71 @@ class Interpreter:
         elif isinstance(value_to_call, Constructor):  # the value is an object constructor
             args = []
             call_with_module_context: bool = value_to_call.call_with_module_context
-            # call the function
-            for arg_node, mul in node.arg_nodes:  # we check the arguments
-                if not mul:
-                    args.append(result.register(self.visit(arg_node, outer_context)))
-                    if result.should_return():  # check for errors
-                        return result
-                else:
-                    list_: Value = result.register(self.visit(arg_node, outer_context))
-                    if not isinstance(list_, List):
-                        return result.failure(
-                            RTTypeError(
-                                list_.pos_start, list_.pos_end,
-                                f"expected a list value after '*', but got '{list_.type_}.",
-                                outer_context,
-                                origin_file="src.interpreter.Interpreter.visit_CallNode"
-                            )
-                        )
-                    args.extend(list_.elements)
 
-            object_ = Object({"__constructor__": value_to_call})
+            obj_attrs = value_to_call.symbol_table.symbols.copy()
+            object_ = Object(obj_attrs, value_to_call).set_pos(value_to_call.pos_start, value_to_call.pos_end)
             if call_with_module_context:
                 inner_ctx = Context(value_to_call.name, value_to_call.module_context)
-                inner_ctx.symbol_table = SymbolTable(value_to_call.module_context.symbol_table)
+                inner_ctx.symbol_table = value_to_call.module_context.symbol_table.copy()
             else:
                 inner_ctx = Context(value_to_call.name, outer_context)
-                inner_ctx.symbol_table = SymbolTable(outer_context.symbol_table)
+                inner_ctx.symbol_table = outer_context.symbol_table.copy()
 
             inner_ctx.symbol_table.set("this", object_)
             self.update_symbol_table(inner_ctx)
-            body = result.register(self.visit(value_to_call.body_node, inner_ctx))
-            # todo: faire en sorte que les différentes valeurs définies dans la classe soient attributs de l'objet
+            object_.inner_context = inner_ctx
+            for attr in obj_attrs.keys():
+                if isinstance(obj_attrs[attr], Method):
+                    obj_attrs[attr].object_ = object_
 
             if result.should_return():  # check for errors
                 return result
+
+            # call the __init__ function if it exists
+            init_func = obj_attrs.get("__init__")
+            if init_func is not None:
+                if not isinstance(init_func, BaseFunction):
+                    return result.failure(
+                        RTTypeError(
+                            init_func.pos_start, init_func.pos_end,
+                            f"‘__init__’ should be a function, not ‘{init_func.type_}’.",
+                            outer_context, origin_file="src.interpreter.Interpreter.visit_CallNode"
+                        )
+                    )
+                for arg_node, mul in node.arg_nodes:  # we check the arguments
+                    if not mul:
+                        args.append(result.register(self.visit(arg_node, outer_context)))
+                    else:
+                        list_: Value = result.register(self.visit(arg_node, outer_context))
+                        if not isinstance(list_, List):
+                            return result.failure(
+                                RTTypeError(
+                                    list_.pos_start, list_.pos_end,
+                                    f"expected a list value after '*', but got '{list_.type_}.",
+                                    outer_context,
+                                    origin_file="src.interpreter.Interpreter.visit_CallNode"
+                                )
+                            )
+                        args.extend(list_.elements)
+                    if result.should_return():
+                        return result
+
+                __init__value = result.register(init_func.execute(
+                    args, Interpreter, self.run, self.noug_dir, exec_from=f"{value_to_call.name} from "
+                                                                          f"{outer_context.display_name}",
+                    use_context=inner_ctx))
+                if result.should_return():
+                    return result
+
+            else:
+                if len(node.arg_nodes) != 0:
+                    return result.failure(
+                        RTTypeError(
+                            node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
+                            f"{value_to_call.name}() takes no arguments.",
+                            outer_context, origin_file="src.interpreter.Interpreter.visit_CallNode"
+                        )
+                    )
 
             return_value = object_.set_pos(node.pos_start, node.pos_end).set_context(outer_context)
             return result.success(return_value)

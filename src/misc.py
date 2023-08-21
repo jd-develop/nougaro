@@ -11,6 +11,7 @@
 # nougaro modules imports
 from src.runtime.context import Context
 from src.parser.nodes import Node
+from src.runtime.values.basevalues.basevalues import Object
 # built-in python imports
 from typing import Protocol, Any
 try:
@@ -89,5 +90,14 @@ class CustomBuiltInFuncMethodWithNougDirButNotRun(CustomBuiltInFuncMethod):
 class CustomInterpreterVisitMethod(Protocol):
     """The type of the methods `visit_{name}` in Interpreter"""
     # This class was made to bypass a pycharm bug.
-    def __call__(self, node: Node = None, exec_context: Context = None, other_context: Context = None) -> Any:
+    def __call__(self, node: Node = None, exec_context: Context = None,
+                 other_context: Context = None) -> Any:
+        ...
+
+
+class CustomInterpreterVisitMethodFuncDef(Protocol):
+    """The type of the methods `visit_{name}` in Interpreter"""
+    # This class was made to bypass a pycharm bug.
+    def __call__(self, node: Node = None, exec_context: Context = None,
+                 method_instead_of_funcs: bool = False, object_: Object = None) -> Any:
         ...

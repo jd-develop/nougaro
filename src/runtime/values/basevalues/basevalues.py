@@ -575,10 +575,10 @@ class Module(Value):
 
 
 class Constructor(Value):
-    def __init__(self, name, body_node, attributes: dict, parent=None):
+    def __init__(self, name, symbol_table, attributes: dict, parent=None):
         super().__init__()
         self.name = name if name is not None else '<class>'
-        self.body_node = body_node
+        self.symbol_table = symbol_table
         self.attributes = attributes.copy()
         self.parent = parent
         self.type_ = "constructor"
@@ -618,7 +618,7 @@ class Constructor(Value):
 
     def copy(self):
         """Return a copy of self"""
-        copy = Constructor(self.name, self.body_node, self.attributes, self.parent)
+        copy = Constructor(self.name, self.symbol_table, self.attributes, self.parent)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
         copy.module_context = self.module_context
@@ -626,12 +626,12 @@ class Constructor(Value):
 
 
 class Object(Value):
-    def __init__(self, attributes: dict):
+    def __init__(self, attributes: dict, constructor: Constructor, inner_ctx=None):
         super().__init__()
         self.attributes = attributes.copy()
-        constructor = self.attributes['__constructor__']
-        constructor: Constructor
+        self.constructor: Constructor = constructor
         self.type_ = constructor.name
+        self.inner_context = inner_ctx
 
     def __repr__(self):
         return f"<{self.type_} object>"
@@ -665,7 +665,7 @@ class Object(Value):
 
     def copy(self):
         """Return a copy of self"""
-        copy = Object(self.attributes)
+        copy = Object(self.attributes, self.constructor, self.inner_context)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
         copy.module_context = self.module_context

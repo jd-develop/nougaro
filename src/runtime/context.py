@@ -48,6 +48,28 @@ class Context:
         """Return the dict returned by Context.dict_ under a str form."""
         return str(self.__repr__())
 
+    def set_symbol_table(self, new_symbol_table: SymbolTable):
+        """Sets symbol table then returns self"""
+        self.symbol_table = new_symbol_table
+        return self
+
+    def set_symbol_table_to_parent_symbol_table(self):
+        """Sets symbol table to parent’s one then return self. If current symbol table is None and parent is None,
+        create a blank symbol table."""
+        if self.parent is not None:
+            self.symbol_table = self.parent.symbol_table.copy()
+        elif self.symbol_table is None:
+            self.symbol_table = SymbolTable()
+        return self
+
+    def set_symbol_table_with_parent_symbol_table_as_parent(self, new_symbol_table: SymbolTable):
+        """Sets symbol table, sets its parent to parent’s one (if it exists) then return self."""
+        if self.parent is not None:
+            self.symbol_table = new_symbol_table.copy().set_parent(self.parent.symbol_table)
+        elif self.symbol_table is None:
+            self.symbol_table = new_symbol_table.copy()
+        return self
+
     def copy(self):
         """Return a copy of self."""
         new_ctx = Context(self.display_name, self.parent, self.parent_entry_pos)

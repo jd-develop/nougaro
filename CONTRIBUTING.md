@@ -19,7 +19,7 @@ By participating, you are expected to uphold this code.
 Please report unacceptable behavior by [mail](mailto:jd-develop@laposte.net).
 
 ## What should I know before I get started?
-Nougaro is a high-level non-yet-object-oriented programming language interpreted in Python.
+Nougaro is a high-level object-oriented programming language interpreted in Python.
 To understand my code, you can first read [this file](how_it_works.md), then read the comments of the code files.
 
 ## How can I contribute?

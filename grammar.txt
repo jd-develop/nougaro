@@ -1,6 +1,6 @@
 This is the AST of the Nougaro language. This AST is computed by the Parser (src.parser.Parser).
 
-statements : NEWLINE* statement (NEWLINE+ statement)* NEWLINE
+statements : NEWLINE* statement (NEWLINE+ statement)* NEWLINE*
 
 statement  : KEYWORD:RETURN expr?
            : KEYWORD:IMPORT IDENTIFIER
@@ -31,7 +31,7 @@ power      : call (DOT call)?* (POW factor)*
 call       : atom (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
 
 atom       : (INT|FLOAT)(E_INFIX INT)?
-           : STRING (STRING)?*
+           : STRING (STRING NEWLINE?*)?*
            : IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*
            : LPAREN expr RPAREN
            : list_expr

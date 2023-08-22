@@ -31,10 +31,16 @@ def debug_mode_enable()
 end
 
 
+var enable = debug_mode_enable
+
+
 def debug_mode_disable()
 	write "0" !>> _CONF_DEBUG_FILE
 	print("DEBUG mode is now DISABLED.")
 end
+
+
+var disable = debug_mode_disable
 
 
 def print_context()
@@ -53,6 +59,8 @@ export should_print_context
 export enable_all
 export disable_all
 export debug_mode_enable
+export enable
 export debug_mode_disable
+export disable
 export print_context
 export stop_print_context

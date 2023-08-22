@@ -238,7 +238,7 @@ class Interpreter:
         if len(nodes_and_tokens_list) == 1:  # there is no comparison
             if not isinstance(nodes_and_tokens_list[0], list):
                 return self.visit(nodes_and_tokens_list[0], ctx)
-            else:
+            else:  # multiple var accesses: this is id.attr
                 value: Value = res.register(self.visit(node.nodes_and_tokens_list[0][0], ctx))
                 if res.should_return():
                     return res

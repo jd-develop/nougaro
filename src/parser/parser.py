@@ -714,7 +714,8 @@ class Parser:
 
     def atom(self) -> ParseResult:
         """
-        atom  : (INT|FLOAT)(E_INFIX INT)?|(STRING (STRING)?*)|(IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*)
+        atom  : (INT|FLOAT)(E_INFIX INT)?|(STRING (STRING NEWLINE?*)?*)
+              : (IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*)
               : LPAREN expr RPAREN
               : list_expr
               : if_expr
@@ -769,12 +770,16 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            # (STRING)?*
+            # (STRING NEWLINE?*)?*
             while self.current_token.type == TT["STRING"]:
                 to_return_str += self.current_token.value
 
                 result.register_advancement()
                 self.advance()
+
+                while self.current_token.type == TT["NEWLINE"]:
+                    result.register_advancement()
+                    self.advance()
 
             to_return_tok.value = to_return_str
             return result.success(StringNode(to_return_tok))

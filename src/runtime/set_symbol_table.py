@@ -51,6 +51,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("is_module", IS_MODULE)
     symbol_table.set("is_none", IS_NONE)
     symbol_table.set("type", TYPE)
+    symbol_table.set("py_type", PY_TYPE)
     symbol_table.set("str", STR)
     symbol_table.set("list", LIST)
     symbol_table.set("int", INT)
@@ -117,7 +118,6 @@ def set_symbol_table(symbol_table: SymbolTable):
     if '__symbol_table__' in symbols_copy.keys():
         del symbols_copy['__symbol_table__']
     symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
-    symbol_table.set("p", String("class_proto_test.noug"))
 
     # test_protected_vars(symbol_table)
 

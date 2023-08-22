@@ -83,6 +83,9 @@ print("OK var del")
 "a\nb"
 "a\tb"
 "a\\b"
+assert "a""b" == "ab"
+assert "a"
+       "b" == "ab"
 
 print("OK str")
 
@@ -172,7 +175,6 @@ print("* exit")
 print("* clear")
 print("* run")
 print("* example")
-print("* system_call")
 print("* __test__")
 
 assert print(hello) == None
@@ -370,6 +372,12 @@ print("OK statistics lib")
 
 print("Please test 'time' module (tested when 'example()' is executed)")
 print("Please test 'lorem' module")
+
+# system_call
+print("Here it should print “hello”:")
+system_call("echo hello")
+print("If it didn't work, please open an issue on the GitHub.")
+print()
 
 # everything is fine in this file
 print("OK everything")

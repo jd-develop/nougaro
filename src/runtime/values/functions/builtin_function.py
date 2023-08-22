@@ -759,6 +759,17 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_type.optional_params = []
     execute_type.should_respect_args_number = True
 
+    def execute_py_type(self, exec_context: Context):
+        """Get the python type of 'value'"""
+        # Params :
+        # * value
+        value_to_get_type = exec_context.symbol_table.getf('value')  # we get the value
+        return RTResult().success(String(str(type(value_to_get_type))))  # we return its python type
+
+    execute_py_type.param_names = ['value']
+    execute_py_type.optional_params = []
+    execute_py_type.should_respect_args_number = True
+
     def execute_str(self, exec_context: Context):
         """Python 'str()'"""
         # Params :

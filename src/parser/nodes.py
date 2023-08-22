@@ -73,21 +73,26 @@ class ListNode(Node):
 # VAR NODES
 class VarAssignNode(Node):
     """Node for variable assign
-    example: `var foo += bar`: var_name_tokens is [Token(TT_STRING, 'foo')]
+    example: `var foo += bar`: var_name_tokens is [[Token(TT_IDENTIFIER, 'foo')]]
                                value_nodes is [VarAccessNode where var_name_tokens_list is [Token(TT_IDENTIFIER, 'bar')]
                                     ]
                                equal is TT_PLUSEQ
-    example: `var a, b /= 1, 2`: var_name_tokens is [Token(TT_STRING, 'a'), Token(TT_STRING, 'b')]
-                                 value_nodes is [NumberNode, NumberNode] (values of the num tok : 1 and 2
+    example: `var a, b /= 1, 2`: var_name_tokens is [[Token(TT_IDENTIFIER, 'a')],
+                                     [Token(TT_IDENTIFIERTT_IDENTIFIER, 'b')]]
+                                 value_nodes is [NumberNode, NumberNode] (values of the num tok: 1 and 2
                                  equal is TT_DIVEQ
                                  same as `var a /= 1 ; var b /= 2`
+    example: `var a.b, c = 1, 2`: var_name_tokens is [[VarAccessNode(a), Token(TT_IDENTIFIER, "b")],
+                                      [Token(TT_IDENTIFIER, c)]
+                                  value_nodes is [NumberNode, NumberNode] (values: 1 and 2)
+                                  equal is TT_EQ
     """
-    def __init__(self, var_name_tokens, value_nodes, equal=TT["EQ"]):
-        self.var_name_tokens = var_name_tokens
+    def __init__(self, var_name_tokens: list[list[Token | Node]], value_nodes, equal=TT["EQ"]):
+        self.var_name_tokens: list[list[Token | Node]] = var_name_tokens
         self.value_nodes = value_nodes
         self.equal = equal
 
-        self.pos_start = self.var_name_tokens[0].pos_start
+        self.pos_start = self.var_name_tokens[0][0].pos_start
         self.pos_end = self.value_nodes[-1].pos_end
 
     def __repr__(self):

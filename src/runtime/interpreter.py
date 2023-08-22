@@ -19,7 +19,7 @@ from src.errors.errors import *
 from src.lexer.token_types import TT
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
-from src.misc import CustomInterpreterVisitMethod
+from src.misc import CustomInterpreterVisitMethod, CustomInterpreterVisitMethodFuncDef
 from src.runtime.symbol_table import SymbolTable
 # built-in python imports
 from inspect import signature
@@ -60,6 +60,7 @@ class Interpreter:
             if "outer_context" in signature_.parameters.keys():
                 return method(node, ctx, other_ctx)
             else:
+                method: CustomInterpreterVisitMethodFuncDef
                 return method(node, ctx, methods_instead_of_funcs)
 
         return method(node, ctx)
@@ -456,7 +457,7 @@ class Interpreter:
     def visit_VarAssignNode(self, node: VarAssignNode, ctx: Context) -> RTResult:
         """Visit VarAssignNode"""
         result = RTResult()
-        var_names = [tok.value for tok in node.var_name_tokens]  # we get the names of the vars to modify / create
+        var_names = node.var_name_tokens
         values = [result.register(self.visit(node, ctx)) for node in node.value_nodes]  # we get the values
         equal = node.equal.type  # we get the equal type
         if result.should_return() or result.old_should_return:  # check for errors
@@ -475,6 +476,14 @@ class Interpreter:
         # print(len(final_values))
         # print(final_values)
         for i, var_name in enumerate(var_names):
+            is_attr = False
+            for node_tok in var_name:
+                if isinstance(node_tok, Node):
+                    is_attr = True
+                    value = result.register(node_tok)
+                    if result.should_return():
+                        return result
+
             if var_name not in PROTECTED_VARS:  # this constant is the list of all var names you can't modify
                 #                                 (unless you want to break nougaro)
                 if equal == TT["EQ"]:  # just a regular equal, we can modify/create the variable in the symbol table

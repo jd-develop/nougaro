@@ -382,3 +382,6 @@ print()
 # everything is fine in this file
 print("OK everything")
 print("Everything seems fine!")
+
+var a = (class Test; var b5 = (class; var c = 2; end)(); end)()
+assert a.b5.c == 2

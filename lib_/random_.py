@@ -50,7 +50,6 @@ class Random(ModuleFunction):
         if not isinstance(b, Number) or not b.is_int():  # we check if 'b' is an integer
             return RTResult().failure(RTTypeErrorF(
                 b.pos_start, b.pos_end, "second", "random.randint", "int", b,
-                "second argument of the built-in function 'random.randint' must be an int.",
                 exec_ctx, "lib_.random_.Random.execute_random_randint"
             ))
 

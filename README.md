@@ -23,10 +23,10 @@
  Un langage de programmation. Interpréteur écrit en Python.
 
 ### Modules tiers
- Modules pas toujours fournis avec Python (pourquoi ?):
+ Modules pas toujours fournis avec Python (pourquoi ?) :
   * `colorama` (`pip install colorama`, optionnel)
 
- Sous Linux (optionnel):
+ Sous Linux (optionnel) :
   * `readline` (`pip install readline`)
  
 ### Exécuter

@@ -9,8 +9,7 @@ statement  : KEYWORD:RETURN expr?
            : KEYWORD:BREAK
            : expr
 
-expr       : KEYWORD:VAR ((expr DOT)? (call DOT)?*)? IDENTIFIER ((DOT call)*? (DOT IDENTIFIER)*?)?*
-                         (COMMA ((expr DOT)? (call DOT)?*)? IDENTIFIER ((DOT call)*? (DOT IDENTIFIER)*?)?*)?*
+expr       : KEYWORD:VAR power (COMMA power)?*  # here power is checked to match expected syntax
                          (EQ|PLUSEQ|MINUSEQ|MULTEQ|DIVEQ|POWEQ|FLOORDIVEQ|PERCEQ|OREQ|ANDEQ|XOREQ|BITWISEANDEQ|BITWISEOREQ|BITWISEXOREQ|EEEQ|GTEQ|GTEEQ|LTEQ|LTEEQ)
                          expr (COMMA expr)?*
            : KEYWORD:DEL IDENTIFIER

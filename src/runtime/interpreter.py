@@ -457,8 +457,12 @@ class Interpreter:
     def visit_VarAssignNode(self, node: VarAssignNode, ctx: Context) -> RTResult:
         """Visit VarAssignNode"""
         result = RTResult()
-        var_names = node.var_name_tokens
-        values = [result.register(self.visit(node, ctx)) for node in node.value_nodes]  # we get the values
+        var_names: list[Token | BinOpCompNode] = node.var_names
+        values = []
+        for value_node in node.value_nodes:  # we get the values
+            values.append(result.register(self.visit(value_node, ctx)))
+            if result.should_return() or result.old_should_return:
+                return result
         equal = node.equal.type  # we get the equal type
         if result.should_return() or result.old_should_return:  # check for errors
             return result
@@ -476,13 +480,18 @@ class Interpreter:
         # print(len(final_values))
         # print(final_values)
         for i, var_name in enumerate(var_names):
-            is_attr = False
-            for node_tok in var_name:
-                if isinstance(node_tok, Node):
-                    is_attr = True
-                    value = result.register(node_tok)
-                    if result.should_return():
-                        return result
+            if isinstance(var_name, BinOpCompNode):
+                print("This feature is work in progress.")
+                return result.success(NoneValue())
+            else:  # token
+                var_name = var_name.value
+            # is_attr = False
+            # for node_tok in var_name:
+            #     if isinstance(node_tok, Node):
+            #         is_attr = True
+            #         value = result.register(node_tok)
+            #         if result.should_return():
+            #             return result
 
             if var_name not in PROTECTED_VARS:  # this constant is the list of all var names you can't modify
                 #                                 (unless you want to break nougaro)

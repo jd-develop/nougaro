@@ -299,12 +299,17 @@ class Parser:
                 result.register_advancement()
                 self.advance()
             else:
-                var_name_node_or_tok: Node = result.register(self.power())
+                var_name_node_or_tok: Node | list = result.register(self.power())
                 if result.error is not None:
                     return result
-                if (not isinstance(var_name_node_or_tok, BinOpCompNode) or
+                if (not isinstance(var_name_node_or_tok, (BinOpCompNode, list)) or
                         not isinstance(var_name_node_or_tok.nodes_and_tokens_list[-1], Token) or
                         var_name_node_or_tok.nodes_and_tokens_list[-1].type != TT["IDENTIFIER"]):
+                    print(var_name_node_or_tok, type(var_name_node_or_tok))
+                    if isinstance(var_name_node_or_tok, BinOpCompNode):
+                        print(var_name_node_or_tok.nodes_and_tokens_list[-1], type(var_name_node_or_tok.nodes_and_tokens_list[-1]))
+                        if isinstance(var_name_node_or_tok.nodes_and_tokens_list[-1], Token):
+                            print(var_name_node_or_tok.nodes_and_tokens_list[-1].type, var_name_node_or_tok.nodes_and_tokens_list[-1].value)
                     return result.failure(
                         InvalidSyntaxError(
                             var_tok.pos_end, self.current_token.pos_start,
@@ -545,6 +550,130 @@ class Parser:
             return result
 
         return result.success(node)
+
+    def var_assign(self) -> ParseResult:
+        """
+        var_assign : KEYWORD:VAR (expr DOT)? (IDENTIFIER (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?* DOT)?*
+                     IDENTIFIER
+                     (COMMA (expr DOT)? (IDENTIFIER (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?* DOT)?*
+                     IDENTIFIER)?*
+                     (EQ|PLUSEQ|MINUSEQ|MULTEQ|DIVEQ|POWEQ|FLOORDIVEQ|PERCEQ|OREQ|ANDEQ|XOREQ|BITWISEANDEQ|BITWISEOREQ|
+                     BITWISEXOREQ|EEEQ|GTEQ|GTEEQ|LTEQ|LTEEQ)
+                     expr (COMMA expr)?*
+        """
+        result = ParseResult()
+        if not self.current_token.matches(TT["KEYWORD"], "var"):
+            return result.failure(
+                InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected ‘var’ keyboard.",
+                    origin_file="src.parser.parser.Parser.var_assign"
+                )
+            )
+        result.register_advancement()
+        self.advance()
+
+        is_attr = False
+        nodes_and_tokens_list: list[Node | Token] = []
+        # if current token is not identifier we have to register expr
+        if self.current_token.type != TT["IDENTIFIER"]:
+            expr_res = result.register(self.expr())
+            if result.error is not None:
+                return result
+            nodes_and_tokens_list.append(expr_res)
+            is_attr = True
+
+        while self.current_token.type == TT["IDENTIFIER"]:
+            identifier = self.current_token
+            result.register_advancement()
+            self.advance()
+
+            is_call = False
+            call_node = identifier
+
+            if self.current_token.type == TT["LPAREN"]:
+                call_node = VarAccessNode([identifier], is_attr)
+                is_call = True
+
+                while self.current_token.type == TT["LPAREN"]:
+                    result.register_advancement()
+                    self.advance()
+                    arg_nodes = []
+
+                    comma_expected = False
+                    mul = False
+                    # we check for the closing paren.
+                    if self.current_token.type == TT["RPAREN"]:
+                        result.register_advancement()
+                        self.advance()
+                    else:  # (MUL? expr (COMMA MUL? expr)?*)?
+                        if self.current_token.type == TT["MUL"]:  # MUL?
+                            mul = True
+                            # we advance
+                            result.register_advancement()
+                            self.advance()
+                        # expr
+                        arg_nodes.append(
+                            (
+                                result.register(self.expr()),
+                                mul
+                            )
+                        )
+                        if result.error is not None:
+                            return result
+                        while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
+                            mul = False
+                            # we advance
+                            result.register_advancement()
+                            self.advance()
+
+                            if self.current_token.type == TT["MUL"]:  # MUL?
+                                mul = True
+                                # we advance
+                                result.register_advancement()
+                                self.advance()
+                            # expr
+                            # we register an expr then check for an error
+                            arg_nodes.append(
+                                (
+                                    result.register(self.expr()),
+                                    mul
+                                )
+                            )
+                            if result.error is not None:
+                                return result
+
+                        if self.current_token.type != TT["RPAREN"]:  # there is no paren (it is expected)
+                            return result.failure(
+                                InvalidSyntaxError(
+                                    self.current_token.pos_start, self.current_token.pos_end,
+                                    "expected ',' or ')'." if comma_expected else "expected ')'.",
+                                    "src.parser.parser.Parser.call"
+                                )
+                            )
+
+                        result.register_advancement()
+                        self.advance()
+                    call_node = CallNode(call_node, arg_nodes)
+
+            if self.current_token == TT["DOT"]:
+                is_attr = True
+                nodes_and_tokens_list.append(call_node)  # call_node can be identifier token
+            else:
+                if is_call:
+                    return result.failure(
+                        InvalidSyntaxError(
+                            self.current_token.pos_start, self.current_token.pos_end,
+                            "expected dot.",
+                            origin_file="src.parser.parser.Parser.var_assign"
+                        )
+                    )
+                else:
+                    nodes_and_tokens_list.append(call_node)
+                    break
+
+        # todo: commas
+        # todo: list(index) = value
 
     def comp_expr(self) -> ParseResult:
         """
@@ -1733,7 +1862,8 @@ class Parser:
             func_b: Callable | list[Node] = None,
             left_has_priority: bool = True
     ) -> ParseResult:
-        """Binary operator such as 1+1 or 3==2"""
+        """Binary operator such as 1+1 or 3==2
+        Can return BinOpCompNode, BinOpNode, or list."""
         # if any func is a list, like [foo, bar()], the func is foo.bar()
         # param left_has_priority is used to know if we have to parse (for exemple) 3==3==3 into
         # ((int:3, ==, int:3), ==, int:3) (True) or (int:3, ==, int:3, ==, int:3) (False)
@@ -1746,7 +1876,7 @@ class Parser:
             if result.error is not None:
                 return result
         else:
-            left = func_a  # func_a is a list : this is the left operand
+            left = func_a  # func_a is a list: this is the left operand
 
         if left_has_priority:
             while self.current_token.type in ops or (self.current_token.type, self.current_token.value) in ops:

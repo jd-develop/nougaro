@@ -19,7 +19,7 @@ from src.errors.errors import *
 from src.lexer.token_types import TT
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
-from src.misc import CustomInterpreterVisitMethod, CustomInterpreterVisitMethodFuncDef
+from src.misc import CustomInterpreterVisitMethod, CustomInterpreterVisitMethodFuncDef, print_in_red
 from src.runtime.symbol_table import SymbolTable
 # built-in python imports
 from inspect import signature
@@ -481,10 +481,26 @@ class Interpreter:
         # print(final_values)
         for i, var_name in enumerate(var_names):
             if len(var_name) != 1:
-                print("This feature is work in progress.")
-                return result.success(NoneValue())
-            else:  # token
-                var_name = var_name.value
+                print_in_red("This feature is work in progress.")
+                return result.success(NoneValue(False))
+            else:  # single var name
+                if not isinstance(var_name[0], Token):
+                    return result.failure(
+                        RunTimeError(
+                            var_name[0].pos_start, var_name[0].pos_end,
+                            "excepted identifier.",
+                            ctx, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
+                        )
+                    )
+                if var_name[0].type != TT["IDENTIFIER"]:
+                    return result.failure(
+                        RunTimeError(
+                            var_name[0].pos_start, var_name[0].pos_end,
+                            "excepted identifier.",
+                            ctx, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
+                        )
+                    )
+                final_var_name = var_name[0].value
             # is_attr = False
             # for node_tok in var_name:
             #     if isinstance(node_tok, Node):
@@ -493,14 +509,14 @@ class Interpreter:
             #         if result.should_return():
             #             return result
 
-            if var_name not in PROTECTED_VARS:  # this constant is the list of all var names you can't modify
+            if final_var_name not in PROTECTED_VARS:  # this constant is the list of all var names you can't modify
                 #                                 (unless you want to break nougaro)
                 if equal == TT["EQ"]:  # just a regular equal, we can modify/create the variable in the symbol table
-                    ctx.symbol_table.set(var_name, values[i])
+                    ctx.symbol_table.set(final_var_name, values[i])
                     final_value = values[i]  # we want to return the new value of the variable
                 else:
-                    if var_name in ctx.symbol_table.symbols:  # edit a variable
-                        var_actual_value: Value = ctx.symbol_table.get(var_name)  # actual value of the variable
+                    if final_var_name in ctx.symbol_table.symbols:  # edit a variable
+                        var_actual_value: Value = ctx.symbol_table.get(final_var_name)  # actual value of the variable
                         if equal == TT["PLUSEQ"]:
                             final_value, error = var_actual_value.added_to(values[i])
                         elif equal == TT["MINUSEQ"]:
@@ -549,28 +565,29 @@ class Interpreter:
                         if error is not None:  # there is an error
                             error.set_pos(node.pos_start, node.pos_end)
                             return result.failure(error)
-                        ctx.symbol_table.set(var_name, final_value)  # we can edit the variable. We will return
-                        #                                              final_value
+                        ctx.symbol_table.set(final_var_name, final_value)  # we can edit the variable. We will return
+                        #                                                    final_value
                     else:
-                        if ctx.symbol_table.exists(f'__{var_name}__'):
+                        if ctx.symbol_table.exists(f'__{final_var_name}__'):
                             # e.g. user entered `var foo += 1` instead of `var __foo__ += 1`
                             return result.failure(
                                 RTNotDefinedError(
-                                    node.pos_start, node.pos_end, f"name '{var_name}' is not defined yet. "
-                                                                  f"Did you mean '__{var_name}__'?", ctx,
-                                    "src.interpreter.Interpreter.visit_VarAssignNode"
+                                    node.pos_start, node.pos_end, f"name '{final_var_name}' is not defined yet. "
+                                                                  f"Did you mean '__{final_var_name}__'?", ctx,
+                                    "src.runtime.interpreter.Interpreter.visit_VarAssignNode"
                                 )
                             )
                         else:
                             return result.failure(
                                 RTNotDefinedError(
-                                    node.pos_start, node.pos_end, f"name '{var_name}' is not defined yet.", ctx,
+                                    node.pos_start, node.pos_end, f"name '{final_var_name}' is not defined yet.", ctx,
                                     "src.interpreter.Interpreter.visit_VarAssignNode"
                                 )
                             )
             else:  # protected variable name
                 return result.failure(RunTimeError(node.pos_start, node.pos_end,
-                                                   f"can not create or edit a variable with builtin name '{var_name}'.",
+                                                   f"can not create or edit a variable with builtin name "
+                                                   f"'{final_var_name}'.",
                                                    ctx, origin_file="src.interpreter.Interpreter.visit_VarAssignNode"))
             final_values.append(final_value)
 

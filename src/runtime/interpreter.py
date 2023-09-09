@@ -457,7 +457,7 @@ class Interpreter:
     def visit_VarAssignNode(self, node: VarAssignNode, ctx: Context) -> RTResult:
         """Visit VarAssignNode"""
         result = RTResult()
-        var_names: list[Token | BinOpCompNode] = node.var_names
+        var_names: list[list[Token | Node]] = node.var_names
         values = []
         for value_node in node.value_nodes:  # we get the values
             values.append(result.register(self.visit(value_node, ctx)))
@@ -480,7 +480,7 @@ class Interpreter:
         # print(len(final_values))
         # print(final_values)
         for i, var_name in enumerate(var_names):
-            if isinstance(var_name, BinOpCompNode):
+            if len(var_name) != 1:
                 print("This feature is work in progress.")
                 return result.success(NoneValue())
             else:  # token

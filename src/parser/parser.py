@@ -574,9 +574,11 @@ class Parser:
                             self.advance()
                         call_node = CallNode(call_node, arg_nodes)
 
-                if self.current_token == TT["DOT"]:
+                if self.current_token.type == TT["DOT"]:
                     is_attr = True
                     current_name_nodes_and_tokens_list.append(call_node)  # call_node can be identifier token
+                    result.register_advancement()
+                    self.advance()
                 else:
                     if is_call:
                         return result.failure(

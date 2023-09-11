@@ -21,11 +21,14 @@ from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
 from src.misc import CustomInterpreterVisitMethod, CustomInterpreterVisitMethodFuncDef, print_in_red
 from src.runtime.symbol_table import SymbolTable
+from src.lexer.position import Position
 # built-in python imports
 from inspect import signature
 import os.path
 import importlib
 import pprint
+
+_ORIGIN_FILE = "src.runtime.interpreter.Interpreter"
 
 
 # ##########
@@ -42,8 +45,6 @@ class Interpreter:
         symbols_copy: dict = ctx.symbol_table.symbols.copy()
         if '__symbol_table__' in symbols_copy.keys():
             del symbols_copy['__symbol_table__']
-        # print(type(symbols_copy))
-        # print(str(symbols_copy))
         ctx.symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
 
     def visit(self, node: Node, ctx: Context, other_ctx: Context = None, methods_instead_of_funcs: bool = True):
@@ -53,11 +54,11 @@ class Interpreter:
         if other_ctx is None:
             other_ctx = ctx.copy()
 
-        signature_ = signature(method)
-        if len(signature_.parameters) <= 1:  # def method(self) is 1 param, def staticmethod() is 0 param
+        PARAMETERS = signature(method).parameters
+        if len(PARAMETERS) <= 1:  # def method(self) is 1 param, def staticmethod() is 0 param
             return method()
-        elif len(signature_.parameters) == 3:
-            if "outer_context" in signature_.parameters.keys():
+        elif len(PARAMETERS) == 3:
+            if "outer_context" in PARAMETERS.keys():
                 return method(node, ctx, other_ctx)
             else:
                 method: CustomInterpreterVisitMethodFuncDef
@@ -66,13 +67,37 @@ class Interpreter:
         return method(node, ctx)
 
     @staticmethod
+    def _undefined(pos_start: Position,
+                   pos_end: Position,
+                   var_name: str,
+                   ctx: Context,
+                   result: RTResult,
+                   origin_file: str = f"{_ORIGIN_FILE}._undefined")\
+            -> RTResult:
+        """Returns a RTNotDefinedError with a proper message."""
+        if ctx.symbol_table.exists(f'__{var_name}__'):
+            # e.g. user entered `var foo += 1` instead of `var __foo__ += 1`
+            return result.failure(RTNotDefinedError(
+                pos_start, pos_end,
+                f"name '{var_name}' is not defined yet. "
+                f"Did you mean '__{var_name}__'?",
+                ctx, origin_file
+            ))
+        else:
+            return result.failure(RTNotDefinedError(
+                pos_start, pos_end,
+                f"name '{var_name}' is not defined yet.",
+                ctx, origin_file
+            ))
+
+    @staticmethod
     def no_visit_method(node, ctx: Context):
         """The method visit_FooNode (with FooNode given in self.visit) does not exist."""
         print(ctx)
-        print(f"NOUGARO INTERNAL ERROR : No visit_{type(node).__name__} method defined in nougaro.Interpreter.\n"
+        print(f"NOUGARO INTERNAL ERROR : No visit_{type(node).__name__} method defined in {_ORIGIN_FILE}.\n"
               f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all informations "
               f"above.")
-        raise Exception(f'No visit_{type(node).__name__} method defined in nougaro.Interpreter.')
+        raise Exception(f'No visit_{type(node).__name__} method defined in {_ORIGIN_FILE}.')
 
     @staticmethod
     def visit_NumberNode(node: NumberNode, ctx: Context) -> RTResult:
@@ -87,11 +112,11 @@ class Interpreter:
             return RTResult().success(Number(value).set_context(ctx).set_pos(node.pos_start, node.pos_end))
         else:
             print(ctx)
-            print(f"NOUGARO INTERNAL ERROR : in visit_NumberENumberNode method defined in nougaro.Interpreter,\n"
+            print(f"NOUGARO INTERNAL ERROR : in visit_NumberENumberNode method defined in {_ORIGIN_FILE},\n"
                   f"{value=}\n"
                   f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all "
                   f"informations above.")
-            raise Exception(f'{value=} in interpreter.Interpreter.visit_NumberENumberNode.')
+            raise Exception(f'{value=} in {_ORIGIN_FILE}.visit_NumberENumberNode.')
 
     @staticmethod
     def visit_StringNode(node: StringNode, ctx: Context) -> RTResult:
@@ -116,7 +141,7 @@ class Interpreter:
                             list_.pos_start, list_.pos_end,
                             f"expected a list value after '*', but got {list_.type_}.",
                             ctx,
-                            origin_file="src.interpreter.Interpreter.visit_ListNode"
+                            origin_file=f"{_ORIGIN_FILE}.visit_ListNode"
                         )
                     )
                 elements.extend(list_.elements)
@@ -222,10 +247,10 @@ class Interpreter:
         else:
             print(ctx)
             print("NOUGARO INTERNAL ERROR : Result is not defined after executing "
-                  "src.interpreter.Interpreter.visit_BinOpNode because of an invalid token.\n"
+                  f"{_ORIGIN_FILE}.visit_BinOpNode because of an invalid token.\n"
                   "Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the information "
                   "above")
-            raise Exception("Result is not defined after executing src.interpreter.Interpreter.visit_BinOpNode")
+            raise Exception(f"Result is not defined after executing {_ORIGIN_FILE}.visit_BinOpNode")
 
         if error is not None:  # there is an error
             return res.failure(error)
@@ -312,12 +337,12 @@ class Interpreter:
                     print(ctx)
                     print(
                         f"NOUGARO INTERNAL ERROR : Result is not defined after executing "
-                        f"src.interpreter.Interpreter.visit_BinOpCompNode because of an invalid token.\n"
+                        f"{_ORIGIN_FILE}.visit_BinOpCompNode because of an invalid token.\n"
                         f"Note for devs : the actual invalid token is {op_token.type}:{op_token.value}.\n"
                         f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
                         f"information above")
                     raise Exception("Result is not defined after executing "
-                                    "src.interpreter.Interpreter.visit_BinOpCompNode")
+                                    f"{_ORIGIN_FILE}.visit_BinOpCompNode")
                 if error is not None:  # there is an error
                     return res.failure(error)
                 if test_result.value == FALSE.value:  # the test is false so far: no need to continue
@@ -335,11 +360,11 @@ class Interpreter:
             else:
                 print(ctx)
                 print(
-                    f"NOUGARO INTERNAL ERROR : len(node.node) != 1 in src.interpreter.Interpreter.visit_UnaryOpNode.\n"
+                    f"NOUGARO INTERNAL ERROR : len(node.node) != 1 in {_ORIGIN_FILE}.visit_UnaryOpNode.\n"
                     f"{node.node=}\n"
                     f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
                     f"information above.")
-                raise Exception("len(node.node) != 1 in src.interpreter.Interpreter.visit_UnaryOpNode.")
+                raise Exception(f"len(node.node) != 1 in {_ORIGIN_FILE}.visit_UnaryOpNode.")
         else:
             value = result.register(self.visit(node.node, ctx))
         if result.should_return():
@@ -381,74 +406,44 @@ class Interpreter:
                 else:
                     return result
 
-        if value is None:  # the variable is not defined
-            if len(var_names_list) == 1:
-                if (var_name.value == "eexit" or var_name.value == "exxit" or var_name.value == "exiit" or
-                        var_name.value == "exitt") and 'exit' in ctx.symbol_table.symbols.keys():
-                    # my keyboard is sh*tty, so sometimes it types a letter twice...
+        VARIABLE_IS_DEFINED = value is not None
+        if not VARIABLE_IS_DEFINED:
+            SINGLE_IDENTIFIER = len(var_names_list) == 1
+            if SINGLE_IDENTIFIER:
+                MISSPELLED_EXIT = var_name.value in ("eexit", "exxit", "exiit", "exitt")
+                FUNCTION_EXIT_IN_SYMBOL_TABLE = 'exit' in ctx.symbol_table.symbols.keys()
+                if FUNCTION_EXIT_IN_SYMBOL_TABLE and MISSPELLED_EXIT:
                     if not attribute_error:
-                        return result.failure(
-                            RTNotDefinedError(
-                                node.pos_start, node.pos_end,
-                                f"name '{var_name.value}' is not defined. Did you mean 'exit'?",
-                                ctx, "src.interpreter.Interpreter.visit_varAccessNode"
-                            )
-                        )
+                        return result.failure(RTNotDefinedError(
+                            node.pos_start, node.pos_end,
+                            f"name '{var_name.value}' is not defined. Did you mean 'exit'?",
+                            ctx, f"{_ORIGIN_FILE}.visit_varAccessNode"
+                        ))
                     else:
-                        return result.failure(
-                            RTAttributeError(
-                                node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
-                                "src.interpreter.Interpreter.visit_varAccessNode"
-                            )
-                        )
+                        return result.failure(RTAttributeError(
+                            node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
+                            f"{_ORIGIN_FILE}.visit_varAccessNode"
+                        ))
                 else:
-                    if ctx.symbol_table.exists(f'__{var_name.value}__'):
-                        # e.g. the user typed symbol_table instead of __symbol_table__
-                        if not attribute_error:
-                            return result.failure(
-                                RTNotDefinedError(
-                                    node.pos_start, node.pos_end,
-                                    f"name '{var_name.value}' is not defined. Did you mean '__{var_name.value}__'?",
-                                    ctx, "src.interpreter.Interpreter.visit_varAccessNode"
-                                )
-                            )
-                        else:
-                            return result.failure(
-                                RTAttributeError(
-                                    node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
-                                    "src.interpreter.Interpreter.visit_varAccessNode"
-                                )
-                            )
-                    else:  # not defined at all
-                        if not attribute_error:
-                            return result.failure(
-                                RTNotDefinedError(
-                                    node.pos_start, node.pos_end, f"name '{var_name.value}' is not defined.", ctx,
-                                    "src.interpreter.Interpreter.visit_varAccessNode"
-                                )
-                            )
-                        else:
-                            return result.failure(
-                                RTAttributeError(
-                                    node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
-                                    "src.interpreter.Interpreter.visit_varAccessNode"
-                                )
-                            )
+                    if not attribute_error:
+                        return self._undefined(node.pos_start, node.pos_end, var_name.value, ctx, result,
+                                               f"{_ORIGIN_FILE}.visit_VarAccessNode")
+                    else:
+                        return result.failure(RTAttributeError(
+                            node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
+                            f"{_ORIGIN_FILE}.visit_varAccessNode"
+                        ))
             else:  # none of the identifiers is defined
                 if not attribute_error:
-                    return result.failure(
-                        RTNotDefinedError(
-                            node.pos_start, node.pos_end, f"none of the given identifiers is defined.", ctx,
-                            "src.interpreter.Interpreter.visit_varAccessNode"
-                        )
-                    )
+                    return result.failure(RTNotDefinedError(
+                        node.pos_start, node.pos_end, f"none of the given identifiers is defined.", ctx,
+                        f"{_ORIGIN_FILE}.visit_varAccessNode"
+                    ))
                 else:
-                    return result.failure(
-                        RTAttributeError(
-                            node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
-                            "src.interpreter.Interpreter.visit_varAccessNode"
-                        )
-                    )
+                    return result.failure(RTAttributeError(
+                        node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
+                        f"{_ORIGIN_FILE}.visit_varAccessNode"
+                    ))
 
         # we get the value
         value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(ctx)
@@ -458,137 +453,110 @@ class Interpreter:
         """Visit VarAssignNode"""
         result = RTResult()
         var_names: list[list[Token | Node]] = node.var_names
+
         values = []
         for value_node in node.value_nodes:  # we get the values
             values.append(result.register(self.visit(value_node, ctx)))
             if result.should_return() or result.old_should_return:
                 return result
+
         equal = node.equal.type  # we get the equal type
         if result.should_return() or result.old_should_return:  # check for errors
             return result
 
         if len(var_names) != len(values):
-            return result.failure(
-                RunTimeError(
-                    node.pos_start, node.pos_end, f"there should be the same amount of identifiers and values. "
-                                                  f"There is {len(var_names)} identifiers and {len(values)} values.",
-                    ctx, origin_file="src.interpreter.Interpreter.visit_VarAssignNode"
-                )
-            )
+            return result.failure(RunTimeError(
+                node.pos_start, node.pos_end, f"there should be the same amount of identifiers and values. "
+                                              f"There are {len(var_names)} identifiers and {len(values)} values.",
+                ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
+            ))
 
         final_values = []
-        # print(len(final_values))
-        # print(final_values)
         for i, var_name in enumerate(var_names):
-            if len(var_name) != 1:
+            IS_SINGLE_VAR_NAME = len(var_name) == 1
+            if not IS_SINGLE_VAR_NAME:  # var a.b.(...).z = value
                 print_in_red("This feature is work in progress.")
                 return result.success(NoneValue(False))
             else:  # single var name
-                if not isinstance(var_name[0], Token):
-                    return result.failure(
-                        RunTimeError(
-                            var_name[0].pos_start, var_name[0].pos_end,
-                            "excepted identifier.",
-                            ctx, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
-                        )
-                    )
-                if var_name[0].type != TT["IDENTIFIER"]:
-                    return result.failure(
-                        RunTimeError(
-                            var_name[0].pos_start, var_name[0].pos_end,
-                            "excepted identifier.",
-                            ctx, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
-                        )
-                    )
+                NAME_IS_IDENTIFIER = isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"]
+                if not NAME_IS_IDENTIFIER:
+                    return result.failure(RunTimeError(
+                        var_name[0].pos_start, var_name[0].pos_end,
+                        "excepted identifier.",
+                        ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
+                    ))
                 final_var_name = var_name[0].value
-            # is_attr = False
-            # for node_tok in var_name:
-            #     if isinstance(node_tok, Node):
-            #         is_attr = True
-            #         value = result.register(node_tok)
-            #         if result.should_return():
-            #             return result
 
-            if final_var_name not in PROTECTED_VARS:  # this constant is the list of all var names you can't modify
-                #                                 (unless you want to break nougaro)
-                if equal == TT["EQ"]:  # just a regular equal, we can modify/create the variable in the symbol table
-                    ctx.symbol_table.set(final_var_name, values[i])
-                    final_value = values[i]  # we want to return the new value of the variable
-                else:
-                    if final_var_name in ctx.symbol_table.symbols:  # edit a variable
-                        var_actual_value: Value = ctx.symbol_table.get(final_var_name)  # actual value of the variable
-                        if equal == TT["PLUSEQ"]:
-                            final_value, error = var_actual_value.added_to(values[i])
-                        elif equal == TT["MINUSEQ"]:
-                            final_value, error = var_actual_value.subbed_by(values[i])
-                        elif equal == TT["MULTEQ"]:
-                            final_value, error = var_actual_value.multiplied_by(values[i])
-                        elif equal == TT["DIVEQ"]:
-                            final_value, error = var_actual_value.dived_by(values[i])
-                        elif equal == TT["POWEQ"]:
-                            final_value, error = var_actual_value.powered_by(values[i])
-                        elif equal == TT["FLOORDIVEQ"]:
-                            final_value, error = var_actual_value.floor_dived_by(values[i])
-                        elif equal == TT["PERCEQ"]:
-                            final_value, error = var_actual_value.modded_by(values[i])
-                        elif equal == TT["OREQ"]:
-                            final_value, error = var_actual_value.or_(values[i])
-                        elif equal == TT["XOREQ"]:
-                            final_value, error = var_actual_value.xor_(values[i])
-                        elif equal == TT["ANDEQ"]:
-                            final_value, error = var_actual_value.and_(values[i])
-                        elif equal == TT["BITWISEANDEQ"]:
-                            final_value, error = var_actual_value.bitwise_and(values[i])
-                        elif equal == TT["BITWISEOREQ"]:
-                            final_value, error = var_actual_value.bitwise_or(values[i])
-                        elif equal == TT["BITWISEXOREQ"]:
-                            final_value, error = var_actual_value.bitwise_xor(values[i])
-                        elif equal == TT["EEEQ"]:
-                            final_value, error = var_actual_value.get_comparison_eq(values[i])
-                        elif equal == TT["LTEQ"]:
-                            final_value, error = var_actual_value.get_comparison_lt(values[i])
-                        elif equal == TT["GTEQ"]:
-                            final_value, error = var_actual_value.get_comparison_gt(values[i])
-                        elif equal == TT["LTEEQ"]:
-                            final_value, error = var_actual_value.get_comparison_lte(values[i])
-                        elif equal == TT["GTEEQ"]:
-                            final_value, error = var_actual_value.get_comparison_gte(values[i])
-                        else:  # this is not supposed to happen
-                            print(f"Note: there was a problem in src.interpreter.Interpreter.visit_VarAssignNode.\n"
-                                  f"Please report this error at https://jd-develop.github.io/nougaro/bugreport.html "
-                                  f"with all infos.\n"
-                                  f"For the dev: equal token '{equal}' is in EQUALS but not planned in "
-                                  f"visit_VarAssignNode")
-                            error = None
-                            final_value = values[i]
+                VARIABLE_IS_PROTECTED = final_var_name in PROTECTED_VARS
+                if VARIABLE_IS_PROTECTED:
+                    return result.failure(RunTimeError(
+                        node.pos_start, node.pos_end,
+                        f"can not create or edit a variable with builtin name '{final_var_name}'.",
+                        ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
+                    ))
 
-                        if error is not None:  # there is an error
-                            error.set_pos(node.pos_start, node.pos_end)
-                            return result.failure(error)
-                        ctx.symbol_table.set(final_var_name, final_value)  # we can edit the variable. We will return
-                        #                                                    final_value
-                    else:
-                        if ctx.symbol_table.exists(f'__{final_var_name}__'):
-                            # e.g. user entered `var foo += 1` instead of `var __foo__ += 1`
-                            return result.failure(
-                                RTNotDefinedError(
-                                    node.pos_start, node.pos_end, f"name '{final_var_name}' is not defined yet. "
-                                                                  f"Did you mean '__{final_var_name}__'?", ctx,
-                                    "src.runtime.interpreter.Interpreter.visit_VarAssignNode"
-                                )
-                            )
-                        else:
-                            return result.failure(
-                                RTNotDefinedError(
-                                    node.pos_start, node.pos_end, f"name '{final_var_name}' is not defined yet.", ctx,
-                                    "src.interpreter.Interpreter.visit_VarAssignNode"
-                                )
-                            )
-            else:  # protected variable name
-                return result.failure(RunTimeError(node.pos_start, node.pos_end,
-                                                   f"can not create or edit a variable with builtin name "
-                                                   f"'{final_var_name}'.",
-                                                   ctx, origin_file="src.interpreter.Interpreter.visit_VarAssignNode"))
+            VARIABLE_EXISTS = final_var_name in ctx.symbol_table.symbols
+            if equal == TT["EQ"]:  # just a regular equal, we can modify/create the variable in the symbol table
+                ctx.symbol_table.set(final_var_name, values[i])
+                final_value = values[i]  # we want to return the new value of the variable
+            elif VARIABLE_EXISTS:  # edit variable
+                var_actual_value: Value = ctx.symbol_table.get(final_var_name)  # actual value of the variable
+                if equal == TT["PLUSEQ"]:
+                    final_value, error = var_actual_value.added_to(values[i])
+                elif equal == TT["MINUSEQ"]:
+                    final_value, error = var_actual_value.subbed_by(values[i])
+                elif equal == TT["MULTEQ"]:
+                    final_value, error = var_actual_value.multiplied_by(values[i])
+                elif equal == TT["DIVEQ"]:
+                    final_value, error = var_actual_value.dived_by(values[i])
+                elif equal == TT["POWEQ"]:
+                    final_value, error = var_actual_value.powered_by(values[i])
+                elif equal == TT["FLOORDIVEQ"]:
+                    final_value, error = var_actual_value.floor_dived_by(values[i])
+                elif equal == TT["PERCEQ"]:
+                    final_value, error = var_actual_value.modded_by(values[i])
+                elif equal == TT["OREQ"]:
+                    final_value, error = var_actual_value.or_(values[i])
+                elif equal == TT["XOREQ"]:
+                    final_value, error = var_actual_value.xor_(values[i])
+                elif equal == TT["ANDEQ"]:
+                    final_value, error = var_actual_value.and_(values[i])
+                elif equal == TT["BITWISEANDEQ"]:
+                    final_value, error = var_actual_value.bitwise_and(values[i])
+                elif equal == TT["BITWISEOREQ"]:
+                    final_value, error = var_actual_value.bitwise_or(values[i])
+                elif equal == TT["BITWISEXOREQ"]:
+                    final_value, error = var_actual_value.bitwise_xor(values[i])
+                elif equal == TT["EEEQ"]:
+                    final_value, error = var_actual_value.get_comparison_eq(values[i])
+                elif equal == TT["LTEQ"]:
+                    final_value, error = var_actual_value.get_comparison_lt(values[i])
+                elif equal == TT["GTEQ"]:
+                    final_value, error = var_actual_value.get_comparison_gt(values[i])
+                elif equal == TT["LTEEQ"]:
+                    final_value, error = var_actual_value.get_comparison_lte(values[i])
+                elif equal == TT["GTEEQ"]:
+                    final_value, error = var_actual_value.get_comparison_gte(values[i])
+                else:  # this is not supposed to happen
+                    print(
+                        f"Note: there was a problem in {_ORIGIN_FILE}.visit_VarAssignNode.\n"
+                        "Please report this error at https://jd-develop.github.io/nougaro/bugreport.html "
+                        "with all infos.\n"
+                        "Note that your variable will be set to the value you given.\n"
+                        f"For the dev: equal token '{equal}' is in EQUALS but not planned in "
+                        "visit_VarAssignNode"
+                    )
+                    error = None
+                    final_value = values[i]
+
+                if error is not None:  # there is an error
+                    error.set_pos(node.pos_start, node.pos_end)
+                    return result.failure(error)
+                ctx.symbol_table.set(final_var_name, final_value)  # we can edit the variable. We will return
+                #                                                    final_value
+            else:  # variable does not exist
+                return self._undefined(node.pos_start, node.pos_end, final_var_name, ctx, result,
+                                       f"{_ORIGIN_FILE}.visit_VarAssignNode")
             final_values.append(final_value)
 
         self.update_symbol_table(ctx)
@@ -603,14 +571,14 @@ class Interpreter:
 
         if var_name not in ctx.symbol_table.symbols:  # the variable is not defined thus we can't delete it
             return result.failure(RTNotDefinedError(node.pos_start, node.pos_end, f"name '{var_name}' is not defined.",
-                                                    ctx, "src.interpreter.Interpreter.visit_VarDeleteNode"))
+                                                    ctx, f"{_ORIGIN_FILE}.visit_VarDeleteNode"))
 
         if var_name not in PROTECTED_VARS:  # the variable isn't protected, we can safely delete it
             ctx.symbol_table.remove(var_name)
         else:  # the variable is protected
             return result.failure(RunTimeError(node.pos_start, node.pos_end,
                                                f"can not delete builtin name '{var_name}'.",
-                                               ctx, origin_file="src.interpreter.Interpreter.visit_VarDeleteNode"))
+                                               ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarDeleteNode"))
 
         self.update_symbol_table(ctx)
         return result.success(NoneValue(False))
@@ -654,14 +622,14 @@ class Interpreter:
             return result.failure(RTTypeError(
                 errmsg.pos_start, errmsg.pos_end,
                 f"error message should be a str, not {errmsg.type_}.",
-                ctx, "src.interpreter.Interpreter.visit_Assert_Node"
+                ctx, f"{_ORIGIN_FILE}.visit_Assert_Node"
             ))
 
         if assertion.is_false():  # the assertion is not true, we return an error
             return result.failure(RTAssertionError(
                 assertion.pos_start, assertion.pos_end,
                 errmsg.value,
-                ctx, "src.interpreter.Interpreter.visit_AssertNode"
+                ctx, f"{_ORIGIN_FILE}.visit_AssertNode"
             ))
 
         return result.success(NoneValue(False))
@@ -780,7 +748,7 @@ class Interpreter:
             return result.failure(
                 RTTypeError(node.list_node.pos_start, node.list_node.pos_end,
                             f"expected a list or a str after 'in', but found {iterable_.type_}.",
-                            ctx, "src.interpreter.Interpreter.visit_ForNodeList")
+                            ctx, f"{_ORIGIN_FILE}.visit_ForNodeList")
             )
 
     def visit_WhileNode(self, node: WhileNode, ctx: Context) -> RTResult:
@@ -884,7 +852,7 @@ class Interpreter:
             else:  # the name is protected
                 return result.failure(RunTimeError(node.pos_start, node.pos_end,
                                                    f"can not create a function with builtin name '{func_name}'.",
-                                                   ctx, origin_file="src.interpreter.Interpreter.visit_FuncDefNode"))
+                                                   ctx, origin_file=f"{_ORIGIN_FILE}.visit_FuncDefNode"))
 
         return result.success(func_value)  # we return our Function value
 
@@ -902,7 +870,7 @@ class Interpreter:
                         node.parent_var_name_token.pos_start, node.parent_var_name_token.pos_end,
                         f"name '{parent_var_name}' is not defined.",
                         ctx,
-                        origin_file="src.runtime.interpreter.visit_ClassNode"
+                        origin_file=f"{_ORIGIN_FILE}.visit_ClassNode"
                     )
                 )
             else:
@@ -915,7 +883,7 @@ class Interpreter:
                             node.parent_var_name_token.pos_start, node.parent_var_name_token.pos_end,
                             f"expected class, got {parent_value.type_} instead.",
                             ctx,
-                            origin_file="src.runtime.interpreter.visit_ClassNode"
+                            origin_file=f"{_ORIGIN_FILE}.visit_ClassNode"
                         )
                     )
         else:
@@ -937,7 +905,7 @@ class Interpreter:
             else:  # the name is protected
                 return result.failure(RunTimeError(node.pos_start, node.pos_end,
                                                    f"can not create a class with builtin name '{class_name}'.",
-                                                   ctx, origin_file="src.interpreter.Interpreter.visit_ClassNode"))
+                                                   ctx, origin_file=f"{_ORIGIN_FILE}.visit_ClassNode"))
 
         return result.success(class_value)  # we return our Function value
 
@@ -966,7 +934,7 @@ class Interpreter:
                                 list_.pos_start, list_.pos_end,
                                 f"expected a list value after '*', but got {list_.type_}.",
                                 outer_context,
-                                origin_file="src.interpreter.Interpreter.visit_CallNode"
+                                origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
                             )
                         )
                     args.extend(list_.elements)
@@ -1041,7 +1009,7 @@ class Interpreter:
                         RTTypeError(
                             init_func.pos_start, init_func.pos_end,
                             f"‘__init__’ should be a function, not ‘{init_func.type_}’.",
-                            outer_context, origin_file="src.interpreter.Interpreter.visit_CallNode"
+                            outer_context, origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
                         )
                     )
                 for arg_node, mul in node.arg_nodes:  # we check the arguments
@@ -1055,7 +1023,7 @@ class Interpreter:
                                     list_.pos_start, list_.pos_end,
                                     f"expected a list value after '*', but got '{list_.type_}.",
                                     outer_context,
-                                    origin_file="src.interpreter.Interpreter.visit_CallNode"
+                                    origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
                                 )
                             )
                         args.extend(list_.elements)
@@ -1075,7 +1043,7 @@ class Interpreter:
                         RTTypeError(
                             node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
                             f"{value_to_call.name}() takes no arguments.",
-                            outer_context, origin_file="src.interpreter.Interpreter.visit_CallNode"
+                            outer_context, origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
                         )
                     )
 
@@ -1096,14 +1064,14 @@ class Interpreter:
                             RTIndexError(
                                 node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
                                 f'list index {index} out of range.',
-                                outer_context, "src.interpreter.Interpreter.visit_CallNode"
+                                outer_context, f"{_ORIGIN_FILE}.visit_CallNode"
                             )
                         )
                 else:  # the index is not a number
                     return result.failure(RunTimeError(
                         node.pos_start, node.pos_end,
                         f"indexes must be integers, not {index.type_}.",
-                        outer_context, origin_file="src.interpreter.Interpreter.visit_CallNode"
+                        outer_context, origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
                     ))
             elif len(node.arg_nodes) > 1:  # there is more than one index given
                 return_value = []
@@ -1118,14 +1086,14 @@ class Interpreter:
                                 RTIndexError(
                                     arg_node[0].pos_start, arg_node[0].pos_end,
                                     f'list index {index} out of range.',
-                                    outer_context, "src.interpreter.Interpreter.Visit_CallNode"
+                                    outer_context, f"{_ORIGIN_FILE}.Visit_CallNode"
                                 )
                             )
                     else:  # the index is not a number
                         return result.failure(RunTimeError(
                             arg_node[0].pos_start, arg_node[0].pos_end,
                             f"indexes must be integers, not {index.type_}.",
-                            outer_context, origin_file="src.interpreter.Interpreter.Visit_CallNode"
+                            outer_context, origin_file=f"{_ORIGIN_FILE}.Visit_CallNode"
                         ))
                 return result.success(
                     List(return_value).set_context(outer_context).set_pos(node.pos_start, node.pos_end)
@@ -1134,7 +1102,7 @@ class Interpreter:
                 return result.failure(RunTimeError(
                     node.pos_start, node.pos_end,
                     f"please give at least one index.",
-                    outer_context, origin_file="src.interpreter.Interpreter.Visit_CallNode"
+                    outer_context, origin_file=f"{_ORIGIN_FILE}.Visit_CallNode"
                 ))
 
         elif isinstance(value_to_call, String):  # the value is a string
@@ -1153,14 +1121,14 @@ class Interpreter:
                             RTIndexError(
                                 node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
                                 f'string index {index} out of range.',
-                                outer_context, "src.interpreter.Interpreter.visit_CallNode"
+                                outer_context, f"{_ORIGIN_FILE}.visit_CallNode"
                             )
                         )
                 else:  # the index is not a number
                     return result.failure(RunTimeError(
                         node.pos_start, node.pos_end,
                         f"indexes must be integers, not {index.type_}.",
-                        outer_context, origin_file="src.interpreter.Interpreter.visit_CallNode"
+                        outer_context, origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
                     ))
             elif len(node.arg_nodes) > 1:  # there is more than one index given
                 return_value = ""
@@ -1175,14 +1143,14 @@ class Interpreter:
                                 RTIndexError(
                                     arg_node[0].pos_start, arg_node[0].pos_end,
                                     f'string index {index} out of range.',
-                                    outer_context, "src.interpreter.Interpreter.Visit_CallNode"
+                                    outer_context, f"{_ORIGIN_FILE}.Visit_CallNode"
                                 )
                             )
                     else:  # the index is not a number
                         return result.failure(RunTimeError(
                             arg_node[0].pos_start, arg_node[0].pos_end,
                             f"indexes must be integers, not {index.type_}.",
-                            outer_context, origin_file="src.interpreter.Interpreter.Visit_CallNode"
+                            outer_context, origin_file=f"{_ORIGIN_FILE}.Visit_CallNode"
                         ))
                 return result.success(
                     String(return_value).set_context(outer_context).set_pos(node.pos_start, node.pos_end)
@@ -1191,13 +1159,13 @@ class Interpreter:
                 return result.failure(RunTimeError(
                     node.pos_start, node.pos_end,
                     f"please give at least one index.",
-                    outer_context, origin_file="src.interpreter.Interpreter.Visit_CallNode"
+                    outer_context, origin_file=f"{_ORIGIN_FILE}.Visit_CallNode"
                 ))
         else:  # the object is not callable
             return result.failure(RunTimeError(
                 node.pos_start, node.pos_end,
                 f"{value_to_call.type_} is not callable.",
-                outer_context, origin_file="src.interpreter.Interpreter.Visit_CallNode"
+                outer_context, origin_file=f"{_ORIGIN_FILE}.Visit_CallNode"
             ))
 
     def visit_ReturnNode(self, node: ReturnNode, ctx: Context) -> RTResult:
@@ -1250,8 +1218,8 @@ class Interpreter:
                 return result.failure(
                     RTNotDefinedError(
                         identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
-                        "src.interpreter.Interpreter.visit_ImportNode\n"
-                        "(troubleshooting: do python importlib is working?)"
+                        f"{_ORIGIN_FILE}.visit_ImportNode\n"
+                        "(troubleshooting: is python importlib working?)"
                     )
                 )
 
@@ -1271,7 +1239,7 @@ class Interpreter:
             return RTResult().failure(
                 RTNotDefinedError(
                     identifier.pos_start, identifier.pos_end, f"name '{name_to_export}' is not defined.", ctx,
-                    "src.interpreter.Interpreter.visit_ExportNode"
+                    f"{_ORIGIN_FILE}.visit_ExportNode"
                 )
             )
         if isinstance(value_to_export, BaseFunction):
@@ -1305,7 +1273,7 @@ class Interpreter:
             return result.failure(
                 RTTypeError(
                     str_to_write.pos_start, str_to_write.pos_end, f"expected str, got {str_to_write.type_}.", ctx,
-                    "src.interpreter.Interpreter.visit_WriteNode"
+                    f"{_ORIGIN_FILE}.visit_WriteNode"
                 )
             )
 
@@ -1316,7 +1284,7 @@ class Interpreter:
             return result.failure(
                 RTTypeError(
                     file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", ctx,
-                    "src.interpreter.Interpreter.visit_WriteNode"
+                    f"{_ORIGIN_FILE}.visit_WriteNode"
                 )
             )
 
@@ -1328,7 +1296,7 @@ class Interpreter:
                 return result.failure(
                     RunTimeError(
                         node.pos_start, node.pos_end, f"can not overwrite <stdout>.", ctx,
-                        origin_file="src.interpreter.Interpreter.visit_WriteNode"
+                        origin_file=f"{_ORIGIN_FILE}.visit_WriteNode"
                     )
                 )
             print(str_to_write_value)
@@ -1361,7 +1329,7 @@ class Interpreter:
                             return result.failure(
                                 RTIndexError(
                                     node.pos_start, node.pos_end, "line number can not be negative.", ctx,
-                                    "src.interpreter.Interpreter.visit_WriteNode"
+                                    f"{_ORIGIN_FILE}.visit_WriteNode"
                                 )
                             )
                     else:  # open_mode == 'w+'
@@ -1373,7 +1341,7 @@ class Interpreter:
                             return result.failure(
                                 RTIndexError(
                                     node.pos_start, node.pos_end, "line number can not be negative.", ctx,
-                                    "src.interpreter.Interpreter.visit_WriteNode"
+                                    f"{_ORIGIN_FILE}.visit_WriteNode"
                                 )
                             )
 
@@ -1385,7 +1353,7 @@ class Interpreter:
                 RunTimeError(
                     node.pos_start, node.pos_end, f"unable to write in file '{file_name_value}'. "
                                                   f"More info : Python{e.__class__.__name__}: {e}", ctx,
-                    origin_file="src.interpreter.Interpreter.visit_WriteNode"
+                    origin_file=f"{_ORIGIN_FILE}.visit_WriteNode"
                 )
             )
 
@@ -1405,7 +1373,7 @@ class Interpreter:
             return result.failure(
                 RTTypeError(
                     file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", ctx,
-                    "src.interpreter.Interpreter.visit_ReadNode"
+                    f"{_ORIGIN_FILE}.visit_ReadNode"
                 )
             )
         file_name_value = file_name.value
@@ -1424,14 +1392,14 @@ class Interpreter:
                             return result.failure(
                                 RTIndexError(
                                     node.pos_start, node.pos_end, f"{line_number}.", ctx,
-                                    "src.interpreter.Interpreter.visit_ReadNode"
+                                    f"{_ORIGIN_FILE}.visit_ReadNode"
                                 )
                             )
             except FileNotFoundError:  # file not found
                 return result.failure(
                     RTFileNotFoundError(
                         node.pos_start, node.pos_end, file_name_value, ctx,
-                        "src.interpreter.Interpreter.visit_ReadNode"
+                        f"{_ORIGIN_FILE}.visit_ReadNode"
                     )
                 )
             except Exception as e:  # other python error
@@ -1439,7 +1407,7 @@ class Interpreter:
                     RunTimeError(
                         node.pos_start, node.pos_end, f"unable to read file '{file_name_value}'. "
                                                       f"More info : Python{e.__class__.__name__}: {e}", ctx,
-                        origin_file="src.interpreter.Interpreter.visit_ReadNode"
+                        origin_file=f"{_ORIGIN_FILE}.visit_ReadNode"
                     )
                 )
         else:
@@ -1454,7 +1422,7 @@ class Interpreter:
                     RunTimeError(
                         node.pos_start, node.pos_end,
                         f"unable to create a variable with builtin name '{identifier.value}'.",
-                        ctx, origin_file="src.interpreter.Interpreter.visit_ReadNode"
+                        ctx, origin_file=f"{_ORIGIN_FILE}.visit_ReadNode"
                     )
                 )
 

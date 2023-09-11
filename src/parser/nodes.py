@@ -236,13 +236,16 @@ class AssertNode(Node):
     def __init__(self, assertion: Node, pos_start, pos_end, errmsg: Node = None):
         self.assertion: Node = assertion
         self.errmsg: Node = errmsg
+        if self.errmsg is None:
+            self.errmsg = StringNode(Token(
+                TT["STRING"],
+                value='',
+                pos_start=pos_start.copy(),
+                pos_end=pos_end.copy()
+            ))
 
         self.pos_start = pos_start
         self.pos_end = pos_end
-
-        if self.errmsg is None:
-            self.errmsg = StringNode(Token(TT["STRING"], value='',
-                                           pos_start=self.pos_start.copy(), pos_end=self.pos_end.copy()))
 
     def __repr__(self):
         return f'assert:({self.assertion}, {self.errmsg})'

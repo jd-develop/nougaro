@@ -47,7 +47,7 @@ class Interpreter:
             del symbols_copy['__symbol_table__']
         ctx.symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
 
-    def visit(self, node: Node, ctx: Context, other_ctx: Context = None, methods_instead_of_funcs: bool = True):
+    def visit(self, node: Node, ctx: Context, other_ctx: Context = None, methods_instead_of_funcs: bool = False):
         """Visit a node."""
         method_name = f'visit_{type(node).__name__}'
         method: CustomInterpreterVisitMethod = getattr(self, method_name, self.no_visit_method)
@@ -79,16 +79,39 @@ class Interpreter:
             # e.g. user entered `var foo += 1` instead of `var __foo__ += 1`
             return result.failure(RTNotDefinedError(
                 pos_start, pos_end,
-                f"name '{var_name}' is not defined yet. "
+                f"name '{var_name}' is not defined. "
                 f"Did you mean '__{var_name}__'?",
                 ctx, origin_file
             ))
         else:
             return result.failure(RTNotDefinedError(
                 pos_start, pos_end,
-                f"name '{var_name}' is not defined yet.",
+                f"name '{var_name}' is not defined.",
                 ctx, origin_file
             ))
+
+    def _visit_value_that_can_have_attributes(self, node_or_list: Node | list, result, context) -> Value:
+        """If node_or_list is Node, visit is and return it. If it is a list, visit the value and its attributes."""
+        if not isinstance(node_or_list, list):
+            value = result.register(self.visit(node_or_list, context))  # left term/factor/etc.
+            if result.should_return():  # check for errors
+                return result
+        else:  # attributes
+            value: Value = result.register(self.visit(node_or_list[0], context))
+            if result.should_return():  # check for errors
+                return result
+            if len(node_or_list) != 1:
+                for node_ in node_or_list[1:]:
+                    new_ctx = Context(display_name=value.__repr__())
+                    new_ctx.symbol_table = SymbolTable()
+                    new_ctx.symbol_table.set_whole_table(value.attributes)
+                    if isinstance(node_, VarAccessNode):
+                        node_.attr = True
+                    attr_ = result.register(self.visit(node_, new_ctx, context))
+                    if result.should_return():
+                        return result
+                    value = attr_
+        return value
 
     @staticmethod
     def no_visit_method(node, ctx: Context):
@@ -131,52 +154,31 @@ class Interpreter:
         elements = []
 
         for element_node, mul in node.element_nodes:  # we visit every node from the list
-            if mul:
-                list_: Value = result.register(self.visit(element_node, ctx))
-                if result.should_return():  # if there is an error
-                    return result
-                if not isinstance(list_, List):
-                    return result.failure(
-                        RTTypeError(
-                            list_.pos_start, list_.pos_end,
-                            f"expected a list value after '*', but got {list_.type_}.",
-                            ctx,
-                            origin_file=f"{_ORIGIN_FILE}.visit_ListNode"
-                        )
-                    )
-                elements.extend(list_.elements)
-            else:
+            if not mul:
                 elements.append(result.register(self.visit(element_node, ctx)))
                 if result.should_return():  # if there is an error
                     return result
+            else:
+                extend_list_: Value = result.register(self.visit(element_node, ctx))
+                if result.should_return():  # if there is an error
+                    return result
+                if not isinstance(extend_list_, List):
+                    return result.failure(RTTypeError(
+                        extend_list_.pos_start, extend_list_.pos_end,
+                        f"expected a list value after '*', but got {extend_list_.type_}.",
+                        ctx,
+                        origin_file=f"{_ORIGIN_FILE}.visit_ListNode"
+                    ))
+                elements.extend(extend_list_.elements)
 
         return result.success(List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end))
 
     def visit_BinOpNode(self, node: BinOpNode, ctx: Context) -> RTResult:
         """Visit BinOpNode"""
         res = RTResult()
-        if not isinstance(node.left_node, list):
-            left = res.register(self.visit(node.left_node, ctx))  # left term/factor/etc.
-            if res.should_return():  # check for errors
-                return res
-        else:
-            value: Value = res.register(self.visit(node.left_node[0], ctx))
-            if res.should_return():
-                return res
-            if len(node.left_node) != 1:
-                for node_ in node.left_node[1:]:
-                    new_ctx = Context(display_name=value.__repr__())
-                    new_ctx.symbol_table = SymbolTable()
-                    new_ctx.symbol_table.set_whole_table(value.attributes)
-                    if isinstance(node_, VarAccessNode):
-                        node_.attr = True
-                    attr_ = res.register(self.visit(node_, new_ctx, ctx))
-                    if res.should_return():
-                        return res
-                    value = attr_
-            left = value
+        left = self._visit_value_that_can_have_attributes(node.left_node, res, ctx)
 
-        if node.op_token.matches(TT["KEYWORD"], 'and') and not left.is_true():
+        if node.op_token.matches(TT["KEYWORD"], 'and') and left.is_false():
             # operator is "and" and the value is false
             return res.success(FALSE.copy().set_pos(node.pos_start, node.pos_end))
 
@@ -184,26 +186,7 @@ class Interpreter:
             # operator is "or" and the value is true
             return res.success(TRUE.copy().set_pos(node.pos_start, node.pos_end))
 
-        if not isinstance(node.right_node, list):
-            right = res.register(self.visit(node.right_node, ctx))  # right term/factor/etc.
-            if res.should_return():  # check for errors
-                return res
-        else:
-            value: Value = res.register(self.visit(node.right_node[0], ctx))
-            if res.should_return():
-                return res
-            if len(node.right_node) != 1:
-                for node_ in node.right_node[1:]:
-                    new_ctx = Context(display_name=value.__repr__())
-                    new_ctx.symbol_table = SymbolTable()
-                    new_ctx.symbol_table.set_whole_table(value.attributes)
-                    if isinstance(node_, VarAccessNode):
-                        node_.attr = True
-                    attr_ = res.register(self.visit(node_, new_ctx, ctx))
-                    if res.should_return():
-                        return res
-                    value = attr_
-            right = value
+        right = self._visit_value_that_can_have_attributes(node.right_node, res, ctx)
 
         # we check for what is the operator token, then we execute the corresponding method
         if node.op_token.type == TT["PLUS"]:
@@ -261,94 +244,63 @@ class Interpreter:
         """Visit BinOpCompNode"""
         res = RTResult()
         nodes_and_tokens_list = node.nodes_and_tokens_list
-        if len(nodes_and_tokens_list) == 1:  # there is no comparison
-            if not isinstance(nodes_and_tokens_list[0], list):
-                return self.visit(nodes_and_tokens_list[0], ctx)
-            else:  # multiple var accesses: this is id.attr
-                value: Value = res.register(self.visit(node.nodes_and_tokens_list[0][0], ctx))
-                if res.should_return():
-                    return res
-                if len(node.nodes_and_tokens_list[0]) != 1:
-                    for node_ in node.nodes_and_tokens_list[0][1:]:
-                        new_ctx = Context(display_name=value.__repr__())
-                        new_ctx.symbol_table = SymbolTable()
-                        new_ctx.symbol_table.set_whole_table(value.attributes)
-                        if isinstance(node_, VarAccessNode):
-                            node_.attr = True
-                        attr_ = res.register(self.visit(node_, new_ctx, ctx))
-                        if res.should_return():
-                            return res
-                        value = attr_
-                return res.success(value)
+        IS_COMPARISON = len(nodes_and_tokens_list) != 1
+        if not IS_COMPARISON:
+            value = self._visit_value_that_can_have_attributes(nodes_and_tokens_list[0], res, ctx)
+            if res.should_return():
+                return res
+            return res.success(value)
 
         visited_nodes_and_tokens_list = []
 
         # just list of visited nodes
         for index, element in enumerate(nodes_and_tokens_list):
             if index % 2 == 0:  # we take only nodes and not ops
-                if not isinstance(element, list):
-                    visited_nodes_and_tokens_list.append(res.register(self.visit(element, ctx)))
-                    if res.should_return():
-                        return res
-                else:
-                    value: Value = res.register(self.visit(element[0], ctx))
-                    if res.should_return():
-                        return res
-                    if len(element) != 1:
-                        for node_ in element[1:]:
-                            new_ctx = Context(display_name=value.__repr__())
-                            new_ctx.symbol_table = SymbolTable()
-                            new_ctx.symbol_table.set_whole_table(value.attributes)
-                            if isinstance(node_, VarAccessNode):
-                                node_.attr = True
-                            attr_ = res.register(self.visit(node_, new_ctx, ctx))
-                            if res.should_return():
-                                return res
-                            value = attr_
-                    visited_nodes_and_tokens_list.append(value)
+                value = self._visit_value_that_can_have_attributes(element, res, ctx)
+                visited_nodes_and_tokens_list.append(value)
             else:
                 visited_nodes_and_tokens_list.append(element)
 
         test_result = FALSE.copy()  # FALSE is Nougaro False
         # let's test!
         for index, element in enumerate(visited_nodes_and_tokens_list):
-            if index % 2 == 0:  # we take only visited nodes and not ops
-                # test
-                try:
-                    op_token = visited_nodes_and_tokens_list[index + 1]
-                    right = visited_nodes_and_tokens_list[index + 2]
-                except IndexError:
-                    break
-                if op_token.type == TT["EE"]:
-                    test_result, error = element.get_comparison_eq(right)
-                elif op_token.type == TT["NE"]:
-                    test_result, error = element.get_comparison_ne(right)
-                elif op_token.type == TT["LT"]:
-                    test_result, error = element.get_comparison_lt(right)
-                elif op_token.type == TT["GT"]:
-                    test_result, error = element.get_comparison_gt(right)
-                elif op_token.type == TT["LTE"]:
-                    test_result, error = element.get_comparison_lte(right)
-                elif op_token.type == TT["GTE"]:
-                    test_result, error = element.get_comparison_gte(right)
-                elif op_token.matches(TT["KEYWORD"], 'in'):
-                    test_result, error = element.is_in(right)
-                else:
-                    print(ctx)
-                    print(
-                        f"NOUGARO INTERNAL ERROR : Result is not defined after executing "
-                        f"{_ORIGIN_FILE}.visit_BinOpCompNode because of an invalid token.\n"
-                        f"Note for devs : the actual invalid token is {op_token.type}:{op_token.value}.\n"
-                        f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
-                        f"information above")
-                    raise Exception("Result is not defined after executing "
-                                    f"{_ORIGIN_FILE}.visit_BinOpCompNode")
-                if error is not None:  # there is an error
-                    return res.failure(error)
-                if test_result.value == FALSE.value:  # the test is false so far: no need to continue
-                    return res.success(test_result.set_pos(node.pos_start, node.pos_end))
+            if index % 2 != 0:  # we take only nodes and not ops
+                continue
+
+            # test
+            try:
+                op_token = visited_nodes_and_tokens_list[index + 1]
+                right = visited_nodes_and_tokens_list[index + 2]
+            except IndexError:
+                break
+            if op_token.type == TT["EE"]:
+                test_result, error = element.get_comparison_eq(right)
+            elif op_token.type == TT["NE"]:
+                test_result, error = element.get_comparison_ne(right)
+            elif op_token.type == TT["LT"]:
+                test_result, error = element.get_comparison_lt(right)
+            elif op_token.type == TT["GT"]:
+                test_result, error = element.get_comparison_gt(right)
+            elif op_token.type == TT["LTE"]:
+                test_result, error = element.get_comparison_lte(right)
+            elif op_token.type == TT["GTE"]:
+                test_result, error = element.get_comparison_gte(right)
+            elif op_token.matches(TT["KEYWORD"], 'in'):
+                test_result, error = element.is_in(right)
             else:
-                pass
+                print(ctx)
+                print(
+                    f"NOUGARO INTERNAL ERROR : Result is not defined after executing "
+                    f"{_ORIGIN_FILE}.visit_BinOpCompNode because of an invalid token.\n"
+                    f"Note for devs : the actual invalid token is {op_token.type}:{op_token.value}.\n"
+                    f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
+                    f"information above")
+                raise Exception("Result is not defined after executing "
+                                f"{_ORIGIN_FILE}.visit_BinOpCompNode")
+            if error is not None:  # there is an error
+                return res.failure(error)
+            if test_result.value == FALSE.value:  # the test is false so far: no need to continue
+                return res.success(test_result.set_pos(node.pos_start, node.pos_end))
         return res.success(test_result.set_pos(node.pos_start, node.pos_end))
 
     def visit_UnaryOpNode(self, node: UnaryOpNode, ctx: Context) -> RTResult:
@@ -394,56 +346,44 @@ class Interpreter:
         value = None
         var_name = var_names_list[0]  # first we take the first identifier
         for i, var_name in enumerate(var_names_list):  # we check for all the identifiers
-            if isinstance(var_name, Token) and var_name.type == TT["IDENTIFIER"]:
-                value = ctx.symbol_table.get(var_name.value)  # we get the value of the variable
-                if value is not None:  # if the variable is defined, we can stop here
-                    break
-            else:
+            IS_IDENTIFIER = isinstance(var_name, Token) and var_name.type == TT["IDENTIFIER"]
+            if not IS_IDENTIFIER:
                 var_name: Node
                 value = result.register(self.visit(var_name, ctx))  # here var_name is an expr
                 if not result.should_return():
                     break
                 else:
                     return result
+            value = ctx.symbol_table.get(var_name.value)  # we get the value of the variable
+            if value is not None:  # if the variable is defined, we can stop here
+                break
 
         VARIABLE_IS_DEFINED = value is not None
         if not VARIABLE_IS_DEFINED:
+            if attribute_error:
+                return result.failure(RTAttributeError(
+                    node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
+                    f"{_ORIGIN_FILE}.visit_varAccessNode"
+                ))
+
             SINGLE_IDENTIFIER = len(var_names_list) == 1
             if SINGLE_IDENTIFIER:
                 MISSPELLED_EXIT = var_name.value in ("eexit", "exxit", "exiit", "exitt")
-                FUNCTION_EXIT_IN_SYMBOL_TABLE = 'exit' in ctx.symbol_table.symbols.keys()
-                if FUNCTION_EXIT_IN_SYMBOL_TABLE and MISSPELLED_EXIT:
+                if MISSPELLED_EXIT:
                     if not attribute_error:
                         return result.failure(RTNotDefinedError(
                             node.pos_start, node.pos_end,
                             f"name '{var_name.value}' is not defined. Did you mean 'exit'?",
                             ctx, f"{_ORIGIN_FILE}.visit_varAccessNode"
                         ))
-                    else:
-                        return result.failure(RTAttributeError(
-                            node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
-                            f"{_ORIGIN_FILE}.visit_varAccessNode"
-                        ))
                 else:
-                    if not attribute_error:
-                        return self._undefined(node.pos_start, node.pos_end, var_name.value, ctx, result,
-                                               f"{_ORIGIN_FILE}.visit_VarAccessNode")
-                    else:
-                        return result.failure(RTAttributeError(
-                            node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
-                            f"{_ORIGIN_FILE}.visit_varAccessNode"
-                        ))
+                    return self._undefined(node.pos_start, node.pos_end, var_name.value, ctx, result,
+                                           f"{_ORIGIN_FILE}.visit_VarAccessNode")
             else:  # none of the identifiers is defined
-                if not attribute_error:
-                    return result.failure(RTNotDefinedError(
-                        node.pos_start, node.pos_end, f"none of the given identifiers is defined.", ctx,
-                        f"{_ORIGIN_FILE}.visit_varAccessNode"
-                    ))
-                else:
-                    return result.failure(RTAttributeError(
-                        node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
-                        f"{_ORIGIN_FILE}.visit_varAccessNode"
-                    ))
+                return result.failure(RTNotDefinedError(
+                    node.pos_start, node.pos_end, f"none of the given identifiers is defined.", ctx,
+                    f"{_ORIGIN_FILE}.visit_varAccessNode"
+                ))
 
         # we get the value
         value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(ctx)
@@ -569,16 +509,19 @@ class Interpreter:
         result = RTResult()
         var_name = node.var_name_token.value  # we get the var name
 
-        if var_name not in ctx.symbol_table.symbols:  # the variable is not defined thus we can't delete it
-            return result.failure(RTNotDefinedError(node.pos_start, node.pos_end, f"name '{var_name}' is not defined.",
-                                                    ctx, f"{_ORIGIN_FILE}.visit_VarDeleteNode"))
+        if var_name not in ctx.symbol_table.symbols:  # the variable is not defined, so we can't delete it
+            return self._undefined(node.pos_start, node.pos_end, var_name, ctx, result,
+                                   f"{_ORIGIN_FILE}.visit_varDeleteNode")
 
-        if var_name not in PROTECTED_VARS:  # the variable isn't protected, we can safely delete it
-            ctx.symbol_table.remove(var_name)
-        else:  # the variable is protected
-            return result.failure(RunTimeError(node.pos_start, node.pos_end,
-                                               f"can not delete builtin name '{var_name}'.",
-                                               ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarDeleteNode"))
+        IS_VAR_NAME_PROTECTED = var_name in PROTECTED_VARS
+        if IS_VAR_NAME_PROTECTED:
+            return result.failure(RunTimeError(
+                node.pos_start, node.pos_end,
+                f"can not delete builtin name '{var_name}'.",
+                ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarDeleteNode"
+            ))
+
+        ctx.symbol_table.remove(var_name)
 
         self.update_symbol_table(ctx)
         return result.success(NoneValue(False))
@@ -586,18 +529,20 @@ class Interpreter:
     def visit_IfNode(self, node: IfNode, ctx: Context) -> RTResult:
         """Visit IfNode"""
         result = RTResult()
-        for condition, expr in node.cases:  # all the possible cases
+        IF_AND_ELIF_CASES = node.cases
+        for condition, body_expr in IF_AND_ELIF_CASES:
             condition_value = result.register(self.visit(condition, ctx))  # we register the condition
             if result.should_return():  # check for errors
                 return result
 
             if condition_value.is_true():  # if it is true: we execute the body code then we return the value
-                expr_value = result.register(self.visit(expr, ctx))
+                expr_value = result.register(self.visit(body_expr, ctx))
                 if result.should_return():  # check for errors
                     return result
                 return result.success(expr_value)
 
-        if node.else_case is not None:  # if none of the ‘if’ or ‘elif’ cases are true, we check for an ‘else’ case
+        ELSE_CASE = node.else_case is not None
+        if ELSE_CASE:
             expr = node.else_case
             else_value = result.register(self.visit(expr, ctx))
             if result.should_return():  # check for errors
@@ -616,8 +561,6 @@ class Interpreter:
         if result.should_return():  # check for errors
             return result
 
-        assert True  # Yup, you've just found an Easter Egg ;)
-
         if not isinstance(errmsg, String):  # we check if the error message is a String
             return result.failure(RTTypeError(
                 errmsg.pos_start, errmsg.pos_end,
@@ -635,7 +578,7 @@ class Interpreter:
         return result.success(NoneValue(False))
 
     def visit_ForNode(self, node: ForNode, ctx: Context) -> RTResult:
-        """Visit ForNode"""
+        """Visit ForNode. for i = start to end then"""
         result = RTResult()
         elements = []
 
@@ -647,7 +590,8 @@ class Interpreter:
         if result.should_return():  # check for errors
             return result
 
-        if node.step_value_node is not None:  # we get the step value, if there is one
+        STEP_VALUE_IS_DEFINED = node.step_value_node is not None
+        if STEP_VALUE_IS_DEFINED:  # we get the step value, if there is one
             step_value = result.register(self.visit(node.step_value_node, ctx))
             if result.should_return():  # check for errors
                 return result
@@ -655,10 +599,14 @@ class Interpreter:
             step_value = Number(1)  # no step value: default is 1
 
         # we make an end condition
-        # if step value >= 0, the end value is more than the initial value
-        # if step value < 0, the end value is less than the initial value
+        # if step value is *positive*, the end value is *more* than the initial value
+        # if step value is *negative*, the end value is *less* than the initial value
         i = start_value.value
-        condition = (lambda: i < end_value.value) if step_value.value >= 0 else (lambda: i > end_value.value)
+        POSITIVE_STEP = step_value.value >= 0
+        if POSITIVE_STEP:
+            condition = (lambda: i < end_value.value)
+        else:
+            condition = (lambda: i > end_value.value)
 
         while condition():
             ctx.symbol_table.set(node.var_name_token.value, Number(i))  # we set the iterating variable
@@ -666,19 +614,17 @@ class Interpreter:
             i += step_value.value  # we add up the step value to the iterating variable
 
             value = result.register(self.visit(node.body_node, ctx))  # we execute code in the body node
-            if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
-                # if there is an error or a 'return' statement
-                return result
-
             if result.loop_should_continue:
-                continue  # will continue the 'while condition()' -> the interpreted 'for' loop is continued ^^
+                continue  # will continue the 'while condition()' -> the interpreted 'for' loop is continued
 
             if result.loop_should_break:
                 break  # will break the 'while condition()' -> the interpreted 'for' loop is break
 
-            if not isinstance(value, NoneValue):
-                elements.append(value)
-            elif value.should_print:
+            if result.should_return():
+                # if there is an error or a 'return' statement
+                return result
+
+            if not isinstance(value, NoneValue) or value.should_print:
                 elements.append(value)
 
         return result.success(
@@ -686,7 +632,7 @@ class Interpreter:
         )
 
     def visit_ForNodeList(self, node: ForNodeList, ctx: Context) -> RTResult:
-        """Visit ForNodeList"""
+        """Visit ForNodeList. for i in list then"""
         result = RTResult()
         elements = []
 
@@ -694,91 +640,69 @@ class Interpreter:
         if result.should_return():  # check for errors
             return result
 
-        if isinstance(iterable_, List):  # if the list is really a list
-            for e in iterable_.elements:
-                # we set the in-game... wait, the in-code 'e' variable to the actual list element
-                ctx.symbol_table.set(node.var_name_token.value, e)
-                self.update_symbol_table(ctx)
-                value = result.register(self.visit(node.body_node, ctx))  # we execute the body node
-                if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
-                    # error or 'return' statement
-                    return result
-
-                if result.loop_should_continue:
-                    continue  # will continue the 'for e in iterable_.elements' -> the interpreted 'for' loop is
-                    #           continued
-
-                if result.loop_should_break:
-                    break  # will break the 'for e in iterable_.elements' -> the interpreted 'for' loop is break
-
-                if not isinstance(value, NoneValue):
-                    elements.append(value)
-                elif value.should_print:
-                    elements.append(value)
-
-            return result.success(
-                List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
-            )
+        if isinstance(iterable_, List):
+            python_iterable = iterable_.elements
         elif isinstance(iterable_, String):
-            for e in iterable_.to_str():
-                # we set the in-game... wait, the in-code 'e' variable to the actual str char
-                ctx.symbol_table.set(node.var_name_token.value, String(e))
-                self.update_symbol_table(ctx)
-                value = result.register(self.visit(node.body_node, ctx))  # we execute the body node
-                if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
-                    # error or 'return' statement
-                    return result
-
-                if result.loop_should_continue:
-                    continue  # will continue the 'for e in iterable_.to_str()' -> the interpreted 'for' loop is
-                    #           continued
-
-                if result.loop_should_break:
-                    break  # will break the 'for e in iterable_.to_str()' -> the interpreted 'for' loop is break
-
-                if not isinstance(value, NoneValue):
-                    elements.append(value)
-                elif value.should_print:
-                    elements.append(value)
-
-            return result.success(
-                List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
-            )
+            python_iterable = iterable_.to_str()
         else:  # this is not a list nor a str
-            return result.failure(
-                RTTypeError(node.list_node.pos_start, node.list_node.pos_end,
-                            f"expected a list or a str after 'in', but found {iterable_.type_}.",
-                            ctx, f"{_ORIGIN_FILE}.visit_ForNodeList")
-            )
+            return result.failure(RTTypeError(
+                node.list_node.pos_start, node.list_node.pos_end,
+                f"expected a list or a str after 'in', but found {iterable_.type_}.",
+                ctx, f"{_ORIGIN_FILE}.visit_ForNodeList"
+            ))
+
+        for element in python_iterable:
+            # we set the variable to the actual list element
+            if isinstance(iterable_, String):
+                element = String(element)
+            ctx.symbol_table.set(node.var_name_token.value, element)
+            self.update_symbol_table(ctx)
+            value = result.register(self.visit(node.body_node, ctx))  # we execute the body node
+            if result.loop_should_continue:
+                continue  # will continue the 'for e in iterable_.elements' -> the interpreted 'for' loop is
+                #           continued
+
+            if result.loop_should_break:
+                break  # will break the 'for e in iterable_.elements' -> the interpreted 'for' loop is break
+
+            if result.should_return():
+                # error or 'return' statement
+                return result
+
+            if not isinstance(value, NoneValue) or value.should_print:
+                elements.append(value)
+
+        return result.success(
+            List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
+        )
 
     def visit_WhileNode(self, node: WhileNode, ctx: Context) -> RTResult:
         """Visit WhileNode"""
         result = RTResult()
         elements = []
 
-        while True:  # we will break when it's finished ;)
-            condition = result.register(self.visit(node.condition_node, ctx))  # we get the condition
-            if result.should_return():  # check for errors
-                return result
+        condition = result.register(self.visit(node.condition_node, ctx))  # we get the condition
+        if result.should_return():  # check for errors
+            return result
 
-            if not condition.is_true():  # the condition isn't true : we break our 'while True'
+        while condition.is_true():
+            value = result.register(self.visit(node.body_node, ctx))  # we execute the body node
+            if result.loop_should_continue:
+                continue
+
+            if result.loop_should_break:
                 break
 
-            value = result.register(self.visit(node.body_node, ctx))  # we execute the body node
-            if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
+            if result.should_return():
                 # error or 'return' statement
                 return result
 
-            if result.loop_should_continue:
-                continue  # will continue the 'while True' -> the interpreted 'while' loop is continued
-
-            if result.loop_should_break:
-                break  # will break the 'while True' -> the interpreted 'while' loop is break
-
-            if not isinstance(value, NoneValue):
+            if not isinstance(value, NoneValue) or value.should_print:
                 elements.append(value)
-            elif value.should_print:
-                elements.append(value)
+
+            condition = result.register(self.visit(node.condition_node, ctx))  # we get the condition
+            if result.should_return():  # check for errors
+                return result
 
         return result.success(
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
@@ -789,39 +713,27 @@ class Interpreter:
         result = RTResult()
         elements = []
 
-        value = result.register(self.visit(node.body_node, ctx))  # we execute the body node for a first time
-        if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
-            # error or 'return' statement
-            return result
+        while True:
+            value = result.register(self.visit(node.body_node, ctx))  # we execute the body node for a first time
+            if result.loop_should_continue:
+                continue
 
-        if not result.loop_should_continue:
-            # if there is a 'continue', we don't want the value to be returned
-            elements.append(value)
+            if result.loop_should_break:
+                break
 
-        if not result.loop_should_break:  # if the loop has break, we no longer want to execute that
-            while True:
-                condition = result.register(self.visit(node.condition_node, ctx))  # we get the condition
-                if result.should_return():  # check for errors
-                    return result
+            if result.should_return():
+                # error or 'return' statement
+                return result
 
-                if not condition.is_true():  # the condition isn't true: we break the loop
-                    break
+            if not isinstance(value, NoneValue) or value.should_print:
+                elements.append(value)
 
-                value = result.register(self.visit(node.body_node, ctx))  # we execute the body node
-                if result.should_return() and not result.loop_should_break and not result.loop_should_continue:
-                    # error or 'return' statement
-                    return result
+            condition = result.register(self.visit(node.condition_node, ctx))  # we get the condition
+            if result.should_return():  # check for errors
+                return result
 
-                if result.loop_should_continue:
-                    continue  # will continue the 'while True' -> the interpreted 'while' loop is continued
-
-                if result.loop_should_break:
-                    break  # will break the 'while True' -> the interpreted 'while' loop is break
-
-                if not isinstance(value, NoneValue):
-                    elements.append(value)
-                elif value.should_print:
-                    elements.append(value)
+            if not condition.is_true():  # the condition isn't true: we break the loop
+                break
 
         return result.success(
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
@@ -830,12 +742,21 @@ class Interpreter:
     def visit_FuncDefNode(self, node: FuncDefNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit FuncDefNode"""
         result = RTResult()
-        # if there is no name given -> None
-        func_name = node.var_name_token.value if node.var_name_token is not None else None
+
+        func_name = None
+        FUNCTION_HAS_NAME = node.var_name_token is not None
+        if FUNCTION_HAS_NAME:
+            func_name = node.var_name_token.value
+            if func_name in PROTECTED_VARS:
+                return result.failure(RunTimeError(
+                    node.pos_start, node.pos_end,
+                    f"can not create a function with builtin name '{func_name}'.",
+                    ctx, origin_file=f"{_ORIGIN_FILE}.visit_FuncDefNode"
+                ))
+
         body_node = node.body_node
         param_names = [param_name.value for param_name in node.param_names_tokens]
 
-        # we already create the Function value, but we'll maybe not return it
         if not methods_instead_of_funcs:
             func_value = Function(func_name, body_node, param_names, node.should_auto_return).set_context(ctx).set_pos(
                 node.pos_start, node.pos_end
@@ -845,49 +766,50 @@ class Interpreter:
                 node.pos_start, node.pos_end
             )
 
-        if node.var_name_token is not None:  # the function have a name
-            if func_name not in PROTECTED_VARS:  # if the name isn't protected, we can set it in the symbol table
-                ctx.symbol_table.set(func_name, func_value)
-                self.update_symbol_table(ctx)
-            else:  # the name is protected
-                return result.failure(RunTimeError(node.pos_start, node.pos_end,
-                                                   f"can not create a function with builtin name '{func_name}'.",
-                                                   ctx, origin_file=f"{_ORIGIN_FILE}.visit_FuncDefNode"))
+        if FUNCTION_HAS_NAME:
+            ctx.symbol_table.set(func_name, func_value)
+            self.update_symbol_table(ctx)
 
-        return result.success(func_value)  # we return our Function value
+        return result.success(func_value)
 
     def visit_ClassNode(self, node: ClassNode, ctx: Context) -> RTResult:
         """Visit ClassNode"""
         result = RTResult()
-        # if there is no name given -> None
-        class_name = node.var_name_token.value if node.var_name_token is not None else None
+        CLASS_HAS_NAME = node.var_name_token is not None
+        CLASS_HAS_PARENT = node.parent_var_name_token is not None
+
+        class_name = None
+        if CLASS_HAS_NAME:
+            class_name = node.var_name_token.value
+            if class_name in PROTECTED_VARS:
+                return result.failure(RunTimeError(
+                    node.pos_start, node.pos_end,
+                    f"can not create a class with builtin name '{class_name}'.",
+                    ctx, origin_file=f"{_ORIGIN_FILE}.visit_ClassNode"
+                ))
+
         body_node = node.body_node
-        parent_var_name = node.parent_var_name_token.value if node.parent_var_name_token is not None else None
-        if parent_var_name is not None:
+        parent = None
+        if CLASS_HAS_PARENT:
+            parent_var_name = node.parent_var_name_token.value
             if not ctx.symbol_table.exists(parent_var_name):
-                return result.failure(
-                    RTNotDefinedError(
-                        node.parent_var_name_token.pos_start, node.parent_var_name_token.pos_end,
-                        f"name '{parent_var_name}' is not defined.",
-                        ctx,
-                        origin_file=f"{_ORIGIN_FILE}.visit_ClassNode"
-                    )
+                return self._undefined(
+                    node.parent_var_name_token.pos_start,
+                    node.parent_var_name_token.pos_end,
+                    parent_var_name,
+                    ctx, result,
+                    f"{_ORIGIN_FILE}.visit_ClassNode"
                 )
-            else:
-                parent_value: Value = ctx.symbol_table.get(parent_var_name)
-                if isinstance(parent_value, Constructor):
-                    parent = parent_value
-                else:
-                    return result.failure(
-                        RTTypeError(
-                            node.parent_var_name_token.pos_start, node.parent_var_name_token.pos_end,
-                            f"expected class, got {parent_value.type_} instead.",
-                            ctx,
-                            origin_file=f"{_ORIGIN_FILE}.visit_ClassNode"
-                        )
-                    )
-        else:
-            parent = None
+
+            parent_value: Value = ctx.symbol_table.get(parent_var_name)
+            if not isinstance(parent_value, Constructor):
+                return result.failure(RTTypeError(
+                    node.parent_var_name_token.pos_start, node.parent_var_name_token.pos_end,
+                    f"expected class constructor, got {parent_value.type_} instead.",
+                    ctx,
+                    origin_file=f"{_ORIGIN_FILE}.visit_ClassNode"
+                ))
+            parent = parent_value
 
         class_ctx = Context(class_name, ctx).set_symbol_table(SymbolTable())
         result.register(self.visit(body_node, class_ctx, methods_instead_of_funcs=True))
@@ -896,18 +818,13 @@ class Interpreter:
 
         class_value = Constructor(class_name, class_ctx.symbol_table, {}, parent).set_context(ctx).set_pos(
             node.pos_start, node.pos_end
-        )  # we already create the Class value, but we'll maybe not return it
+        )
 
-        if node.var_name_token is not None:  # the function have a name
-            if class_name not in PROTECTED_VARS:  # if the name isn't protected, we can set it in the symbol table
-                ctx.symbol_table.set(class_name, class_value)
-                self.update_symbol_table(ctx)
-            else:  # the name is protected
-                return result.failure(RunTimeError(node.pos_start, node.pos_end,
-                                                   f"can not create a class with builtin name '{class_name}'.",
-                                                   ctx, origin_file=f"{_ORIGIN_FILE}.visit_ClassNode"))
+        if CLASS_HAS_NAME:
+            ctx.symbol_table.set(class_name, class_value)
+            self.update_symbol_table(ctx)
 
-        return result.success(class_value)  # we return our Function value
+        return result.success(class_value)
 
     def visit_CallNode(self, node: CallNode, node_to_call_context: Context, outer_context: Context) -> RTResult:
         """Visit CallNode"""
@@ -926,51 +843,41 @@ class Interpreter:
             for arg_node, mul in node.arg_nodes:  # we check the arguments
                 if not mul:
                     args.append(result.register(self.visit(arg_node, outer_context)))
-                else:
-                    list_: Value = result.register(self.visit(arg_node, outer_context))
-                    if not isinstance(list_, List):
-                        return result.failure(
-                            RTTypeError(
-                                list_.pos_start, list_.pos_end,
-                                f"expected a list value after '*', but got {list_.type_}.",
-                                outer_context,
-                                origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
-                            )
-                        )
-                    args.extend(list_.elements)
-                if result.should_return():  # check for errors
+                    if result.should_return():
+                        return result
+                    continue
+
+                list_: Value = result.register(self.visit(arg_node, outer_context))
+                if result.should_return():
                     return result
+                if not isinstance(list_, List):
+                    return result.failure(RTTypeError(
+                        list_.pos_start, list_.pos_end,
+                        f"expected a list value after '*', but got {list_.type_}.",
+                        outer_context,
+                        origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
+                    ))
+                args.extend(list_.elements)
 
             if call_with_module_context:
-                if outer_context.parent is None:
-                    return_value = result.register(value_to_call.execute(
-                        args, Interpreter, self.run, self.noug_dir, exec_from=f"{outer_context.display_name}",
-                        use_context=value_to_call.module_context))
-                else:
-                    return_value = result.register(value_to_call.execute(
-                        args, Interpreter, self.run, self.noug_dir, exec_from=f"{outer_context.display_name} from "
-                                                                              f"{outer_context.parent.display_name}",
-                        use_context=value_to_call.module_context))
+                use_context = value_to_call.module_context
             elif isinstance(value_to_call, Method):
+                use_context = outer_context
                 outer_context.symbol_table.set("this", value_to_call.object_)
                 self.update_symbol_table(outer_context)
-                if outer_context.parent is None:
-                    return_value = result.register(value_to_call.execute(
-                        args, Interpreter, self.run, self.noug_dir, exec_from=f"{outer_context.display_name}",
-                        use_context=outer_context))
-                else:
-                    return_value = result.register(value_to_call.execute(
-                        args, Interpreter, self.run, self.noug_dir, exec_from=f"{outer_context.display_name} from "
-                                                                              f"{outer_context.parent.display_name}",
-                        use_context=outer_context))
             else:
-                if outer_context.parent is None:
-                    return_value = result.register(value_to_call.execute(
-                        args, Interpreter, self.run, self.noug_dir, exec_from=f"{outer_context.display_name}"))
-                else:
-                    return_value = result.register(value_to_call.execute(
-                        args, Interpreter, self.run, self.noug_dir, exec_from=f"{outer_context.display_name} from "
-                                                                              f"{outer_context.parent.display_name}"))
+                use_context = None
+
+            if outer_context.parent is None:
+                exec_from = f"{outer_context.display_name}"
+            else:
+                exec_from = f"{outer_context.display_name} from {outer_context.parent.display_name}"
+
+            return_value = result.register(value_to_call.execute(
+                args, Interpreter, self.run, self.noug_dir,
+                exec_from=exec_from,
+                use_context=use_context
+            ))
 
             if result.should_return():  # check for errors
                 return result
@@ -1003,170 +910,175 @@ class Interpreter:
 
             # call the __init__ function if it exists
             init_func = obj_attrs.get("__init__")
-            if init_func is not None:
+            HAS_INIT = init_func is not None
+            if not HAS_INIT and len(node.arg_nodes) != 0:
+                return result.failure(RTTypeError(
+                    node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
+                    f"{value_to_call.name}() takes no arguments.",
+                    outer_context,
+                    origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
+                ))
+
+            if HAS_INIT:
                 if not isinstance(init_func, BaseFunction):
-                    return result.failure(
-                        RTTypeError(
-                            init_func.pos_start, init_func.pos_end,
-                            f"‘__init__’ should be a function, not ‘{init_func.type_}’.",
-                            outer_context, origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
-                        )
-                    )
+                    return result.failure(RTTypeError(
+                        init_func.pos_start, init_func.pos_end,
+                        f"‘__init__’ should be a function, not ‘{init_func.type_}’.",
+                        outer_context,
+                        origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
+                    ))
                 for arg_node, mul in node.arg_nodes:  # we check the arguments
                     if not mul:
                         args.append(result.register(self.visit(arg_node, outer_context)))
-                    else:
-                        list_: Value = result.register(self.visit(arg_node, outer_context))
-                        if not isinstance(list_, List):
-                            return result.failure(
-                                RTTypeError(
-                                    list_.pos_start, list_.pos_end,
-                                    f"expected a list value after '*', but got '{list_.type_}.",
-                                    outer_context,
-                                    origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
-                                )
-                            )
-                        args.extend(list_.elements)
+                        if result.should_return():
+                            return result
+                        continue
+
+                    list_: Value = result.register(self.visit(arg_node, outer_context))
                     if result.should_return():
                         return result
+                    if not isinstance(list_, List):
+                        return result.failure(RTTypeError(
+                            list_.pos_start, list_.pos_end,
+                            f"expected a list value after '*', but got '{list_.type_}.",
+                            outer_context,
+                            origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
+                        ))
+                    args.extend(list_.elements)
 
                 __init__value = result.register(init_func.execute(
-                    args, Interpreter, self.run, self.noug_dir, exec_from=f"{value_to_call.name} from "
-                                                                          f"{outer_context.display_name}",
+                    args, Interpreter, self.run, self.noug_dir,
+                    exec_from=f"{value_to_call.name} from {outer_context.display_name}",
                     use_context=inner_ctx))
                 if result.should_return():
                     return result
-
-            else:
-                if len(node.arg_nodes) != 0:
-                    return result.failure(
-                        RTTypeError(
-                            node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
-                            f"{value_to_call.name}() takes no arguments.",
-                            outer_context, origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
-                        )
-                    )
 
             return_value = object_.set_pos(node.pos_start, node.pos_end).set_context(outer_context)
             return result.success(return_value)
 
         elif isinstance(value_to_call, List):  # the value is a list
             # get the element at the given index
-            if len(node.arg_nodes) == 1:  # there is only one index given
-                index = result.register(self.visit(node.arg_nodes[0][0], outer_context))
-                if isinstance(index, Number):  # the index should be a number
-                    index = index.value
-                    try:  # we try to return the value at the index
-                        return_value = value_to_call[index]
-                        return result.success(return_value)
-                    except IndexError:  # index error
-                        return result.failure(
-                            RTIndexError(
-                                node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
-                                f'list index {index} out of range.',
-                                outer_context, f"{_ORIGIN_FILE}.visit_CallNode"
-                            )
-                        )
-                else:  # the index is not a number
-                    return result.failure(RunTimeError(
-                        node.pos_start, node.pos_end,
-                        f"indexes must be integers, not {index.type_}.",
-                        outer_context, origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
-                    ))
-            elif len(node.arg_nodes) > 1:  # there is more than one index given
-                return_value = []
-                for arg_node in node.arg_nodes:  # for every index
-                    index = result.register(self.visit(arg_node[0], outer_context))
-                    if isinstance(index, Number):  # the index should be a number
-                        index = index.value
-                        try:  # we try to return the value at the given index
-                            return_value.append(value_to_call[index])
-                        except IndexError:  # index error
-                            return result.failure(
-                                RTIndexError(
-                                    arg_node[0].pos_start, arg_node[0].pos_end,
-                                    f'list index {index} out of range.',
-                                    outer_context, f"{_ORIGIN_FILE}.Visit_CallNode"
-                                )
-                            )
-                    else:  # the index is not a number
-                        return result.failure(RunTimeError(
-                            arg_node[0].pos_start, arg_node[0].pos_end,
-                            f"indexes must be integers, not {index.type_}.",
-                            outer_context, origin_file=f"{_ORIGIN_FILE}.Visit_CallNode"
-                        ))
-                return result.success(
-                    List(return_value).set_context(outer_context).set_pos(node.pos_start, node.pos_end)
-                )
-            else:  # there is no index given
+            if len(node.arg_nodes) == 0:
                 return result.failure(RunTimeError(
                     node.pos_start, node.pos_end,
                     f"please give at least one index.",
                     outer_context, origin_file=f"{_ORIGIN_FILE}.Visit_CallNode"
                 ))
 
-        elif isinstance(value_to_call, String):  # the value is a string
-            # get the element at the given index
-            if len(node.arg_nodes) == 1:  # there is only one index given
+            elif len(node.arg_nodes) == 1:  # there is only one index given
                 index = result.register(self.visit(node.arg_nodes[0][0], outer_context))
-                if isinstance(index, Number):  # the index should be a number
-                    index = index.value
-                    try:  # we try to return the value at the index
-                        return_value = String(value_to_call.value[index]).set_context(outer_context).set_pos(
-                            node.pos_start, node.pos_end
-                        )
-                        return result.success(return_value)
-                    except IndexError:  # index error
-                        return result.failure(
-                            RTIndexError(
-                                node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
-                                f'string index {index} out of range.',
-                                outer_context, f"{_ORIGIN_FILE}.visit_CallNode"
-                            )
-                        )
-                else:  # the index is not a number
+                if result.should_return():
+                    return result
+                if not isinstance(index, Number):
                     return result.failure(RunTimeError(
                         node.pos_start, node.pos_end,
                         f"indexes must be integers, not {index.type_}.",
                         outer_context, origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
                     ))
-            elif len(node.arg_nodes) > 1:  # there is more than one index given
-                return_value = ""
+
+                index = index.value
+                try:
+                    return_value = value_to_call[index]
+                    return result.success(return_value)
+                except IndexError:
+                    return result.failure(RTIndexError(
+                        node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
+                        f'list index {index} out of range.',
+                        outer_context, f"{_ORIGIN_FILE}.visit_CallNode"
+                    ))
+
+            else:  # there is more than one index given
+                return_value = []
                 for arg_node in node.arg_nodes:  # for every index
                     index = result.register(self.visit(arg_node[0], outer_context))
-                    if isinstance(index, Number):  # the index should be a number
-                        index = index.value
-                        try:  # we try to return the value at the given index
-                            return_value += value_to_call.value[index]
-                        except IndexError:  # index error
-                            return result.failure(
-                                RTIndexError(
-                                    arg_node[0].pos_start, arg_node[0].pos_end,
-                                    f'string index {index} out of range.',
-                                    outer_context, f"{_ORIGIN_FILE}.Visit_CallNode"
-                                )
-                            )
-                    else:  # the index is not a number
+                    if result.should_return():
+                        return result
+                    if not isinstance(index, Number):
                         return result.failure(RunTimeError(
                             arg_node[0].pos_start, arg_node[0].pos_end,
                             f"indexes must be integers, not {index.type_}.",
                             outer_context, origin_file=f"{_ORIGIN_FILE}.Visit_CallNode"
                         ))
+
+                    index = index.value
+                    try:
+                        return_value.append(value_to_call[index])
+                    except IndexError:
+                        return result.failure(RTIndexError(
+                            arg_node[0].pos_start, arg_node[0].pos_end,
+                            f'list index {index} out of range.',
+                            outer_context, f"{_ORIGIN_FILE}.Visit_CallNode"
+                        ))
+
                 return result.success(
-                    String(return_value).set_context(outer_context).set_pos(node.pos_start, node.pos_end)
+                    List(return_value).set_context(outer_context).set_pos(node.pos_start, node.pos_end)
                 )
-            else:  # there is no index given
+
+        elif isinstance(value_to_call, String):  # the value is a string
+            # get the element at the given index
+            if len(node.arg_nodes) == 0:
                 return result.failure(RunTimeError(
                     node.pos_start, node.pos_end,
                     f"please give at least one index.",
                     outer_context, origin_file=f"{_ORIGIN_FILE}.Visit_CallNode"
                 ))
+            elif len(node.arg_nodes) == 1:  # there is only one index given
+                index = result.register(self.visit(node.arg_nodes[0][0], outer_context))
+                if result.should_return():
+                    return result
+                if not isinstance(index, Number):
+                    return result.failure(RunTimeError(
+                        node.pos_start, node.pos_end,
+                        f"indexes must be integers, not {index.type_}.",
+                        outer_context, origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
+                    ))
+                index = index.value
+                try:  # we try to return the value at the index
+                    return_value = String(value_to_call.value[index]).set_context(outer_context).set_pos(
+                        node.pos_start, node.pos_end
+                    )
+                    return result.success(return_value)
+                except IndexError:  # index error
+                    return result.failure(RTIndexError(
+                        node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
+                        f'string index {index} out of range.',
+                        outer_context, f"{_ORIGIN_FILE}.visit_CallNode"
+                    ))
+
+            else:  # there is more than one index given
+                return_value = ""
+                for arg_node in node.arg_nodes:  # for every index
+                    index = result.register(self.visit(arg_node[0], outer_context))
+                    if result.should_return():
+                        return result
+                    if not isinstance(index, Number):
+                        return result.failure(RunTimeError(
+                            arg_node[0].pos_start, arg_node[0].pos_end,
+                            f"indexes must be integers, not {index.type_}.",
+                            outer_context, origin_file=f"{_ORIGIN_FILE}.Visit_CallNode"
+                        ))
+
+                    index = index.value
+                    try:
+                        return_value += value_to_call.value[index]
+                    except IndexError:
+                        return result.failure(RTIndexError(
+                            arg_node[0].pos_start, arg_node[0].pos_end,
+                            f'string index {index} out of range.',
+                            outer_context, f"{_ORIGIN_FILE}.Visit_CallNode"
+                        ))
+                return result.success(
+                    String(return_value).set_context(outer_context).set_pos(node.pos_start, node.pos_end)
+                )
+
         else:  # the object is not callable
             return result.failure(RunTimeError(
                 node.pos_start, node.pos_end,
                 f"{value_to_call.type_} is not callable.",
                 outer_context, origin_file=f"{_ORIGIN_FILE}.Visit_CallNode"
             ))
+
+    # todo: separate call methods
 
     def visit_ReturnNode(self, node: ReturnNode, ctx: Context) -> RTResult:
         """Visit ReturnNode"""
@@ -1197,7 +1109,10 @@ class Interpreter:
         identifier: Token = node.identifier  # we get the module identifier token
         name_to_import = identifier.value  # we get the module identifier
 
-        if os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}.noug")):
+        IS_NOUGARO_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}.noug"))
+        IS_PYTHON_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}_.py"))
+
+        if IS_NOUGARO_LIB:
             with open(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}.noug")) as lib_:
                 text = lib_.read()
 
@@ -1210,18 +1125,22 @@ class Interpreter:
                 return result
 
             what_to_import = value.context.what_to_export.symbols
-        else:
+        elif IS_PYTHON_LIB:
             try:
                 module = importlib.import_module(f"lib_.{name_to_import}_")
                 what_to_import = module.WHAT_TO_IMPORT
             except ImportError:
-                return result.failure(
-                    RTNotDefinedError(
-                        identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
-                        f"{_ORIGIN_FILE}.visit_ImportNode\n"
-                        "(troubleshooting: is python importlib working?)"
-                    )
-                )
+                return result.failure(RTNotDefinedError(
+                    identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
+                    f"{_ORIGIN_FILE}.visit_ImportNode\n"
+                    "(troubleshooting: is python importlib working?)"
+                ))
+        else:
+            return result.failure(RTNotDefinedError(
+                identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
+                f"{_ORIGIN_FILE}.visit_ImportNode\n"
+                "(troubleshooting: not involving importlib)"
+            ))
 
         module_value = Module(name_to_import, what_to_import)
         ctx.symbol_table.set(name_to_import, module_value)
@@ -1236,12 +1155,10 @@ class Interpreter:
         name_to_export = identifier.value
         value_to_export = ctx.symbol_table.get(name_to_export)
         if value_to_export is None:
-            return RTResult().failure(
-                RTNotDefinedError(
-                    identifier.pos_start, identifier.pos_end, f"name '{name_to_export}' is not defined.", ctx,
-                    f"{_ORIGIN_FILE}.visit_ExportNode"
-                )
-            )
+            return RTResult().failure(RTNotDefinedError(
+                identifier.pos_start, identifier.pos_end, f"name '{name_to_export}' is not defined.", ctx,
+                f"{_ORIGIN_FILE}.visit_ExportNode"
+            ))
         if isinstance(value_to_export, BaseFunction):
             value_to_export.call_with_module_context = True
             value_to_export.module_context = ctx.copy()
@@ -1270,35 +1187,30 @@ class Interpreter:
         if result.should_return():  # check for errors
             return result
         if not isinstance(str_to_write, String):  # if the str is not a String
-            return result.failure(
-                RTTypeError(
-                    str_to_write.pos_start, str_to_write.pos_end, f"expected str, got {str_to_write.type_}.", ctx,
-                    f"{_ORIGIN_FILE}.visit_WriteNode"
-                )
-            )
+            return result.failure(RTTypeError(
+                str_to_write.pos_start, str_to_write.pos_end, f"expected str, got {str_to_write.type_}.", ctx,
+                f"{_ORIGIN_FILE}.visit_WriteNode"
+            ))
 
         file_name = result.register(self.visit(file_name_expr, ctx))  # we get the str of the file name
         if result.should_return():  # check for errors
             return result
         if not isinstance(file_name, String):  # if the file name is not a String
-            return result.failure(
-                RTTypeError(
-                    file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", ctx,
-                    f"{_ORIGIN_FILE}.visit_WriteNode"
-                )
-            )
+            return result.failure(RTTypeError(
+                file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", ctx,
+                f"{_ORIGIN_FILE}.visit_WriteNode"
+            ))
 
         str_to_write_value = str_to_write.value
         file_name_value = file_name.value
 
         if file_name_value == '<stdout>':  # print in console
             if open_mode == 'w+':  # can not overwrite the console
-                return result.failure(
-                    RunTimeError(
-                        node.pos_start, node.pos_end, f"can not overwrite <stdout>.", ctx,
-                        origin_file=f"{_ORIGIN_FILE}.visit_WriteNode"
-                    )
-                )
+                # todo: manage to clear screen and print
+                return result.failure(RunTimeError(
+                    node.pos_start, node.pos_end, f"can not overwrite <stdout>.", ctx,
+                    origin_file=f"{_ORIGIN_FILE}.visit_WriteNode"
+                ))
             print(str_to_write_value)
             return result.success(str_to_write)
 
@@ -1326,24 +1238,20 @@ class Interpreter:
                             file_data[line_number - 1] = file_data[line_number - 1].replace('\n', '')
                             file_data[line_number - 1] += str_to_write_value + '\n'
                         else:  # line number is negative
-                            return result.failure(
-                                RTIndexError(
-                                    node.pos_start, node.pos_end, "line number can not be negative.", ctx,
-                                    f"{_ORIGIN_FILE}.visit_WriteNode"
-                                )
-                            )
+                            return result.failure(RTIndexError(
+                                node.pos_start, node.pos_end, "line number can not be negative.", ctx,
+                                f"{_ORIGIN_FILE}.visit_WriteNode"
+                            ))
                     else:  # open_mode == 'w+'
                         if line_number == 0:  # we insert at the top of the file
                             file_data.insert(0, str_to_write_value + '\n')
                         elif line_number > 0:  # we replace the line by the new one
                             file_data[line_number - 1] = str_to_write_value + '\n'
                         else:  # line number is negative
-                            return result.failure(
-                                RTIndexError(
-                                    node.pos_start, node.pos_end, "line number can not be negative.", ctx,
-                                    f"{_ORIGIN_FILE}.visit_WriteNode"
-                                )
-                            )
+                            return result.failure(RTIndexError(
+                                node.pos_start, node.pos_end, "line number can not be negative.", ctx,
+                                f"{_ORIGIN_FILE}.visit_WriteNode"
+                            ))
 
                     # we replace our old file by the new one
                     with open(file_name_value, 'w+', encoding='UTF-8') as file:
@@ -1370,12 +1278,10 @@ class Interpreter:
         if result.error is not None:  # check for errors
             return result
         if not isinstance(file_name, String):  # check if the str is a String
-            return result.failure(
-                RTTypeError(
-                    file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", ctx,
-                    f"{_ORIGIN_FILE}.visit_ReadNode"
-                )
-            )
+            return result.failure(RTTypeError(
+                file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", ctx,
+                f"{_ORIGIN_FILE}.visit_ReadNode"
+            ))
         file_name_value = file_name.value
 
         if file_name_value != "<stdin>":
@@ -1389,27 +1295,22 @@ class Interpreter:
                         if 0 < line_number <= len(file_data):  # good index
                             file_str = file_data[line_number - 1]
                         else:  # wrong index
-                            return result.failure(
-                                RTIndexError(
-                                    node.pos_start, node.pos_end, f"{line_number}.", ctx,
-                                    f"{_ORIGIN_FILE}.visit_ReadNode"
-                                )
-                            )
+                            return result.failure(RTIndexError(
+                                node.pos_start, node.pos_end, f"{line_number}.", ctx,
+                                f"{_ORIGIN_FILE}.visit_ReadNode"
+                            ))
             except FileNotFoundError:  # file not found
-                return result.failure(
-                    RTFileNotFoundError(
-                        node.pos_start, node.pos_end, file_name_value, ctx,
-                        f"{_ORIGIN_FILE}.visit_ReadNode"
-                    )
-                )
+                return result.failure(RTFileNotFoundError(
+                    node.pos_start, node.pos_end, file_name_value, ctx,
+                    f"{_ORIGIN_FILE}.visit_ReadNode"
+                ))
             except Exception as e:  # other python error
-                return result.failure(
-                    RunTimeError(
-                        node.pos_start, node.pos_end, f"unable to read file '{file_name_value}'. "
-                                                      f"More info : Python{e.__class__.__name__}: {e}", ctx,
-                        origin_file=f"{_ORIGIN_FILE}.visit_ReadNode"
-                    )
-                )
+                return result.failure(RunTimeError(
+                    node.pos_start, node.pos_end,
+                    f"unable to read file '{file_name_value}'. "
+                    f"More info : Python{e.__class__.__name__}: {e}",
+                    ctx, origin_file=f"{_ORIGIN_FILE}.visit_ReadNode"
+                ))
         else:
             file_str = input()
 
@@ -1418,13 +1319,11 @@ class Interpreter:
                 ctx.symbol_table.set(identifier.value, String(file_str))
                 self.update_symbol_table(ctx)
             else:
-                return result.failure(
-                    RunTimeError(
-                        node.pos_start, node.pos_end,
-                        f"unable to create a variable with builtin name '{identifier.value}'.",
-                        ctx, origin_file=f"{_ORIGIN_FILE}.visit_ReadNode"
-                    )
-                )
+                return result.failure(RunTimeError(
+                    node.pos_start, node.pos_end,
+                    f"unable to create a variable with builtin name '{identifier.value}'.",
+                    ctx, origin_file=f"{_ORIGIN_FILE}.visit_ReadNode"
+                ))
 
         return result.success(String(file_str))
 

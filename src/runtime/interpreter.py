@@ -13,7 +13,7 @@ from src.runtime.values.basevalues.basevalues import Number, String, List, NoneV
 from src.runtime.values.defined_values.number import FALSE, TRUE
 from src.runtime.values.functions.function import Function, Method
 from src.runtime.values.functions.base_function import BaseFunction
-from src.constants import PROTECTED_VARS
+from src.constants import PROTECTED_VARS, KEYWORDS
 from src.parser.nodes import *
 from src.errors.errors import *
 from src.lexer.token_types import TT
@@ -75,12 +75,18 @@ class Interpreter:
                    origin_file: str = f"{_ORIGIN_FILE}._undefined")\
             -> RTResult:
         """Returns a RTNotDefinedError with a proper message."""
+        close_match_in_symbol_table = ctx.symbol_table.best_match(var_name, keywords=KEYWORDS)
         if ctx.symbol_table.exists(f'__{var_name}__'):
             # e.g. user entered `var foo += 1` instead of `var __foo__ += 1`
             return result.failure(RTNotDefinedError(
                 pos_start, pos_end,
-                f"name '{var_name}' is not defined. "
-                f"Did you mean '__{var_name}__'?",
+                f"name '{var_name}' is not defined. Did you mean '__{var_name}__'?",
+                ctx, origin_file
+            ))
+        elif close_match_in_symbol_table is not None:
+            return result.failure(RTNotDefinedError(
+                pos_start, pos_end,
+                f"name '{var_name}' is not defined. Did you mean '{close_match_in_symbol_table}'?",
                 ctx, origin_file
             ))
         else:

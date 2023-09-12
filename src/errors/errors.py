@@ -118,9 +118,9 @@ class RunTimeError(Error):
             ctx = ctx.parent
 
         if _print_origin_file:
-            return f"(from {self.origin_file})\nTraceback (more recent call last) :\n" + result
+            return f"(from {self.origin_file})\nTraceback (most recent call last) :\n" + result
         else:
-            return "Traceback (more recent call last) :\n" + result
+            return "Traceback (most recent call last) :\n" + result
 
     def set_pos(self, pos_start, pos_end):
         self.pos_start = pos_start

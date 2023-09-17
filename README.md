@@ -2,7 +2,7 @@
 ## English description
  A programming language. Interpreter written in Python.
  
-### Third-party modules (optionals)
+### Third-party modules (optional)
  Python builtins that are not always builtin (why?):
   * `colorama` (`pip install colorama`)
 

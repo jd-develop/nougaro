@@ -2,11 +2,11 @@
 ## English description
  A programming language. Interpreter written in Python.
  
-### Third-party modules
+### Third-party modules (optionals)
  Python builtins that are not always builtin (why?):
-  * `colorama` (`pip install colorama`, optional)
+  * `colorama` (`pip install colorama`)
 
- Under Linux (optional):
+ Under Linux:
   * `readline` (`pip install readline`)
 
 ### Run
@@ -22,11 +22,11 @@
 ## French description
  Un langage de programmation. Interpréteur écrit en Python.
 
-### Modules tiers
+### Modules tiers (optionnels)
  Modules pas toujours fournis avec Python (pourquoi ?) :
-  * `colorama` (`pip install colorama`, optionnel)
+  * `colorama` (`pip install colorama`)
 
- Sous Linux (optionnel) :
+ Sous Linux :
   * `readline` (`pip install readline`)
  
 ### Exécuter

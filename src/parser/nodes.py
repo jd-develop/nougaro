@@ -74,12 +74,12 @@ class ListNode(Node):
 class VarAssignNode(Node):
     """Node for variable assign
     I’m too bored to rewrite examples. TODO: rewrite examples"""
-    def __init__(self, var_names: list[Token | Node], value_nodes, equal=TT["EQ"]):
-        self.var_names: list[Token | Node] = var_names
+    def __init__(self, var_names: list[list[Token | Node]], value_nodes: list[Node], equal: Token = Token(TT["EQ"])):
+        self.var_names: list[list[Token | Node]] = var_names
         self.value_nodes = value_nodes
         self.equal = equal
 
-        self.pos_start = self.var_names[0].pos_start
+        self.pos_start = self.var_names[0][0].pos_start
         self.pos_end = self.value_nodes[-1].pos_end
 
     def __repr__(self):
@@ -236,13 +236,16 @@ class AssertNode(Node):
     def __init__(self, assertion: Node, pos_start, pos_end, errmsg: Node = None):
         self.assertion: Node = assertion
         self.errmsg: Node = errmsg
+        if self.errmsg is None:
+            self.errmsg = StringNode(Token(
+                TT["STRING"],
+                value='',
+                pos_start=pos_start.copy(),
+                pos_end=pos_end.copy()
+            ))
 
         self.pos_start = pos_start
         self.pos_end = pos_end
-
-        if self.errmsg is None:
-            self.errmsg = StringNode(Token(TT["STRING"], value='',
-                                           pos_start=self.pos_start.copy(), pos_end=self.pos_end.copy()))
 
     def __repr__(self):
         return f'assert:({self.assertion}, {self.errmsg})'

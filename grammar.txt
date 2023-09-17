@@ -9,14 +9,17 @@ statement  : KEYWORD:RETURN expr?
            : KEYWORD:BREAK
            : expr
 
-expr       : KEYWORD:VAR power (COMMA power)?*  # here power is checked to match expected syntax
-                         (EQ|PLUSEQ|MINUSEQ|MULTEQ|DIVEQ|POWEQ|FLOORDIVEQ|PERCEQ|OREQ|ANDEQ|XOREQ|BITWISEANDEQ|BITWISEOREQ|BITWISEXOREQ|EEEQ|GTEQ|GTEEQ|LTEQ|LTEEQ)
-                         expr (COMMA expr)?*
+expr       : var_assign
            : KEYWORD:DEL IDENTIFIER
            : KEYWORD:WRITE expr (TO|TO_AND_OVERWRITE) expr INT?
            : KEYWORD:READ expr (TO IDENTIFIER)? INT?
            : KEYWORD:ASSERT expr (COMMA expr)?
            : comp_expr ((KEYWORD:AND|KEYWORD:OR|KEYWORD:XOR|BITWISEAND|BITWISEOR|BITWISEXOR) comp_expr)*
+
+var_assign : KEYWORD:VAR (IDENTIFIER (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?* DOT)?* IDENTIFIER
+             (COMMA (IDENTIFIER (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?* DOT)?* IDENTIFIER)?*
+             (EQ|PLUSEQ|MINUSEQ|MULTEQ|DIVEQ|POWEQ|FLOORDIVEQ|PERCEQ|OREQ|ANDEQ|XOREQ|BITWISEANDEQ|BITWISEOREQ|BITWISEXOREQ|EEEQ|GTEQ|GTEEQ|LTEQ|LTEEQ)
+             expr (COMMA expr)?*
 
 comp_expr  : (KEYWORD:NOT|BITWISENOT) comp_expr
            : arith_expr ((EE|LT|GT|LTE|GTE|KEYWORD:IN) arith_expr)*

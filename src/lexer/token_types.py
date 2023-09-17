@@ -166,7 +166,7 @@ TOKENS_TO_QUOTE = [  # list of all the tokens that needs a quote ("'") when ther
     TT["DOT"]
 ]
 
-EQUALS = [  # all the assignation tokens ('=', '+=', ...) but not the equal tokens for tests ('==', '!=', ...)
+EQUALS = [  # all the assignment tokens ('=', '+=', ...) but not the equal tokens for tests ('==', '!=', ...)
     TT["EQ"],
     TT["PLUSEQ"],
     TT["MINUSEQ"],

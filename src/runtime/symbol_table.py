@@ -12,6 +12,7 @@
 # no imports
 # built-in python imports
 import pprint
+import difflib
 
 
 # ##########
@@ -54,6 +55,25 @@ class SymbolTable:
     def set_parent(self, parent):
         self.parent = parent
         return self
+
+    def best_match(self, name: str, keywords: list | None = None) -> str | None:
+        """Return the name in the symbol table that is the closest to 'name'. Return None if there is no close match."""
+        if len(self.symbols) == 0 or name is None or name == "":
+            return None
+        min_best_match = 0.3
+        best_match = min_best_match
+        best_match_name = ""
+        list_to_check = list(self.symbols.keys())
+        if keywords is not None:
+            list_to_check.extend(keywords)
+        for key in list_to_check:
+            ratio = difflib.SequenceMatcher(None, name, key).ratio()
+            if ratio > best_match:
+                best_match = ratio
+                best_match_name = key
+        if best_match_name == "":
+            return None
+        return best_match_name
 
     def copy(self):
         new_symbol_table = SymbolTable(self.parent)

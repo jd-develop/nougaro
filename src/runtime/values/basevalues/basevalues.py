@@ -177,18 +177,19 @@ class Number(Value):
 
     def dived_by(self, other):  # DIVISION
         if isinstance(other, Number):
-            if other.value == 0:
+            try:
+                val = self.value / other.value
+            except ZeroDivisionError:
                 return None, RTArithmeticError(
                     other.pos_start, other.pos_end, 'division by zero is not possible.', self.context,
                     "src.values.basevalues.Number.dived_by"
                 )
-            try:
-                return Number(self.value / other.value).set_context(self.context), None
             except OverflowError as e:  # I hate python
                 return None, RTOverflowError(
                     self.pos_start, other.pos_end, e, self.context,
                     "src.values.basevalues.Number.dived_by"
                 )
+            return Number(val).set_context(self.context), None
         else:
             return None, self.illegal_operation(other)
 

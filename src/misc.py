@@ -29,7 +29,7 @@ if colorama_installed:
 # ##########
 # prints text in red.
 if colorama_installed:
-    def print_in_red(txt): print(Fore.RED + txt + Fore.RESET)
+    def print_in_red(txt: str): print(Fore.RED + txt + Fore.RESET)
 else:
     print_in_red = print
 

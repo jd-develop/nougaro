@@ -9,7 +9,7 @@
 
 """ Math module
 
-    Math is a module that contains mathematical stuff, such as functions and constants, that is very useful to do math
+    Math is a module that contains math stuff, such as functions and constants, that are very useful to do math
     things.
 """
 

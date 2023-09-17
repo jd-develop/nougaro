@@ -99,10 +99,50 @@ class Random(ModuleFunction):
     execute_random_choice.optional_params = []
     execute_random_choice.should_respect_args_number = True
 
+    def execute_random_shuffle(self, exec_ctx: Context):
+        """Shuffle a list and returns it."""
+        # Params:
+        # * list_
+        list_ = exec_ctx.symbol_table.getf("list_")  # we get the 'list' argument
+        if not isinstance(list_, List):  # we check if it is a list
+            return RTResult().failure(RTTypeErrorF(
+                list_.pos_start, list_.pos_end, "first", "random.shuffle", "list", list_,
+                exec_ctx, "lib_.random_.Random.execute_random_shuffle"
+            ))
+        
+        py_list = list_.elements.copy()
+        random.shuffle(py_list)
+        list_.elements = py_list
+
+        return RTResult().success(list_)
+    
+    execute_random_shuffle.param_names = ['list_']
+    execute_random_shuffle.optional_params = []
+    execute_random_shuffle.should_respect_args_number = True
+    
+    def execute_random_seed(self, exec_ctx: Context):
+        """Set the seed to generate pseudo-random numbers."""
+        # Params:
+        # * seed
+        seed = exec_ctx.symbol_table.getf("seed")
+        if not (isinstance(seed, Number) or isinstance(seed, String)):
+            return RTResult().failure(RTTypeErrorF(
+                seed.pos_start, seed.pos_end, "first", "random.seed", "number or string", seed,
+                exec_ctx, "lib_.random_.Random.execute_random_seed"
+            ))
+        random.seed(seed.value)
+        return RTResult().success(NoneValue(False))
+    
+    execute_random_seed.param_names = ['seed']
+    execute_random_seed.optional_params = []
+    execute_random_seed.should_respect_args_number = True
+
 
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported
     # functions
     "randint": Random("randint"),
     "random": Random("random"),
     "choice": Random("choice"),
+    "shuffle": Random("shuffle"),
+    "seed": Random("seed"),
 }

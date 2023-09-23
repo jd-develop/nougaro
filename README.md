@@ -46,7 +46,7 @@
  A [file](highlight%20theme%20for%20NPP.xml) can be imported in Notepad++ for syntax highlighting, but only in dark theme.
  Light theme will be uploaded later :D
 
-# How it works ?
+# How it works?
  Everything is explained [here](how_it_works.md) :)
 
 Enjoy :)

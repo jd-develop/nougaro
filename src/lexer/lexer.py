@@ -12,7 +12,7 @@
 from src.lexer.position import Position
 from src.lexer.token import Token
 from src.lexer.token_types import *
-from src.constants import DIGITS, LETTERS, LETTERS_DIGITS
+from src.constants import DIGITS, IDENTIFIERS_LEGAL_CHARS, LETTERS_DIGITS
 from src.errors.errors import *
 # built-in python imports
 # no imports
@@ -27,28 +27,31 @@ class Lexer:
         self.file_name: str = file_name  # name of the file we're executing
         self.text: str = text  # raw code we have to execute
         self.pos: Position = Position(-1, 0, -1, file_name, text)  # actual position of the lexer
-        self.current_char: str | None = None  # current char
+        self.current_char: str | None = None
         self.advance()
+
+    def get_char(self, pos):
+        return self.text[pos.index] if pos.index < len(self.text) else None
 
     def advance(self):
         """Advance of 1 char in self.text"""
         self.pos.advance(self.current_char)  # advance in position
         # set the new current char - the next one in the code or None if this is EOF (end of file)
-        self.current_char = self.text[self.pos.index] if self.pos.index < len(self.text) else None
+        self.current_char = self.get_char(self.pos)
 
     def next_char(self):
         """Returns the next char without advancing"""
         new_pos = self.pos.copy().advance(self.current_char)
         # get the next char in the code (or None if this is EOF (end of file))
-        next_char = self.text[new_pos.index] if new_pos.index < len(self.text) else None
+        next_char = self.get_char(new_pos)
         return next_char
 
-    def make_tokens(self):
+    def make_tokens(self) -> tuple[list[Token], None | Error]:
         """Returns a token list with self.text. Return tok_list, None or [], error."""
         tokens: list[Token] = []
 
         there_is_a_space_or_a_tab_or_a_comment = False
-        identifiers_legal_chars = LETTERS + '_'
+
         while self.current_char is not None:  # None is EOF
             if self.current_char in ' \t':  # tab and space
                 there_is_a_space_or_a_tab_or_a_comment = True
@@ -59,6 +62,12 @@ class Lexer:
             elif self.current_char == '\\' and self.next_char() is not None and self.next_char() in ';\n':
                 self.advance()
                 self.advance()
+            elif self.current_char == "\\":  # and next char is invalid
+                return [], InvalidSyntaxError(
+                    self.pos.copy(), self.pos.advance(),
+                    "expected new line or semicolon after '\\'.",
+                    origin_file="src.lexer.lexer.Lexer.make_tokens"
+                )
             elif self.current_char in ';\n':  # semicolons and new lines
                 there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(Token(TT["NEWLINE"], pos_start=self.pos))
@@ -71,39 +80,63 @@ class Lexer:
                     tokens.append(number)
                 else:  # there is an error, we return it
                     return [], error
-            elif self.current_char in identifiers_legal_chars:  # the char is legal: identifier or keyword
+            elif self.current_char in IDENTIFIERS_LEGAL_CHARS:  # the char is legal: identifier or keyword
                 tok = self.make_identifier()
+                try:
+                    last_tok_is_number = tokens[-1].type in (TT['INT'], TT['FLOAT'])
+                except IndexError:
+                    last_tok_is_number = False
+                current_tok_is_identifier = tok.type == TT['IDENTIFIER']
+                current_tok_is_maybe_e_infix = (
+                        last_tok_is_number and current_tok_is_identifier and
+                        (tok.value.startswith('e') or tok.value.startswith('E'))
+                )
+                current_tok_is_positive_e_infix = (
+                        current_tok_is_maybe_e_infix and tok.value[1:].isdigit() and self.current_char != "."
+                )
+                if self.next_char() is not None:
+                    current_tok_is_negative_e_infix = (
+                        current_tok_is_maybe_e_infix and self.current_char == "-" and self.next_char() in DIGITS
+                    )
+                else:
+                    current_tok_is_negative_e_infix = False
+
                 if len(tokens) == 0:
                     tokens.append(tok)
                 elif there_is_a_space_or_a_tab_or_a_comment:
                     tokens.append(tok)
-                # if you think the following code is awful and ugly, you're RIGHT
-                elif tokens[-1].type in (TT['INT'], TT['FLOAT']) and \
-                        tok.type == TT['IDENTIFIER'] and \
-                        (tok.value.startswith('e') or tok.value.startswith('E')) and \
-                        tok.value[1:].isdigit() and \
-                        self.current_char != '.':
-                    tokens.append(Token(TT['E_INFIX'], pos_start=tok.pos_start, pos_end=tok.pos_start.copy().advance()))
-                    tokens.append(Token(TT['INT'], int(tok.value[1:]), tok.pos_start.copy().advance().advance(),
-                                        tok.pos_end))
-                elif tokens[-1].type in (TT['INT'], TT['FLOAT']) and \
-                        tok.type == TT['IDENTIFIER'] and \
-                        (tok.value.startswith('e') or tok.value.startswith('E')) and \
-                        self.current_char == '-' and \
-                        self.next_char() in DIGITS:
+                elif current_tok_is_positive_e_infix:
+                    tokens.append(Token(
+                        TT['E_INFIX'],
+                        pos_start=tok.pos_start,
+                        pos_end=tok.pos_start.copy().advance()
+                    ))
+                    tokens.append(Token(
+                        TT['INT'],
+                        value=int(tok.value[1:]),
+                        pos_start=tok.pos_start.copy().advance().advance(),
+                        pos_end=tok.pos_end
+                    ))
+                elif current_tok_is_negative_e_infix:
                     self.advance()
 
                     num, error = self.make_number(_0prefixes=False)
                     if error is not None:
                         return [], error
-                    
+
                     num: Token
                     if num.type == TT["FLOAT"]:
-                        return [], InvalidSyntaxError(num.pos_start, num.pos_end, "expected int, get float.",
-                                                      "src.lexer.Lexer.make_tokens")
+                        return [], InvalidSyntaxError(
+                            num.pos_start, num.pos_end,
+                            "expected int, get float.",
+                            origin_file="src.lexer.Lexer.make_tokens"
+                        )
                     else:
-                        tokens.append(
-                            Token(TT['E_INFIX'], pos_start=tok.pos_start, pos_end=tok.pos_start.copy().advance()))
+                        tokens.append(Token(
+                            TT['E_INFIX'],
+                            pos_start=tok.pos_start,
+                            pos_end=tok.pos_start.copy().advance()
+                        ))
                         tokens.append(num.set_value(-1*num.value))
                 else:
                     tokens.append(tok)
@@ -213,8 +246,11 @@ class Lexer:
                 # illegal char
                 pos_start = self.pos.copy()
                 char = self.current_char
-                return [], IllegalCharError(pos_start, self.pos.advance(), f"'{char}' is an illegal character.",
-                                            origin_file="src.lexer.Lexer.make_tokens")
+                return [], IllegalCharError(
+                    pos_start, self.pos.advance(),
+                    f"'{char}' is an illegal character.",
+                    origin_file="src.lexer.Lexer.make_tokens"
+                )
 
         # append the end of file
         tokens.append(Token(TT["EOF"], pos_start=self.pos))
@@ -390,11 +426,9 @@ class Lexer:
                     "src.lexer.Lexer.make_string"
                 )
             if escape_character:  # if the last char is \, we check for escape sequence
-                string_ += escape_characters.get(self.current_char, self.current_char)  # the arg is doubled: if
-                #                                                                         self.current_char is not a
-                #                                                                         valid escape_sequence, we
-                #                                                                         get self.current_char as
-                #                                                                         the next char.
+                string_ += escape_characters.get(self.current_char, self.current_char)
+                # the arg is doubled: if self.current_char is not a valid escape_sequence, we get self.current_char as
+                # the next char.
                 escape_character = False  # there is no more escape char
             elif self.current_char == '\\':  # the next is an escape char
                 escape_character = True

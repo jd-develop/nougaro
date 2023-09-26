@@ -356,10 +356,9 @@ class Interpreter:
             if not IS_IDENTIFIER:
                 var_name: Node
                 value = result.register(self.visit(var_name, ctx))  # here var_name is an expr
-                if not result.should_return():
-                    break
-                else:
+                if result.should_return():
                     return result
+                break
             value = ctx.symbol_table.get(var_name.value)  # we get the value of the variable
             if value is not None:  # if the variable is defined, we can stop here
                 break
@@ -421,6 +420,10 @@ class Interpreter:
         for i, var_name in enumerate(var_names):
             IS_SINGLE_VAR_NAME = len(var_name) == 1
             if not IS_SINGLE_VAR_NAME:  # var a.b.(...).z = value
+                # here:
+                # should check if the first var name, if it is an identifier, is not protected
+                # should visit everything visitable, checking in attributes for the next identifier
+                # should finally edit the variable (separate method?)
                 print_in_red("This feature is work in progress.")
                 return result.success(NoneValue(False))
             else:  # single var name

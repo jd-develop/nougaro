@@ -1347,4 +1347,4 @@ class Interpreter:
     @staticmethod
     def visit_NoNode() -> RTResult:
         """There is no node"""
-        return RTResult().success(NoneValue(False))
+        return RTResult().success(List([NoneValue(False)]))

@@ -163,8 +163,12 @@ class Lexer:
                 there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(self.make_mul())
             elif self.current_char == '/':
-                there_is_a_space_or_a_tab_or_a_comment = False
-                tokens.append(self.make_div())
+                if self.next_char() == "*":
+                    there_is_a_space_or_a_tab_or_a_comment = True
+                    self.skip_multiline_comment()
+                else:
+                    there_is_a_space_or_a_tab_or_a_comment = False
+                    tokens.append(self.make_div())
             elif self.current_char == '^':
                 there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_pow()
@@ -630,3 +634,18 @@ class Lexer:
 
         while self.current_char != '\n' and self.current_char is not None:  # None -> EOF
             self.advance()
+
+    def skip_multiline_comment(self):
+        """Skip a comment (until back line or EOF)"""
+        # current char is '/'
+        self.advance()
+        # current char is '*'
+        self.advance()
+
+        # None -> EOF
+        while self.current_char is not None and not (self.current_char == "*" and self.next_char() == "/"):
+            self.advance()
+        if self.current_char == "*":
+            self.advance()
+            if self.current_char == "/":
+                self.advance()

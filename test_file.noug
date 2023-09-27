@@ -1,13 +1,18 @@
-# Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/* Nougaro : a python-interpreted high-level programming language
+   Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 print("Hello Toulouse!")  # the entire world is actually Toulouse, trust me. If you say 'pain au chocolat', you're not in the world.
 # comment
+/* single-line multi-line comment */
+/* real
+multi-line
+     comment
+     */
 
-print("OK print & comments")
+/* comment */ print("OK print & comments") /* comment */ # comment
 
 # basic syntax
 "a" ; "b"

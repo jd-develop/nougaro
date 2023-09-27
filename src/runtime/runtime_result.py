@@ -7,7 +7,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# NO IMPORTS
+# IMPORTS
+# nougaro modules imports: NO IMPORTS
+# built-in python imports
+import pprint
+
 
 # ##########
 # RUNTIME RESULT
@@ -83,4 +87,17 @@ class RTResult:
             self.function_return_value or
             self.loop_should_continue or
             self.loop_should_break
+        )
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return "RTResult: " + pprint.pformat(
+            {"value": self.value,
+             "function_return_value": self.function_return_value,
+             "error": self.error,
+             "loop_should_continue": self.loop_should_continue,
+             "loop_should_break": self.loop_should_break,
+             "old_should_return": self.old_should_return}
         )

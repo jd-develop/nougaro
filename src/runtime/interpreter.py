@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
+import sys
 
 # Nougaro : a python-interpreted high-level programming language
 # Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
@@ -183,6 +184,8 @@ class Interpreter:
         """Visit BinOpNode"""
         res = RTResult()
         left = self._visit_value_that_can_have_attributes(node.left_node, res, ctx)
+        if res.should_return():
+            return res
 
         if node.op_token.matches(TT["KEYWORD"], 'and') and left.is_false():
             # operator is "and" and the value is false
@@ -193,6 +196,8 @@ class Interpreter:
             return res.success(TRUE.copy().set_pos(node.pos_start, node.pos_end))
 
         right = self._visit_value_that_can_have_attributes(node.right_node, res, ctx)
+        if res.should_return():
+            return res
 
         # we check for what is the operator token, then we execute the corresponding method
         if node.op_token.type == TT["PLUS"]:
@@ -263,6 +268,8 @@ class Interpreter:
         for index, element in enumerate(nodes_and_tokens_list):
             if index % 2 == 0:  # we take only nodes and not ops
                 value = self._visit_value_that_can_have_attributes(element, res, ctx)
+                if res.should_return():
+                    return res
                 visited_nodes_and_tokens_list.append(value)
             else:
                 visited_nodes_and_tokens_list.append(element)
@@ -279,6 +286,7 @@ class Interpreter:
                 right = visited_nodes_and_tokens_list[index + 2]
             except IndexError:
                 break
+
             if op_token.type == TT["EE"]:
                 test_result, error = element.get_comparison_eq(right)
             elif op_token.type == TT["NE"]:

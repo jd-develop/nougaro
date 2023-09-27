@@ -3,7 +3,7 @@ import math
 
 print()
 print("Welcome to the Nougaro calculator!")
-print("Enter 'exit' to exit.")
+print("Enter 'exit' to exit, 'cls' or 'clear' to clear the screen.")
 print("This calculator uses the Reverse Polish Notation.")
 print("Examples:")
 print()
@@ -18,9 +18,9 @@ while True then
     var calcul = input("calc> ")
     var should_continue = False
     
-    if calcul == "exit" then break
+    if calcul in ["exit", "done"] then break
     if calcul == "" then continue
-    if calcul == "clear" then; clear(); continue; end
+    if calcul in ["clear", "cls"] then; clear(); continue; end
     
     # tokenize
     var tokens = []
@@ -113,7 +113,11 @@ while True then
     
     # parse
     var stack = []
+    var i = -1
+    var last_token = ""
     for token in tokens then
+        var i += 1
+        if last_token == "/" and token == "/" then continue
         if is_num(token) then
             append(stack, token)
         elif token == "sqrt" and len(stack) > 0 and is_num(stack(-1)) then
@@ -149,7 +153,11 @@ while True then
                         var should_continue = True
                         break
                     end
-                    var result = stack(-2) / stack(-1)
+                    if len(tokens) >= i+2 and tokens(i+1) == "/" then
+                        var result = stack(-2) // stack(-1)
+                    else
+                        var result = stack(-2) / stack(-1)
+                    end
                 elif token == "*" then
                     var result = stack(-2) * stack(-1)
                 elif token == "^" then
@@ -172,6 +180,7 @@ while True then
                 break
             end
         end
+        var last_token = token
     end
     
     if should_continue then continue

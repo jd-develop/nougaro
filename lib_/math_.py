@@ -18,13 +18,12 @@
 from lib_.lib_to_make_libs import *
 # Above line : Context, RTResult, errors and values are imported in lib_to_make_libs.py
 # built-in python imports
-from math import sqrt as math_sqrt, degrees as math_degrees, radians as math_radians, sin as math_sin, cos as math_cos
-from math import tan as math_tan, asin as math_asin, acos as math_acos, atan as math_atan, log, log2, e, pi
+import math
 
 # constants
-PI = Number(pi)
-SQRT_PI = Number(math_sqrt(pi))
-E = Number(e)
+PI = Number(math.pi)
+SQRT_PI = Number(math.sqrt(math.pi))
+E = Number(math.e)
 
 
 class Math(ModuleFunction):
@@ -59,7 +58,7 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_sqrt"
             ))
 
-        sqrt_ = math_sqrt(value.value)  # we calculate the square root
+        sqrt_ = math.sqrt(value.value)  # we calculate the square root
         return RTResult().success(Number(sqrt_))
 
     execute_math_sqrt.param_names = ['value']
@@ -115,7 +114,7 @@ class Math(ModuleFunction):
                 value.pos_start, value.pos_end, "first", "math.degrees", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_degrees"
             ))
-        degrees = math_degrees(value.value)
+        degrees = math.degrees(value.value)
         return RTResult().success(Number(degrees))
 
     execute_math_degrees.param_names = ['value']
@@ -132,7 +131,7 @@ class Math(ModuleFunction):
                 value.pos_start, value.pos_end, "first", "math.radians", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_radians"
             ))
-        radians = math_radians(value.value)
+        radians = math.radians(value.value)
         return RTResult().success(Number(radians))
 
     execute_math_radians.param_names = ['value']
@@ -149,7 +148,7 @@ class Math(ModuleFunction):
                 value.pos_start, value.pos_end, "first", "math.sin", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_sin"
             ))
-        sin = math_sin(value.value)
+        sin = math.sin(value.value)
         return RTResult().success(Number(sin))
 
     execute_math_sin.param_names = ['value']
@@ -166,7 +165,7 @@ class Math(ModuleFunction):
                 value.pos_start, value.pos_end, "first", "math.cos", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_cos"
             ))
-        cos = math_cos(value.value)
+        cos = math.cos(value.value)
         return RTResult().success(Number(cos))
 
     execute_math_cos.param_names = ['value']
@@ -183,7 +182,7 @@ class Math(ModuleFunction):
                 value.pos_start, value.pos_end, "first", "math.tan", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_tan"
             ))
-        tan = math_tan(value.value)
+        tan = math.tan(value.value)
         return RTResult().success(Number(tan))
 
     execute_math_tan.param_names = ['value']
@@ -201,7 +200,7 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_asin"
             ))
         try:
-            asin = math_asin(value.value)
+            asin = math.asin(value.value)
         except ValueError:
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
@@ -225,7 +224,7 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_acos"
             ))
         try:
-            acos = math_acos(value.value)
+            acos = math.acos(value.value)
         except ValueError:  # 1 < value or value < -1
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
@@ -248,7 +247,7 @@ class Math(ModuleFunction):
                 value.pos_start, value.pos_end, "first", "math.atan", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_atan"
             ))
-        atan = math_atan(value.value)
+        atan = math.atan(value.value)
         return RTResult().success(Number(atan))
 
     execute_math_atan.param_names = ['value']
@@ -289,14 +288,14 @@ class Math(ModuleFunction):
 
         base: Value = exec_context.symbol_table.getf('base')  # we get the base
         if base is None:
-            value_to_return = Number(log(value.value))
+            value_to_return = Number(math.log(value.value))
         else:
             if not isinstance(base, Number):  # we check if the base is a number
                 return RTResult().failure(RTTypeErrorF(
                     base.pos_start, base.pos_end, "second", "math.log", "number", base,
                     exec_context, "lib_.math_.Math.execute_math_log"
                 ))
-            value_to_return = Number(log(value.value, base.value))
+            value_to_return = Number(math.log(value.value, base.value))
 
         return RTResult().success(value_to_return)
 
@@ -315,7 +314,7 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_log2"
             ))
 
-        value_to_return = Number(log2(value.value))
+        value_to_return = Number(math.log2(value.value))
 
         return RTResult().success(value_to_return)
 

@@ -38,6 +38,9 @@ class Lexer:
         self.pos.advance(self.current_char)  # advance in position
         # set the new current char - the next one in the code or None if this is EOF (end of file)
         self.current_char = self.get_char(self.pos)
+        # USEFUL to know where tf you are in the file when it throws at you an unclear error
+        # if self.pos.index in [7583, 5547]:
+        #     print(self.pos.index, self.pos.line_number, self.current_char, self.next_char())
 
     def next_char(self):
         """Returns the next char without advancing"""

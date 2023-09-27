@@ -995,7 +995,7 @@ class Interpreter:
 
                 index = index.value
                 try:
-                    return_value = value_to_call[index]
+                    return_value = value_to_call[index].copy().set_pos(node.pos_start, node.pos_end)
                     return result.success(return_value)
                 except IndexError:
                     return result.failure(RTIndexError(

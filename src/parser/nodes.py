@@ -551,6 +551,18 @@ class ReadNode(Node):
         return f'read:({self.file_name_expr}>>{self.identifier} at line {self.line_number})'
 
 
+class DollarPrintNode(Node):
+    """$identifier"""
+    def __init__(self, identifier: Token, pos_start, pos_end):
+        self.identifier: Token = identifier
+
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+    def __repr__(self):
+        return f'${self.identifier}'
+
+
 # SPECIAL NODES
 class NoNode(Node):
     """If the file to execute is empty or filled by back lines, this node is the only node of the node list."""

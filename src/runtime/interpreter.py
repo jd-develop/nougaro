@@ -1344,6 +1344,24 @@ class Interpreter:
 
         return result.success(String(file_str))
 
+    def visit_DollarPrintNode(self, node: DollarPrintNode, ctx: Context) -> RTResult:
+        """Visit DollarPrintNode."""
+        result = RTResult()
+        if node.identifier.value == "":
+            print("$")
+            value_to_return = String("$").set_pos(node.pos_start, node.pos_end)
+        elif ctx.symbol_table.exists(node.identifier.value):
+            value_to_return = ctx.symbol_table.get(node.identifier.value)
+            try:
+                print(value_to_return.to_str())
+            except AttributeError:
+                print(str(value_to_return))
+        else:
+            print(f"${node.identifier.value}")
+            value_to_return = String(f"${node.identifier.value}").set_pos(node.pos_start, node.pos_end)
+
+        return result.success(value_to_return)
+
     @staticmethod
     def visit_NoNode() -> RTResult:
         """There is no node"""

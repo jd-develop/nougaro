@@ -810,6 +810,7 @@ class Parser:
         atom  : (INT|FLOAT)(E_INFIX INT)?|(STRING (STRING NEWLINE?*)?*)
               : (IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*)
               : LPAREN expr RPAREN
+              : DOLLAR IDENTIFIER
               : list_expr
               : if_expr
               : for_expr
@@ -934,6 +935,22 @@ class Parser:
                     InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, "expected ')'.",
                                        "src.parser.parser.Parser.atom")
                 )
+
+        elif token.type == TT["DOLLAR"]:
+            result.register_advancement()
+            self.advance()
+
+            if self.current_token.type != TT["IDENTIFIER"]:
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected identifier or nothing.",
+                    origin_file="src.parser.parser.Parser.atom"
+                ))
+
+            identifier = self.current_token
+            result.register_advancement()
+            self.advance()
+            return result.success(DollarPrintNode(identifier, token.pos_start, identifier.pos_end))
 
         # list_expr
         elif token.type == TT["LSQUARE"]:

@@ -39,6 +39,7 @@ atom       : (INT|FLOAT)(E_INFIX INT)?
            : STRING (STRING NEWLINE?*)?*
            : IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*
            : LPAREN expr RPAREN
+           : DOLLAR IDENTIFIER
            : list_expr
            : if_expr
            : for_expr

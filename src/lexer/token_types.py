@@ -75,6 +75,8 @@ TT = {
     "COMMA": ',',                # ,
     "ARROW": '->',               # ->
     "INTERROGATIVE_PNT": '?',    # ?
+
+    "DOLLAR": "$",               # $
     
     "EOF": 'end of file',        # end of file
 }

@@ -249,6 +249,13 @@ class Lexer:
                 there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(Token(TT["COMMA"], pos_start=self.pos))
                 self.advance()
+
+            # dollar-print
+            elif self.current_char == "$":
+                there_is_a_space_or_a_tab_or_a_comment = False
+                dollar, id_ = self.make_dollar_print()
+                tokens.append(dollar)
+                tokens.append(id_)
             else:
                 # illegal char
                 pos_start = self.pos.copy()
@@ -627,6 +634,26 @@ class Lexer:
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 
+    def make_dollar_print(self):
+        """Make dollar-print syntax"""
+        # current char is '$'
+        dollar_pos = self.pos.copy()
+        self.advance()
+
+        id_pos_start = self.pos.copy()
+        identifier = ""
+        if self.current_char is not None and self.current_char in IDENTIFIERS_LEGAL_CHARS:
+            identifier += self.current_char
+            self.advance()
+
+        # while not EOF and current char still in authorized chars in identifier and keywords
+        while self.current_char is not None and self.current_char in LETTERS_DIGITS + '_':
+            identifier += self.current_char
+            self.advance()
+
+        token_type = TT["KEYWORD"] if identifier in KEYWORDS else TT["IDENTIFIER"]  # KEYWORDS is the keywords list
+        return Token(TT["DOLLAR"], pos_start=dollar_pos), Token(token_type, identifier, id_pos_start, self.pos)
+
     def skip_comment(self):
         """Skip a comment (until back line or EOF)"""
         # current char is '#'
@@ -636,7 +663,7 @@ class Lexer:
             self.advance()
 
     def skip_multiline_comment(self):
-        """Skip a comment (until back line or EOF)"""
+        """Skip a multi-line comment (until */ or EOF)"""
         # current char is '/'
         self.advance()
         # current char is '*'

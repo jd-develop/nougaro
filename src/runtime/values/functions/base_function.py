@@ -31,7 +31,10 @@ class BaseFunction(Value):
         # print(self.context)
         new_context = Context(self.name, self.context, self.pos_start)
         # set the symbol table to the parent one
-        new_context.symbol_table = SymbolTable(new_context.parent.symbol_table)
+        if new_context.parent is None:
+            new_context.symbol_table = SymbolTable()
+        else:
+            new_context.symbol_table = SymbolTable(new_context.parent.symbol_table)
         return new_context
 
     def check_args(self, param_names, args, optional_params: list = None, should_respect_args_number: bool = True):

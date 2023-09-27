@@ -12,7 +12,12 @@ multi-line
      comment
      */
 
-/* comment */ print("OK print & comments") /* comment */ # comment
+assert $ == "$"
+assert $test == "$test"
+var a = 1
+assert $a == 1
+
+/* comment */ $print("OK print & comments") /* comment */ # comment
 
 # basic syntax
 "a" ; "b"

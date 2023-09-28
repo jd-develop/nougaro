@@ -41,17 +41,33 @@ class Error:
         assert self.pos_start is not None, f"error from {self.origin_file}, {self.details=}"
         assert self.pos_end is not None, f"error from {self.origin_file}, {self.details=}"
         string_line = string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end)
-        while string_line[0] in " ":
-            # delete spaces at the start of the str.
-            # Add chars after the space in the string after the "while string_line[0] in" to delete them.
+
+        if len(string_line) != 0 and string_line[0] == "\n":
             string_line = string_line[1:]
+
+        string_line = string_line.split("\n")
+
+        if len(string_line) != 0:
+            for i in range(len(string_line)):
+                if i % 2 == 1:
+                    continue
+                while string_line[i][0] in " ":
+                    # delete spaces at the start of the str.
+                    # Add chars after the space in the string after the "while string_line[0] in" to delete them.
+                    string_line[i] = string_line[i][1:]
+                    try:
+                        string_line[i+1] = string_line[i+1][1:]
+                    except IndexError:
+                        pass
+
         if _print_origin_file:
             result = f"(from {self.origin_file})\n" \
-                     f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n \t' + \
-                     string_line + '\n '
+                     f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n'
         else:
-            result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n \t' + \
-                     string_line + '\n '
+            result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n'
+
+        for i, line in enumerate(string_line):
+            result += '\t' + line + '\n '
         result += f'{self.error_name}: {self.details}' if self.details != '' else f'{self.error_name}'
         return result
 
@@ -104,8 +120,8 @@ class RunTimeError(Error):
             for i in range(len(string_line)):
                 if i % 2 == 1:
                     continue
-                while string_line[i][0] in " \t":
-                    # delete spaces, tabs and back lines at the start of the str.
+                while string_line[i][0] in " ":
+                    # delete spaces at the start of the str.
                     # Add chars after the space in the string after the "while string_line[0] in" to delete them.
                     string_line[i] = string_line[i][1:]
                     try:
@@ -114,7 +130,7 @@ class RunTimeError(Error):
                         pass
 
         result = self.generate_traceback() + "\n"
-        for line in string_line:
+        for i, line in enumerate(string_line):
             result += '\t' + line + '\n '
         result += f'{self.error_name}: {self.details}' if self.details != '' else f'{self.error_name}'
         return result

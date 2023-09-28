@@ -58,4 +58,4 @@ def string_with_arrows(text: str, pos_start, pos_end) -> str:
         if idx_end < 0:
             idx_end = len(text)
 
-    return result.replace('\t', '').replace('\n', '\n\t')
+    return result.replace('\t', '    ')  # .replace('\n', '\n    ')

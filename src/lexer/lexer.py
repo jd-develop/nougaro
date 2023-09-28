@@ -15,7 +15,7 @@ from src.lexer.token_types import *
 from src.constants import DIGITS, IDENTIFIERS_LEGAL_CHARS, LETTERS_DIGITS
 from src.errors.errors import *
 # built-in python imports
-# no imports
+import unicodedata
 
 
 # ##########
@@ -260,9 +260,13 @@ class Lexer:
                 # illegal char
                 pos_start = self.pos.copy()
                 char = self.current_char
+                try:
+                    char_name = unicodedata.name(char)
+                except ValueError:
+                    char_name = "unknown char"
                 return [], IllegalCharError(
                     pos_start, self.pos.advance(),
-                    f"'{char}' is an illegal character.",
+                    f"'{char}' is an illegal character (U+{hex(ord(char))[2:].upper()}, {char_name})",
                     origin_file="src.lexer.Lexer.make_tokens"
                 )
 

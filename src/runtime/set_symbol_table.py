@@ -51,7 +51,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("is_module", IS_MODULE)
     symbol_table.set("is_none", IS_NONE)
     symbol_table.set("type", TYPE)
-    symbol_table.set("py_type", PY_TYPE)
+    symbol_table.set("__py_type__", PY_TYPE)
     symbol_table.set("str", STR)
     symbol_table.set("list", LIST)
     symbol_table.set("int", INT)

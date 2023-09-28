@@ -44,7 +44,7 @@ BUILTIN_FUNCTIONS = [
     "replace",
     "exit",
     "type",
-    "py_type",
+    "__py_type__",
     "str",
     "list",
     "int",

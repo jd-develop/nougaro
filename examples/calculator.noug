@@ -15,6 +15,7 @@ print("Type 'help' for all the operators and constants.")
 print()
 
 var answer = 0
+var increment = 0
 
 while True then
     var calcul = input("calc> ")
@@ -23,6 +24,7 @@ while True then
     if calcul in ["exit", "done"] then break
     if calcul == "" then continue
     if calcul in ["clear", "cls"] then; clear(); continue; end
+    if calcul in ["reseti", "ri"] then; var increment = 0; continue; end
     if calcul == "help" then
         print("Welcome to the nougaro calculator help.")
         print("Here all the binary operators with their syntax:")
@@ -40,6 +42,10 @@ while True then
         print()
         print("Here all the constants:")
         print("        pi : 3.141592653589793")
+        print()
+        print("Here all the variables:")
+        print("       ans : result of last operation")
+        print("         i : value that increments at each operation. Reset it with reseti or ri.") 
         print()
         continue
     end
@@ -119,6 +125,8 @@ while True then
             replace(tokens, -1, "mo")
         elif char == "d" and len(tokens) > 0 and tokens(-1) == "mo" then
             replace(tokens, -1, "mod")
+        elif char == "i" then
+             append(tokens, char)
         elif char == "\t" then
             print("Error: use spaces instead of tabulations.")
             var should_continue = True
@@ -163,6 +171,8 @@ while True then
             append(stack, mod)
         elif token == "space" then
             void()
+        elif token == "i" then
+            append(stack, increment)
         else
             if len(stack) >= 2 then
                 if token == "+" then
@@ -214,4 +224,5 @@ while True then
     
     print(stack(0))
     var answer = stack(0)
+    var increment += 1
 end

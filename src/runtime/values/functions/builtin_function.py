@@ -24,7 +24,6 @@ import os.path
 import random
 import sys
 import subprocess
-import asyncio
 
 
 class BuiltInFunction(BaseBuiltInFunction):
@@ -1429,13 +1428,18 @@ class BuiltInFunction(BaseBuiltInFunction):
             sorted_ = list_to_sort
             
         elif mode == "sleep": # sleep sort
+            # sleep sort was implemented by Mistera. Please refer to him if you have any questions about it, as I
+            # completely don’t fuc*ng know how asyncio works
+            import asyncio
+
             sorted_ = []
             for i in list_to_sort:
                 if i.type_ != "int":
                     return result.failure(RTTypeError(
                         i.pos_start, i.pos_end, 
-                        f"""sleep mode: expected list of int, but found {i.type_} inside the list""", 
-                        exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
+                        f"sleep mode: expected list of int, but found {i.type_} inside the list", 
+                        exec_ctx,
+                        origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
                         
                     ))
             async def execute_coroutine_list(_list: list):

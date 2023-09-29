@@ -24,6 +24,7 @@ import os.path
 import random
 import sys
 import subprocess
+import asyncio
 
 
 class BuiltInFunction(BaseBuiltInFunction):
@@ -1426,6 +1427,28 @@ class BuiltInFunction(BaseBuiltInFunction):
                         return result.failure(error)
 
             sorted_ = list_to_sort
+            
+        elif mode == "sleep": # sleep sort
+            sorted_ = []
+            for i in list_to_sort:
+                if i.type_ != "int":
+                    return result.failure(RTTypeError(
+                        i.pos_start, i.pos_end, 
+                        f"""sleep mode: expected list of int, but found {i.type_} inside the list""", 
+                        exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
+                        
+                    ))
+            async def execute_coroutine_list(_list: list):
+                await asyncio.gather(*_list)
+
+            async def wait_and_append(i: int):
+                nonlocal sorted_
+                await asyncio.sleep(i)
+                sorted_.append(Number(i))
+
+            list_of_coroutines = [wait_and_append(i.value) for i in list_to_sort]
+            asyncio.run(execute_coroutine_list(list_of_coroutines))
+            
         else:
             return result.failure(RunTimeError(
                 mode_noug.pos_start, mode_noug.pos_end,

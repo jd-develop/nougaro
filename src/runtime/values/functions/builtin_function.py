@@ -1373,41 +1373,69 @@ class BuiltInFunction(BaseBuiltInFunction):
     
     def execute_sort(self, exec_ctx: Context):
         """Like python’s sort()"""
+        result = RTResult()
         list_ = exec_ctx.symbol_table.getf("list_")
         mode = exec_ctx.symbol_table.getf("mode")
         
         if not isinstance(list_, List):
-            return RTResult().failure(RTTypeErrorF(
+            return result.failure(RTTypeErrorF(
                 list_.pos_start, list_.pos_end, "first", "sort", "list", list_,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
             ))
         if mode is None:
             mode = String("timsort").set_pos(self.pos_start, self.pos_end)
         if not isinstance(mode, String):
-            return RTResult().failure(RTTypeErrorF(
+            return result.failure(RTTypeErrorF(
                 mode.pos_start, mode.pos_end, "second", "sort", "str", mode,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
             ))
-        
-        mode = mode.value
+
+        mode_noug = mode
+        mode = mode_noug.value
         list_to_sort = list_.elements
         if mode == "timsort":  # default python sort algorithm
             try:
                 sorted_ = sorted(list_to_sort, key=lambda val: py2noug.noug2py(val, False))
             except TypeError as e:
-                return RTResult().failure(RTTypeError(
+                return result.failure(RTTypeError(
                     list_.pos_start, list_.pos_end,
                     e, exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
                 ))
+        elif mode == "stalin":  # stalin sort
+            def get_comparison(list_to_sort_, index_):
+                if index_ + 1 < len(list_to_sort_):
+                    comp, err = list_to_sort_[index_].get_comparison_gt(list_to_sort_[index_ + 1])
+                    if err is not None:
+                        return None, error
+                else:
+                    comp = FALSE.copy()
+                return comp, None
+
+            for i in range(len(list_to_sort)):
+                if i == len(list_to_sort):
+                    break
+
+                comparison, error = get_comparison(list_to_sort, i)
+                if error is not None:
+                    return result.failure(error)
+
+                while i + 1 < len(list_to_sort) and comparison.is_true():
+                    list_to_sort.pop(i + 1)
+                    comparison, error = get_comparison(list_to_sort, i)
+                    if error is not None:
+                        return result.failure(error)
+
+            sorted_ = list_to_sort
         else:
-            return RTResult().failure(RunTimeError(
-                mode.pos_start, mode.pos_end,
+            return result.failure(RunTimeError(
+                mode_noug.pos_start, mode_noug.pos_end,
                 "this mode does not exist. Available modes:\n"
-                " * 'timsort' (default).",
+                "\t* 'timsort' (default),\n"
+                "\t* 'stalin'.",
                 exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
             ))
         
-        return RTResult().success(List(sorted_))
+        return result.success(List(sorted_))
     
     execute_sort.param_names = ["list_"]
     execute_sort.optional_params = ["mode"]

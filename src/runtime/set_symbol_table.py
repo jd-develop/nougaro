@@ -67,6 +67,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("max", MAX)
     symbol_table.set("min", MIN)
     symbol_table.set("len", LEN)
+    symbol_table.set("sort", SORT)
 
     symbol_table.set("split", SPLIT)
     symbol_table.set("upper", UPPER)

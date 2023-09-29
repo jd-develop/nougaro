@@ -65,7 +65,8 @@ BUILTIN_FUNCTIONS = [
     'round',
     "__test__",
     '__is_keyword__',
-    '__is_valid_token_type__'
+    '__is_valid_token_type__',
+    'sort'
 ]
 PROTECTED_VARS = [  # finally, the list with all the names that can't be defined by the user
     "null",

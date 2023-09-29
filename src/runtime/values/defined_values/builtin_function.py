@@ -51,6 +51,7 @@ REPLACE = BuiltInFunction('replace')
 MAX = BuiltInFunction('max')
 MIN = BuiltInFunction('min')
 LEN = BuiltInFunction('len')
+SORT = BuiltInFunction('sort')
 
 SPLIT = BuiltInFunction('split')
 LOWER = BuiltInFunction('lower')

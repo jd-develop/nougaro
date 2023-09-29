@@ -32,13 +32,16 @@ def py2noug(value: Any):
         return Value()  # we just return a base value if there is no equivalent...
 
 
-def noug2py(value: Any):
+def noug2py(value: Any, none_instead_of_raw_value=True):
     """Converts nougaro values to python ones."""
     if isinstance(value, String) or isinstance(value, Number):
         return value.value
     elif isinstance(value, List):
-        return value.elements
+        return [noug2py(e) for e in value.elements]
     elif isinstance(value, NoneValue):
         return None
     else:
-        return None
+        if none_instead_of_raw_value:
+            return None
+        else:
+            return value

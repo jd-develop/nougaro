@@ -9,7 +9,8 @@ import random
 
 def ipsum(paragraphs)
     assert is_int(paragraphs), "first argument of function 'lorem.ipsum' SHOULD be an integer."
-    assert paragraphs > 0, "first argument of function 'lorem.ipsum' SHOULD be greater than 0."
+    assert paragraphs >= 0, "first argument of function 'lorem.ipsum' SHOULD be positive."
+    if paragraphs == 0 then return ""
     var lorem_sentences = [\
         "Quisque vitae varius ex, eu volutpat orci.",\
         "Aenean ullamcorper orci et vulputate fermentum.",\

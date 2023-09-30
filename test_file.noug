@@ -280,11 +280,19 @@ assert __how_many_lines_of_code__(False) > 10000  # yes I know, I write a lot of
 
 print("OK builtin funcs 11")
 
-## sorting algoritms
+## sorting algorithms
 assert sort([1, 2, 3, 4, 3, 2, 1, 5, 2, 6, 1, 2, 4, 3, 7]) == [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 5, 6, 7]
+assert sort([]) == []
+assert sort([0, -1]) == [-1, 0]
 assert sort([1, 2, 3, 4, 3, 2, 1, 5, 2, 6, 1, 2, 4, 3, 7], "stalin") == [1, 2, 3, 4, 5, 6, 7]
-print("Executing sleep sort, this should take 6 seconds...")
-assert sort([1, 2, 3, 4, 3, 2, 1, 5, 2, 6, 1, 2, 4, 3], "sleep") == [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 5, 6]
+assert sort([1, 2, 3, 4, 3, 2, 1, 5, 0, 6, -400, 2, 4, 3, 7], "stalin") == [1, 2, 3, 4, 5, 6, 7]
+assert sort([], "stalin") == []
+assert sort([-1, 0, -3], "stalin") == [-1, 0]
+assert reverse(sort([3, 1, 5, 6, 12, -4, 0, 9999999, 45])) == [9999999, 45, 12, 6, 5, 3, 1, 0, -4]
+print("Executing sleep sort, this should take 4 seconds...")
+assert sort([1, 2, 3, 4, 3, 2, 1, 0, 4, 2, 4, 1, 2, 4, 3], "sleep") == [0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4]
+assert sort([0], "sleep") == [0]
+assert sort([], "sleep") == []
 
 print("OK builtin funcs 12")
 

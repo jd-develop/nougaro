@@ -52,6 +52,7 @@ MAX = BuiltInFunction('max')
 MIN = BuiltInFunction('min')
 LEN = BuiltInFunction('len')
 SORT = BuiltInFunction('sort')
+REVERSE = BuiltInFunction('reverse')
 
 SPLIT = BuiltInFunction('split')
 LOWER = BuiltInFunction('lower')

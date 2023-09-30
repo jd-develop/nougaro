@@ -1429,7 +1429,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             
         elif mode == "sleep": # sleep sort
             # sleep sort was implemented by Mistera. Please refer to him if you have any questions about it, as I
-            # completely don’t fuc*ng know how asyncio works
             import asyncio
 
             sorted_ = []
@@ -1437,7 +1436,6 @@ class BuiltInFunction(BaseBuiltInFunction):
                 if i.type_ != "int":
                     return result.failure(RTTypeError(
                         i.pos_start, i.pos_end, 
-                        f"sleep mode: expected list of int, but found {i.type_} inside the list", 
                         exec_ctx,
                         origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
                         
@@ -1445,10 +1443,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             async def execute_coroutine_list(_list: list):
                 await asyncio.gather(*_list)
 
-            async def wait_and_append(i: int):
                 nonlocal sorted_
-                await asyncio.sleep(i)
-                sorted_.append(Number(i))
 
             list_of_coroutines = [wait_and_append(i.value) for i in list_to_sort]
             asyncio.run(execute_coroutine_list(list_of_coroutines))
@@ -1458,7 +1453,6 @@ class BuiltInFunction(BaseBuiltInFunction):
                 mode_noug.pos_start, mode_noug.pos_end,
                 "this mode does not exist. Available modes:\n"
                 "\t* 'timsort' (default),\n"
-                "\t* 'stalin'.",
                 exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
             ))
         
@@ -1467,5 +1461,21 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_sort.param_names = ["list_"]
     execute_sort.optional_params = ["mode"]
     execute_sort.should_respect_args_number = True
+
+    def execute_reverse(self, exec_ctx: Context):
+        """Reverses a list, e.g. [1, 2, 3] becomes [3, 2, 1]"""
+        list_ = exec_ctx.symbol_table.getf("list_")
+        if not isinstance(list_, List):
+            return RTResult().failure(RTTypeError(
+                    list_.pos_start, list_.pos_end, list_, exec_ctx,
+                    origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_reverse"
+            ))
+
+        list_.elements.reverse()
+        return RTResult().success(list_)
+
+    execute_reverse.param_names = ["list_"]
+    execute_reverse.optional_params = []
+    execute_reverse.should_respect_args_number = True
 
     # ==================

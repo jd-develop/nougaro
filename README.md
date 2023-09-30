@@ -43,8 +43,9 @@
  Please refer to the [wiki](https://github.com/jd-develop/nougaro/wiki/) for documentation.
 
 # About syntax highlighting
- A [file](highlight%20theme%20for%20NPP.xml) can be imported in Notepad++ for syntax highlighting, but only in dark theme.
- Light theme will be uploaded later :D
+ The notepad++ file is no longer updated, so I deleted it from the repo.
+
+ I’m planning to create a VSCode extension – if you know something about that, contact me!
 
 # How it works?
  Everything is explained [here](how_it_works.md) :)

@@ -1429,6 +1429,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             
         elif mode == "sleep": # sleep sort
             # sleep sort was implemented by Mistera. Please refer to him if you have any questions about it, as I
+            # completely don’t have any ideas of how tf asyncio works
             import asyncio
 
             sorted_ = []
@@ -1436,14 +1437,28 @@ class BuiltInFunction(BaseBuiltInFunction):
                 if i.type_ != "int":
                     return result.failure(RTTypeError(
                         i.pos_start, i.pos_end, 
+                        f"sleep mode: expected list of int, but found {i.type_} inside the list.",
                         exec_ctx,
                         origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
                         
                     ))
+                if i.value < 0:
+                    return result.failure(RTTypeError(
+                        i.pos_start, i.pos_end,
+                        f"sleep mode: expected list of positive integers, but found negative integer {i.value} inside "
+                        f"the list.",
+                        exec_ctx,
+                        origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
+
+                    ))
+
             async def execute_coroutine_list(_list: list):
                 await asyncio.gather(*_list)
 
+            async def wait_and_append(i_: int):
                 nonlocal sorted_
+                await asyncio.sleep(i_)
+                sorted_.append(Number(i_))
 
             list_of_coroutines = [wait_and_append(i.value) for i in list_to_sort]
             asyncio.run(execute_coroutine_list(list_of_coroutines))
@@ -1453,6 +1468,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                 mode_noug.pos_start, mode_noug.pos_end,
                 "this mode does not exist. Available modes:\n"
                 "\t* 'timsort' (default),\n"
+                "\t* 'stalin',"
+                "\t* 'sleep'.",
                 exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
             ))
         

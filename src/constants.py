@@ -55,7 +55,17 @@ BUILTIN_FUNCTIONS = [
     "run",
     "example",
     "len",
+    "split",
+    "lower",
+    "upper",
+    "chr",
+    "ord",
+    "nougaro",
+    "__gpl__",
+    "round",
     "__test__",
+    "__is_keyword__",
+    "__is_valid_token_type__",
     "sort",
     "reverse"
 ]
@@ -64,6 +74,17 @@ PROTECTED_VARS = [  # finally, the list with all the names that can't be defined
     "True",
     "False",
     "None",
+    "__noug_version__",
+    "__python_version__",
+    "__exec_from__",
+    "__symbol_table__",
+    "__os_name__",
+    "__os_release__",
+    "__os_version__",
+    "__base_value__",
+    "__disclaimer_of_warranty__",
+    "__noug_dir__",
+    "answerToTheLifeTheUniverseAndEverything",
     *KEYWORDS,  # all the keywords
     *BUILTIN_FUNCTIONS,  # all the builtin function names
 ]

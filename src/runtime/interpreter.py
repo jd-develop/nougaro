@@ -1344,7 +1344,8 @@ class Interpreter:
 
         return result.success(String(file_str))
 
-    def visit_DollarPrintNode(self, node: DollarPrintNode, ctx: Context) -> RTResult:
+    @staticmethod
+    def visit_DollarPrintNode(node: DollarPrintNode, ctx: Context) -> RTResult:
         """Visit DollarPrintNode."""
         result = RTResult()
         if node.identifier.value == "":

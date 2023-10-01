@@ -1,5 +1,5 @@
-# TODO list:
-## 0.15 beta:
+# TODO list
+## 0.15 beta
 * [ ] add `var id.attr = value`
 * [ ] add class inheritance
 * [ ] add an error when things like `math.(assert 1)`

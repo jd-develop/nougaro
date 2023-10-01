@@ -8,6 +8,7 @@
 ## 0.16 beta (goal: february 2024)
 * [ ] add '\xXX' and '\uXXXX' support
 * [ ] add possibility to import files in current folder and sub-folders
+* [ ] add `var++`, `var#` and `var--`
 
 ## 0.17 beta (goal: april 2024)
 * [ ] rewrite parser to make it faster and easier to read

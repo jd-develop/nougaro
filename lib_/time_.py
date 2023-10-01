@@ -73,7 +73,7 @@ class Time(ModuleFunction):
     execute_time_sleep_milliseconds.optional_params = []
     execute_time_sleep_milliseconds.should_respect_args_number = True
 
-    def execute_time_time(self, exec_ctx: Context):
+    def execute_time_time(self):
         """Like python time.time()"""
         return RTResult().success(Number(time.time()))
 
@@ -81,12 +81,23 @@ class Time(ModuleFunction):
     execute_time_time.optional_params = []
     execute_time_time.should_respect_args_number = True
 
+    def execute_time_epoch(self):
+        """Like python time.gmtime(0), but returns a string"""
+        epoch = time.gmtime(0)
+        return RTResult().success(String(f"{epoch.tm_year}/{epoch.tm_mon}/{epoch.tm_mday} "
+                                         f"{epoch.tm_hour}:{epoch.tm_min}:{epoch.tm_sec}"))
+
+    execute_time_epoch.param_names = []
+    execute_time_epoch.optional_params = []
+    execute_time_epoch.should_respect_args_number = True
+
 
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported
     # functions
     "sleep": Time("sleep"),
     "sleep_milliseconds": Time("sleep_milliseconds"),
     "time": Time("time"),
+    "epoch": Time("epoch"),
     # constants
     "timezone": TIMEZONE,
 }

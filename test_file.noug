@@ -399,6 +399,9 @@ def test_nougaro(print_OK)
 
     if print_OK then print("OK statistics lib")
 
+    import time
+    assert time.time() > 0  # don’t test after changing your computer clock before 1970-01-01 00:00:00 x)
+
     print("Please test 'time' module (tested when 'example()' is executed)")
     print("Please test 'lorem' module")
 

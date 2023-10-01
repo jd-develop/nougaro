@@ -3,7 +3,7 @@
 * [ ] add `var id.attr = value`
 * [ ] add class inheritance
 * [ ] add an error when things like `math.(assert 1)`
-* [ ] add `time.time()`
+* [x] add `time.time()`
 
 ## 0.16 beta (goal: february 2024)
 * [ ] add '\xXX' and '\uXXXX' support

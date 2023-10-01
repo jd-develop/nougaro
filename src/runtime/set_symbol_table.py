@@ -10,9 +10,9 @@
 # IMPORTS
 # nougaro modules imports
 from src.runtime.symbol_table import SymbolTable
-from src.runtime.values.defined_values.number import *
+from src.runtime.values.number_constants import *
 from src.runtime.values.basevalues.basevalues import String, Value, NoneValue
-from src.runtime.values.defined_values.builtin_function import *
+from src.runtime.values.functions.builtin_function import BuiltInFunction
 from src.constants import PROTECTED_VARS
 # built-in python imports
 import platform
@@ -31,61 +31,62 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("None", NoneValue(True))
 
     # Built-in functions
-    symbol_table.set("void", VOID)
-    symbol_table.set("run", RUN)
-    symbol_table.set("example", EXAMPLE)
+    symbol_table.set("void", BuiltInFunction('void'))
 
-    symbol_table.set("print", PRINT)
-    symbol_table.set("print_ret", PRINT_RET)
-    symbol_table.set("input", INPUT)
-    symbol_table.set("input_int", INPUT_INT)
-    symbol_table.set("input_num", INPUT_NUM)
-    symbol_table.set("clear", CLEAR)
+    symbol_table.set("run", BuiltInFunction('run'))
+    symbol_table.set("example", BuiltInFunction('example'))
 
-    symbol_table.set("is_int", IS_INT)
-    symbol_table.set("is_float", IS_FLOAT)
-    symbol_table.set("is_num", IS_NUM)
-    symbol_table.set("is_str", IS_STRING)
-    symbol_table.set("is_list", IS_LIST)
-    symbol_table.set("is_func", IS_FUNCTION)
-    symbol_table.set("is_module", IS_MODULE)
-    symbol_table.set("is_none", IS_NONE)
-    symbol_table.set("type", TYPE)
-    symbol_table.set("__py_type__", PY_TYPE)
-    symbol_table.set("str", STR)
-    symbol_table.set("list", LIST)
-    symbol_table.set("int", INT)
-    symbol_table.set("float", FLOAT)
-    symbol_table.set("round", ROUND)
+    symbol_table.set("print", BuiltInFunction('print'))
+    symbol_table.set("print_ret", BuiltInFunction('print_ret'))
+    symbol_table.set("input", BuiltInFunction('input'))
+    symbol_table.set("input_int", BuiltInFunction('input_int'))
+    symbol_table.set("input_num", BuiltInFunction('input_num'))
+    symbol_table.set("clear", BuiltInFunction('clear'))
 
-    symbol_table.set("append", APPEND)
-    symbol_table.set("pop", POP)
-    symbol_table.set("insert", INSERT)
-    symbol_table.set("extend", EXTEND)
-    symbol_table.set("get", GET)
-    symbol_table.set("replace", REPLACE)
-    symbol_table.set("max", MAX)
-    symbol_table.set("min", MIN)
-    symbol_table.set("len", LEN)
-    symbol_table.set("sort", SORT)
-    symbol_table.set("reverse", REVERSE)
+    symbol_table.set("is_int", BuiltInFunction('is_int'))
+    symbol_table.set("is_float", BuiltInFunction('is_float'))
+    symbol_table.set("is_num", BuiltInFunction('is_num'))
+    symbol_table.set("is_str", BuiltInFunction('is_str'))
+    symbol_table.set("is_list", BuiltInFunction('is_list'))
+    symbol_table.set("is_func", BuiltInFunction('is_func'))
+    symbol_table.set("is_module", BuiltInFunction('is_module'))
+    symbol_table.set("is_none", BuiltInFunction('is_none'))
+    symbol_table.set("type", BuiltInFunction('type'))
+    symbol_table.set("__py_type__", BuiltInFunction('py_type'))
+    symbol_table.set("str", BuiltInFunction('str'))
+    symbol_table.set("list", BuiltInFunction('list'))
+    symbol_table.set("int", BuiltInFunction('int'))
+    symbol_table.set("float", BuiltInFunction('float'))
+    symbol_table.set("round", BuiltInFunction('round'))
 
-    symbol_table.set("split", SPLIT)
-    symbol_table.set("upper", UPPER)
-    symbol_table.set("lower", LOWER)
-    symbol_table.set("ord", ORD)
-    symbol_table.set("chr", CHR)
+    symbol_table.set("append", BuiltInFunction('append'))
+    symbol_table.set("pop", BuiltInFunction('pop'))
+    symbol_table.set("insert", BuiltInFunction('insert'))
+    symbol_table.set("extend", BuiltInFunction('extend'))
+    symbol_table.set("get", BuiltInFunction('get'))
+    symbol_table.set("replace", BuiltInFunction('replace'))
+    symbol_table.set("max", BuiltInFunction('max'))
+    symbol_table.set("min", BuiltInFunction('min'))
+    symbol_table.set("len", BuiltInFunction('len'))
+    symbol_table.set("sort", BuiltInFunction('sort'))
+    symbol_table.set("reverse", BuiltInFunction('reverse'))
+
+    symbol_table.set("split", BuiltInFunction('split'))
+    symbol_table.set("upper", BuiltInFunction('upper'))
+    symbol_table.set("lower", BuiltInFunction('lower'))
+    symbol_table.set("ord", BuiltInFunction('ord'))
+    symbol_table.set("chr", BuiltInFunction('chr'))
 
     # Hum...
     symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))
     symbol_table.set("numberOfHornsOnAnUnicorn", Number(1))
     symbol_table.set("theLoneliestNumber", Number(1))
-    symbol_table.set("rickroll", RICKROLL)
-    symbol_table.set("nougaro", NOUGARO)
+    symbol_table.set("rickroll", BuiltInFunction('rickroll'))
+    symbol_table.set("nougaro", BuiltInFunction('nougaro'))
 
     # Technical
-    symbol_table.set("exit", EXIT)
-    symbol_table.set("system_call", SYSTEM_CALL)
+    symbol_table.set("exit", BuiltInFunction('exit'))
+    symbol_table.set("system_call", BuiltInFunction('system_call'))
     symbol_table.set('__os_name__', String(platform.system()))
     symbol_table.set('__os_release__', String(platform.uname().release))
     symbol_table.set('__os_version__', String(platform.uname().version))
@@ -110,11 +111,12 @@ def set_symbol_table(symbol_table: SymbolTable):
                          "IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF\n"
                          "ALL NECESSARY SERVICING, REPAIR OR CORRECTION."
                      ))
-    symbol_table.set("__gpl__", GPL)
-    symbol_table.set("__is_keyword__", IS_KEYWORD)
-    symbol_table.set("__is_valid_token_type__", IS_VALID_TOKEN_TYPE)
-    symbol_table.set("__test__", TEST)
-    symbol_table.set("__how_many_lines_of_code__", HOW_MANY_LINES_OF_CODE)
+    symbol_table.set("__gpl__", BuiltInFunction('__gpl__'))
+
+    symbol_table.set("__is_keyword__", BuiltInFunction('__is_keyword__'))
+    symbol_table.set("__is_valid_token_type__", BuiltInFunction('__is_valid_token_type__'))
+    symbol_table.set("__test__", BuiltInFunction("__test__"))
+    symbol_table.set("__how_many_lines_of_code__", BuiltInFunction("__how_many_lines_of_code__"))
 
     symbols_copy: dict = symbol_table.symbols.copy()
     if '__symbol_table__' in symbols_copy.keys():

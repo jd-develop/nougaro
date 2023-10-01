@@ -13,7 +13,7 @@ from src.runtime.values.functions.base_builtin_func import BaseBuiltInFunction
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.context import Context
 from src.runtime.values.basevalues.basevalues import *
-from src.runtime.values.defined_values.number import *
+from src.runtime.values.number_constants import *
 from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam
 from src.misc import CustomBuiltInFuncMethodWithNougDirButNotRun, is_keyword, does_tok_type_exist
 from src.errors.errors import RTFileNotFoundError, RTTypeError, RTTypeErrorF
@@ -246,7 +246,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 is_int = False
         else:
             is_int = False
-        # TRUE and FALSE are defined in src/values/defined_values/number.py
+        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(TRUE.copy() if is_int else FALSE.copy())
 
     execute_is_int.param_names = ['value']
@@ -266,7 +266,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 is_float = False
         else:
             is_float = False
-        # TRUE and FALSE are defined in src/values/defined_values/number.py
+        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(TRUE.copy() if is_float else FALSE.copy())
 
     execute_is_float.param_names = ['value']
@@ -279,7 +279,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         value = exec_context.symbol_table.getf('value')  # we get the value
         is_number = isinstance(value, Number)  # we check if the value is a number
-        # TRUE and FALSE are defined in src/values/defined_values/number.py
+        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(TRUE.copy() if is_number else FALSE.copy())
 
     execute_is_num.param_names = ['value']
@@ -292,7 +292,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         # we get the value and check if it is a list
         is_list = isinstance(exec_context.symbol_table.getf('value'), List)
-        # TRUE and FALSE are defined in src/values/defined_values/number.py
+        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(TRUE.copy() if is_list else FALSE.copy())
 
     execute_is_list.param_names = ['value']
@@ -305,7 +305,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         # we get the value and check if it is a str
         is_str = isinstance(exec_context.symbol_table.getf('value'), String)
-        # TRUE and FALSE are defined in src/values/defined_values/number.py
+        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(TRUE.copy() if is_str else FALSE.copy())
 
     execute_is_str.param_names = ['value']
@@ -318,7 +318,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         is_func = isinstance(exec_context.symbol_table.getf('value'), BaseFunction)  # we get the value and check if it
         #                                                                             is a function
-        # TRUE and FALSE are defined in src/values/defined_values/number.py
+        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(TRUE.copy() if is_func else FALSE.copy())
 
     execute_is_func.param_names = ['value']
@@ -331,7 +331,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         # we get the value and check if it is None
         is_none = isinstance(exec_context.symbol_table.getf('value'), NoneValue)
-        # TRUE and FALSE are defined in src/values/defined_values/number.py
+        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(TRUE.copy() if is_none else FALSE.copy())
 
     execute_is_none.param_names = ['value']
@@ -344,7 +344,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         # we get the value and check if it is a module
         is_none = isinstance(exec_ctx.symbol_table.getf('value'), Module)
-        # TRUE and FALSE are defined in src/values/defined_values/number.py
+        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(TRUE.copy() if is_none else FALSE.copy())
 
     execute_is_module.param_names = ['value']
@@ -1312,7 +1312,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 '/src/parser',
                 *[
                     '/src/runtime' + g for g in [
-                        '', '/values', '/values/basevalues', '/values/defined_values', '/values/functions',
+                        '', '/values', '/values/basevalues', '/values/functions',
                         '/values/tools'
                     ]
                 ]

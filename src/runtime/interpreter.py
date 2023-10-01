@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
-import sys
 
 # Nougaro : a python-interpreted high-level programming language
 # Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
@@ -11,7 +10,7 @@ import sys
 # IMPORTS
 # nougaro modules imports
 from src.runtime.values.basevalues.basevalues import Number, String, List, NoneValue, Value, Module, Constructor, Object
-from src.runtime.values.defined_values.number import FALSE, TRUE
+from src.runtime.values.number_constants import FALSE, TRUE
 from src.runtime.values.functions.function import Function, Method
 from src.runtime.values.functions.base_function import BaseFunction
 from src.constants import PROTECTED_VARS, KEYWORDS

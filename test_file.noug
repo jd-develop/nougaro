@@ -349,7 +349,7 @@ assert (read "example_file" 2) in ["hey\n", "hey"]
 assert (write "Hello world!" !>> "example_file" 2) == "Hello world!"
 assert (read "example_file" 2) in ["Hello world!\n", "Hello world!"]
 
-print("OK I/O")
+print("OK read/write")
 
 # libs
 import hello

@@ -121,3 +121,5 @@ dmypy.json
 tests.noug
 example_file
 sandbox/
+config/debug.conf
+config/SHOULD_TEST_PRINT_OK

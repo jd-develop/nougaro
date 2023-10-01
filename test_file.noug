@@ -4,411 +4,419 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-print("Hello Toulouse!")  # the entire world is actually Toulouse, trust me. If you say 'pain au chocolat', you're not in the world.
-# comment
-/* single-line multi-line comment */
-/* real
-multi-line
-     comment
-     */
 
-assert $ == "$"
-assert $test == "$test"
-var a = 1
-assert $a == 1
+def test_nougaro(print_OK)
+    print("Hello Toulouse!")  # the entire world is actually Toulouse, trust me. If you say 'pain au chocolat', you're not in the world.
+    # comment
+    /* single-line multi-line comment */
+    /* real
+    multi-line
+         comment
+         */
 
-/* comment */ $print("OK print & comments") /* comment */ # comment
+    assert $ == "$"
+    assert $test == "$test"
+    var a = 1
+    assert $a == 1
 
-# basic syntax
-"a" ; "b"
+    if print_OK then /* comment */ assert $print("OK print & comments") == None /* comment */ # comment
 
-print("OK basic syntax")
+    # basic syntax
+    "a" ; "b"
 
-# operators
-assert 1 ^ 2 == 1
-assert 1 * 2 == 2
-assert 1 % 2 == 1
-assert 1 / 2 == 0.5
-assert 1 // 2 == 0
-assert 1 + 2 == 3
-assert 1 - 2 == -1
-assert (1 & 2) == 0
-assert (1 | 2) == 3
-assert (3 ^^ 2) == 1
-assert 1e3 == 1000
-assert 1e-3 == 0.001
-assert 1.1e1 == 11
-# assert 1.1e-1 == 0.11  # it crashes because 1.1e-1 = 0.11000000000000001...
+    if print_OK then print("OK basic syntax")
 
-print("OK ops")
+    # operators
+    assert 1 ^ 2 == 1
+    assert 1 * 2 == 2
+    assert 1 % 2 == 1
+    assert 1 / 2 == 0.5
+    assert 1 // 2 == 0
+    assert 1 + 2 == 3
+    assert 1 - 2 == -1
+    assert (1 & 2) == 0
+    assert (1 | 2) == 3
+    assert (3 ^^ 2) == 1
+    assert 1e3 == 1000
+    assert 1e-3 == 0.001
+    assert 1.1e1 == 11
+    # assert 1.1e-1 == 0.11  # it crashes because 1.1e-1 = 0.11000000000000001...
 
-# variables
-## definition
-var hello = "Hello Toulouse!"
-assert (var a = 1) == 1
-assert (var b = var c = 2) == 2
+    if print_OK then print("OK ops")
 
-assert (1 + (var a = 2)) == 3
+    # variables
+    ## definition
+    var hello = "Hello Toulouse!"
+    assert (var a = 1) == 1
+    assert (var b = var c = 2) == 2
 
-print("OK var def")
+    assert (1 + (var a = 2)) == 3
 
-## edit
-assert (var a = 1) == 1
-assert (var a += 1) == 2
-assert (var a -= 1) == 1
-assert (var a *= 1) == 1
-assert (var a /= 1) == 1
-assert (var a ^= 1) == 1
-assert (var a //= 1) == 1
-assert (var a %= 1) == 0
-assert (var a ||= 1) == 1
-assert (var a &&= 1) == 1
-assert (var a ^^^= 1) == 0
-assert (var a |= 1) == 1
-assert (var a &= 1) == 1
-assert (var a ^^= 1) == 0
-assert (var a === 1) == 0
-assert (var a <== 1) == 1
-assert (var a <<= 1) == 0
-assert (var a >== 1) == 0
-assert (var a >>= 1) == 0
+    if print_OK then print("OK var def")
 
-print("OK var edit")
+    ## edit
+    assert (var a = 1) == 1
+    assert (var a += 1) == 2
+    assert (var a -= 1) == 1
+    assert (var a *= 1) == 1
+    assert (var a /= 1) == 1
+    assert (var a ^= 1) == 1
+    assert (var a //= 1) == 1
+    assert (var a %= 1) == 0
+    assert (var a ||= 1) == 1
+    assert (var a &&= 1) == 1
+    assert (var a ^^^= 1) == 0
+    assert (var a |= 1) == 1
+    assert (var a &= 1) == 1
+    assert (var a ^^= 1) == 0
+    assert (var a === 1) == 0
+    assert (var a <== 1) == 1
+    assert (var a <<= 1) == 0
+    assert (var a >== 1) == 0
+    assert (var a >>= 1) == 0
 
-## access
-assert a==0
+    if print_OK then print("OK var edit")
 
-print("OK var acc")
+    ## access
+    assert a==0
 
-## deletion
-del a
+    if print_OK then print("OK var acc")
 
-print("OK var del")
+    ## deletion
+    del a
 
-# strings
-"a"
-'b'
-"a\""
-'b\''
-"a\nb"
-"a\tb"
-"a\\b"
-assert "a""b" == "ab"
-assert "a"
-       "b" == "ab"
+    if print_OK then print("OK var del")
 
-print("OK str")
+    # strings
+    "a"
+    'b'
+    "a\""
+    'b\''
+    "a\nb"
+    "a\tb"
+    "a\\b"
+    assert "a""b" == "ab"
+    assert "a"
+           "b" == "ab"
 
-## operations
-assert ("a" + "b") == 'ab'
-assert "a" * 3 == "aaa"
+    if print_OK then print("OK str")
 
-print("OK str ops")
+    ## operations
+    assert ("a" + "b") == 'ab'
+    assert "a" * 3 == "aaa"
 
-## tests
-assert True==1
-assert False==0
-assert null==0
-assert False!=True
-assert "a" in "this is an example string"
-assert 1 in "123"
-assert "bépo" in ["azerty", "qwerty", "bépo"]
-assert 1 > 0
-assert 1 >= 1
-assert 0 < 1
-assert 1 <= 1
-assert True
-assert True and True
-assert True or False
-assert False or True
-assert not (False and True)
-assert False xor True
-assert not (True xor True)
-assert not False
-assert True or 1/0
-assert not (False and 1/0)
-var a = 1
-assert (is_int(a) and round(a)) == True
-var a = "str"
-assert not (is_int(a) and round(a))
-del a
+    if print_OK then print("OK str ops")
 
-print("OK tests")
+    ## tests
+    assert True==1
+    assert False==0
+    assert null==0
+    assert False!=True
+    assert "a" in "this is an example string"
+    assert 1 in "123"
+    assert "bépo" in ["azerty", "qwerty", "bépo"]
+    assert 1 > 0
+    assert 1 >= 1
+    assert 0 < 1
+    assert 1 <= 1
+    assert True
+    assert True and True
+    assert True or False
+    assert False or True
+    assert not (False and True)
+    assert False xor True
+    assert not (True xor True)
+    assert not False
+    assert True or 1/0
+    assert not (False and 1/0)
+    var a = 1
+    assert (is_int(a) and round(a)) == True
+    var a = "str"
+    assert not (is_int(a) and round(a))
+    del a
 
-assert (if 2 == 2 then "yes" else "no") == "yes"
-assert (if 2 == 3 then "yes" else "no") == "no"
-assert (if 2 == 3 then "yes" elif True then "elif" else "no") == "elif"
-assert (if 2 == 3 then "yes" elif False then "elif" else "no") == "no"
-assert (if 2 == 2 then "yes" elif False then "elif" else "no") == "yes"
+    if print_OK then print("OK tests")
 
-print("OK if")
+    assert (if 2 == 2 then "yes" else "no") == "yes"
+    assert (if 2 == 3 then "yes" else "no") == "no"
+    assert (if 2 == 3 then "yes" elif True then "elif" else "no") == "elif"
+    assert (if 2 == 3 then "yes" elif False then "elif" else "no") == "no"
+    assert (if 2 == 2 then "yes" elif False then "elif" else "no") == "yes"
 
-# loops
-assert (for i = 1 to 10 then i) == [1, 2, 3, 4, 5, 6, 7, 8, 9]
-assert (for i in [1, 2, 3, 4, 5, 6, 7, 8, 9] then if i%2 == 0 then i else continue) == [2, 4, 6, 8]
-assert (for i = -1 to -10 step -1 then i%2) == [1, 0, 1, 0, 1, 0, 1, 0, 1]
-var b = 1
-assert (while b<10 then; var b+=1; end) == [[2], [3], [4], [5], [6], [7], [8], [9], [10]]
-assert b == 10
+    if print_OK then print("OK if")
 
-var b = 1
-assert (do var b += 1 then loop while b < 10) == [2, 3, 4, 5, 6, 7, 8, 9, 10]
-assert b == 10
-assert (do var b += 1 then loop while b < 10) == [11]
-assert b == 11
+    # loops
+    assert (for i = 1 to 10 then i) == [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    assert (for i in [1, 2, 3, 4, 5, 6, 7, 8, 9] then if i%2 == 0 then i else continue) == [2, 4, 6, 8]
+    assert (for i = -1 to -10 step -1 then i%2) == [1, 0, 1, 0, 1, 0, 1, 0, 1]
+    var b = 1
+    assert (while b<10 then; var b+=1; end) == [[2], [3], [4], [5], [6], [7], [8], [9], [10]]
+    assert b == 10
 
-del b
+    var b = 1
+    assert (do var b += 1 then loop while b < 10) == [2, 3, 4, 5, 6, 7, 8, 9, 10]
+    assert b == 10
+    assert (do var b += 1 then loop while b < 10) == [11]
+    assert b == 11
 
-print("OK loops")
+    del b
 
-# functions
-## definition
-def func()
-    ## return
-    return "str"
+    if print_OK then print("OK loops")
+
+    # functions
+    ## definition
+    def func()
+        ## return
+        return "str"
+    end
+
+    if print_OK then print("OK func")
+
+    ## call
+    assert (def()->"str")() == func()
+
+    if print_OK then print("OK call")
+
+    # builtin funcs
+    print("Please test these builtin functions after the execution of the test:")
+    print("* input")
+    print("* input_int")
+    print("* input_num")
+    print("* __gpl__")
+    print("* exit")
+    print("* clear")
+    print("* run")
+    print("* example")
+    print("* __test__")
+
+    assert print(hello) == None
+    assert print(1) == None
+    assert print(123.456) == None
+    assert print_ret(1) == "1"
+    assert print_ret(123.456) == "123.456"
+    assert print_ret(hello) == hello
+
+    if print_OK then print("OK builtin funcs 1")
+
+    assert type("a") == "str"
+    assert type(123) == "int"
+    assert type(3.14) == "float"
+    assert type([1, 2, 3]) == "list"
+    assert type(def()->null) == "func"
+    assert type(type) == "built-in func"
+
+    if print_OK then print("OK builtin funcs 2")
+
+    assert is_int(123)
+    assert is_float(3.14)
+    assert is_num(123)
+    assert is_num(3.14)
+    assert is_str("abc")
+    assert is_list([1, 2, 3])
+    assert is_func(is_func)
+    assert is_func(def()->null)
+    assert is_none(None)
+
+    if print_OK then print("OK builtin funcs 3")
+
+    assert str(123) == "123"
+    assert int("123") == 123
+    assert float("3.14") == 3.14
+    assert list("abc") == ["a", "b", "c"]
+
+    if print_OK then print("OK builtin funcs 4")
+
+    assert upper("aZeRtY") == "AZERTY"
+    assert lower("aZeRtY") == "azerty"
+    assert split("lorem ipsum dolor sit amet") == ["lorem", "ipsum", "dolor", "sit", "amet"]
+    assert split("lorem ipsum dolor sit amet", 'o') == ["l", "rem ipsum d", "l", "r sit amet"]
+    assert split("lorem ipsum, dolor sit amet", ',') == ["lorem ipsum", " dolor sit amet"]
+    assert len("lorem ipsum dolor sit amet") == 26
+
+    if print_OK then print("OK builtin funcs 5")
+
+    assert ord('a') == 0x61
+    assert chr(0x61) == 'a'
+    assert chr(0x48) + chr(0b1100101) + 2*chr(0o154) + chr(111) + chr(32) + chr(84) + chr(111) + chr(117) + chr(108) + \
+      chr(111) + chr(117) + chr(115) + chr(101) + chr(33) == hello
+
+    if print_OK then print("OK builtin funcs 6")
+
+    assert append(["lorem", "ipsum"], "dolor") == ["lorem", "ipsum", "dolor"]
+    assert pop(["lorem", "ipsum", "dolor", "sit", "amet"]) == ["lorem", "ipsum", "dolor", "sit"]
+    assert pop(["lorem", "ipsum", "dolor", "sit", "amet"], -1) == ["lorem", "ipsum", "dolor", "sit"]
+    assert pop(["lorem", "ipsum", "dolor", "sit", "amet"], 0) == ["ipsum", "dolor", "sit", "amet"]
+    assert insert(["lorem", "ipsum"], "dolor") == append(["lorem", "ipsum"], "dolor")
+    assert insert(["lorem", "ipsum", "sit", "amet"], "dolor", 2) == ["lorem", "ipsum", "dolor", "sit", "amet"]
+    assert replace(["lorem", "ipsum", "azerty", "sit", "amet"], 2, "dolor") == ["lorem", "ipsum", "dolor", "sit", "amet"]
+
+    if print_OK then print("OK builtin funcs 7")
+
+    assert extend(["lorem", "ipsum"], ["dolor", "sit", "amet"]) == ["lorem", "ipsum", "dolor", "sit", "amet"]
+    assert extend(["lorem", "ipsum", "dolor"], ["dolor", "sit", "amet"], True) == ["lorem", "ipsum", "dolor", "sit", "amet"]
+    assert get(["lorem", "ipsum"], 1) == "ipsum"
+    assert max([12, 6, 4, 45, 7]) == 45
+    assert max(["lorem", 12, 6, "ipsum", 4, 45, "dolor", 7], True) == 45
+    assert min([12, 6, 4, 45, 7]) == 4
+    assert min(["lorem", 12, 6, "ipsum", 4, 45, "dolor", 7], True) == 4
+    assert len(split("lorem ipsum dolor sit amet")) == 5
+
+    if print_OK then print("OK builtin funcs 8")
+
+    assert round(12) == 12
+    assert round(12.4) == 12
+    assert round(3.14159265358979323846264338327950288419, 5) == 3.14159
+
+    if print_OK then print("OK builtin funcs 9")
+
+    assert void() == None
+    assert __is_keyword__("assert")
+    assert not __is_keyword__("print")  # we're not in Python 2 x)
+    assert __is_valid_token_type__("PLUS")  # the + token
+    assert not __is_valid_token_type__("LOREM_IPSUM")
+
+    if print_OK then print("OK builtin funcs 10")
+
+    assert __how_many_lines_of_code__(False) != 0
+    assert __how_many_lines_of_code__(False) > 10000  # yes I know, I write a lot of code ;)
+
+    if print_OK then print("OK builtin funcs 11")
+
+    ## sorting algorithms
+    assert sort([1, 2, 3, 4, 3, 2, 1, 5, 2, 6, 1, 2, 4, 3, 7]) == [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 5, 6, 7]
+    assert sort([]) == []
+    assert sort([0, -1]) == [-1, 0]
+    assert sort([1, 2, 3, 4, 3, 2, 1, 5, 2, 6, 1, 2, 4, 3, 7], "stalin") == [1, 2, 3, 4, 5, 6, 7]
+    assert sort([1, 2, 3, 4, 3, 2, 1, 5, 0, 6, -400, 2, 4, 3, 7], "stalin") == [1, 2, 3, 4, 5, 6, 7]
+    assert sort([], "stalin") == []
+    assert sort([-1, 0, -3], "stalin") == [-1, 0]
+    assert reverse(sort([3, 1, 5, 6, 12, -4, 0, 9999999, 45])) == [9999999, 45, 12, 6, 5, 3, 1, 0, -4]
+    print("Executing sleep sort, this should take 4 seconds...")
+    assert sort([1, 2, 3, 4, 3, 2, 1, 0, 4, 2, 4, 1, 2, 4, 3], "sleep") == [0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4]
+    assert sort([0], "sleep") == [0]
+    assert sort([], "sleep") == []
+
+    if print_OK then print("OK builtin funcs 12")
+
+    # builtin variables
+    assert __os_name__ in [\
+        "Windows",\
+        "Linux",\
+        "Darwin",\
+        "Java",\
+        "OpenBSD",\
+        "FreeBSD"],\
+    "Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html"
+
+    if print_OK then print("OK __os_name__")
+
+    # lists
+    var list_ = [3, 4]
+    assert [1, 2, *list_, 5] == [1, 2, 3, 4, 5]
+
+    assert [1, 2, 'str'] + '3' == [1, 2, 'str', '3']
+    assert append([1, 2, 'str'], 3) == [1, 2, 'str', 3]
+    assert [1, 2, 'str'] * [3, 4, 'str2'] == [1, 2, 'str', 3, 4, 'str2']
+    assert extend([1, 2, 'str'], [3, 4, 'str2']) == [1, 2, 'str', 3, 4, 'str2']
+    assert [0]*3 == [0, 0, 0]
+    assert ["a", None]*2 == ["a", None, "a", None]
+
+    assert [1, 2, 'str'] / 0 == [1, 2, 'str'](0) == 1
+    assert [1, 2, 'str'] / -1 == [1, 2, 'str'](-1) == 'str'
+    assert [0, 1, 2, 3, 4](3, -4) == [3, 1]
+    assert [1, 2, 'str'] - 0 == [2, 'str']
+    assert [1, 2, 'str'] - -1 == [1, 2]
+    assert pop([1, 2, 'str'], 0) == [2, 'str']
+
+    assert [1, 2, 3]
+    assert not []
+
+    if print_OK then print("OK lists")
+
+    # Loops
+    assert (while (assert True) == None then break) == []
+    assert (for i in [1, 2, 3] then i) == [1, 2, 3]
+    assert (for i = 0 to 9 step 2 then assert i%2 == 0) == []
+    assert (for j in for i = 1 to 100 then i then if j%25 == 0 then j) == [25, 50, 75]
+    assert not (for i = 0 to -9 step -2 then assert i%2 == 0)
+    assert (do assert True then loop while False) == []
+    assert (do "hi" then loop while False) == ["hi"]
+
+    if print_OK then print("OK loops 2")
+
+    # files
+    assert (read "test_file.noug" 8) == "def test_nougaro(print_OK)\n"
+    assert (write "hey" !>> "example_file" 2) == "hey"
+    assert (read "example_file" 2) in ["hey\n", "hey"]
+    assert (write "Hello world!" !>> "example_file" 2) == "Hello world!"
+    assert (read "example_file" 2) in ["Hello world!\n", "Hello world!"]
+
+    if print_OK then print("OK read/write")
+
+    # libs
+    import hello
+
+    if print_OK then print("OK hello lib")
+
+    import math
+    assert math.sqrt_pi == math.sqrt(math.pi)
+    assert math.root(8, 3) == 2
+    assert math.degrees(math.pi) == 180
+    assert math.radians(180) == math.pi
+    assert round(math.sin(math.pi), 5) == 0
+    assert round(math.cos(math.pi), 5) == -1
+    assert round(math.tan(math.pi), 5) == 0
+    assert round(math.tan(2*math.pi), 5) == round(math.tan(0), 5)
+    assert math.asin(0) == 0
+    assert round(math.acos(-1), 9) == round(math.pi, 9)
+    assert math.abs(10) == 10
+    assert math.abs(-10) == 10
+    assert round(math.log(12, 2), 9) == round(math.log2(12), 9)
+    assert math.e == 2.718281828459045
+
+    if print_OK then print("OK math lib")
+
+    import random
+    assert 0 <= random.random() <= 1
+    assert random.randint(1, 4) in (for i = 1 to 5 then i)  # in the list definition, 5 is excluded !
+    assert random.choice(for i = 1 to 5 then i) in (for i = 1 to 5 then i)
+
+    if print_OK then print("OK random lib")
+
+    import statistics
+    assert statistics.mean([8, 16, 15, 17, 18, 20, 25]) == 17
+    var example_list = [50.3, 55.7, 57.1, 54.9, 60.1]
+    assert statistics.geometric_mean(example_list) == 55.526617820569356
+    assert statistics.harmonic_mean(example_list) == 55.43173136736931
+    assert statistics.median(example_list) == 55.7
+    assert statistics.quantiles(example_list) == [52.599999999999994, 55.7, 58.6]
+    assert statistics.quantiles(example_list, 3, 'inclusive') == [55.166666666666664, 56.63333333333333]
+    assert statistics.scope(example_list) == max(example_list) - min(example_list)
+    var example_list += 57.1
+    assert statistics.mode(example_list) == 57.1
+    assert statistics.multimode("Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch") == ["l"]
+    assert statistics.multimode("Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch          ") == ["l", " "]
+
+    if print_OK then print("OK statistics lib")
+
+    print("Please test 'time' module (tested when 'example()' is executed)")
+    print("Please test 'lorem' module")
+
+    # system_call
+    print("Here it should print “hello”:")
+    system_call("echo hello")
+    print("If it didn't work, please open an issue on the GitHub.")
+    print()
+
+    # everything is fine in this file
+    if print_OK then print("OK everything")
+    print("Everything seems fine!")
+
+    var a = (class Test; var b5 = (class; var c = 2; end)(); end)()
+    assert a.b5.c == 2
 end
 
-print("OK func")
 
-## call
-assert (def()->"str")() == func()
-
-print("OK call")
-
-# builtin funcs
-print("Please test these builtin functions after the execution of the test:")
-print("* input")
-print("* input_int")
-print("* input_num")
-print("* __gpl__")
-print("* exit")
-print("* clear")
-print("* run")
-print("* example")
-print("* __test__")
-
-assert print(hello) == None
-assert print(1) == None
-assert print(123.456) == None
-assert print_ret(1) == "1"
-assert print_ret(123.456) == "123.456"
-assert print_ret(hello) == hello
-
-print("OK builtin funcs 1")
-
-assert type("a") == "str"
-assert type(123) == "int"
-assert type(3.14) == "float"
-assert type([1, 2, 3]) == "list"
-assert type(def()->null) == "func"
-assert type(type) == "built-in func"
-
-print("OK builtin funcs 2")
-
-assert is_int(123)
-assert is_float(3.14)
-assert is_num(123)
-assert is_num(3.14)
-assert is_str("abc")
-assert is_list([1, 2, 3])
-assert is_func(is_func)
-assert is_func(def()->null)
-assert is_none(None)
-
-print("OK builtin funcs 3")
-
-assert str(123) == "123"
-assert int("123") == 123
-assert float("3.14") == 3.14
-assert list("abc") == ["a", "b", "c"]
-
-print("OK builtin funcs 4")
-
-assert upper("aZeRtY") == "AZERTY"
-assert lower("aZeRtY") == "azerty"
-assert split("lorem ipsum dolor sit amet") == ["lorem", "ipsum", "dolor", "sit", "amet"]
-assert split("lorem ipsum dolor sit amet", 'o') == ["l", "rem ipsum d", "l", "r sit amet"]
-assert split("lorem ipsum, dolor sit amet", ',') == ["lorem ipsum", " dolor sit amet"]
-assert len("lorem ipsum dolor sit amet") == 26
-
-print("OK builtin funcs 5")
-
-assert ord('a') == 0x61
-assert chr(0x61) == 'a'
-assert chr(0x48) + chr(0b1100101) + 2*chr(0o154) + chr(111) + chr(32) + chr(84) + chr(111) + chr(117) + chr(108) + \
-  chr(111) + chr(117) + chr(115) + chr(101) + chr(33) == hello
-
-print("OK builtin funcs 6")
-
-assert append(["lorem", "ipsum"], "dolor") == ["lorem", "ipsum", "dolor"]
-assert pop(["lorem", "ipsum", "dolor", "sit", "amet"]) == ["lorem", "ipsum", "dolor", "sit"]
-assert pop(["lorem", "ipsum", "dolor", "sit", "amet"], -1) == ["lorem", "ipsum", "dolor", "sit"]
-assert pop(["lorem", "ipsum", "dolor", "sit", "amet"], 0) == ["ipsum", "dolor", "sit", "amet"]
-assert insert(["lorem", "ipsum"], "dolor") == append(["lorem", "ipsum"], "dolor")
-assert insert(["lorem", "ipsum", "sit", "amet"], "dolor", 2) == ["lorem", "ipsum", "dolor", "sit", "amet"]
-assert replace(["lorem", "ipsum", "azerty", "sit", "amet"], 2, "dolor") == ["lorem", "ipsum", "dolor", "sit", "amet"]
-
-print("OK builtin funcs 7")
-
-assert extend(["lorem", "ipsum"], ["dolor", "sit", "amet"]) == ["lorem", "ipsum", "dolor", "sit", "amet"]
-assert extend(["lorem", "ipsum", "dolor"], ["dolor", "sit", "amet"], True) == ["lorem", "ipsum", "dolor", "sit", "amet"]
-assert get(["lorem", "ipsum"], 1) == "ipsum"
-assert max([12, 6, 4, 45, 7]) == 45
-assert max(["lorem", 12, 6, "ipsum", 4, 45, "dolor", 7], True) == 45
-assert min([12, 6, 4, 45, 7]) == 4
-assert min(["lorem", 12, 6, "ipsum", 4, 45, "dolor", 7], True) == 4
-assert len(split("lorem ipsum dolor sit amet")) == 5
-
-print("OK builtin funcs 8")
-
-assert round(12) == 12
-assert round(12.4) == 12
-assert round(3.14159265358979323846264338327950288419, 5) == 3.14159
-
-print("OK builtin funcs 9")
-
-assert void() == None
-assert __is_keyword__("assert")
-assert not __is_keyword__("print")  # we're not in Python 2 x)
-assert __is_valid_token_type__("PLUS")  # the + token
-assert not __is_valid_token_type__("LOREM_IPSUM")
-
-print("OK builtin funcs 10")
-
-assert __how_many_lines_of_code__(False) != 0
-assert __how_many_lines_of_code__(False) > 10000  # yes I know, I write a lot of code ;)
-
-print("OK builtin funcs 11")
-
-## sorting algorithms
-assert sort([1, 2, 3, 4, 3, 2, 1, 5, 2, 6, 1, 2, 4, 3, 7]) == [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 5, 6, 7]
-assert sort([]) == []
-assert sort([0, -1]) == [-1, 0]
-assert sort([1, 2, 3, 4, 3, 2, 1, 5, 2, 6, 1, 2, 4, 3, 7], "stalin") == [1, 2, 3, 4, 5, 6, 7]
-assert sort([1, 2, 3, 4, 3, 2, 1, 5, 0, 6, -400, 2, 4, 3, 7], "stalin") == [1, 2, 3, 4, 5, 6, 7]
-assert sort([], "stalin") == []
-assert sort([-1, 0, -3], "stalin") == [-1, 0]
-assert reverse(sort([3, 1, 5, 6, 12, -4, 0, 9999999, 45])) == [9999999, 45, 12, 6, 5, 3, 1, 0, -4]
-print("Executing sleep sort, this should take 4 seconds...")
-assert sort([1, 2, 3, 4, 3, 2, 1, 0, 4, 2, 4, 1, 2, 4, 3], "sleep") == [0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4]
-assert sort([0], "sleep") == [0]
-assert sort([], "sleep") == []
-
-print("OK builtin funcs 12")
-
-# builtin variables
-assert __os_name__ in [\
-    "Windows",\
-    "Linux",\
-    "Darwin",\
-    "Java",\
-    "OpenBSD",\
-    "FreeBSD"],\
-"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html"
-
-print("OK __os_name__")
-
-# lists
-var list_ = [3, 4]
-assert [1, 2, *list_, 5] == [1, 2, 3, 4, 5]
-
-assert [1, 2, 'str'] + '3' == [1, 2, 'str', '3']
-assert append([1, 2, 'str'], 3) == [1, 2, 'str', 3]
-assert [1, 2, 'str'] * [3, 4, 'str2'] == [1, 2, 'str', 3, 4, 'str2']
-assert extend([1, 2, 'str'], [3, 4, 'str2']) == [1, 2, 'str', 3, 4, 'str2']
-assert [0]*3 == [0, 0, 0]
-assert ["a", None]*2 == ["a", None, "a", None]
-
-assert [1, 2, 'str'] / 0 == [1, 2, 'str'](0) == 1
-assert [1, 2, 'str'] / -1 == [1, 2, 'str'](-1) == 'str'
-assert [0, 1, 2, 3, 4](3, -4) == [3, 1]
-assert [1, 2, 'str'] - 0 == [2, 'str']
-assert [1, 2, 'str'] - -1 == [1, 2]
-assert pop([1, 2, 'str'], 0) == [2, 'str']
-
-assert [1, 2, 3]
-assert not []
-
-print("OK lists")
-
-# Loops
-assert (while (assert True) == None then break) == []
-assert (for i in [1, 2, 3] then i) == [1, 2, 3]
-assert (for i = 0 to 9 step 2 then assert i%2 == 0) == []
-assert (for j in for i = 1 to 100 then i then if j%25 == 0 then j) == [25, 50, 75]
-assert not (for i = 0 to -9 step -2 then assert i%2 == 0)
-assert (do assert True then loop while False) == []
-assert (do "hi" then loop while False) == ["hi"]
-
-print("OK loops 2")
-
-# files
-assert (read "test_file.noug" 8) == "# comment\n"
-assert (write "hey" !>> "example_file" 2) == "hey"
-assert (read "example_file" 2) in ["hey\n", "hey"]
-assert (write "Hello world!" !>> "example_file" 2) == "Hello world!"
-assert (read "example_file" 2) in ["Hello world!\n", "Hello world!"]
-
-print("OK read/write")
-
-# libs
-import hello
-
-print("OK hello lib")
-
-import math
-assert math.sqrt_pi == math.sqrt(math.pi)
-assert math.root(8, 3) == 2
-assert math.degrees(math.pi) == 180
-assert math.radians(180) == math.pi
-assert round(math.sin(math.pi), 5) == 0
-assert round(math.cos(math.pi), 5) == -1
-assert round(math.tan(math.pi), 5) == 0
-assert round(math.tan(2*math.pi), 5) == round(math.tan(0), 5)
-assert math.asin(0) == 0
-assert round(math.acos(-1), 9) == round(math.pi, 9)
-assert math.abs(10) == 10
-assert math.abs(-10) == 10
-assert round(math.log(12, 2), 9) == round(math.log2(12), 9)
-assert math.e == 2.718281828459045
-
-print("OK math lib")
-
-import random
-assert 0 <= random.random() <= 1
-assert random.randint(1, 4) in (for i = 1 to 5 then i)  # in the list definition, 5 is excluded !
-assert random.choice(for i = 1 to 5 then i) in (for i = 1 to 5 then i)
-
-print("OK random lib")
-
-import statistics
-assert statistics.mean([8, 16, 15, 17, 18, 20, 25]) == 17
-var example_list = [50.3, 55.7, 57.1, 54.9, 60.1]
-assert statistics.geometric_mean(example_list) == 55.526617820569356
-assert statistics.harmonic_mean(example_list) == 55.43173136736931
-assert statistics.median(example_list) == 55.7
-assert statistics.quantiles(example_list) == [52.599999999999994, 55.7, 58.6]
-assert statistics.quantiles(example_list, 3, 'inclusive') == [55.166666666666664, 56.63333333333333]
-assert statistics.scope(example_list) == max(example_list) - min(example_list)
-var example_list += 57.1
-assert statistics.mode(example_list) == 57.1
-assert statistics.multimode("Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch") == ["l"]
-assert statistics.multimode("Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch          ") == ["l", " "]
-
-print("OK statistics lib")
-
-print("Please test 'time' module (tested when 'example()' is executed)")
-print("Please test 'lorem' module")
-
-# system_call
-print("Here it should print “hello”:")
-system_call("echo hello")
-print("If it didn't work, please open an issue on the GitHub.")
-print()
-
-# everything is fine in this file
-print("OK everything")
-print("Everything seems fine!")
-
-var a = (class Test; var b5 = (class; var c = 2; end)(); end)()
-assert a.b5.c == 2
+var _SHOULD_PRINT_OK_FILE = __noug_dir__ + "/config/SHOULD_TEST_PRINT_OK"
+var _SHOULD_PRINT_OK = read _SHOULD_PRINT_OK_FILE
+test_nougaro(int(_SHOULD_PRINT_OK))  # _SHOULD_PRINT_OK is defined when calling __test__

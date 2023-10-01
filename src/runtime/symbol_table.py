@@ -49,8 +49,11 @@ class SymbolTable:
     def remove(self, name):
         del self.symbols[name]
 
-    def exists(self, name):
-        return name in self.symbols
+    def exists(self, name, look_in_parent: bool = False):
+        if not look_in_parent or self.parent is None:
+            return name in self.symbols
+        else:
+            return name in self.symbols or self.parent.exists(name, True)
 
     def set_parent(self, parent):
         self.parent = parent

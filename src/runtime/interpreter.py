@@ -1351,7 +1351,7 @@ class Interpreter:
         if node.identifier.value == "":
             print("$")
             value_to_return = String("$").set_pos(node.pos_start, node.pos_end)
-        elif ctx.symbol_table.exists(node.identifier.value):
+        elif ctx.symbol_table.exists(node.identifier.value, True):
             value_to_return = ctx.symbol_table.get(node.identifier.value)
             try:
                 print(value_to_return.to_str())

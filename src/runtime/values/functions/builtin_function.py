@@ -1199,10 +1199,16 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Execute the test file."""
         # optional params:
         # * return
+        should_i_print_ok = exec_ctx.symbol_table.getf("print_OK")
         should_i_return = exec_ctx.symbol_table.getf("return")
+        if should_i_print_ok is None:
+            should_i_print_ok = FALSE.copy()
         if should_i_return is None:
             should_i_return = FALSE.copy()
         exec_ctx.symbol_table.set("file_name", String(os.path.abspath(noug_dir + "/test_file.noug")))
+
+        with open(os.path.abspath(noug_dir + "/config/SHOULD_TEST_PRINT_OK"), "w+") as should_i_print_ok_f:
+            should_i_print_ok_f.write(str(int(should_i_print_ok.is_true())))
 
         if should_i_return.is_true():
             return self.execute_run(exec_ctx, run, noug_dir)
@@ -1213,7 +1219,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().success(NoneValue(False))
 
     execute___test__.param_names = []
-    execute___test__.optional_params = ["return"]
+    execute___test__.optional_params = ["print_OK", "return"]
     execute___test__.should_respect_args_number = True
 
     def execute_ord(self, exec_ctx: Context):

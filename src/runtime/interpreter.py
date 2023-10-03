@@ -488,12 +488,19 @@ class Interpreter:
                             return result.failure(RunTimeError(
                                 node_or_tok.pos_start, node_or_tok.pos_end,
                                 f"unexpected node: {node_or_tok.__class__.__name__}.",
-                                ctx,
-                                origin_file="src.runtime.interpreter.Interpreter._visit_value_that_can_have_attributes"
+                                ctx, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
                             ))
                         value = result.register(self.visit(node_or_tok, new_ctx, ctx))
                         if result.should_return():
                             return result
+
+                NAME_IS_IDENTIFIER = isinstance(var_name[-1], Token) and var_name[-1].type == TT["IDENTIFIER"]
+                if not NAME_IS_IDENTIFIER:
+                    return result.failure(RunTimeError(
+                        var_name[-1].pos_start, var_name[-1].pos_end,
+                        "expected valid identifier.",
+                        ctx, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
+                    ))
                 print_in_red("This feature is work in progress.")
                 return result.success(NoneValue(False))
             else:  # single var name

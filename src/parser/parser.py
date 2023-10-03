@@ -501,6 +501,7 @@ class Parser:
                     )
                 )
 
+            identifier_expected = False
             while self.current_token.type == TT["IDENTIFIER"]:
                 identifier = self.current_token
                 result.register_advancement()
@@ -579,6 +580,7 @@ class Parser:
                     current_name_nodes_and_tokens_list.append(call_node)  # call_node can be identifier token
                     result.register_advancement()
                     self.advance()
+                    identifier_expected = True
                 else:
                     if is_call:
                         return result.failure(
@@ -591,6 +593,14 @@ class Parser:
                     else:
                         current_name_nodes_and_tokens_list.append(call_node)
                         break
+
+            if identifier_expected:
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected identifier after dot.",
+                    origin_file="src.parser.parser.Parser.var_assign"
+                ))
+
             all_names_list.append(current_name_nodes_and_tokens_list.copy())
             if self.current_token.type != TT["COMMA"]:
                 break

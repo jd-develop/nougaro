@@ -1312,22 +1312,15 @@ class BuiltInFunction(BaseBuiltInFunction):
         if print_:
             print("Computing...")
 
-        folders = [
-            os.path.abspath(noug_dir + f) for f in [
-                '/',
-                '/lib_',
-                '/src',
-                '/src/errors',
-                '/src/lexer',
-                '/src/parser',
-                *[
-                    '/src/runtime' + g for g in [
-                        '', '/values', '/values/basevalues', '/values/functions',
-                        '/values/tools'
-                    ]
-                ]
-            ]
-        ]
+        folders = [os.path.abspath(noug_dir + f) for f in [
+            '/',
+            '/lib_',
+            '/src',
+            '/src/errors',
+            '/src/lexer',
+            '/src/parser',
+            *['/src/runtime' + g for g in ['', '/values', '/values/basevalues', '/values/functions', '/values/tools']]
+        ]]
         for folder in folders:
             for file_dir in os.listdir(folder):
                 if file_dir != "example.noug" and (file_dir.endswith(".py") or file_dir.endswith(".noug")):

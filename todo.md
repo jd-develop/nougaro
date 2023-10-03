@@ -3,12 +3,13 @@
 * [ ] add `var id.attr = value`
 * [ ] add class inheritance
 * [ ] add an error when things like `math.(assert 1)`
-* [x] add `time.time()`
+* [X] add `time.time()`
 
 ## 0.16 beta (goal: february 2024)
 * [ ] add '\xXX' and '\uXXXX' support
 * [ ] add possibility to import files in current folder and sub-folders
 * [ ] add `var++`, `var#` and `var--`
+* [ ] add possibility to read command line arguments
 
 ## 0.17 beta (goal: april 2024)
 * [ ] rewrite parser to make it faster and easier to read

@@ -10,7 +10,7 @@
 # IMPORTS
 # nougaro modules imports
 # other tests files imports
-from tests.test_lexer import TestLexer
+from test_lexer import TestLexer
 # python imports
 import unittest
 

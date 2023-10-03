@@ -21,6 +21,7 @@ fi
 if [[ $c == [Yy] && $d == [Yy] ]]; then
     echo "WARNING: please make sure patchelf is installed on your system."
     echo "WARNING: to install it, execute 'apt/dnf/yum install patchelf'"
+    echo "Moreover, ccache is recommanded. Install it with 'apt/dnf/yum install ccache'"
     read -p "Continue? [y/N] " -r e
 fi
 
@@ -32,7 +33,7 @@ if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
 
     python3 -m nuitka --standalone --include-package=lib_ shell.py
 
-    cp -r example.noug highlight\ theme\ for\ NPP.xml LICENSE README.md shell.py CODE_OF_CONDUCT.md how_it_works.md test_file.noug examples lib_ src config shell.dist/
+    cp -r example.noug LICENSE README.md shell.py CODE_OF_CONDUCT.md how_it_works.md tests/test_file.noug examples lib_ src config shell.dist/
 
     echo "Renaming and compressing…"
     mv shell.dist nougaro-"$nougversion"-"$nougphase"-linux-bin

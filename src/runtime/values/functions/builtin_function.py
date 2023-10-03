@@ -1207,15 +1207,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             should_i_return = FALSE.copy()
         exec_ctx.symbol_table.set("file_name", String(os.path.abspath(noug_dir + "/tests/test_file.noug")))
 
-        import tests.tests
-        res = tests.tests.run_tests()
-        if not res.wasSuccessful():
-            return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
-                "failure",
-                exec_ctx, False, "PyUnitTestFailed",
-                origin_file="src.runtime.values.functions.builtin_functions.BuiltInFunction.execute___test__"
-            ))
+        print("Please also run unittests if you want to build nougaro.")
 
         with open(os.path.abspath(noug_dir + "/config/SHOULD_TEST_PRINT_OK"), "w+") as should_i_print_ok_f:
             should_i_print_ok_f.write(str(int(should_i_print_ok.is_true())))

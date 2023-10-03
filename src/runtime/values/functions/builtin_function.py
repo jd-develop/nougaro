@@ -720,7 +720,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(
                 RTTypeErrorF(
                     self.pos_start, self.pos_end, "second", "split", "str", char,
-                    exec_context, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_split", or_="None"
+                    exec_context, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_split",
+                    or_="None"
                 )
             )
         # we split and make the list that we return
@@ -1185,7 +1186,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         if not isinstance(type_, String):  # we check if it is a string
             return RTResult().failure(RTTypeErrorF(
                 type_.pos_start, type_.pos_end, "first", "__is_valid_token_type__", "str", type_,
-                exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute___is_valid_token_type__"
+                exec_ctx,
+                "src.runtime.values.functions.builtin_function.BuiltInFunction.execute___is_valid_token_type__"
             ))
         result = RTResult()
         # then we return if this is a valid tok type or not.
@@ -1428,7 +1430,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
             sorted_ = list_to_sort
             
-        elif mode == "sleep": # sleep sort
+        elif mode == "sleep":  # sleep sort
             # sleep sort was implemented by Mistera. Please refer to him if you have any questions about it, as I
             # completely don’t have any ideas of how tf asyncio works
             import asyncio

@@ -380,17 +380,8 @@ class Interpreter:
 
             SINGLE_IDENTIFIER = len(var_names_list) == 1
             if SINGLE_IDENTIFIER:
-                MISSPELLED_EXIT = var_name.value in ("eexit", "exxit", "exiit", "exitt")
-                if MISSPELLED_EXIT:
-                    if not attribute_error:
-                        return result.failure(RTNotDefinedError(
-                            node.pos_start, node.pos_end,
-                            f"name '{var_name.value}' is not defined. Did you mean 'exit'?",
-                            ctx, f"{_ORIGIN_FILE}.visit_varAccessNode"
-                        ))
-                else:
-                    return self._undefined(node.pos_start, node.pos_end, var_name.value, ctx, result,
-                                           f"{_ORIGIN_FILE}.visit_VarAccessNode")
+                return self._undefined(node.pos_start, node.pos_end, var_name.value, ctx, result,
+                                       f"{_ORIGIN_FILE}.visit_VarAccessNode")
             else:  # none of the identifiers is defined
                 return result.failure(RTNotDefinedError(
                     node.pos_start, node.pos_end, f"none of the given identifiers is defined.", ctx,

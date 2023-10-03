@@ -21,7 +21,7 @@ fi
 if [[ $c == [Yy] && $d == [Yy] ]]; then
     echo "WARNING: please make sure patchelf is installed on your system."
     echo "WARNING: to install it, execute 'apt/dnf/yum install patchelf'"
-    echo "Moreover, ccache is recommanded. Install it with 'apt/dnf/yum install ccache'"
+    echo "Moreover, ccache is recommended. Install it with 'apt/dnf/yum install ccache'"
     read -p "Continue? [y/N] " -r e
 fi
 

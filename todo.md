@@ -2,7 +2,7 @@
 ## 0.15 beta (goal: december 2023)
 * [ ] add `var id.attr = value`
 * [ ] add class inheritance
-* [ ] add an error when things like `math.(assert 1)`
+* [X] add an error when things like `math.(assert 1)`
 * [X] add `time.time()`
 
 ## 0.16 beta (goal: february 2024)

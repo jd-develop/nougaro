@@ -21,6 +21,7 @@ from src.lexer.token_types import TT
 class Node:
     pos_start = None
     pos_end = None
+    attr = False
 
 
 # VALUE NODES

@@ -111,8 +111,16 @@ class Interpreter:
                     new_ctx = Context(display_name=value.__repr__())
                     new_ctx.symbol_table = SymbolTable()
                     new_ctx.symbol_table.set_whole_table(value.attributes)
-                    if isinstance(node_, VarAccessNode):
-                        node_.attr = True
+
+                    if not (isinstance(node_, VarAccessNode) or isinstance(node_, CallNode)):
+                        return result.failure(RunTimeError(
+                            node_.pos_start, node_.pos_end,
+                            f"unexpected node: {node_.__class__.__name__}.",
+                            context,
+                            origin_file="src.runtime.interpreter.Interpreter._visit_value_that_can_have_attributes"
+                        ))
+
+                    node_.attr = True
                     attr_ = result.register(self.visit(node_, new_ctx, context))
                     if result.should_return():
                         return result
@@ -419,9 +427,22 @@ class Interpreter:
             IS_SINGLE_VAR_NAME = len(var_name) == 1
             if not IS_SINGLE_VAR_NAME:  # var a.b.(...).z = value
                 # here:
-                # should check if the first var name, if it is an identifier, is not protected
-                # should visit everything visitable, checking in attributes for the next identifier
-                # should finally edit the variable (separate method?)
+                # [x] should check if the first var name, if it is an identifier, is not protected
+                # [ ] should visit everything visitable, checking in attributes for the next identifier
+                # [ ] should finally edit the variable (separate method?)
+                NAME_IS_IDENTIFIER = isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"]
+                if NAME_IS_IDENTIFIER and var_name[0].value in PROTECTED_VARS:
+                    return result.failure(RunTimeError(
+                        var_name[0].pos_start, var_name[0].pos_end,
+                        f"name '{var_name[0].value}' is protected.",
+                        ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
+                    ))
+                # if not isinstance(var_name[0], Token):
+                #     value = result.register(self.visit(var_name[0], ctx))
+                #     for actual_name in var_name[1:]:
+                #         if isinstance(actual_name, Token):
+                #             break
+                #         value = result.register(self.visit(actual_name, ctx))
                 print_in_red("This feature is work in progress.")
                 return result.success(NoneValue(False))
             else:  # single var name

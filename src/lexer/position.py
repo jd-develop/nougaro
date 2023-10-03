@@ -16,11 +16,16 @@
 class Position:
     """Contain file name, index in file, line number and colon"""
     def __init__(self, index: int, line_number: int, colon: int, file_name: str, file_txt: str):
-        self.index: int = index
+        """
+        index       starts at 0
+        line_number starts at 0
+        colon       starts at 0
+        """
+        self.index:       int = index
         self.line_number: int = line_number
-        self.colon: int = colon
-        self.file_name: str = file_name
-        self.file_txt: str = file_txt
+        self.colon:       int = colon
+        self.file_name:   str = file_name
+        self.file_txt:    str = file_txt
 
     def advance(self, current_char=None):
         """Add 1 to the index, automatically make back lines."""

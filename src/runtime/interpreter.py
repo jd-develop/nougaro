@@ -16,7 +16,7 @@ from src.runtime.values.functions.base_function import BaseFunction
 from src.constants import PROTECTED_VARS, KEYWORDS
 from src.parser.nodes import *
 from src.errors.errors import *
-from src.lexer.token_types import TT
+from src.lexer.token_types import TT, TOKENS_TO_QUOTE
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
 from src.misc import CustomInterpreterVisitMethod, CustomInterpreterVisitMethodFuncDef, print_in_red
@@ -426,23 +426,74 @@ class Interpreter:
         for i, var_name in enumerate(var_names):
             IS_SINGLE_VAR_NAME = len(var_name) == 1
             if not IS_SINGLE_VAR_NAME:  # var a.b.(...).z = value
+                # todo
                 # here:
                 # [x] should check if the first var name, if it is an identifier, is not protected
-                # [ ] should visit everything visitable, checking in attributes for the next identifier
+                # [x] should visit everything visitable, checking in attributes for the next identifier
                 # [ ] should finally edit the variable (separate method?)
                 NAME_IS_IDENTIFIER = isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"]
                 if NAME_IS_IDENTIFIER and var_name[0].value in PROTECTED_VARS:
                     return result.failure(RunTimeError(
                         var_name[0].pos_start, var_name[0].pos_end,
-                        f"name '{var_name[0].value}' is protected.",
+                        f"can not edit a variable with builtin name '{var_name[0].value}'.",
                         ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
                     ))
-                # if not isinstance(var_name[0], Token):
-                #     value = result.register(self.visit(var_name[0], ctx))
-                #     for actual_name in var_name[1:]:
-                #         if isinstance(actual_name, Token):
-                #             break
-                #         value = result.register(self.visit(actual_name, ctx))
+
+                if NAME_IS_IDENTIFIER:
+                    value = ctx.symbol_table.get(var_name[0].value)
+                    if value is None:
+                        return self._undefined(
+                            var_name[0].pos_start, var_name[0].pos_end, var_name[0].value, ctx, result,
+                            origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
+                        )
+                elif isinstance(var_name[0], Token):
+                    if var_name[0].type in TOKENS_TO_QUOTE:
+                        err_msg = f"unexpected token: '{var_name[0].type}'."
+                    else:
+                        err_msg = f"unexpected token: {var_name[0].type}."
+                    return result.failure(InvalidSyntaxError(
+                        var_name[0].pos_start, var_name[0].pos_end,
+                        err_msg, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
+                    ))
+                else:
+                    value = result.register(self.visit(var_name[0], ctx))
+                    if result.should_return():
+                        return result
+
+                value: Value
+
+                for node_or_tok in var_name[1:-1]:
+                    new_ctx = Context(display_name=value.__repr__())
+                    new_ctx.symbol_table = SymbolTable()
+                    new_ctx.symbol_table.set_whole_table(value.attributes)
+
+                    if isinstance(node_or_tok, Token) and node_or_tok.type == TT["IDENTIFIER"]:
+                        value = new_ctx.symbol_table.get(node_or_tok.value)
+                        if value is None:
+                            return self._undefined(
+                                node_or_tok.pos_start, node_or_tok.pos_end, node_or_tok.value, new_ctx, result,
+                                origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
+                            )
+                    elif isinstance(var_name[0], Token):
+                        if node_or_tok.type in TOKENS_TO_QUOTE:
+                            err_msg = f"unexpected token: '{node_or_tok.type}'."
+                        else:
+                            err_msg = f"unexpected token: {node_or_tok.type}."
+                        return result.failure(InvalidSyntaxError(
+                            node_or_tok.pos_start, node_or_tok.pos_end,
+                            err_msg, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
+                        ))
+                    else:
+                        if not (isinstance(node_or_tok, VarAccessNode) or isinstance(node_or_tok, CallNode)):
+                            return result.failure(RunTimeError(
+                                node_or_tok.pos_start, node_or_tok.pos_end,
+                                f"unexpected node: {node_or_tok.__class__.__name__}.",
+                                ctx,
+                                origin_file="src.runtime.interpreter.Interpreter._visit_value_that_can_have_attributes"
+                            ))
+                        value = result.register(self.visit(node_or_tok, new_ctx, ctx))
+                        if result.should_return():
+                            return result
                 print_in_red("This feature is work in progress.")
                 return result.success(NoneValue(False))
             else:  # single var name
@@ -463,69 +514,69 @@ class Interpreter:
                         ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
                     ))
 
-            VARIABLE_EXISTS = final_var_name in ctx.symbol_table.symbols
-            if equal == TT["EQ"]:  # just a regular equal, we can modify/create the variable in the symbol table
-                ctx.symbol_table.set(final_var_name, values[i])
-                final_value = values[i]  # we want to return the new value of the variable
-            elif VARIABLE_EXISTS:  # edit variable
-                var_actual_value: Value = ctx.symbol_table.get(final_var_name)  # actual value of the variable
-                if equal == TT["PLUSEQ"]:
-                    final_value, error = var_actual_value.added_to(values[i])
-                elif equal == TT["MINUSEQ"]:
-                    final_value, error = var_actual_value.subbed_by(values[i])
-                elif equal == TT["MULTEQ"]:
-                    final_value, error = var_actual_value.multiplied_by(values[i])
-                elif equal == TT["DIVEQ"]:
-                    final_value, error = var_actual_value.dived_by(values[i])
-                elif equal == TT["POWEQ"]:
-                    final_value, error = var_actual_value.powered_by(values[i])
-                elif equal == TT["FLOORDIVEQ"]:
-                    final_value, error = var_actual_value.floor_dived_by(values[i])
-                elif equal == TT["PERCEQ"]:
-                    final_value, error = var_actual_value.modded_by(values[i])
-                elif equal == TT["OREQ"]:
-                    final_value, error = var_actual_value.or_(values[i])
-                elif equal == TT["XOREQ"]:
-                    final_value, error = var_actual_value.xor_(values[i])
-                elif equal == TT["ANDEQ"]:
-                    final_value, error = var_actual_value.and_(values[i])
-                elif equal == TT["BITWISEANDEQ"]:
-                    final_value, error = var_actual_value.bitwise_and(values[i])
-                elif equal == TT["BITWISEOREQ"]:
-                    final_value, error = var_actual_value.bitwise_or(values[i])
-                elif equal == TT["BITWISEXOREQ"]:
-                    final_value, error = var_actual_value.bitwise_xor(values[i])
-                elif equal == TT["EEEQ"]:
-                    final_value, error = var_actual_value.get_comparison_eq(values[i])
-                elif equal == TT["LTEQ"]:
-                    final_value, error = var_actual_value.get_comparison_lt(values[i])
-                elif equal == TT["GTEQ"]:
-                    final_value, error = var_actual_value.get_comparison_gt(values[i])
-                elif equal == TT["LTEEQ"]:
-                    final_value, error = var_actual_value.get_comparison_lte(values[i])
-                elif equal == TT["GTEEQ"]:
-                    final_value, error = var_actual_value.get_comparison_gte(values[i])
-                else:  # this is not supposed to happen
-                    print(
-                        f"Note: there was a problem in {_ORIGIN_FILE}.visit_VarAssignNode.\n"
-                        "Please report this error at https://jd-develop.github.io/nougaro/bugreport.html "
-                        "with all infos.\n"
-                        "Note that your variable will be set to the value you given.\n"
-                        f"For the dev: equal token '{equal}' is in EQUALS but not planned in "
-                        "visit_VarAssignNode"
-                    )
-                    error = None
-                    final_value = values[i]
+                VARIABLE_EXISTS = final_var_name in ctx.symbol_table.symbols
+                if equal == TT["EQ"]:  # just a regular equal, we can modify/create the variable in the symbol table
+                    ctx.symbol_table.set(final_var_name, values[i])
+                    final_value = values[i]  # we want to return the new value of the variable
+                elif VARIABLE_EXISTS:  # edit variable
+                    var_actual_value: Value = ctx.symbol_table.get(final_var_name)  # actual value of the variable
+                    if equal == TT["PLUSEQ"]:
+                        final_value, error = var_actual_value.added_to(values[i])
+                    elif equal == TT["MINUSEQ"]:
+                        final_value, error = var_actual_value.subbed_by(values[i])
+                    elif equal == TT["MULTEQ"]:
+                        final_value, error = var_actual_value.multiplied_by(values[i])
+                    elif equal == TT["DIVEQ"]:
+                        final_value, error = var_actual_value.dived_by(values[i])
+                    elif equal == TT["POWEQ"]:
+                        final_value, error = var_actual_value.powered_by(values[i])
+                    elif equal == TT["FLOORDIVEQ"]:
+                        final_value, error = var_actual_value.floor_dived_by(values[i])
+                    elif equal == TT["PERCEQ"]:
+                        final_value, error = var_actual_value.modded_by(values[i])
+                    elif equal == TT["OREQ"]:
+                        final_value, error = var_actual_value.or_(values[i])
+                    elif equal == TT["XOREQ"]:
+                        final_value, error = var_actual_value.xor_(values[i])
+                    elif equal == TT["ANDEQ"]:
+                        final_value, error = var_actual_value.and_(values[i])
+                    elif equal == TT["BITWISEANDEQ"]:
+                        final_value, error = var_actual_value.bitwise_and(values[i])
+                    elif equal == TT["BITWISEOREQ"]:
+                        final_value, error = var_actual_value.bitwise_or(values[i])
+                    elif equal == TT["BITWISEXOREQ"]:
+                        final_value, error = var_actual_value.bitwise_xor(values[i])
+                    elif equal == TT["EEEQ"]:
+                        final_value, error = var_actual_value.get_comparison_eq(values[i])
+                    elif equal == TT["LTEQ"]:
+                        final_value, error = var_actual_value.get_comparison_lt(values[i])
+                    elif equal == TT["GTEQ"]:
+                        final_value, error = var_actual_value.get_comparison_gt(values[i])
+                    elif equal == TT["LTEEQ"]:
+                        final_value, error = var_actual_value.get_comparison_lte(values[i])
+                    elif equal == TT["GTEEQ"]:
+                        final_value, error = var_actual_value.get_comparison_gte(values[i])
+                    else:  # this is not supposed to happen
+                        print(
+                            f"Note: there was a problem in {_ORIGIN_FILE}.visit_VarAssignNode.\n"
+                            "Please report this error at https://jd-develop.github.io/nougaro/bugreport.html "
+                            "with all infos.\n"
+                            "Note that your variable will be set to the value you given.\n"
+                            f"For the dev: equal token '{equal}' is in EQUALS but not planned in "
+                            "visit_VarAssignNode"
+                        )
+                        error = None
+                        final_value = values[i]
 
-                if error is not None:  # there is an error
-                    error.set_pos(node.pos_start, node.pos_end)
-                    return result.failure(error)
-                ctx.symbol_table.set(final_var_name, final_value)  # we can edit the variable. We will return
-                #                                                    final_value
-            else:  # variable does not exist
-                return self._undefined(node.pos_start, node.pos_end, final_var_name, ctx, result,
-                                       f"{_ORIGIN_FILE}.visit_VarAssignNode")
-            final_values.append(final_value)
+                    if error is not None:  # there is an error
+                        error.set_pos(node.pos_start, node.pos_end)
+                        return result.failure(error)
+                    ctx.symbol_table.set(final_var_name, final_value)  # we can edit the variable. We will return
+                    #                                                    final_value
+                else:  # variable does not exist
+                    return self._undefined(node.pos_start, node.pos_end, final_var_name, ctx, result,
+                                           f"{_ORIGIN_FILE}.visit_VarAssignNode")
+                final_values.append(final_value)
 
         self.update_symbol_table(ctx)
         return result.success(

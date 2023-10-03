@@ -18,6 +18,7 @@ import unittest
 def suite():
     s = unittest.TestSuite()
     s.addTest(TestLexer('test_invalid_char'))
+    s.addTest(TestLexer('test_identifiers_and_keywords'))
     return s
 
 

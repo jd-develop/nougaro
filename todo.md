@@ -1,4 +1,6 @@
 # TODO list
+<!-- check mark character: ✅ -->
+
 ## 0.15 beta (goal: december 2023)
 * [ ] add `var id.attr = value`
 * [ ] add class inheritance

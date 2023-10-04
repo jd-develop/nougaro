@@ -19,7 +19,7 @@ from src.errors.errors import *
 from src.lexer.token_types import TT, TOKENS_TO_QUOTE
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
-from src.misc import CustomInterpreterVisitMethod, CustomInterpreterVisitMethodFuncDef
+from src.misc import CustomInterpreterVisitMethod, CustomInterpreterVisitMethodFuncDef, clear_screen
 from src.runtime.symbol_table import SymbolTable
 from src.lexer.position import Position
 # built-in python imports
@@ -1300,11 +1300,7 @@ class Interpreter:
 
         if file_name_value == '<stdout>':  # print in console
             if open_mode == 'w+':  # can not overwrite the console
-                # todo: manage to clear screen and print
-                return result.failure(RunTimeError(
-                    node.pos_start, node.pos_end, f"can not overwrite <stdout>.", ctx,
-                    origin_file=f"{_ORIGIN_FILE}.visit_WriteNode"
-                ))
+                clear_screen()
             print(str_to_write_value)
             return result.success(str_to_write)
 

@@ -15,7 +15,7 @@ from src.runtime.context import Context
 from src.runtime.values.basevalues.basevalues import *
 from src.runtime.values.number_constants import *
 from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam
-from src.misc import CustomBuiltInFuncMethodWithNougDirButNotRun, is_keyword, does_tok_type_exist
+from src.misc import CustomBuiltInFuncMethodWithNougDirButNotRun, is_keyword, does_tok_type_exist, clear_screen
 from src.errors.errors import RTFileNotFoundError, RTTypeError, RTTypeErrorF
 from src.runtime.values.tools import py2noug
 # built-in python imports
@@ -223,11 +223,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     def execute_clear(self):
         """Clear the screen"""
         # No params.
-        # depends on the os
-        # if windows -> 'cls'
-        # if Linux, macOS or UNIX -> 'clear'
-        # TODO: find more OSes to include here OR find another way to clear the screen
-        os_system('cls' if (os_name.lower() == "nt" or os_name.lower().startswith("windows")) else 'clear')
+        clear_screen()
         return RTResult().success(NoneValue(False))
 
     execute_clear.param_names = []

@@ -14,6 +14,7 @@ from src.parser.nodes import Node
 from src.runtime.values.basevalues.basevalues import Object
 # built-in python imports
 from typing import Protocol, Any
+import os
 try:
     from colorama import init as colorama_init, Fore
     colorama_installed = True
@@ -51,6 +52,14 @@ def is_keyword(word: str):
     """Return True if the str is a valid Nougaro keyword, such as 'import' or 'if'."""
     from src.lexer.token_types import KEYWORDS
     return word in KEYWORDS
+
+
+def clear_screen():
+    # depends on the os
+    # if windows -> 'cls'
+    # if Linux, macOS or UNIX -> 'clear'
+    # TODO: find more OSes to include here OR find another way to clear the screen
+    os.system('cls' if (os.name.lower() == "nt" or os.name.lower().startswith("windows")) else 'clear')
 
 
 # ##########

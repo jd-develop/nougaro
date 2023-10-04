@@ -324,4 +324,9 @@ class Value:
 
     def copy(self):
         """Return a copy of self"""
-        return Value()
+        value = Value().set_pos(self.pos_start, self.pos_end).set_context(self.context)
+        value.attributes = self.attributes.copy()
+        value.call_with_module_context = self.call_with_module_context
+        value.module_context = self.module_context
+        value.should_print = self.should_print
+        return value

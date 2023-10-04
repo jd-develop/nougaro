@@ -79,6 +79,7 @@ class ModuleFunction(BaseBuiltInFunction):
         """Return a copy of self"""
         copy = ModuleFunction(self.module_name, self.name, self.link_for_bug_report)
         copy.module_context = self.module_context
+        copy.attributes = self.attributes.copy()
         return self.set_context_and_pos_to_a_copy(copy)
 
     def set_context_and_pos_to_a_copy(self, copy):

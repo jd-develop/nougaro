@@ -74,6 +74,7 @@ class Function(BaseFunction):
         copy.module_context = self.module_context
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
+        copy.attributes = self.attributes.copy()
         return copy
 
 
@@ -93,4 +94,5 @@ class Method(Function):
         copy.module_context = self.module_context
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
+        copy.attributes = self.attributes.copy()
         return copy

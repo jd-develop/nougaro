@@ -19,7 +19,7 @@ from src.errors.errors import *
 from src.lexer.token_types import TT, TOKENS_TO_QUOTE
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
-from src.misc import CustomInterpreterVisitMethod, CustomInterpreterVisitMethodFuncDef, print_in_red
+from src.misc import CustomInterpreterVisitMethod, CustomInterpreterVisitMethodFuncDef
 from src.runtime.symbol_table import SymbolTable
 from src.lexer.position import Position
 # built-in python imports
@@ -426,11 +426,6 @@ class Interpreter:
         for i, var_name in enumerate(var_names):
             IS_SINGLE_VAR_NAME = len(var_name) == 1
             if not IS_SINGLE_VAR_NAME:  # var a.b.(...).z = value
-                # todo
-                # here:
-                # [x] should check if the first var name, if it is an identifier, is not protected
-                # [x] should visit everything visitable, checking in attributes for the next identifier
-                # [ ] should finally edit the variable (separate method?)
                 NAME_IS_IDENTIFIER = isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"]
                 if NAME_IS_IDENTIFIER and var_name[0].value in PROTECTED_VARS:
                     return result.failure(RunTimeError(
@@ -501,8 +496,13 @@ class Interpreter:
                         "expected valid identifier.",
                         ctx, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
                     ))
-                print_in_red("This feature is work in progress.")
-                return result.success(NoneValue(False))
+
+                final_var_name = var_name[-1].value
+                VARIABLE_EXISTS = final_var_name in value.attributes
+                if VARIABLE_EXISTS:
+                    var_actual_value: Value | None = value.attributes[var_name[-1].value]
+                else:
+                    var_actual_value: Value | None = None
             else:  # single var name
                 NAME_IS_IDENTIFIER = isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"]
                 if not NAME_IS_IDENTIFIER:
@@ -522,68 +522,76 @@ class Interpreter:
                     ))
 
                 VARIABLE_EXISTS = final_var_name in ctx.symbol_table.symbols
-                if equal == TT["EQ"]:  # just a regular equal, we can modify/create the variable in the symbol table
-                    ctx.symbol_table.set(final_var_name, values[i])
-                    final_value = values[i]  # we want to return the new value of the variable
-                elif VARIABLE_EXISTS:  # edit variable
-                    var_actual_value: Value = ctx.symbol_table.get(final_var_name)  # actual value of the variable
-                    if equal == TT["PLUSEQ"]:
-                        final_value, error = var_actual_value.added_to(values[i])
-                    elif equal == TT["MINUSEQ"]:
-                        final_value, error = var_actual_value.subbed_by(values[i])
-                    elif equal == TT["MULTEQ"]:
-                        final_value, error = var_actual_value.multiplied_by(values[i])
-                    elif equal == TT["DIVEQ"]:
-                        final_value, error = var_actual_value.dived_by(values[i])
-                    elif equal == TT["POWEQ"]:
-                        final_value, error = var_actual_value.powered_by(values[i])
-                    elif equal == TT["FLOORDIVEQ"]:
-                        final_value, error = var_actual_value.floor_dived_by(values[i])
-                    elif equal == TT["PERCEQ"]:
-                        final_value, error = var_actual_value.modded_by(values[i])
-                    elif equal == TT["OREQ"]:
-                        final_value, error = var_actual_value.or_(values[i])
-                    elif equal == TT["XOREQ"]:
-                        final_value, error = var_actual_value.xor_(values[i])
-                    elif equal == TT["ANDEQ"]:
-                        final_value, error = var_actual_value.and_(values[i])
-                    elif equal == TT["BITWISEANDEQ"]:
-                        final_value, error = var_actual_value.bitwise_and(values[i])
-                    elif equal == TT["BITWISEOREQ"]:
-                        final_value, error = var_actual_value.bitwise_or(values[i])
-                    elif equal == TT["BITWISEXOREQ"]:
-                        final_value, error = var_actual_value.bitwise_xor(values[i])
-                    elif equal == TT["EEEQ"]:
-                        final_value, error = var_actual_value.get_comparison_eq(values[i])
-                    elif equal == TT["LTEQ"]:
-                        final_value, error = var_actual_value.get_comparison_lt(values[i])
-                    elif equal == TT["GTEQ"]:
-                        final_value, error = var_actual_value.get_comparison_gt(values[i])
-                    elif equal == TT["LTEEQ"]:
-                        final_value, error = var_actual_value.get_comparison_lte(values[i])
-                    elif equal == TT["GTEEQ"]:
-                        final_value, error = var_actual_value.get_comparison_gte(values[i])
-                    else:  # this is not supposed to happen
-                        print(
-                            f"Note: there was a problem in {_ORIGIN_FILE}.visit_VarAssignNode.\n"
-                            "Please report this error at https://jd-develop.github.io/nougaro/bugreport.html "
-                            "with all infos.\n"
-                            "Note that your variable will be set to the value you given.\n"
-                            f"For the dev: equal token '{equal}' is in EQUALS but not planned in "
-                            "visit_VarAssignNode"
-                        )
-                        error = None
-                        final_value = values[i]
+                if VARIABLE_EXISTS:
+                    var_actual_value: Value | None = ctx.symbol_table.get(final_var_name)
+                else:
+                    var_actual_value: Value | None = None
+                value: Value | None = None
 
-                    if error is not None:  # there is an error
-                        error.set_pos(node.pos_start, node.pos_end)
-                        return result.failure(error)
-                    ctx.symbol_table.set(final_var_name, final_value)  # we can edit the variable. We will return
-                    #                                                    final_value
-                else:  # variable does not exist
-                    return self._undefined(node.pos_start, node.pos_end, final_var_name, ctx, result,
-                                           f"{_ORIGIN_FILE}.visit_VarAssignNode")
-                final_values.append(final_value)
+            if equal == TT["EQ"]:  # just a regular equal, we can modify/create the variable in the symbol table
+                final_value, error = values[i], None  # we want to return the new value of the variable
+            elif VARIABLE_EXISTS:  # edit variable
+                if equal == TT["PLUSEQ"]:
+                    final_value, error = var_actual_value.added_to(values[i])
+                elif equal == TT["MINUSEQ"]:
+                    final_value, error = var_actual_value.subbed_by(values[i])
+                elif equal == TT["MULTEQ"]:
+                    final_value, error = var_actual_value.multiplied_by(values[i])
+                elif equal == TT["DIVEQ"]:
+                    final_value, error = var_actual_value.dived_by(values[i])
+                elif equal == TT["POWEQ"]:
+                    final_value, error = var_actual_value.powered_by(values[i])
+                elif equal == TT["FLOORDIVEQ"]:
+                    final_value, error = var_actual_value.floor_dived_by(values[i])
+                elif equal == TT["PERCEQ"]:
+                    final_value, error = var_actual_value.modded_by(values[i])
+                elif equal == TT["OREQ"]:
+                    final_value, error = var_actual_value.or_(values[i])
+                elif equal == TT["XOREQ"]:
+                    final_value, error = var_actual_value.xor_(values[i])
+                elif equal == TT["ANDEQ"]:
+                    final_value, error = var_actual_value.and_(values[i])
+                elif equal == TT["BITWISEANDEQ"]:
+                    final_value, error = var_actual_value.bitwise_and(values[i])
+                elif equal == TT["BITWISEOREQ"]:
+                    final_value, error = var_actual_value.bitwise_or(values[i])
+                elif equal == TT["BITWISEXOREQ"]:
+                    final_value, error = var_actual_value.bitwise_xor(values[i])
+                elif equal == TT["EEEQ"]:
+                    final_value, error = var_actual_value.get_comparison_eq(values[i])
+                elif equal == TT["LTEQ"]:
+                    final_value, error = var_actual_value.get_comparison_lt(values[i])
+                elif equal == TT["GTEQ"]:
+                    final_value, error = var_actual_value.get_comparison_gt(values[i])
+                elif equal == TT["LTEEQ"]:
+                    final_value, error = var_actual_value.get_comparison_lte(values[i])
+                elif equal == TT["GTEEQ"]:
+                    final_value, error = var_actual_value.get_comparison_gte(values[i])
+                else:  # this is not supposed to happen
+                    print(
+                        f"Note: there was a problem in {_ORIGIN_FILE}.visit_VarAssignNode.\n"
+                        "Please report this error at https://jd-develop.github.io/nougaro/bugreport.html "
+                        "with all infos.\n"
+                        "Note that your variable will be set to the value you given.\n"
+                        f"For the dev: equal token '{equal}' is in EQUALS but not planned in "
+                        "visit_VarAssignNode"
+                    )
+                    error = None
+                    final_value = values[i]
+            else:  # variable does not exist
+                return self._undefined(node.pos_start, node.pos_end, final_var_name, ctx, result,
+                                       f"{_ORIGIN_FILE}.visit_VarAssignNode")
+
+            if error is not None:  # there is an error
+                error.set_pos(node.pos_start, node.pos_end)
+                return result.failure(error)
+
+            if not IS_SINGLE_VAR_NAME:
+                value.attributes[var_name[-1].value] = final_value
+            else:
+                ctx.symbol_table.set(final_var_name, final_value)
+
+            final_values.append(final_value)
 
         self.update_symbol_table(ctx)
         return result.success(

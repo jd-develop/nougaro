@@ -2,7 +2,10 @@
 <!-- check mark character: ✅ -->
 
 ## 0.15 beta (goal: december 2023)
-* [ ] add `var id.attr = value`
+* [X] add `var id.attr = value`
+* [ ] fix bug where `this` is not defined in classes
+* [ ] fix bug where methods are of type `functions`
+* [ ] fix bug where global vars are not accessible in methods
 * [ ] add class inheritance
 * [X] add an error when things like `math.(assert 1)`
 * [X] add `time.time()`

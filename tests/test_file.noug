@@ -166,6 +166,7 @@ def test_nougaro(print_OK)
     # functions
     ## definition
     def func()
+        void()
         ## return
         return "str"
     end
@@ -176,6 +177,32 @@ def test_nougaro(print_OK)
     assert (def()->"str")() == func()
 
     if print_OK then print("OK call")
+
+    # classes
+    ## definition
+    var a = (class Test; var b5 = (class; var c = 2; end)(); end)()
+    assert a.b5.c == 2
+    var c = 12
+    class Test2
+        def __init__()
+            # var this.test = 1
+            0
+        end
+
+        def method()
+            /* assert this.test == 1
+            var this.test, c += 1, 1
+            assert this.test == 2
+            assert c == 13
+            var this.test, c = c, this.test
+            assert this.test == 13
+            assert c == 2 */
+            0
+        end
+    end
+
+    var d = Test2()
+    d.method()
 
     # builtin funcs
     print("Please test these builtin functions after the execution of the test:")
@@ -414,9 +441,6 @@ def test_nougaro(print_OK)
     # everything is fine in this file
     if print_OK then print("OK everything")
     print("Everything seems fine!")
-
-    var a = (class Test; var b5 = (class; var c = 2; end)(); end)()
-    assert a.b5.c == 2
 end
 
 

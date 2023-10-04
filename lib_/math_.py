@@ -34,6 +34,7 @@ class Math(ModuleFunction):
     def copy(self):
         """Return a copy of self"""
         copy = Math(self.name)
+        copy.attributes = self.attributes.copy()
         return self.set_context_and_pos_to_a_copy(copy)
 
     # =========

@@ -46,4 +46,5 @@ class BaseBuiltInFunction(BaseFunction):
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
         copy.module_context = self.module_context
+        copy.attributes = self.attributes.copy()
         return copy

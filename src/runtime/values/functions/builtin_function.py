@@ -105,6 +105,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         copy = BuiltInFunction(self.name)
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
+        copy.attributes = self.attributes.copy()
         return copy
 
     # ==================

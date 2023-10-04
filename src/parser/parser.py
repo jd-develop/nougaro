@@ -493,16 +493,14 @@ class Parser:
             current_name_nodes_and_tokens_list: list[Node | Token] = []
             # if current token is not identifier we have to register expr
             if self.current_token.type != TT["IDENTIFIER"]:
-                return result.failure(
-                    InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected identifier.",
-                        origin_file="src.parser.parser.Parser.var_assign"
-                    )
-                )
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected identifier.", origin_file="src.parser.parser.Parser.var_assign"
+                ))
 
             identifier_expected = False
             while self.current_token.type == TT["IDENTIFIER"]:
+                identifier_expected = False
                 identifier = self.current_token
                 result.register_advancement()
                 self.advance()
@@ -532,12 +530,7 @@ class Parser:
                                 result.register_advancement()
                                 self.advance()
                             # expr
-                            arg_nodes.append(
-                                (
-                                    result.register(self.expr()),
-                                    mul
-                                )
-                            )
+                            arg_nodes.append((result.register(self.expr()), mul))
                             if result.error is not None:
                                 return result
                             while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
@@ -553,23 +546,15 @@ class Parser:
                                     self.advance()
                                 # expr
                                 # we register an expr then check for an error
-                                arg_nodes.append(
-                                    (
-                                        result.register(self.expr()),
-                                        mul
-                                    )
-                                )
+                                arg_nodes.append((result.register(self.expr()), mul))
                                 if result.error is not None:
                                     return result
 
                             if self.current_token.type != TT["RPAREN"]:  # there is no paren (it is expected)
-                                return result.failure(
-                                    InvalidSyntaxError(
-                                        self.current_token.pos_start, self.current_token.pos_end,
-                                        "expected ',' or ')'." if comma_expected else "expected ')'.",
-                                        "src.parser.parser.Parser.call"
-                                    )
-                                )
+                                return result.failure(InvalidSyntaxError(
+                                    self.current_token.pos_start, self.current_token.pos_end,
+                                    "expected ',' or ')'." if comma_expected else "expected ')'.",
+                                    "src.parser.parser.Parser.call"))
 
                             result.register_advancement()
                             self.advance()

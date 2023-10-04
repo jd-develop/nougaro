@@ -19,6 +19,7 @@
 ## 0.17 beta (goal: april 2024)
 * [ ] rewrite parser to make it faster and easier to read
 * [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
+* [ ] add builtin classes
 
 ## 0.18 beta (goal: june 2024)
 * [ ] add tkinter
@@ -26,6 +27,7 @@
 
 ## 0.19 beta (goal: august 2024)
 * [ ] add unit tests
+* [ ] add complex numbers
 
 ## 1.0 release candidate (goal: october 2024)
 * [ ] create highlight extension for VSCode

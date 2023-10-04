@@ -387,7 +387,11 @@ def test_nougaro(print_OK)
 
     import math
     assert math.sqrt_pi == math.sqrt(math.pi)
+    assert int(math.sqrt_pi) == math.isqrt(int(math.pi))
     assert math.root(8, 3) == 2
+    assert math.iroot(7.4) == math.isqrt(7)
+    assert math.isqrt(26) == 5
+    assert math.iroot(30, 25) == int(30 ^ (1/25))
     assert math.degrees(math.pi) == 180
     assert math.radians(180) == math.pi
     assert round(math.sin(math.pi), 5) == 0

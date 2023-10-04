@@ -42,7 +42,7 @@ class Math(ModuleFunction):
     # =========
     def execute_math_sqrt(self, exec_context: Context):
         """Calculates square root of 'value'
-        It returns the same as math_root(value, 2) or """
+        It returns the same as math.root(value, 2)"""
         # Params:
         # * value
         value = exec_context.symbol_table.getf('value')  # we get the value
@@ -65,6 +65,32 @@ class Math(ModuleFunction):
     execute_math_sqrt.param_names = ['value']
     execute_math_sqrt.optional_params = []
     execute_math_sqrt.should_respect_args_number = True
+
+    def execute_math_isqrt(self, exec_context: Context):
+        """Calculates the integer part of the square root of 'value'
+        It returns the same as math.iroot(value, 2)"""
+        # Params:
+        # * value
+        value = exec_context.symbol_table.getf('value')  # we get the value
+        if not (isinstance(value, Number) and value.is_int()):  # we check if the value is a number
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.sqrt", "int", value,
+                exec_context, "lib_.math_.Math.execute_math_sqrt"
+            ))
+
+        if value.value < 0:  # we check if the value is greater than (or equal to) 0
+            return RTResult().failure(RTArithmeticError(
+                value.pos_start, value.pos_end,
+                "first argument of the built-in function 'math.isqrt' must be greater than (or equal to) 0.",
+                exec_context, "lib_.math_.Math.execute_math_sqrt"
+            ))
+
+        sqrt_ = math.isqrt(value.value)  # we calculate the square root
+        return RTResult().success(Number(sqrt_))
+
+    execute_math_isqrt.param_names = ['value']
+    execute_math_isqrt.optional_params = []
+    execute_math_isqrt.should_respect_args_number = True
 
     def execute_math_root(self, exec_context: Context):
         """Calculates the n-root of 'value' (ⁿ√value)
@@ -104,6 +130,45 @@ class Math(ModuleFunction):
     execute_math_root.param_names = ['value']
     execute_math_root.optional_params = ['n']
     execute_math_root.should_respect_args_number = True
+
+    def execute_math_iroot(self, exec_context: Context):
+        """Calculates the integer part of the n-root of 'value' (ⁿ√value)
+        Default value for 'n' is 2 (isqrt)."""
+        # Params:
+        # * value
+        # Optional params:
+        # * n
+        value = exec_context.symbol_table.getf('value')  # we get the value
+        if not isinstance(value, Number):  # we check if the value is a number
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.iroot", "number", value,
+                exec_context, "lib_.math_.Math.execute_math_root"
+            ))
+
+        if value.value < 0:  # we check if the value is greater than (or equal to) 0
+            return RTResult().failure(RTArithmeticError(
+                value.pos_start, value.pos_end,
+                "first argument of the built-in function ‘math.iroot’ must be greater than (or equal to) 0.",
+                exec_context, "lib_.math_.Math.execute_math_root"
+            ))
+
+        n = exec_context.symbol_table.getf('n')  # we get 'n'
+        if n is None:  # if 'n' parameter is not filled, we set it to 2
+            n = Number(2).set_pos(value.pos_end, self.pos_end)
+
+        if not isinstance(n, Number):  # we check if 'n' is a number
+            return RTResult().failure(RTTypeErrorF(
+                n.pos_start, n.pos_end, "second", "math.iroot", "number", n,
+                exec_context, "lib_.math_.Math.execute_math_root"
+            ))
+
+        value_to_return = Number(int(value.value ** (1 / n.value)))  # we calculate the root
+
+        return RTResult().success(value_to_return)
+
+    execute_math_iroot.param_names = ['value']
+    execute_math_iroot.optional_params = ['n']
+    execute_math_iroot.should_respect_args_number = True
 
     def execute_math_degrees(self, exec_context: Context):
         """Converts 'value' (radians) to degrees"""
@@ -332,7 +397,9 @@ WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the modu
 
     # Functions
     "sqrt": Math("sqrt"),
+    "isqrt": Math("isqrt"),
     "root": Math("root"),
+    "iroot": Math("iroot"),
     "radians": Math("radians"),
     "degrees": Math("degrees"),
     "sin": Math("sin"),

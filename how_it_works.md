@@ -19,7 +19,7 @@
  The lexer uses the [position class](src/lexer/position.py) to do not lose itself in the raw code.
 
 ### Parser
- After the lexer, the [parser](src/parser/parser.py) converts the tokens into [nodes](src/parser/nodes.py), following some [grammar rules](grammar.txt). Nodes are bigger parts of the code, such as function definitions or binary operators.
+ After the lexer, the [parser](src/parser/parser.py) converts the tokens into [nodes](src/parser/nodes.py), following some [grammar rules](src/parser/grammar.txt). Nodes are bigger parts of the code, such as function definitions or binary operators.
 
  The lexer return a [parse result](src/parser/parse_result.py) where the main node of the file is stored, along with errors that may have occurred.
 

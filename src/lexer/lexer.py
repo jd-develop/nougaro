@@ -425,11 +425,16 @@ class Lexer:
             other_quote = '"'
         pos_start = self.pos.copy()
         escape_character = False
+        unicode_escape_character = False
+        unicode_ttl = 0
+        unicode_str = ""
         self.advance()
 
         escape_characters = {  # \n is a back line, \t is a tab
             'n': '\n',
-            't': '\t'
+            't': '\t',
+            'x': 'UNICODE00',
+            'u': 'UNICODE0000',
         }
 
         # if self.current_char == quote, we have to stop looping because the str is closed
@@ -443,8 +448,31 @@ class Lexer:
                     f"{other_quote}{quote}{other_quote} was never closed.",
                     "src.lexer.Lexer.make_string"
                 )
-            if escape_character:  # if the last char is \, we check for escape sequence
-                string_ += escape_characters.get(self.current_char, self.current_char)
+            if unicode_escape_character:
+                unicode_ttl -= 1
+                if self.current_char not in "0123456789ABCDEF" + "abcdef":
+                    return None, InvalidSyntaxError(
+                        pos_start, self.pos,
+                        "please provide valid unicode codepoint (in hexadecimal).",
+                        origin_file="src.lexer.lexer.Lexer.make_string"
+                    )
+                unicode_str += self.current_char
+                if unicode_ttl == 0:
+                    unicode_escape_character = False
+                    string_ += chr(int(unicode_str, base=16))
+                    unicode_str = ""
+            elif escape_character:  # if the last char is \, we check for escape sequence
+                character = escape_characters.get(self.current_char, self.current_char)
+                if character == "UNICODE00":
+                    unicode_ttl = 2
+                    unicode_escape_character = True
+                    unicode_str = ""
+                elif character == "UNICODE0000":
+                    unicode_ttl = 4
+                    unicode_escape_character = True
+                    unicode_str = ""
+                else:
+                    string_ += character
                 # the arg is doubled: if self.current_char is not a valid escape_sequence, we get self.current_char as
                 # the next char.
                 escape_character = False  # there is no more escape char
@@ -453,6 +481,13 @@ class Lexer:
             else:  # there is no escape char, we add our char in the str
                 string_ += self.current_char
             self.advance()  # we advance
+
+        if unicode_escape_character:
+            return None, InvalidSyntaxError(
+                pos_start, self.pos,
+                "please provide valid unicode codepoint (len 4 after \\u, len 2 after \\x).",
+                origin_file="src.lexer.lexer.Lexer.make_string"
+            )
 
         self.advance()  # we advance after the str
         return Token(TT["STRING"], string_, pos_start, self.pos), None

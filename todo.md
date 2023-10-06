@@ -21,6 +21,7 @@
 * [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
 * [ ] add builtin classes
 * [ ] add `try catch`
+* [ ] add `raise`
 * [ ] add `assert ... crashes (on Error) (with message "...")`
 
 ## 0.18 beta (goal: may 2024)

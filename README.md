@@ -1,4 +1,7 @@
 # Nougaro
+
+<img src="repo-image.png" alt="Nougaro. A programming Language." width="700"/>
+
 ## English description
  A programming language. Interpreter written in Python.
  
@@ -23,17 +26,17 @@
  Un langage de programmation. Interpréteur écrit en Python.
 
 ### Modules tiers (optionnels)
- Modules pas toujours fournis avec Python (pourquoi ?) :
+ Modules pas toujours fournis avec Python (pourquoi&nbsp;?)&nbsp;:
   * `colorama` (`pip install colorama`)
 
- Sous Linux :
+ Sous Linux&nbsp;:
   * `readline` (`pip install readline`)
  
 ### Exécuter
  Exécutez le shell avec `python3 shell.py`. Ouvrez des fichiers avec `python3 shell.py nomdufichier.extention`.
  Généralement, on utilise l'extension `.noug` pour les fichiers Nougaro.
  
- Le code est compilé pour Windows et Linux. Disponible dans l'onglet [releases](https://github.com/jd-develop/nougaro/releases/) !
+ Le code est compilé pour Windows et Linux. Disponible dans l'onglet [releases](https://github.com/jd-develop/nougaro/releases/)&nbsp;!
  
  Minimum : Python 3.10
  
@@ -43,7 +46,7 @@
  Please refer to the [wiki](https://github.com/jd-develop/nougaro/wiki/) for documentation.
 
 # About syntax highlighting
- The notepad++ file is no longer updated, so I deleted it from the repo.
+ The notepad++ file was no longer updated, so I deleted it from the repo.
 
  I’m planning to create a VSCode extension – if you know something about that, contact me!
 

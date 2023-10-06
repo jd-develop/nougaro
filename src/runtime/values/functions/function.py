@@ -40,7 +40,7 @@ class Function(BaseFunction):
         if use_context is not None:
             self.context = use_context
         # generate the context and update symbol table
-        exec_context = self.generate_new_context()
+        exec_context = self.generate_new_context(True)
         exec_context.symbol_table.set("__exec_from__", String(exec_from))
         exec_context.symbol_table.set("__actual_context__", String(self.name))
         # print(self.context)

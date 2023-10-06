@@ -184,6 +184,8 @@ def test_nougaro(print_OK)
     assert a.b5.c == 2
     var c = 12
     class Test2
+        void()
+
         def __init__()
             # var this.test = 1
             0

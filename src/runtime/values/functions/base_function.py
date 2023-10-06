@@ -26,12 +26,14 @@ class BaseFunction(Value):
         self.type_ = 'BaseFunction'
         self.call_with_module_context: bool = call_with_module_context
 
-    def generate_new_context(self):
+    def generate_new_context(self, use_self_context_ctx_table: bool = False):
         """Generates a new context with the right name, the right parent context and the right position"""
         # print(self.context)
         new_context = Context(self.name, self.context, self.pos_start)
         # set the symbol table to the parent one
-        if new_context.parent is None:
+        if use_self_context_ctx_table:
+            new_context.symbol_table = SymbolTable(self.context.symbol_table)
+        elif new_context.parent is None:
             new_context.symbol_table = SymbolTable()
         else:
             new_context.symbol_table = SymbolTable(new_context.parent.symbol_table)

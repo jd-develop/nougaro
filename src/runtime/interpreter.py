@@ -905,8 +905,8 @@ class Interpreter:
                 ))
             parent = parent_value
 
-        class_ctx = Context(class_name, ctx).set_symbol_table(SymbolTable())
-        result.register(self.visit(body_node, class_ctx, methods_instead_of_funcs=True))
+        class_ctx = Context(class_name, ctx).set_symbol_table(SymbolTable(ctx.symbol_table))
+        result.register(self.visit(body_node, class_ctx))  # , methods_instead_of_funcs=True))
         if result.should_return():
             return result
 
@@ -987,10 +987,10 @@ class Interpreter:
             object_ = Object(obj_attrs, value_to_call).set_pos(value_to_call.pos_start, value_to_call.pos_end)
             if call_with_module_context:
                 inner_ctx = Context(value_to_call.name, value_to_call.module_context)
-                inner_ctx.symbol_table = value_to_call.module_context.symbol_table.copy()
+                inner_ctx.symbol_table = SymbolTable(value_to_call.module_context.symbol_table)
             else:
                 inner_ctx = Context(value_to_call.name, outer_context)
-                inner_ctx.symbol_table = outer_context.symbol_table.copy()
+                inner_ctx.symbol_table = SymbolTable(outer_context.symbol_table)
 
             inner_ctx.symbol_table.set("this", object_)
             self.update_symbol_table(inner_ctx)

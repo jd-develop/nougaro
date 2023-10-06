@@ -3,7 +3,7 @@
 
 ## 0.15 beta (goal: december 2023)
 * [X] add `var id.attr = value`
-* [ ] fix bug where `this` is not defined in classes
+* [X] fix bug where `this` is not defined in classes
 * [ ] fix bug where methods are of type `functions`
 * [ ] fix bug where global vars are not accessible in methods
 * [ ] add class inheritance
@@ -20,6 +20,8 @@
 * [ ] rewrite parser to make it faster and easier to read
 * [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
 * [ ] add builtin classes
+* [ ] add `try catch`
+* [ ] add `assert ... crashes (on Error) (with message "...")`
 
 ## 0.18 beta (goal: june 2024)
 * [ ] add tkinter

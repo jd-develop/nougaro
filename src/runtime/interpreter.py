@@ -19,7 +19,7 @@ from src.errors.errors import *
 from src.lexer.token_types import TT, TOKENS_TO_QUOTE
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
-from src.misc import CustomInterpreterVisitMethod, CustomInterpreterVisitMethodFuncDef, clear_screen
+from src.misc import CustomInterpreterVisitMethod, clear_screen
 from src.runtime.symbol_table import SymbolTable
 from src.lexer.position import Position
 # built-in python imports
@@ -47,7 +47,7 @@ class Interpreter:
             del symbols_copy['__symbol_table__']
         ctx.symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
 
-    def visit(self, node: Node, ctx: Context, other_ctx: Context = None, methods_instead_of_funcs: bool = False):
+    def visit(self, node: Node, ctx: Context, methods_instead_of_funcs: bool, other_ctx: Context = None):
         """Visit a node."""
         method_name = f'visit_{type(node).__name__}'
         method: CustomInterpreterVisitMethod = getattr(self, method_name, self.no_visit_method)
@@ -58,11 +58,9 @@ class Interpreter:
         if len(PARAMETERS) <= 1:  # def method(self) is 1 param, def staticmethod() is 0 param
             return method()
         elif len(PARAMETERS) == 3:
-            if "outer_context" in PARAMETERS.keys():
-                return method(node, ctx, other_ctx)
-            else:
-                method: CustomInterpreterVisitMethodFuncDef
-                return method(node, ctx, methods_instead_of_funcs)
+            return method(node, ctx, methods_instead_of_funcs=methods_instead_of_funcs)
+        elif len(PARAMETERS) == 4:
+            return method(node, ctx, other_ctx, methods_instead_of_funcs=methods_instead_of_funcs)
 
         return method(node, ctx)
 
@@ -96,14 +94,15 @@ class Interpreter:
                 ctx, origin_file
             ))
 
-    def _visit_value_that_can_have_attributes(self, node_or_list: Node | list, result, context) -> Value:
+    def _visit_value_that_can_have_attributes(self, node_or_list: Node | list, result, context,
+                                              methods_instead_of_funcs: bool) -> Value:
         """If node_or_list is Node, visit is and return it. If it is a list, visit the value and its attributes."""
         if not isinstance(node_or_list, list):
-            value = result.register(self.visit(node_or_list, context))  # left term/factor/etc.
+            value = result.register(self.visit(node_or_list, context, methods_instead_of_funcs))
             if result.should_return():  # check for errors
                 return result
         else:  # attributes
-            value: Value = result.register(self.visit(node_or_list[0], context))
+            value: Value = result.register(self.visit(node_or_list[0], context, methods_instead_of_funcs))
             if result.should_return():  # check for errors
                 return result
             if len(node_or_list) != 1:
@@ -121,7 +120,7 @@ class Interpreter:
                         ))
 
                     node_.attr = True
-                    attr_ = result.register(self.visit(node_, new_ctx, context))
+                    attr_ = result.register(self.visit(node_, new_ctx, methods_instead_of_funcs, other_ctx=context))
                     if result.should_return():
                         return result
                     value = attr_
@@ -142,7 +141,7 @@ class Interpreter:
         return RTResult().success(Number(node.token.value).set_context(ctx).set_pos(node.pos_start, node.pos_end))
 
     @staticmethod
-    def visit_NumberENumberNode(node: NumberENumberNode, ctx: Context) -> RTResult:
+    def visit_NumberENumberNode(node: NumberENumberNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit NumberENumberNode."""
         value = node.num_token.value * (10 ** node.exponent_token.value)
         if isinstance(value, int) or isinstance(value, float):
@@ -150,7 +149,7 @@ class Interpreter:
         else:
             print(ctx)
             print(f"NOUGARO INTERNAL ERROR : in visit_NumberENumberNode method defined in {_ORIGIN_FILE},\n"
-                  f"{value=}\n"
+                  f"{value=}, {methods_instead_of_funcs=}\n"
                   f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all "
                   f"informations above.")
             raise Exception(f'{value=} in {_ORIGIN_FILE}.visit_NumberENumberNode.')
@@ -162,18 +161,18 @@ class Interpreter:
             String(node.token.value).set_context(ctx).set_pos(node.pos_start, node.pos_end)
         )
 
-    def visit_ListNode(self, node: ListNode, ctx: Context) -> RTResult:
+    def visit_ListNode(self, node: ListNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit ListNode"""
         result = RTResult()
         elements = []
 
         for element_node, mul in node.element_nodes:  # we visit every node from the list
             if not mul:
-                elements.append(result.register(self.visit(element_node, ctx)))
+                elements.append(result.register(self.visit(element_node, ctx, methods_instead_of_funcs)))
                 if result.should_return():  # if there is an error
                     return result
             else:
-                extend_list_: Value = result.register(self.visit(element_node, ctx))
+                extend_list_: Value = result.register(self.visit(element_node, ctx, methods_instead_of_funcs))
                 if result.should_return():  # if there is an error
                     return result
                 if not isinstance(extend_list_, List):
@@ -187,10 +186,10 @@ class Interpreter:
 
         return result.success(List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end))
 
-    def visit_BinOpNode(self, node: BinOpNode, ctx: Context) -> RTResult:
+    def visit_BinOpNode(self, node: BinOpNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit BinOpNode"""
         res = RTResult()
-        left = self._visit_value_that_can_have_attributes(node.left_node, res, ctx)
+        left = self._visit_value_that_can_have_attributes(node.left_node, res, ctx, methods_instead_of_funcs)
         if res.should_return():
             return res
 
@@ -202,7 +201,7 @@ class Interpreter:
             # operator is "or" and the value is true
             return res.success(TRUE.copy().set_pos(node.pos_start, node.pos_end))
 
-        right = self._visit_value_that_can_have_attributes(node.right_node, res, ctx)
+        right = self._visit_value_that_can_have_attributes(node.right_node, res, ctx, methods_instead_of_funcs)
         if res.should_return():
             return res
 
@@ -249,6 +248,7 @@ class Interpreter:
             print(ctx)
             print("NOUGARO INTERNAL ERROR : Result is not defined after executing "
                   f"{_ORIGIN_FILE}.visit_BinOpNode because of an invalid token.\n"
+                  f"{methods_instead_of_funcs=}\n"
                   "Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the information "
                   "above")
             raise Exception(f"Result is not defined after executing {_ORIGIN_FILE}.visit_BinOpNode")
@@ -258,13 +258,14 @@ class Interpreter:
         else:
             return res.success(result.set_pos(node.pos_start, node.pos_end))
 
-    def visit_BinOpCompNode(self, node: BinOpCompNode, ctx: Context) -> RTResult:
+    def visit_BinOpCompNode(self, node: BinOpCompNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit BinOpCompNode"""
         res = RTResult()
         nodes_and_tokens_list = node.nodes_and_tokens_list
         IS_COMPARISON = len(nodes_and_tokens_list) != 1
         if not IS_COMPARISON:
-            value = self._visit_value_that_can_have_attributes(nodes_and_tokens_list[0], res, ctx)
+            value = self._visit_value_that_can_have_attributes(nodes_and_tokens_list[0], res, ctx,
+                                                               methods_instead_of_funcs)
             if res.should_return():
                 return res
             return res.success(value)
@@ -274,7 +275,7 @@ class Interpreter:
         # just list of visited nodes
         for index, element in enumerate(nodes_and_tokens_list):
             if index % 2 == 0:  # we take only nodes and not ops
-                value = self._visit_value_that_can_have_attributes(element, res, ctx)
+                value = self._visit_value_that_can_have_attributes(element, res, ctx, methods_instead_of_funcs)
                 if res.should_return():
                     return res
                 visited_nodes_and_tokens_list.append(value)
@@ -313,6 +314,7 @@ class Interpreter:
                 print(
                     f"NOUGARO INTERNAL ERROR : Result is not defined after executing "
                     f"{_ORIGIN_FILE}.visit_BinOpCompNode because of an invalid token.\n"
+                    f"{methods_instead_of_funcs}\n"
                     f"Note for devs : the actual invalid token is {op_token.type}:{op_token.value}.\n"
                     f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
                     f"information above")
@@ -324,22 +326,22 @@ class Interpreter:
                 return res.success(test_result.set_pos(node.pos_start, node.pos_end))
         return res.success(test_result.set_pos(node.pos_start, node.pos_end))
 
-    def visit_UnaryOpNode(self, node: UnaryOpNode, ctx: Context) -> RTResult:
+    def visit_UnaryOpNode(self, node: UnaryOpNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit UnaryOpNode (-x, not x, ~x)"""
         result = RTResult()
         if isinstance(node.node, list):
             if len(node.node) == 1:
-                value = result.register(self.visit(node.node[0], ctx))
+                value = result.register(self.visit(node.node[0], ctx, methods_instead_of_funcs))
             else:
                 print(ctx)
                 print(
                     f"NOUGARO INTERNAL ERROR : len(node.node) != 1 in {_ORIGIN_FILE}.visit_UnaryOpNode.\n"
-                    f"{node.node=}\n"
+                    f"{node.node=}, {methods_instead_of_funcs=}\n"
                     f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
                     f"information above.")
                 raise Exception(f"len(node.node) != 1 in {_ORIGIN_FILE}.visit_UnaryOpNode.")
         else:
-            value = result.register(self.visit(node.node, ctx))
+            value = result.register(self.visit(node.node, ctx, methods_instead_of_funcs))
         if result.should_return():
             return result
 
@@ -359,7 +361,7 @@ class Interpreter:
         else:
             return result.success(value.set_pos(node.pos_start, node.pos_end))
 
-    def visit_VarAccessNode(self, node: VarAccessNode, ctx: Context) -> RTResult:
+    def visit_VarAccessNode(self, node: VarAccessNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit VarAccessNode"""
         attribute_error = node.attr
         result = RTResult()
@@ -370,7 +372,7 @@ class Interpreter:
             IS_IDENTIFIER = isinstance(var_name, Token) and var_name.type == TT["IDENTIFIER"]
             if not IS_IDENTIFIER:
                 var_name: Node
-                value = result.register(self.visit(var_name, ctx))  # here var_name is an expr
+                value = result.register(self.visit(var_name, ctx, methods_instead_of_funcs))  # here var_name is an expr
                 if result.should_return():
                     return result
                 break
@@ -400,14 +402,14 @@ class Interpreter:
         value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(ctx)
         return result.success(value)
 
-    def visit_VarAssignNode(self, node: VarAssignNode, ctx: Context) -> RTResult:
+    def visit_VarAssignNode(self, node: VarAssignNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit VarAssignNode"""
         result = RTResult()
         var_names: list[list[Token | Node]] = node.var_names
 
         values = []
         for value_node in node.value_nodes:  # we get the values
-            values.append(result.register(self.visit(value_node, ctx)))
+            values.append(result.register(self.visit(value_node, ctx, methods_instead_of_funcs)))
             if result.should_return() or result.old_should_return:
                 return result
 
@@ -451,7 +453,7 @@ class Interpreter:
                         err_msg, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
                     ))
                 else:
-                    value = result.register(self.visit(var_name[0], ctx))
+                    value = result.register(self.visit(var_name[0], ctx, methods_instead_of_funcs))
                     if result.should_return():
                         return result
 
@@ -485,7 +487,8 @@ class Interpreter:
                                 f"unexpected node: {node_or_tok.__class__.__name__}.",
                                 ctx, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
                             ))
-                        value = result.register(self.visit(node_or_tok, new_ctx, ctx))
+                        value = result.register(self.visit(node_or_tok, new_ctx, methods_instead_of_funcs,
+                                                           other_ctx=ctx))
                         if result.should_return():
                             return result
 
@@ -620,17 +623,17 @@ class Interpreter:
         self.update_symbol_table(ctx)
         return result.success(NoneValue(False))
 
-    def visit_IfNode(self, node: IfNode, ctx: Context) -> RTResult:
+    def visit_IfNode(self, node: IfNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit IfNode"""
         result = RTResult()
         IF_AND_ELIF_CASES = node.cases
         for condition, body_expr in IF_AND_ELIF_CASES:
-            condition_value = result.register(self.visit(condition, ctx))  # we register the condition
+            condition_value = result.register(self.visit(condition, ctx, methods_instead_of_funcs))
             if result.should_return():  # check for errors
                 return result
 
             if condition_value.is_true():  # if it is true: we execute the body code then we return the value
-                expr_value = result.register(self.visit(body_expr, ctx))
+                expr_value = result.register(self.visit(body_expr, ctx, methods_instead_of_funcs))
                 if result.should_return():  # check for errors
                     return result
                 return result.success(expr_value)
@@ -638,20 +641,20 @@ class Interpreter:
         ELSE_CASE = node.else_case is not None
         if ELSE_CASE:
             expr = node.else_case
-            else_value = result.register(self.visit(expr, ctx))
+            else_value = result.register(self.visit(expr, ctx, methods_instead_of_funcs))
             if result.should_return():  # check for errors
                 return result
             return result.success(else_value)
 
         return result.success(NoneValue(False))
 
-    def visit_AssertNode(self, node: AssertNode, ctx: Context) -> RTResult:
+    def visit_AssertNode(self, node: AssertNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit AssertNode"""
         result = RTResult()
-        assertion = result.register(self.visit(node.assertion, ctx))  # we get the assertion
+        assertion = result.register(self.visit(node.assertion, ctx, methods_instead_of_funcs))  # we get the assertion
         if result.should_return():  # check for errors
             return result
-        errmsg = result.register(self.visit(node.errmsg, ctx))  # we get the error message
+        errmsg = result.register(self.visit(node.errmsg, ctx, methods_instead_of_funcs))  # we get the error message
         if result.should_return():  # check for errors
             return result
 
@@ -671,22 +674,22 @@ class Interpreter:
 
         return result.success(NoneValue(False))
 
-    def visit_ForNode(self, node: ForNode, ctx: Context) -> RTResult:
+    def visit_ForNode(self, node: ForNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit ForNode. for i = start to end then"""
         result = RTResult()
         elements = []
 
-        start_value = result.register(self.visit(node.start_value_node, ctx))  # we get the start value
+        start_value = result.register(self.visit(node.start_value_node, ctx, methods_instead_of_funcs))
         if result.should_return():  # check for errors
             return result
 
-        end_value = result.register(self.visit(node.end_value_node, ctx))  # we get the end value
+        end_value = result.register(self.visit(node.end_value_node, ctx, methods_instead_of_funcs))
         if result.should_return():  # check for errors
             return result
 
         STEP_VALUE_IS_DEFINED = node.step_value_node is not None
         if STEP_VALUE_IS_DEFINED:  # we get the step value, if there is one
-            step_value = result.register(self.visit(node.step_value_node, ctx))
+            step_value = result.register(self.visit(node.step_value_node, ctx, methods_instead_of_funcs))
             if result.should_return():  # check for errors
                 return result
         else:
@@ -707,7 +710,7 @@ class Interpreter:
             self.update_symbol_table(ctx)
             i += step_value.value  # we add up the step value to the iterating variable
 
-            value = result.register(self.visit(node.body_node, ctx))  # we execute code in the body node
+            value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
                 continue  # will continue the 'while condition()' -> the interpreted 'for' loop is continued
 
@@ -725,12 +728,12 @@ class Interpreter:
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
         )
 
-    def visit_ForNodeList(self, node: ForNodeList, ctx: Context) -> RTResult:
+    def visit_ForNodeList(self, node: ForNodeList, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit ForNodeList. for i in list then"""
         result = RTResult()
         elements = []
 
-        iterable_ = result.register(self.visit(node.list_node, ctx))  # we get the list
+        iterable_ = result.register(self.visit(node.list_node, ctx, methods_instead_of_funcs))  # we get the list
         if result.should_return():  # check for errors
             return result
 
@@ -751,7 +754,7 @@ class Interpreter:
                 element = String(element)
             ctx.symbol_table.set(node.var_name_token.value, element)
             self.update_symbol_table(ctx)
-            value = result.register(self.visit(node.body_node, ctx))  # we execute the body node
+            value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
                 continue  # will continue the 'for e in iterable_.elements' -> the interpreted 'for' loop is
                 #           continued
@@ -770,17 +773,17 @@ class Interpreter:
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
         )
 
-    def visit_WhileNode(self, node: WhileNode, ctx: Context) -> RTResult:
+    def visit_WhileNode(self, node: WhileNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit WhileNode"""
         result = RTResult()
         elements = []
 
-        condition = result.register(self.visit(node.condition_node, ctx))  # we get the condition
+        condition = result.register(self.visit(node.condition_node, ctx, methods_instead_of_funcs))
         if result.should_return():  # check for errors
             return result
 
         while condition.is_true():
-            value = result.register(self.visit(node.body_node, ctx))  # we execute the body node
+            value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
                 continue
 
@@ -794,7 +797,7 @@ class Interpreter:
             if not isinstance(value, NoneValue) or value.should_print:
                 elements.append(value)
 
-            condition = result.register(self.visit(node.condition_node, ctx))  # we get the condition
+            condition = result.register(self.visit(node.condition_node, ctx, methods_instead_of_funcs))
             if result.should_return():  # check for errors
                 return result
 
@@ -802,13 +805,13 @@ class Interpreter:
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
         )
 
-    def visit_DoWhileNode(self, node: DoWhileNode, ctx: Context) -> RTResult:
+    def visit_DoWhileNode(self, node: DoWhileNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit DoWhileNode"""
         result = RTResult()
         elements = []
 
         while True:
-            value = result.register(self.visit(node.body_node, ctx))  # we execute the body node for a first time
+            value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
                 continue
 
@@ -822,7 +825,7 @@ class Interpreter:
             if not isinstance(value, NoneValue) or value.should_print:
                 elements.append(value)
 
-            condition = result.register(self.visit(node.condition_node, ctx))  # we get the condition
+            condition = result.register(self.visit(node.condition_node, ctx, methods_instead_of_funcs))
             if result.should_return():  # check for errors
                 return result
 
@@ -906,7 +909,7 @@ class Interpreter:
             parent = parent_value
 
         class_ctx = Context(class_name, ctx).set_symbol_table(SymbolTable(ctx.symbol_table))
-        result.register(self.visit(body_node, class_ctx))  # , methods_instead_of_funcs=True))
+        result.register(self.visit(body_node, class_ctx, methods_instead_of_funcs=True))
         if result.should_return():
             return result
 
@@ -920,11 +923,12 @@ class Interpreter:
 
         return result.success(class_value)
 
-    def visit_CallNode(self, node: CallNode, node_to_call_context: Context, outer_context: Context) -> RTResult:
+    def visit_CallNode(self, node: CallNode, node_to_call_context: Context, outer_context: Context,
+                       methods_instead_of_funcs: bool) -> RTResult:
         """Visit CallNode"""
         result = RTResult()
 
-        value_to_call = result.register(self.visit(node.node_to_call, node_to_call_context))  # we get the value to call
+        value_to_call = result.register(self.visit(node.node_to_call, node_to_call_context, methods_instead_of_funcs))
         if result.should_return():  # check for errors
             return result
         # we copy it and set a new pos
@@ -936,12 +940,12 @@ class Interpreter:
             # call the function
             for arg_node, mul in node.arg_nodes:  # we check the arguments
                 if not mul:
-                    args.append(result.register(self.visit(arg_node, outer_context)))
+                    args.append(result.register(self.visit(arg_node, outer_context, methods_instead_of_funcs)))
                     if result.should_return():
                         return result
                     continue
 
-                list_: Value = result.register(self.visit(arg_node, outer_context))
+                list_: Value = result.register(self.visit(arg_node, outer_context, methods_instead_of_funcs))
                 if result.should_return():
                     return result
                 if not isinstance(list_, List):
@@ -1023,12 +1027,12 @@ class Interpreter:
                     ))
                 for arg_node, mul in node.arg_nodes:  # we check the arguments
                     if not mul:
-                        args.append(result.register(self.visit(arg_node, outer_context)))
+                        args.append(result.register(self.visit(arg_node, outer_context, methods_instead_of_funcs)))
                         if result.should_return():
                             return result
                         continue
 
-                    list_: Value = result.register(self.visit(arg_node, outer_context))
+                    list_: Value = result.register(self.visit(arg_node, outer_context, methods_instead_of_funcs))
                     if result.should_return():
                         return result
                     if not isinstance(list_, List):
@@ -1060,7 +1064,7 @@ class Interpreter:
                 ))
 
             elif len(node.arg_nodes) == 1:  # there is only one index given
-                index = result.register(self.visit(node.arg_nodes[0][0], outer_context))
+                index = result.register(self.visit(node.arg_nodes[0][0], outer_context, methods_instead_of_funcs))
                 if result.should_return():
                     return result
                 if not isinstance(index, Number):
@@ -1084,7 +1088,7 @@ class Interpreter:
             else:  # there is more than one index given
                 return_value = []
                 for arg_node in node.arg_nodes:  # for every index
-                    index = result.register(self.visit(arg_node[0], outer_context))
+                    index = result.register(self.visit(arg_node[0], outer_context, methods_instead_of_funcs))
                     if result.should_return():
                         return result
                     if not isinstance(index, Number):
@@ -1117,7 +1121,7 @@ class Interpreter:
                     outer_context, origin_file=f"{_ORIGIN_FILE}.Visit_CallNode"
                 ))
             elif len(node.arg_nodes) == 1:  # there is only one index given
-                index = result.register(self.visit(node.arg_nodes[0][0], outer_context))
+                index = result.register(self.visit(node.arg_nodes[0][0], outer_context, methods_instead_of_funcs))
                 if result.should_return():
                     return result
                 if not isinstance(index, Number):
@@ -1142,7 +1146,7 @@ class Interpreter:
             else:  # there is more than one index given
                 return_value = ""
                 for arg_node in node.arg_nodes:  # for every index
-                    index = result.register(self.visit(arg_node[0], outer_context))
+                    index = result.register(self.visit(arg_node[0], outer_context, methods_instead_of_funcs))
                     if result.should_return():
                         return result
                     if not isinstance(index, Number):
@@ -1174,12 +1178,12 @@ class Interpreter:
 
     # todo: separate call methods
 
-    def visit_ReturnNode(self, node: ReturnNode, ctx: Context) -> RTResult:
+    def visit_ReturnNode(self, node: ReturnNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit ReturnNode"""
         result = RTResult()
 
         if node.node_to_return is not None:  # 'return foo'
-            value = result.register(self.visit(node.node_to_return, ctx))  # we get the value (foo)
+            value = result.register(self.visit(node.node_to_return, ctx, methods_instead_of_funcs))
             if result.should_return():  # check for errors
                 return result
         else:  # only 'return'
@@ -1262,7 +1266,7 @@ class Interpreter:
 
         return RTResult().success(NoneValue(False))
 
-    def visit_WriteNode(self, node: WriteNode, ctx: Context) -> RTResult:
+    def visit_WriteNode(self, node: WriteNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit WriteNode"""
         result = RTResult()
 
@@ -1277,7 +1281,7 @@ class Interpreter:
         else:
             open_mode = 'a+'
 
-        str_to_write = result.register(self.visit(expr_to_write, ctx))  # we get the str to write
+        str_to_write = result.register(self.visit(expr_to_write, ctx, methods_instead_of_funcs))
         if result.should_return():  # check for errors
             return result
         if not isinstance(str_to_write, String):  # if the str is not a String
@@ -1286,7 +1290,7 @@ class Interpreter:
                 f"{_ORIGIN_FILE}.visit_WriteNode"
             ))
 
-        file_name = result.register(self.visit(file_name_expr, ctx))  # we get the str of the file name
+        file_name = result.register(self.visit(file_name_expr, ctx, methods_instead_of_funcs))
         if result.should_return():  # check for errors
             return result
         if not isinstance(file_name, String):  # if the file name is not a String
@@ -1357,14 +1361,14 @@ class Interpreter:
 
         return result.success(str_to_write)
 
-    def visit_ReadNode(self, node: ReadNode, ctx: Context) -> RTResult:
+    def visit_ReadNode(self, node: ReadNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit ReadNode"""
         result = RTResult()
         file_name_expr = node.file_name_expr  # we get the file name
         identifier = node.identifier  # we get the variable to put the file/line
         line_number = node.line_number  # we get the line number (if the line number is not given, equals to 'all')
 
-        file_name = result.register(self.visit(file_name_expr, ctx))  # we get the str of the file name
+        file_name = result.register(self.visit(file_name_expr, ctx, methods_instead_of_funcs))
         if result.error is not None:  # check for errors
             return result
         if not isinstance(file_name, String):  # check if the str is a String

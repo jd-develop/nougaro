@@ -187,24 +187,23 @@ def test_nougaro(print_OK)
         void()
 
         def __init__()
-            # var this.test = 1
-            0
+            var this.test = 1
         end
 
         def method()
-            /* assert this.test == 1
-            var this.test, c += 1, 1
+            assert this.test == 1
+            /* var this.test, c += 1, 1
             assert this.test == 2
             assert c == 13
             var this.test, c = c, this.test
             assert this.test == 13
             assert c == 2 */
-            0
         end
     end
 
     var d = Test2()
     d.method()
+    assert type(d.method) == "method"
 
     # builtin funcs
     print("Please test these builtin functions after the execution of the test:")
@@ -233,6 +232,7 @@ def test_nougaro(print_OK)
     assert type([1, 2, 3]) == "list"
     assert type(def()->null) == "func"
     assert type(type) == "built-in func"
+    # type(method) is tested in classes
 
     if print_OK then print("OK builtin funcs 2")
 

@@ -19,7 +19,7 @@ from src.misc import CustomBuiltInFuncMethodWithNougDirButNotRun, is_keyword, do
 from src.errors.errors import RTFileNotFoundError, RTTypeError, RTTypeErrorF
 from src.runtime.values.tools import py2noug
 # built-in python imports
-from os import system as os_system, name as os_name
+from os import system as os_system
 import os.path
 import random
 import sys

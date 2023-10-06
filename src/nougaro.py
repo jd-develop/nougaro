@@ -98,7 +98,7 @@ def run(file_name: str, text: str, noug_dir: str, version: str = None, exec_from
         context = use_context  # do not .copy() here
     interpreter.update_symbol_table(context)
 
-    result = interpreter.visit(ast.node, context)  # visit the main node of the AST with the created context
+    result = interpreter.visit(ast.node, context, False)  # visit the main node of the AST with the created context
     if print_context:
         print(context.__str__())
 

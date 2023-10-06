@@ -6,7 +6,7 @@
  When you enter something in the shell, or that you run a nougaro file, the code always pass into these three steps: [lexer](#Lexer), [parser](#Parser), [interpreter](#Interpreter).
 
 ### Lexer
- Firsts things first, the [lexer](src/lexer/lexer.py) converts your plain text code into [tokens](src/lexer/token_types.py). Tokens (in French: "lexèmes") are like lexical units, such as a '+', a keyword like 'import' or an identifier.
+ Firsts things first, the [lexer](src/lexer/lexer.py) converts your plain text code into [tokens](src/lexer/token_types.py). Tokens (in French: «&nbsp;lexèmes&nbsp;») are like lexical units, such as a '+', a keyword like 'import' or an identifier.
 
  For example, the line `while a != 10 then var a += 1` is translated by the lexer to this list of tokens :
 
@@ -65,7 +65,7 @@
  The [context](src/runtime/context.py) contain a lot of useful thing for the interpreter, such as the `display_name` (name of the function), or the [**Symbol Table**](src/runtime/symbol_table.py).
 
 ##### Variables and symbol tables
- The interpreter store all the variables in the Symbol Table. This is a table, with the name of the variables on one side and the values on the other side. This looks like that:
+ The interpreter store all the variables in the Symbol Table. This is a table, with the name of the variables on one side and the values on the other side. It looks like that:
    
     {
        "parent": None,

@@ -191,6 +191,7 @@ def test_nougaro(print_OK)
         end
 
         def method()
+            void()
             assert this.test == 1
             /* var this.test, c += 1, 1
             assert this.test == 2

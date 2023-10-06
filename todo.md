@@ -5,7 +5,7 @@
 * [X] add `var id.attr = value`
 * [X] fix bug where `this` is not defined in classes
 * [X] fix bug where methods are of type `functions`
-* [ ] fix bug where global vars are not accessible in methods
+* [X] fix bug where global vars are not accessible in methods
 * [ ] add class inheritance
 * [X] add an error when things like `math.(assert 1)`
 * [X] add `time.time()`

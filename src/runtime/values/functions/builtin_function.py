@@ -15,7 +15,8 @@ from src.runtime.context import Context
 from src.runtime.values.basevalues.basevalues import *
 from src.runtime.values.number_constants import *
 from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam
-from src.misc import CustomBuiltInFuncMethodWithNougDirButNotRun, is_keyword, does_tok_type_exist, clear_screen
+from src.misc import CustomBuiltInFuncMethodWithNougDirButNotRun
+from src.misc import print_in_red, is_keyword, does_tok_type_exist, clear_screen
 from src.errors.errors import RTFileNotFoundError, RTTypeError, RTTypeErrorF
 from src.runtime.values.tools import py2noug
 # built-in python imports
@@ -139,6 +140,24 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_print.optional_params = ["value"]
     execute_print.should_respect_args_number = True
 
+    def execute_print_in_red(self, exec_context: Context):
+        """Print 'value' in red"""
+        # Optional params:
+        # * value
+        value = exec_context.symbol_table.getf('value')
+        if value is not None:  # if the value is defined
+            try:
+                print_in_red(value.to_str())
+            except AttributeError:
+                print_in_red(str(value))
+        else:  # the value is not defined, we just print a new line like in regular print() python builtin func
+            print_in_red()
+        return RTResult().success(NoneValue(False))
+
+    execute_print_in_red.param_names = []
+    execute_print_in_red.optional_params = ["value"]
+    execute_print_in_red.should_respect_args_number = True
+
     def execute_print_ret(self, exec_context: Context):
         """Print 'value' and returns 'value'"""
         # Optional params:
@@ -160,6 +179,28 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_print_ret.param_names = []
     execute_print_ret.optional_params = ['value']
     execute_print_ret.should_respect_args_number = True
+
+    def execute_print_in_red_ret(self, exec_context: Context):
+        """Print 'value' and returns 'value'"""
+        # Optional params:
+        # * value
+        value = exec_context.symbol_table.getf('value')
+        if value is not None:  # if the value is defined
+            try:
+                print_in_red(value.to_str())
+                return RTResult().success(String(value.to_str()))
+            except AttributeError:
+                print_in_red(str(value))
+                return RTResult().success(String(str(value)))
+        else:
+            # the value is not defined, we just print a new line like in regular print() python builtin func and return
+            # an empty str
+            print_in_red()
+            return RTResult().success(String(''))
+
+    execute_print_in_red_ret.param_names = []
+    execute_print_in_red_ret.optional_params = ['value']
+    execute_print_in_red_ret.should_respect_args_number = True
 
     def execute_input(self, exec_context: Context):
         """Basic input (str)"""

@@ -23,6 +23,8 @@ IDENTIFIERS_LEGAL_CHARS = LETTERS + '_'
 BUILTIN_FUNCTIONS = [
     "void",
     "print",
+    "print_in_red",
+    "print_in_red_ret",
     "print_ret",
     "input",
     "input_int",

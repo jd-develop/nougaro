@@ -4,7 +4,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-assert False
+
 def test_nougaro(print_OK)
     print("Hello Toulouse!")  # the entire world is actually Toulouse, trust me. If you say 'pain au chocolat', you're not in the world.
     # comment

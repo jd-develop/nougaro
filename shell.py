@@ -195,6 +195,7 @@ def main():
 
         if error is not None:  # there is an error, we print it in RED because OMG AN ERROR
             print_in_red(error.as_string())
+            sys.exit(1)
         elif result is not None:  # there is no error, but there is a result
             if args[0] != "-cd":
                 if isinstance(result, List):  # the result is always a nougaro List value
@@ -234,6 +235,7 @@ def main():
                 sys.exit()
         if error is not None:  # there is an error, so before exiting we have to say "OH NO IT'S BROKEN"
             print_in_red(error.as_string())
+            sys.exit(1)
 
 
 if __name__ == '__main__':  # SOMEBODY ONCE TOLD ME it was good to do that

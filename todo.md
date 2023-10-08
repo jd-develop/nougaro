@@ -33,7 +33,7 @@
 * [ ] add `socket`
 * [ ] add `requests`
 * [ ] add `webbrowser`
-* [ ] add `unicodedata`
+* [ ] add `unicodedata` (in progress)
 
 ## 0.19 beta (goal: july 2024)
 * [ ] add unit tests

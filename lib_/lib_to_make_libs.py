@@ -83,6 +83,8 @@ class ModuleFunction(BaseBuiltInFunction):
         return self.set_context_and_pos_to_a_copy(copy)
 
     def set_context_and_pos_to_a_copy(self, copy):
+        """Also sets attributes (name not changed for retro-compatibility)"""
         copy.set_context(self.context)
         copy.set_pos(self.pos_start, self.pos_end)
+        copy.attributes = self.attributes.copy()
         return copy

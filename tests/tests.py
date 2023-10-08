@@ -12,6 +12,7 @@
 # other tests files imports
 from tests.test_lexer import TestLexer
 # python imports
+import sys
 import unittest
 
 
@@ -28,4 +29,6 @@ def run_tests():
 
 
 if __name__ == "__main__":
-    run_tests()
+    result = run_tests()
+    if len(result.failures) != 0:
+        sys.exit(1)

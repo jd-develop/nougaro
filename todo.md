@@ -17,6 +17,7 @@
 * [ ] add possibility to import files in current folder and sub-folders
 * [ ] add `var++`, `var#` and `var--`
 * [ ] add possibility to read command line arguments
+* [ ] add optional arguments in functions
 
 ## 0.17 beta (goal: february 2024)
 * [ ] rewrite parser to make it faster and easier to read

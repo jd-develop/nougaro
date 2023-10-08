@@ -64,8 +64,8 @@ class Interpreter:
 
         return method(node, ctx)
 
-    @staticmethod
-    def _undefined(pos_start: Position,
+    def _undefined(self,
+                   pos_start: Position,
                    pos_end: Position,
                    var_name: str,
                    ctx: Context,
@@ -74,11 +74,20 @@ class Interpreter:
             -> RTResult:
         """Returns a RTNotDefinedError with a proper message."""
         close_match_in_symbol_table = ctx.symbol_table.best_match(var_name, keywords=KEYWORDS)
+        IS_NOUGARO_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{var_name}.noug"))
+        IS_PYTHON_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{var_name}_.py"))
+
         if ctx.symbol_table.exists(f'__{var_name}__'):
             # e.g. user entered `var foo += 1` instead of `var __foo__ += 1`
             return result.failure(RTNotDefinedError(
                 pos_start, pos_end,
                 f"name '{var_name}' is not defined. Did you mean '__{var_name}__'?",
+                ctx, origin_file
+            ))
+        elif IS_NOUGARO_LIB or IS_PYTHON_LIB:
+            return result.failure(RTNotDefinedError(
+                pos_start, pos_end,
+                f"name '{var_name}' is not defined. Maybe you forgot to import it?",
                 ctx, origin_file
             ))
         elif close_match_in_symbol_table is not None:
@@ -116,7 +125,7 @@ class Interpreter:
                             node_.pos_start, node_.pos_end,
                             f"unexpected node: {node_.__class__.__name__}.",
                             context,
-                            origin_file="src.runtime.interpreter.Interpreter._visit_value_that_can_have_attributes"
+                            origin_file=f"{_ORIGIN_FILE}._visit_value_that_can_have_attributes"
                         ))
 
                     node_.attr = True

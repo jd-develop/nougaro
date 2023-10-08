@@ -28,6 +28,9 @@ class String(Value):
     def __repr__(self):
         return f'"{self.value}"'
 
+    def __len__(self):
+        return len(self.value)
+
     def to_str(self):
         """Returns self.value, as a python str"""
         return self.value

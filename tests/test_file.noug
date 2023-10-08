@@ -98,6 +98,7 @@ def test_nougaro(print_OK)
     assert "\xD9" == chr(0xD9)
     assert "\u0D9e" == chr(0xD9E)
     assert "\xBb\u09Df" == chr(0xbB) + chr(0x9dF)
+    assert "\U0001f937" == "🤷"
     assert "a""b" == "ab"
     assert "a"
            "b" == "ab"

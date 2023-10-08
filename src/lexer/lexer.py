@@ -433,8 +433,9 @@ class Lexer:
         escape_characters = {  # \n is a back line, \t is a tab
             'n': '\n',
             't': '\t',
-            'x': 'UNICODE00',
-            'u': 'UNICODE0000',
+            'x': 'UNICODE2',
+            'u': 'UNICODE4',
+            'U': 'UNICODE8'
         }
 
         # if self.current_char == quote, we have to stop looping because the str is closed
@@ -463,12 +464,16 @@ class Lexer:
                     unicode_str = ""
             elif escape_character:  # if the last char is \, we check for escape sequence
                 character = escape_characters.get(self.current_char, self.current_char)
-                if character == "UNICODE00":
+                if character == "UNICODE2":
                     unicode_ttl = 2
                     unicode_escape_character = True
                     unicode_str = ""
-                elif character == "UNICODE0000":
+                elif character == "UNICODE4":
                     unicode_ttl = 4
+                    unicode_escape_character = True
+                    unicode_str = ""
+                elif character == "UNICODE8":
+                    unicode_ttl = 8
                     unicode_escape_character = True
                     unicode_str = ""
                 else:

@@ -12,6 +12,8 @@
 
 ## 0.16 beta (goal: december 2024)
 * [X] add '\xXX' and '\uXXXX' support
+* [X] add '\UXXXXXXXX'
+* [ ] add '\N{UNICODE CHARACTER NAME}'
 * [ ] add possibility to import files in current folder and sub-folders
 * [ ] add `var++`, `var#` and `var--`
 * [ ] add possibility to read command line arguments
@@ -25,8 +27,11 @@
 * [ ] add `assert ... crashes (on Error) (with message "...")`
 
 ## 0.18 beta (goal: may 2024)
-* [ ] add tkinter
-* [ ] add turtle
+* [ ] add `tkinter`
+* [ ] add `turtle`
+* [ ] add `socket`
+* [ ] add `requests`
+* [ ] add `webbrowser`
 
 ## 0.19 beta (goal: july 2024)
 * [ ] add unit tests

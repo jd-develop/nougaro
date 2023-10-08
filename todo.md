@@ -13,7 +13,7 @@
 ## 0.16 beta (goal: december 2024)
 * [X] add '\xXX' and '\uXXXX' support
 * [X] add '\UXXXXXXXX'
-* [ ] add '\N{UNICODE CHARACTER NAME}'
+* [X] add '\N{UNICODE CHARACTER NAME}'
 * [ ] add possibility to import files in current folder and sub-folders
 * [ ] add `var++`, `var#` and `var--`
 * [ ] add possibility to read command line arguments
@@ -32,6 +32,7 @@
 * [ ] add `socket`
 * [ ] add `requests`
 * [ ] add `webbrowser`
+* [ ] add `unicodedata`
 
 ## 0.19 beta (goal: july 2024)
 * [ ] add unit tests
@@ -39,3 +40,4 @@
 
 ## 1.0 release candidate (goal: october 2024)
 * [ ] create highlight extension for VSCode
+* [ ] if possible, implement `break (name)` and `continue (name)` where (name) is `if`, `for`, …

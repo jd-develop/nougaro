@@ -95,9 +95,9 @@ def test_nougaro(print_OK)
     "a\nb"
     "a\tb"
     "a\\b"
-    assert "\xD9" == chr(0xD9)
-    assert "\u0D9e" == chr(0xD9E)
-    assert "\xBb\u09Df" == chr(0xbB) + chr(0x9dF)
+    assert "\xD9" == chr(0xD9) == "\N{Latin capital letter u with grave}" == "Ù"
+    assert "\u0D9e" == chr(0xD9E) == "\N{sinhala LETTER Kantaja nAAsIkyaya}" == "ඞ"
+    assert "\xBb\u09Df" == chr(0xbB) + chr(0x9dF) == "»য়"
     assert "\U0001f937" == "🤷"
     assert "a""b" == "ab"
     assert "a"

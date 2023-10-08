@@ -132,7 +132,7 @@ class Lexer:
                         return [], InvalidSyntaxError(
                             num.pos_start, num.pos_end,
                             "expected int, get float.",
-                            origin_file="src.lexer.Lexer.make_tokens"
+                            origin_file="src.lexer.lexer.Lexer.make_tokens"
                         )
                     else:
                         tokens.append(Token(
@@ -267,7 +267,7 @@ class Lexer:
                 return [], IllegalCharError(
                     pos_start, self.pos.advance(),
                     f"'{char}' is an illegal character (U+{hex(ord(char))[2:].upper()}, {char_name})",
-                    origin_file="src.lexer.Lexer.make_tokens"
+                    origin_file="src.lexer.lexer.Lexer.make_tokens"
                 )
 
         # append the end of file
@@ -354,7 +354,7 @@ class Lexer:
                 self.advance()
                 if self.current_char != "=":
                     return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '^^^'.",
-                                                    "src.lexer.Lexer.make_pow")
+                                                    "src.lexer.lexer.Lexer.make_pow")
                 token_type = TT["XOREQ"]  # ^^^=
                 self.advance()
 
@@ -388,7 +388,7 @@ class Lexer:
             self.advance()
             if self.current_char != "=":
                 return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '||'.",
-                                                "src.lexer.Lexer.make_or")
+                                                "src.lexer.lexer.Lexer.make_or")
             token_type = TT["OREQ"]  # ||=
             self.advance()
 
@@ -410,7 +410,7 @@ class Lexer:
             self.advance()
             if self.current_char != "=":
                 return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '&&'.",
-                                                "src.lexer.Lexer.make_and")
+                                                "src.lexer.lexer.Lexer.make_and")
             token_type = TT["ANDEQ"]  # &&=
             self.advance()
 
@@ -424,10 +424,17 @@ class Lexer:
         else:
             other_quote = '"'
         pos_start = self.pos.copy()
+
         escape_character = False
         unicode_escape_character = False
+        unicode_char_name = False
+        bracket_expected = False
+
         unicode_ttl = 0
         unicode_str = ""
+        unicode_char_name_str = ""
+        unicode_char_name_exp_pos_start = self.pos.copy()
+
         self.advance()
 
         escape_characters = {  # \n is a back line, \t is a tab
@@ -435,7 +442,8 @@ class Lexer:
             't': '\t',
             'x': 'UNICODE2',
             'u': 'UNICODE4',
-            'U': 'UNICODE8'
+            'U': 'UNICODE8',
+            'N': 'UNICODE_CHAR_NAME'
         }
 
         # if self.current_char == quote, we have to stop looping because the str is closed
@@ -447,7 +455,7 @@ class Lexer:
                 return None, InvalidSyntaxError(
                     pos_start, pos_start.copy().advance(),
                     f"{other_quote}{quote}{other_quote} was never closed.",
-                    "src.lexer.Lexer.make_string"
+                    "src.lexer.lexer.Lexer.make_string"
                 )
             if unicode_escape_character:
                 unicode_ttl -= 1
@@ -462,6 +470,31 @@ class Lexer:
                     unicode_escape_character = False
                     string_ += chr(int(unicode_str, base=16))
                     unicode_str = ""
+            elif unicode_char_name:
+                if bracket_expected:
+                    if self.current_char != "{":
+                        return None, InvalidSyntaxError(
+                            unicode_char_name_exp_pos_start, self.pos.copy(),
+                            "'{' expected after '\\N'.",
+                            origin_file="src.lexer.lexer.Lexer.make_string"
+                        )
+                    self.advance()
+                    bracket_expected = False
+                    continue
+                if self.current_char == "}":
+                    unicode_char_name = False
+                    try:
+                        character = unicodedata.lookup(unicode_char_name_str)
+                    except KeyError as e:
+                        return None, InvalidSyntaxError(
+                            unicode_char_name_exp_pos_start, self.pos.copy(),
+                            str(e).replace('"', ''),  # There are quotes around the error message.
+                            origin_file="src.lexer.lexer.Lexer.make_string"
+                        )
+                    string_ += character
+                    self.advance()
+                    continue
+                unicode_char_name_str += self.current_char
             elif escape_character:  # if the last char is \, we check for escape sequence
                 character = escape_characters.get(self.current_char, self.current_char)
                 if character == "UNICODE2":
@@ -476,6 +509,11 @@ class Lexer:
                     unicode_ttl = 8
                     unicode_escape_character = True
                     unicode_str = ""
+                elif character == "UNICODE_CHAR_NAME":
+                    unicode_char_name = True
+                    bracket_expected = True
+                    unicode_char_name_str = ""
+                    unicode_char_name_exp_pos_start = self.pos.copy()
                 else:
                     string_ += character
                 # the arg is doubled: if self.current_char is not a valid escape_sequence, we get self.current_char as
@@ -488,9 +526,21 @@ class Lexer:
             self.advance()  # we advance
 
         if unicode_escape_character:
+            if bracket_expected:
+                return None, InvalidSyntaxError(
+                    unicode_char_name_exp_pos_start, self.pos.copy(),
+                    "'{' expected after '\\N'.",
+                    origin_file="src.lexer.lexer.Lexer.make_string"
+                )
             return None, InvalidSyntaxError(
                 pos_start, self.pos,
-                "please provide valid unicode codepoint (len 4 after \\u, len 2 after \\x).",
+                f"please provide valid unicode codepoint (missing {unicode_ttl} hexadecimal digits).",
+                origin_file="src.lexer.lexer.Lexer.make_string"
+            )
+        if unicode_char_name:
+            return None, InvalidSyntaxError(
+                pos_start, self.pos,
+                "'\\N{' expression never closed.",
                 origin_file="src.lexer.lexer.Lexer.make_string"
             )
 
@@ -528,7 +578,7 @@ class Lexer:
                 if dot_count == 1:  # if we already encountered a dot
                     return None, InvalidSyntaxError(self.pos, self.pos.copy().advance(),
                                                     "a number can't have more than one dot.",
-                                                    "src.lexer.Lexer.make_number")
+                                                    "src.lexer.lexer.Lexer.make_number")
                 dot_count += 1
                 num_str += '.'
             elif self.current_char == '_':  # you can write 5_371_281 instead of 5371281
@@ -545,7 +595,7 @@ class Lexer:
             return None, InvalidSyntaxError(
                 self.pos, self.pos.copy().advance(),
                 f"invalid digit for base {base[mode]}: {self.current_char}",
-                "src.lexer.Lexer.make_number"
+                "src.lexer.lexer.Lexer.make_number"
             )
 
         if num_str == '.':
@@ -555,7 +605,7 @@ class Lexer:
             return None, InvalidSyntaxError(
                 pos_start, self.pos,
                 "can not make a number with this expression.",
-                "src.lexer.Lexer.make_number"
+                "src.lexer.lexer.Lexer.make_number"
             )
 
         if _0prefixes and num_str == '0':
@@ -602,14 +652,14 @@ class Lexer:
             self.advance()
             if self.current_char != '>':
                 return None, InvalidSyntaxError(pos_start, self.pos, "expected '!>>', but got '!>'.",
-                                                "src.lexer.Lexer.make_not_equals")
+                                                "src.lexer.lexer.Lexer.make_not_equals")
             # !>>
             self.advance()
             return Token(TT["TO_AND_OVERWRITE"], pos_start=pos_start, pos_end=self.pos), None
 
         self.advance()
         return None, InvalidSyntaxError(pos_start, self.pos, "expected '!=' or '!>>', but got '!'.",
-                                        "src.lexer.Lexer.make_not_equals")
+                                        "src.lexer.lexer.Lexer.make_not_equals")
 
     def make_equals(self):
         """Make = , == or ===
@@ -652,7 +702,7 @@ class Lexer:
                     pos_start,
                     self.pos,
                     f"expected '=' after '<<', got '{self.current_char}'.",
-                    "src.lexer.Lexer.make_less_than"
+                    "src.lexer.lexer.Lexer.make_less_than"
                 )
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None

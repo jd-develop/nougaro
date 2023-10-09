@@ -491,7 +491,7 @@ def test_nougaro(print_OK)
     # system_call
     print("Here it should print “hello”:")
     system_call("echo hello")
-    print("If it didn't work, please open an issue on the GitHub.")
+    print("If it didn't work, please open an issue on GitHub.")
     print()
 
     # everything is fine in this file

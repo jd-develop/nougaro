@@ -52,6 +52,7 @@ print("this is a string quoted by \".")
 print("You can put\nbacklines and\n\ttabs.")
 print("You can add \\ backslashes and \" \' quotes")
 print("\u0D9E and \xD9 are unicode chars U+D9E and U+D9")
+print("\N{sinhala letter kantaja naasikyaya} is sus")  # sus
 
 print("You can add up and multiply strings: " + 3*some_text)
 print()

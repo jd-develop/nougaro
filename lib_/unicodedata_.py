@@ -231,7 +231,7 @@ class UnicodeData(ModuleFunction):
         if is_valid_form_and_uni_str is not None:
             return is_valid_form_and_uni_str
 
-        return RTResult().success(unicodedata.normalize(form.value, uni_str.value))
+        return RTResult().success(String(unicodedata.normalize(form.value, uni_str.value)))
 
     execute_unicodedata_normalize.param_names = ['form', 'uni_str']
     execute_unicodedata_normalize.optional_params = []
@@ -248,7 +248,7 @@ class UnicodeData(ModuleFunction):
         if is_valid_form_and_uni_str is not None:
             return is_valid_form_and_uni_str
 
-        return RTResult().success(unicodedata.is_normalized(form.value, uni_str.value))
+        return RTResult().success(Number(int(unicodedata.is_normalized(form.value, uni_str.value))))
 
     execute_unicodedata_is_normalized.param_names = ['form', 'uni_str']
     execute_unicodedata_is_normalized.optional_params = []

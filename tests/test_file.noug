@@ -477,7 +477,15 @@ def test_nougaro(print_OK)
     assert unicodedata.east_asian_width("a") == "Na"
     assert unicodedata.mirrored("(")
     assert not unicodedata.mirrored("ề")
-    # todo: tests for decomposition, normalize, is_normalized
+    assert unicodedata.decomposition("ê") == "0065 0302"
+    assert unicodedata.decomposition("e") == ""
+    assert unicodedata.decomposition("ề") == "00EA 0300"
+    assert "ềtre ou ne pas être" == unicodedata.normalize("NFC","ềtre ou ne pas être")
+    assert "ềtre ou ne pas être" == unicodedata.normalize("NFKC","ềtre ou ne pas être")
+    assert "ềtre ou ne pas être" != unicodedata.normalize("NFD","ềtre ou ne pas être")
+    assert "ềtre ou ne pas être" != unicodedata.normalize("NFKD","ềtre ou ne pas être")
+    assert unicodedata.is_normalized("NFD", unicodedata.normalize("NFKD","ềtre ou ne pas être"))
+    assert not unicodedata.is_normalized("NFC", unicodedata.normalize("NFKD","ềtre ou ne pas être"))
     assert split(unicodedata.unicodedata_version, ".")(0) in ["14", "13", "15"]  # depends on python version
 
     # system_call

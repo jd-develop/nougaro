@@ -14,6 +14,7 @@
 * [X] add '\xXX' and '\uXXXX' support
 * [X] add '\UXXXXXXXX'
 * [X] add '\N{UNICODE CHARACTER NAME}'
+* [ ] add `startswith` and `endswith`
 * [ ] add possibility to import files in current folder and sub-folders
 * [ ] add `var++`, `var#` and `var--`
 * [ ] add possibility to read command line arguments
@@ -33,7 +34,7 @@
 * [ ] add `socket`
 * [ ] add `requests`
 * [ ] add `webbrowser`
-* [ ] add `unicodedata` (in progress)
+* [X] add `unicodedata`
 
 ## 0.19 beta (goal: july 2024)
 * [ ] add unit tests

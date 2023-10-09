@@ -132,6 +132,8 @@ def test_nougaro(print_OK)
     assert not (True xor True)
     assert not False
     assert True or 1/0
+    import debug
+    assert not 10 == debug and 10 != debug and not debug == 10 and debug != 10
     assert not (False and 1/0)
     var a = 1
     assert (is_int(a) and round(a)) == True
@@ -248,6 +250,22 @@ def test_nougaro(print_OK)
     assert is_str("abc")
     assert is_list([1, 2, 3])
     assert is_func(is_func)
+    assert is_func(def()->null)
+
+    assert is_int(debug.is_debug_enabled)
+    assert is_num(debug.is_debug_enabled)
+    assert is_int(debug.should_print_context)
+    assert is_num(debug.should_print_context)
+
+    assert is_func(debug.enable_all)
+    assert is_func(debug.disable_all)
+    assert is_func(debug.debug_mode_enable)
+    assert is_func(debug.enable)
+    assert is_func(debug.debug_mode_disable)
+    assert is_func(debug.disable)
+    assert is_func(debug.print_context)
+    assert is_func(debug.stop_print_context)
+
     assert is_func(def()->null)
     assert is_none(None)
 
@@ -446,11 +464,21 @@ def test_nougaro(print_OK)
     # unicodedata
     import unicodedata
     assert unicodedata.name("\N{shrug}") == "SHRUG"
-    assert unicodedata.name("\uEEEE", 10) == 10  # != unicodedata  # todo: fix this bug
+    assert unicodedata.name("\uEEEE", 10) == 10 != unicodedata
     assert unicodedata.lookup("latin small letter c with cedilla") == "\ç" == "ç" == \
         "\N{latin small letter c with cedilla}"
     assert unicodedata.category("1") == "Nd"
     assert unicodedata.category("ç") == "Ll"
+    assert unicodedata.bidirectional("\u0660") == "AN"  # Arabic Number
+    assert unicodedata.combining("a") == 0
+    assert unicodedata.combining("\u0334") == 1
+    assert unicodedata.combining("\u302A") == 218
+    assert unicodedata.east_asian_width("\u20A9") == "H"
+    assert unicodedata.east_asian_width("a") == "Na"
+    assert unicodedata.mirrored("(")
+    assert not unicodedata.mirrored("ề")
+    # todo: tests for decomposition, normalize, is_normalized
+    assert split(unicodedata.unicodedata_version, ".")(0) in ["14", "13", "15"]  # depends on python version
 
     # system_call
     print("Here it should print “hello”:")

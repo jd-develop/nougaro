@@ -19,6 +19,8 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import unicodedata
 
+UNICODEDATA_VERSION = unicodedata.unidata_version
+
 
 class UnicodeData(ModuleFunction):
     """ unicodedata module """
@@ -29,6 +31,47 @@ class UnicodeData(ModuleFunction):
         """Return a copy of self"""
         copy = UnicodeData(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
+
+    @staticmethod
+    def is_unicode_char(char: Value, exec_ctx: Context, function: str) -> RTResult | None:
+        if not isinstance(char, String):
+            return RTResult().failure(RTTypeErrorF(
+                char.pos_start, char.pos_end,
+                "first", f"unicodedata.{function}", "str", char, exec_ctx,
+                origin_file=f"lib_.unicodedata_.UnicodeData.is_unicode_char"
+            ))
+        if len(char) != 1:
+            return RTResult().failure(RunTimeError(
+                char.pos_start, char.pos_end,
+                f"first argument of function unicodedata.{function} should be only one unicode character, not "
+                f"{len(char)}.",
+                exec_ctx,
+                origin_file=f"lib_.unicodedata_.UnicodeData.is_unicode_char"
+            ))
+        return None
+
+    @staticmethod
+    def is_valid_form_and_uni_str(form: Value, uni_str: Value, exec_ctx: Context, function: str) -> RTResult | None:
+        if not isinstance(form, String):
+            return RTResult().failure(RTTypeErrorF(
+                form.pos_start, form.pos_end,
+                "first", f"unicodedata.{function}", "str", form, exec_ctx,
+                origin_file="lib_.unicodedata_.UnicodeData.is_valid_form_and_uni_str"
+            ))
+        if form.value not in ["NFC", "NFKC", "NFD", "NFKD"]:
+            return RTResult().failure(RunTimeError(
+                form.pos_start, form.pos_end,
+                f"first argument of builtin function unicodedata.{function} should be 'NFC', 'NFKC', 'NFD' or 'NFKD', "
+                f"not '{form.value}'.",
+                exec_ctx, origin_file="lib_.unicodedata_.UnicodeData.is_valid_form_and_uni_str"
+            ))
+        if not isinstance(uni_str, String):
+            return RTResult().failure(RTTypeErrorF(
+                uni_str.pos_start, uni_str.pos_end,
+                "second", f"unicodedata.{function}", "str", uni_str, exec_ctx,
+                origin_file="lib_.unicodedata_.UnicodeData.is_valid_form_and_uni_str"
+            ))
+        return None
 
     # =========
     # FUNCTIONS
@@ -64,19 +107,10 @@ class UnicodeData(ModuleFunction):
         # Params:
         # * char
         char = exec_ctx.symbol_table.getf("char")
-        if not isinstance(char, String):
-            return RTResult().failure(RTTypeErrorF(
-                char.pos_start, char.pos_end,
-                "first", "unicodedata.name", "str", char, exec_ctx,
-                origin_file="lib_.unicodedata_.UnicodeData.execute_unicodedata_name"
-            ))
-        if len(char) != 1:
-            return RTResult().failure(RunTimeError(
-                char.pos_start, char.pos_end,
-                f"first argument of function unicodedata.name should be only one unicode character, not {len(char)}.",
-                exec_ctx,
-                origin_file="lib_.unicodedata_.UnicodeData.execute_unicodedata_name"
-            ))
+        is_unicode_char = self.is_unicode_char(char, exec_ctx, "name")
+        if is_unicode_char is not None:
+            return is_unicode_char
+
         default = exec_ctx.symbol_table.getf("default")
 
         try:
@@ -101,19 +135,9 @@ class UnicodeData(ModuleFunction):
         # Params:
         # * char
         char = exec_ctx.symbol_table.getf("char")
-        if not isinstance(char, String):
-            return RTResult().failure(RTTypeErrorF(
-                char.pos_start, char.pos_end,
-                "first", "unicodedata.category", "str", char, exec_ctx,
-                origin_file="lib_.unicodedata_.UnicodeData.execute_unicodedata_category"
-            ))
-        if len(char) != 1:
-            return RTResult().failure(RunTimeError(
-                char.pos_start, char.pos_end,
-                f"first argument of function unicodedata.category should be only one unicode character, not {len(char)}.",
-                exec_ctx,
-                origin_file="lib_.unicodedata_.UnicodeData.execute_unicodedata_category"
-            ))
+        is_unicode_char = self.is_unicode_char(char, exec_ctx, "category")
+        if is_unicode_char is not None:
+            return is_unicode_char
 
         return RTResult().success(String(unicodedata.category(char.value)))
 
@@ -121,12 +145,128 @@ class UnicodeData(ModuleFunction):
     execute_unicodedata_category.optional_params = []
     execute_unicodedata_category.should_respect_args_number = True
 
-    # todo: add others functions
+    def execute_unicodedata_bidirectional(self, exec_ctx: Context):
+        """ Like python unicodedata.bidirectional """
+        # Params:
+        # * char
+        char = exec_ctx.symbol_table.getf("char")
+        is_unicode_char = self.is_unicode_char(char, exec_ctx, "bidirectional")
+        if is_unicode_char is not None:
+            return is_unicode_char
+
+        return RTResult().success(String(unicodedata.bidirectional(char.value)))
+
+    execute_unicodedata_bidirectional.param_names = ['char']
+    execute_unicodedata_bidirectional.optional_params = []
+    execute_unicodedata_bidirectional.should_respect_args_number = True
+
+    def execute_unicodedata_combining(self, exec_ctx: Context):
+        """ Like python unicodedata.combining """
+        # Params:
+        # * char
+        char = exec_ctx.symbol_table.getf("char")
+        is_unicode_char = self.is_unicode_char(char, exec_ctx, "combining")
+        if is_unicode_char is not None:
+            return is_unicode_char
+
+        return RTResult().success(Number(unicodedata.combining(char.value)))
+
+    execute_unicodedata_combining.param_names = ['char']
+    execute_unicodedata_combining.optional_params = []
+    execute_unicodedata_combining.should_respect_args_number = True
+
+    def execute_unicodedata_east_asian_width(self, exec_ctx: Context):
+        """ Like python unicodedata.east_asian_width """
+        # Params:
+        # * char
+        char = exec_ctx.symbol_table.getf("char")
+        is_unicode_char = self.is_unicode_char(char, exec_ctx, "east_asian_width")
+        if is_unicode_char is not None:
+            return is_unicode_char
+
+        return RTResult().success(String(unicodedata.east_asian_width(char.value)))
+
+    execute_unicodedata_east_asian_width.param_names = ['char']
+    execute_unicodedata_east_asian_width.optional_params = []
+    execute_unicodedata_east_asian_width.should_respect_args_number = True
+
+    def execute_unicodedata_mirrored(self, exec_ctx: Context):
+        """ Like python unicodedata.mirrored """
+        # Params:
+        # * char
+        char = exec_ctx.symbol_table.getf("char")
+        is_unicode_char = self.is_unicode_char(char, exec_ctx, "mirrored")
+        if is_unicode_char is not None:
+            return is_unicode_char
+
+        return RTResult().success(Number(unicodedata.mirrored(char.value)))
+
+    execute_unicodedata_mirrored.param_names = ['char']
+    execute_unicodedata_mirrored.optional_params = []
+    execute_unicodedata_mirrored.should_respect_args_number = True
+
+    def execute_unicodedata_decomposition(self, exec_ctx: Context):
+        """ Like python unicodedata.decomposition """
+        # Params:
+        # * char
+        char = exec_ctx.symbol_table.getf("char")
+        is_unicode_char = self.is_unicode_char(char, exec_ctx, "decomposition")
+        if is_unicode_char is not None:
+            return is_unicode_char
+
+        return RTResult().success(String(unicodedata.decomposition(char.value)))
+
+    execute_unicodedata_decomposition.param_names = ['char']
+    execute_unicodedata_decomposition.optional_params = []
+    execute_unicodedata_decomposition.should_respect_args_number = True
+
+    def execute_unicodedata_normalize(self, exec_ctx: Context):
+        """ Like python unicodedata.normalize """
+        # Params:
+        # * form
+        # * uni_str
+        form = exec_ctx.symbol_table.getf("form")
+        uni_str = exec_ctx.symbol_table.getf("uni_str")
+        is_valid_form_and_uni_str = self.is_valid_form_and_uni_str(form, uni_str, exec_ctx, "normalize")
+        if is_valid_form_and_uni_str is not None:
+            return is_valid_form_and_uni_str
+
+        return RTResult().success(unicodedata.normalize(form.value, uni_str.value))
+
+    execute_unicodedata_normalize.param_names = ['form', 'uni_str']
+    execute_unicodedata_normalize.optional_params = []
+    execute_unicodedata_normalize.should_respect_args_number = True
+
+    def execute_unicodedata_is_normalized(self, exec_ctx: Context):
+        """ Like python unicodedata.is_normalized """
+        # Params:
+        # * form
+        # * uni_str
+        form = exec_ctx.symbol_table.getf("form")
+        uni_str = exec_ctx.symbol_table.getf("uni_str")
+        is_valid_form_and_uni_str = self.is_valid_form_and_uni_str(form, uni_str, exec_ctx, "is_normalized")
+        if is_valid_form_and_uni_str is not None:
+            return is_valid_form_and_uni_str
+
+        return RTResult().success(unicodedata.is_normalized(form.value, uni_str.value))
+
+    execute_unicodedata_is_normalized.param_names = ['form', 'uni_str']
+    execute_unicodedata_is_normalized.optional_params = []
+    execute_unicodedata_is_normalized.should_respect_args_number = True
 
 
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported
+    # constants
+    "unicodedata_version": String(UNICODEDATA_VERSION),
     # functions
     "lookup": UnicodeData("lookup"),
     "name": UnicodeData("name"),
-    "category": UnicodeData("category")
+    "category": UnicodeData("category"),
+    "bidirectional": UnicodeData("bidirectional"),
+    "combining": UnicodeData("combining"),
+    "east_asian_width": UnicodeData("east_asian_width"),
+    "mirrored": UnicodeData("mirrored"),
+    "decomposition": UnicodeData("decomposition"),
+    "normalize": UnicodeData("normalize"),
+    "is_normalized": UnicodeData("is_normalized")
 }

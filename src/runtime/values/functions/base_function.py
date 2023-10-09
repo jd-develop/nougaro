@@ -10,6 +10,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.runtime.values.basevalues.value import Value
+from src.runtime.values.number_constants import TRUE, FALSE
 from src.runtime.runtime_result import RTResult
 from src.errors.errors import RunTimeError
 from src.runtime.context import Context
@@ -120,3 +121,9 @@ class BaseFunction(Value):
             return result
         self.populate_args(param_names, args, exec_context, optional_params, should_respect_args_number)
         return result.success(None)
+
+    def get_comparison_eq(self, other):
+        return FALSE.copy().set_context(self.context), None
+
+    def get_comparison_ne(self, other):
+        return TRUE.copy().set_context(self.context), None

@@ -95,9 +95,22 @@ class String(Value):
         return Number(int(is_ne)), None
 
     def get_comparison_gt(self, other): return Number.FALSE.copy().set_context(self.context), None
-    def get_comparison_gte(self, other): return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_gte(self, other):
+        is_eq = bool(self.get_comparison_eq(other)[0].value)
+        if is_eq:
+            return Number.TRUE.copy().set_context(self.context), None
+        else:
+            return Number.FALSE.copy().set_context(self.context), None
+
     def get_comparison_lt(self, other): return Number.FALSE.copy().set_context(self.context), None
-    def get_comparison_lte(self, other): return Number.FALSE.copy().set_context(self.context), None
+
+    def get_comparison_lte(self, other):
+        is_eq = bool(self.get_comparison_eq(other)[0].value)
+        if is_eq:
+            return Number.TRUE.copy().set_context(self.context), None
+        else:
+            return Number.FALSE.copy().set_context(self.context), None
 
     def and_(self, other: Value):
         return Number(int(self.is_true() and other.is_true())), None
@@ -251,13 +264,21 @@ class Number(Value):
         if isinstance(other, Number):
             return Number(int(self.value <= other.value)).set_context(self.context), None
         else:
-            return Number.FALSE.copy().set_context(self.context), None
+            is_eq = bool(self.get_comparison_eq(other)[0].value)
+            if is_eq:
+                return Number.TRUE.copy().set_context(self.context), None
+            else:
+                return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_gte(self, other):
         if isinstance(other, Number):
             return Number(int(self.value >= other.value)).set_context(self.context), None
         else:
-            return Number.FALSE.copy().set_context(self.context), None
+            is_eq = bool(self.get_comparison_eq(other)[0].value)
+            if is_eq:
+                return Number.TRUE.copy().set_context(self.context), None
+            else:
+                return Number.FALSE.copy().set_context(self.context), None
 
     def and_(self, other: Value):
         return Number(int(self.is_true() and other.is_true())), None
@@ -486,12 +507,16 @@ class List(Value):
         return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_gte(self, other):
+        if self.is_eq(other):
+            return Number.TRUE.copy().set_context(self.context), None
         return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_lt(self, other):
         return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_lte(self, other):
+        if self.is_eq(other):
+            return Number.TRUE.copy().set_context(self.context), None
         return Number.FALSE.copy().set_context(self.context), None
 
     def and_(self, other: Value):
@@ -559,12 +584,16 @@ class Module(Value):
         return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_gte(self, other):
+        if self.is_eq(other):
+            return Number.TRUE.copy().set_context(self.context), None
         return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_lt(self, other):
         return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_lte(self, other):
+        if self.is_eq(other):
+            return Number.TRUE.copy().set_context(self.context), None
         return Number.FALSE.copy().set_context(self.context), None
 
     def and_(self, other: Value):
@@ -732,12 +761,16 @@ class NoneValue(Value):
         return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_gte(self, other):
+        if isinstance(other, NoneValue):
+            return Number.TRUE.copy().set_context(self.context), None
         return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_lt(self, other):
         return Number.FALSE.copy().set_context(self.context), None
 
     def get_comparison_lte(self, other):
+        if isinstance(other, NoneValue):
+            return Number.TRUE.copy().set_context(self.context), None
         return Number.FALSE.copy().set_context(self.context), None
 
     def and_(self, other: Value):

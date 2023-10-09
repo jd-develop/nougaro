@@ -127,3 +127,9 @@ class BaseFunction(Value):
 
     def get_comparison_ne(self, other):
         return TRUE.copy().set_context(self.context), None
+
+    def get_comparison_gte(self, other):
+        return FALSE.copy().set_context(self.context), None
+
+    def get_comparison_lte(self, other):
+        return FALSE.copy().set_context(self.context), None

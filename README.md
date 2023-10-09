@@ -22,6 +22,8 @@
  
  Supports Python 3.11
 
+ Didn’t test in Python 3.12.
+
 ## French description
  Un langage de programmation. Interpréteur écrit en Python.
 
@@ -41,6 +43,8 @@
  Minimum : Python 3.10
  
  Prend en charge Python 3.11
+
+ Non testé sous Python 3.12
 
 # Documentation
  Please refer to the [wiki](https://github.com/jd-develop/nougaro/wiki/) for documentation.

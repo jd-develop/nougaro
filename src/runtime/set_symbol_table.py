@@ -78,6 +78,8 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("lower", BuiltInFunction('lower'))
     symbol_table.set("ord", BuiltInFunction('ord'))
     symbol_table.set("chr", BuiltInFunction('chr'))
+    symbol_table.set("startswith", BuiltInFunction('startswith'))
+    symbol_table.set("endswith", BuiltInFunction('endswith'))
 
     # Hum...
     symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))

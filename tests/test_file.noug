@@ -284,6 +284,10 @@ def test_nougaro(print_OK)
     assert split("lorem ipsum dolor sit amet", 'o') == ["l", "rem ipsum d", "l", "r sit amet"]
     assert split("lorem ipsum, dolor sit amet", ',') == ["lorem ipsum", " dolor sit amet"]
     assert len("lorem ipsum dolor sit amet") == 26
+    assert startswith("bépo", "bé")
+    assert not startswith("bépo", "po")
+    assert endswith("bépo", "po")
+    assert not endswith("bépo", "bé")
 
     if print_OK then print("OK builtin funcs 5")
 

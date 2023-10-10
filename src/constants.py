@@ -69,7 +69,9 @@ BUILTIN_FUNCTIONS = [
     "__is_keyword__",
     "__is_valid_token_type__",
     "sort",
-    "reverse"
+    "reverse",
+    "endswith",
+    "startswith"
 ]
 PROTECTED_VARS = [  # finally, the list with all the names that can't be defined by the user
     "null",

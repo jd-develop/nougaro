@@ -1536,4 +1536,56 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_reverse.optional_params = []
     execute_reverse.should_respect_args_number = True
 
+    def execute_startswith(self, exec_ctx: Context):
+        """Check if a str starts with some other str"""
+        str_ = exec_ctx.symbol_table.getf("str_")
+        if not isinstance(str_, String):
+            return RTResult().failure(RTTypeErrorF(
+                str_.pos_start, str_.pos_end,
+                "first", "startswith", "str", str_,
+                exec_ctx,
+                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_startswith"
+            ))
+
+        startswith = exec_ctx.symbol_table.getf("startswith")
+        if not isinstance(startswith, String):
+            return RTResult().failure(RTTypeErrorF(
+                startswith.pos_start, startswith.pos_end,
+                "second", "startswith", "str", startswith,
+                exec_ctx,
+                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_startswith"
+            ))
+
+        return RTResult().success(Number(int(str_.value.startswith(startswith.value))))
+
+    execute_startswith.param_names = ["str_", "startswith"]
+    execute_startswith.optional_params = []
+    execute_startswith.should_respect_args_number = True
+
+    def execute_endswith(self, exec_ctx: Context):
+        """Check if a str ends with some other str"""
+        str_ = exec_ctx.symbol_table.getf("str_")
+        if not isinstance(str_, String):
+            return RTResult().failure(RTTypeErrorF(
+                str_.pos_start, str_.pos_end,
+                "first", "endswith", "str", str_,
+                exec_ctx,
+                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_endswith"
+            ))
+
+        endswith = exec_ctx.symbol_table.getf("endswith")
+        if not isinstance(endswith, String):
+            return RTResult().failure(RTTypeErrorF(
+                endswith.pos_start, endswith.pos_end,
+                "second", "endswith", "str", endswith,
+                exec_ctx,
+                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_endswith"
+            ))
+
+        return RTResult().success(Number(int(str_.value.endswith(endswith.value))))
+
+    execute_endswith.param_names = ["str_", "endswith"]
+    execute_endswith.optional_params = []
+    execute_endswith.should_respect_args_number = True
+
     # ==================

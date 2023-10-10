@@ -2,25 +2,26 @@
 <!-- check mark character: ✅ -->
 
 ## 0.15 beta (goal: october 20th, 2023)
-* [X] add `var id.attr = value`
-* [X] fix bug where `this` is not defined in classes
-* [X] fix bug where methods are of type `functions`
-* [X] fix bug where global vars are not accessible in methods
+* [X] add `var id.attr = value` (finished 4/10/23)
+* [X] fix bug where `this` is not defined in classes (finished 6/10/23)
+* [X] fix bug where methods are of type `functions` (finished 6/10/23)
+* [X] fix bug where global vars are not accessible in methods (finished 6/10/23)
 * [ ] add class inheritance
-* [X] add an error when things like `math.(assert 1)`
-* [X] add `time.time()`
+* [X] add an error when things like `math.(assert 1)` (finished 3/10/23)
+* [X] add `time.time()` (finished 3/10/23)
 
-## 0.16 beta (goal: december 2024)
-* [X] add '\xXX' and '\uXXXX' support
-* [X] add '\UXXXXXXXX'
-* [X] add '\N{UNICODE CHARACTER NAME}'
-* [ ] add `startswith` and `endswith`
+## 0.16 beta (goal: december 2023)
+* [X] add '\xXX' and '\uXXXX' support (finished 6/10/23)
+* [X] add '\UXXXXXXXX' (finished 8/10/23)
+* [X] add '\N{UNICODE CHARACTER NAME}' (finished 8/10/23)
+* [X] add `startswith` and `endswith` (finished 10/10/23)
 * [ ] add possibility to import files in current folder and sub-folders
 * [ ] add `var++`, `var#` and `var--`
 * [ ] add possibility to read command line arguments
 * [ ] add optional arguments in functions
 
 ## 0.17 beta (goal: february 2024)
+* [ ] add `import ... as ...`
 * [ ] rewrite parser to make it faster and easier to read
 * [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
 * [ ] add builtin classes
@@ -34,7 +35,7 @@
 * [ ] add `socket`
 * [ ] add `requests`
 * [ ] add `webbrowser`
-* [X] add `unicodedata`
+* [X] add `unicodedata` (finished 9/10/23)
 
 ## 0.19 beta (goal: july 2024)
 * [ ] add unit tests

@@ -564,6 +564,8 @@ class Lexer:
         """Make number, int or float"""
         num_str = ''
         dot_count = 0  # we can't have more than one dot, so we count them
+        last_was_dot = False
+        last_was_underscore = False
         pos_start = self.pos.copy()
 
         if self.current_char == '+':
@@ -575,6 +577,11 @@ class Lexer:
         # if char is still a number or a dot
         while self.current_char is not None and self.current_char in digits + '_':
             if self.current_char == '.':  # if the char is a dot
+                last_was_dot = True
+                if last_was_underscore:
+                    return None, InvalidSyntaxError(self.pos, self.pos.copy().advance(),
+                                                    "invalid decimal literal",
+                                                    "src.lexer.lexer.Lexer.make_number")
                 if dot_count == 1:  # if we already encountered a dot
                     return None, InvalidSyntaxError(self.pos, self.pos.copy().advance(),
                                                     "a number can't have more than one dot.",
@@ -582,8 +589,11 @@ class Lexer:
                 dot_count += 1
                 num_str += '.'
             elif self.current_char == '_':  # you can write 5_371_281 instead of 5371281
-                pass
+                last_was_underscore = True
+                if last_was_dot:
+                    break
             else:
+                last_was_underscore = last_was_dot = False
                 num_str += self.current_char
             self.advance()  # we advance
 

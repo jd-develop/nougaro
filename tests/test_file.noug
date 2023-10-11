@@ -185,9 +185,9 @@ def test_nougaro(print_OK)
     if print_OK then print("OK call")
 
     # classes
-    ## definition
     var a = (class Test; var b5 = (class; var c = 2; end)(); end)()
     assert a.b5.c == 2
+
     var c = 12
     class Test2
         void()
@@ -199,6 +199,7 @@ def test_nougaro(print_OK)
         def method()
             void()
             assert this.test == 1
+            var this.test += 12  # this line SHOULD be deleted when the bug is fixed (todo)
             /* var this.test, c += 1, 1
             assert this.test == 2
             assert c == 13
@@ -206,11 +207,28 @@ def test_nougaro(print_OK)
             assert this.test == 13
             assert c == 2 */
         end
+
+        def method2()
+            assert this.test == 13
+        end
     end
 
     var d = Test2()
     d.method()
+    d.method2()
+    assert c == 12
     assert type(d.method) == "method"
+
+    class Test3(Test2)
+        def method()
+            return this.test
+        end
+
+        def foo()
+            return this.method() + 6
+        end
+    end
+    assert Test3().foo() == 7
 
     # builtin funcs
     print("Please test these builtin functions after the execution of the test:")

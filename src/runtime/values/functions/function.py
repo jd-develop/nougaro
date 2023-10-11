@@ -50,7 +50,7 @@ class Function(BaseFunction):
         if result.should_return():
             return result
 
-        # run the interpreter to the body node and check for errors
+        # run the body node with the interpreter and check for errors
         value = result.register(interpreter.visit(self.body_node, exec_context, methods_instead_of_funcs=False))
         if result.should_return() and result.function_return_value is None:
             return result

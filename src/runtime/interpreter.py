@@ -996,8 +996,14 @@ class Interpreter:
             args = []
             call_with_module_context: bool = value_to_call.call_with_module_context
 
-            obj_attrs = value_to_call.symbol_table.symbols.copy()
-            object_ = Object(obj_attrs, value_to_call).set_pos(value_to_call.pos_start, value_to_call.pos_end)
+            if value_to_call.parent is not None:
+                value_to_init = value_to_call.parent
+            else:
+                value_to_init = value_to_call
+
+            obj_attrs = value_to_init.symbol_table.symbols.copy()
+            object_ = Object(obj_attrs, value_to_init).set_pos(value_to_call.pos_start, value_to_call.pos_end)
+            object_.type_ = value_to_call.name
             if call_with_module_context:
                 inner_ctx = Context(value_to_call.name, value_to_call.module_context)
                 inner_ctx.symbol_table = SymbolTable(value_to_call.module_context.symbol_table)
@@ -1060,6 +1066,21 @@ class Interpreter:
                 if result.should_return():
                     return result
 
+            if value_to_call.parent is not None:
+                value_to_call_attrs: dict = value_to_call.symbol_table.symbols.copy()
+                for key in value_to_call_attrs.keys():
+                    if key == "__init__":
+                        return result.failure(RunTimeError(
+                            value_to_call_attrs[key].pos_start, value_to_call_attrs[key].pos_end,
+                            "please don't use '__init__' in child objects.",
+                            outer_context,
+                            origin_file=f"f{_ORIGIN_FILE}.visit_CallNode"
+                        ))
+                    new_value = value_to_call_attrs[key]
+                    if isinstance(new_value, Method):
+                        new_value.object_ = object_
+                    object_.attributes[key] = new_value
+
             return_value = object_.set_pos(node.pos_start, node.pos_end).set_context(outer_context)
             return result.success(return_value)
 
@@ -1069,7 +1090,7 @@ class Interpreter:
                 return result.failure(RunTimeError(
                     node.pos_start, node.pos_end,
                     f"please give at least one index.",
-                    outer_context, origin_file=f"{_ORIGIN_FILE}.Visit_CallNode"
+                    outer_context, origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
                 ))
 
             elif len(node.arg_nodes) == 1:  # there is only one index given

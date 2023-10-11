@@ -116,9 +116,10 @@ class Interpreter:
                 return result
             if len(node_or_list) != 1:
                 for node_ in node_or_list[1:]:
-                    new_ctx = Context(display_name=value.__repr__())
+                    new_ctx = Context(display_name=value.__repr__(), parent=context)
                     new_ctx.symbol_table = SymbolTable()
                     new_ctx.symbol_table.set_whole_table(value.attributes)
+                    new_ctx.symbol_table.parent = context.symbol_table
 
                     if not (isinstance(node_, VarAccessNode) or isinstance(node_, CallNode)):
                         return result.failure(RunTimeError(
@@ -469,9 +470,10 @@ class Interpreter:
                 value: Value
 
                 for node_or_tok in var_name[1:-1]:
-                    new_ctx = Context(display_name=value.__repr__())
+                    new_ctx = Context(display_name=value.__repr__(), parent=ctx)
                     new_ctx.symbol_table = SymbolTable()
                     new_ctx.symbol_table.set_whole_table(value.attributes)
+                    new_ctx.symbol_table.parent = ctx.symbol_table
 
                     if isinstance(node_or_tok, Token) and node_or_tok.type == TT["IDENTIFIER"]:
                         value = new_ctx.symbol_table.get(node_or_tok.value)
@@ -971,6 +973,8 @@ class Interpreter:
             elif isinstance(value_to_call, Method):
                 use_context = outer_context
                 outer_context.symbol_table.set("this", value_to_call.object_)
+                if outer_context.parent is not None:
+                    outer_context.symbol_table.parent = outer_context.parent.symbol_table
                 self.update_symbol_table(outer_context)
             else:
                 use_context = None

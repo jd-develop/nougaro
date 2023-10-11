@@ -199,13 +199,13 @@ def test_nougaro(print_OK)
         def method()
             void()
             assert this.test == 1
-            var this.test += 12  # this line SHOULD be deleted when the bug is fixed (todo)
-            /* var this.test, c += 1, 1
+            var c = c
+            var this.test, c += 1, 1
             assert this.test == 2
             assert c == 13
             var this.test, c = c, this.test
             assert this.test == 13
-            assert c == 2 */
+            assert c == 2
         end
 
         def method2()

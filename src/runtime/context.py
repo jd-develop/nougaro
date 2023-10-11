@@ -26,7 +26,6 @@ class Context:
         # ABOUT self.parent_entry_pos:
         # I actually don't know why there is a parent_entry_pos to every context, but there is no pos_start.
         # The entry pos seems to be the pos start of a context, but... Well, I don't know....
-        # TODO: find what tf is self.parent_entry_pos
         self.symbol_table: SymbolTable | None = None
         self.what_to_export: SymbolTable = SymbolTable()
 

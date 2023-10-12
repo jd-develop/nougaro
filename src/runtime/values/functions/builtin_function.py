@@ -437,15 +437,21 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         try:  # we try to pop the element
-            list_.elements.pop(index.value)
+            element = list_.elements.pop(index.value)
             list_.update_should_print()
         except IndexError:  # except if the index is out of range
+            if index.pos_end is not None:
+                error_pos_start = list_.pos_start
+                error_pos_end = index.pos_end
+            else:
+                error_pos_start = self.pos_start
+                error_pos_end = self.pos_end
             return RTResult().failure(RTIndexError(
-                list_.pos_start, index.pos_end,
+                error_pos_start, error_pos_end,
                 f'pop index {index.value} out of range.',
                 exec_context, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_pop"
             ))
-        return RTResult().success(list_)
+        return RTResult().success(element)
 
     execute_pop.param_names = ['list']
     execute_pop.optional_params = ['index']

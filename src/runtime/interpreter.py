@@ -1005,7 +1005,9 @@ class Interpreter:
             else:
                 value_to_init = value_to_call
 
-            obj_attrs = value_to_init.symbol_table.symbols.copy()
+            obj_attrs = dict()
+            for key in value_to_init.symbol_table.symbols:
+                obj_attrs[key] = value_to_init.symbol_table.symbols[key].copy()
             object_ = Object(obj_attrs, value_to_init).set_pos(value_to_call.pos_start, value_to_call.pos_end)
             object_.type_ = value_to_call.name
             if call_with_module_context:
@@ -1038,6 +1040,7 @@ class Interpreter:
 
             if HAS_INIT:
                 if not isinstance(init_func, BaseFunction):
+                    init_func: Value
                     return result.failure(RTTypeError(
                         init_func.pos_start, init_func.pos_end,
                         f"‘__init__’ should be a function, not ‘{init_func.type_}’.",

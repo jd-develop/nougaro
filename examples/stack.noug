@@ -1,0 +1,31 @@
+class Stack
+    var stack = []
+
+    def is_empty() -> len(this.stack) == 0
+
+    def push(value)
+        append(this.stack, value)
+    end
+
+    def getlast() -> this.stack(-1)
+    def pop_element() -> pop(this.stack)
+end
+
+
+def copy_stack(stack)
+    var temporary = Stack()
+    var copy = Stack()
+
+    while not stack.is_empty() then
+        var element = stack.pop_element()
+        temporary.push(element)
+    end
+
+    while not temporary.is_empty() then
+        var element = temporary.pop_element()
+        copy.push(element)
+        stack.push(element)
+    end
+
+    return copy
+end

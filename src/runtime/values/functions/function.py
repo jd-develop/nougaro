@@ -86,6 +86,9 @@ class Method(Function):
         self.type_ = "method"
         self.object_ = None
 
+    def __repr__(self):
+        return f'<method {self.name}>'
+
     def copy(self):
         """Return a copy of self"""
         copy = Method(self.name, self.body_node, self.param_names, self.should_auto_return,

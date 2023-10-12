@@ -29,3 +29,16 @@ def copy_stack(stack)
 
     return copy
 end
+
+
+def destructive_print(stack)
+    while not stack.is_empty() then
+        print(stack.pop_element())
+    end
+end
+
+
+def print_stack(stack)
+    var copy = copy_stack(stack)
+    destructive_print(copy)
+end

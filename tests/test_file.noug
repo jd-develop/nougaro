@@ -317,9 +317,9 @@ def test_nougaro(print_OK)
     if print_OK then print("OK builtin funcs 6")
 
     assert append(["lorem", "ipsum"], "dolor") == ["lorem", "ipsum", "dolor"]
-    assert pop(["lorem", "ipsum", "dolor", "sit", "amet"]) == ["lorem", "ipsum", "dolor", "sit"]
-    assert pop(["lorem", "ipsum", "dolor", "sit", "amet"], -1) == ["lorem", "ipsum", "dolor", "sit"]
-    assert pop(["lorem", "ipsum", "dolor", "sit", "amet"], 0) == ["ipsum", "dolor", "sit", "amet"]
+    assert pop(["lorem", "ipsum", "dolor", "sit", "amet"]) == "amet"
+    assert pop(["lorem", "ipsum", "dolor", "sit", "amet"], -1) == "amet"
+    assert pop(["lorem", "ipsum", "dolor", "sit", "amet"], 0) == "lorem"
     assert insert(["lorem", "ipsum"], "dolor") == append(["lorem", "ipsum"], "dolor")
     assert insert(["lorem", "ipsum", "sit", "amet"], "dolor", 2) == ["lorem", "ipsum", "dolor", "sit", "amet"]
     assert replace(["lorem", "ipsum", "azerty", "sit", "amet"], 2, "dolor") == ["lorem", "ipsum", "dolor", "sit", "amet"]
@@ -400,7 +400,7 @@ def test_nougaro(print_OK)
     assert [0, 1, 2, 3, 4](3, -4) == [3, 1]
     assert [1, 2, 'str'] - 0 == [2, 'str']
     assert [1, 2, 'str'] - -1 == [1, 2]
-    assert pop([1, 2, 'str'], 0) == [2, 'str']
+    assert pop([1, 2, 'str'], 0) == 1
 
     assert [1, 2, 3]
     assert not []

@@ -1007,7 +1007,11 @@ class Interpreter:
 
             obj_attrs = dict()
             for key in value_to_init.symbol_table.symbols:
-                obj_attrs[key] = value_to_init.symbol_table.symbols[key].copy()
+                value = value_to_init.symbol_table.symbols[key]
+                if isinstance(value, List):
+                    obj_attrs[key] = value.true_copy()
+                else:
+                    obj_attrs[key] = value.copy()
             object_ = Object(obj_attrs, value_to_init).set_pos(value_to_call.pos_start, value_to_call.pos_end)
             object_.type_ = value_to_call.name
             if call_with_module_context:

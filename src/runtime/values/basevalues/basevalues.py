@@ -547,6 +547,15 @@ class List(Value):
 
     def copy(self):
         """Return a copy of self"""
+        copy = List(self.elements)
+        copy.set_pos(self.pos_start, self.pos_end)
+        copy.set_context(self.context)
+        copy.module_context = self.module_context
+        copy.attributes = self.attributes.copy()
+        return copy
+
+    def true_copy(self):
+        """Return a copy of self where elements is also a copy"""
         copy = List(self.elements.copy())
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)

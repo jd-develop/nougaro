@@ -2,6 +2,8 @@
 
 <img src="repo-image.png" alt="Nougaro. A programming Language." width="700"/>
 
+This is Nougaro beta 0.15.
+
 ## English description
  A programming language. Interpreter written in Python.
  

@@ -10,7 +10,7 @@
 
 echo "WARNING: please execute this script ONLY in a safe environnement, like in a sandbox directory."
 echo "WARNING: this script may use Internet connection, and having an Internet connection is recommended. However, you can execute the script without any Internet connection."
-echo "INFO: it is recommended to test nougaro before building it. Run `sh run_tests.sh` to test it."
+echo "INFO: it is recommended to test nougaro before building it. Run 'sh run_tests.sh' to test it."
 read -p "Continue? [y/N] " -r c
 
 if [[ $c == [Yy] ]]; then

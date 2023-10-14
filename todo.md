@@ -6,7 +6,7 @@
 * [X] fix bug where `this` is not defined in classes (finished 6/10/23)
 * [X] fix bug where methods are of type `functions` (finished 6/10/23)
 * [X] fix bug where global vars are not accessible in methods (finished 6/10/23)
-* [X] add class inheritance (finished 11/10/23)
+* [X] add class inheritance (finished 11/10/23, fixed 14/10/23)
 * [X] add an error when things like `math.(assert 1)` (finished 3/10/23)
 * [X] add `time.time()` (finished 3/10/23)
 

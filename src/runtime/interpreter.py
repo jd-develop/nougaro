@@ -70,36 +70,41 @@ class Interpreter:
                    var_name: str,
                    ctx: Context,
                    result: RTResult,
-                   origin_file: str = f"{_ORIGIN_FILE}._undefined")\
+                   origin_file: str = f"{_ORIGIN_FILE}._undefined",
+                   edit: bool = False)\
             -> RTResult:
         """Returns a RTNotDefinedError with a proper message."""
         close_match_in_symbol_table = ctx.symbol_table.best_match(var_name, keywords=KEYWORDS)
         IS_NOUGARO_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{var_name}.noug"))
         IS_PYTHON_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{var_name}_.py"))
+        if edit:
+            err_msg = f"name '{var_name}' is not defined or is not editable in current scope."
+        else:
+            err_msg = f"name '{var_name}' is not defined."
 
         if ctx.symbol_table.exists(f'__{var_name}__'):
             # e.g. user entered `var foo += 1` instead of `var __foo__ += 1`
             return result.failure(RTNotDefinedError(
                 pos_start, pos_end,
-                f"name '{var_name}' is not defined. Did you mean '__{var_name}__'?",
+                f"{err_msg} Did you mean '__{var_name}__'?",
                 ctx, origin_file
             ))
         elif IS_NOUGARO_LIB or IS_PYTHON_LIB:
             return result.failure(RTNotDefinedError(
                 pos_start, pos_end,
-                f"name '{var_name}' is not defined. Maybe you forgot to import it?",
+                f"{err_msg} Maybe you forgot to import it?",
                 ctx, origin_file
             ))
         elif close_match_in_symbol_table is not None:
             return result.failure(RTNotDefinedError(
                 pos_start, pos_end,
-                f"name '{var_name}' is not defined. Did you mean '{close_match_in_symbol_table}'?",
+                f"{err_msg} Did you mean '{close_match_in_symbol_table}'?",
                 ctx, origin_file
             ))
         else:
             return result.failure(RTNotDefinedError(
                 pos_start, pos_end,
-                f"name '{var_name}' is not defined.",
+                err_msg,
                 ctx, origin_file
             ))
 
@@ -345,7 +350,7 @@ class Interpreter:
             else:
                 print(ctx)
                 print(
-                    f"NOUGARO INTERNAL ERROR : len(node.node) != 1 in {_ORIGIN_FILE}.visit_UnaryOpNode.\n"
+                    f"NOUGARO INTERNAL ERROR: len(node.node) != 1 in {_ORIGIN_FILE}.visit_UnaryOpNode.\n"
                     f"{node.node=}, {methods_instead_of_funcs=}\n"
                     f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
                     f"information above.")
@@ -480,7 +485,7 @@ class Interpreter:
                         if value is None:
                             return self._undefined(
                                 node_or_tok.pos_start, node_or_tok.pos_end, node_or_tok.value, new_ctx, result,
-                                origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
+                                origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
                             )
                     elif isinstance(var_name[0], Token):
                         if node_or_tok.type in TOKENS_TO_QUOTE:
@@ -594,7 +599,7 @@ class Interpreter:
                     final_value = values[i]
             else:  # variable does not exist
                 return self._undefined(node.pos_start, node.pos_end, final_var_name, ctx, result,
-                                       f"{_ORIGIN_FILE}.visit_VarAssignNode")
+                                       f"{_ORIGIN_FILE}.visit_VarAssignNode", edit=True)
 
             if error is not None:  # there is an error
                 error.set_pos(node.pos_start, node.pos_end)
@@ -1133,8 +1138,6 @@ class Interpreter:
 
     def _init_constructor(self, constructor, outer_context, result, node, object_to_set_this=None) -> RTResult:
         """Initialize a constructor. Recursive method."""
-        # todo finish
-
         call_with_module_context: bool = constructor.call_with_module_context
 
         obj_attrs = dict()

@@ -997,103 +997,15 @@ class Interpreter:
             return result.success(return_value)
 
         elif isinstance(value_to_call, Constructor):  # the value is an object constructor
-            args = []
-            call_with_module_context: bool = value_to_call.call_with_module_context
-
-            if value_to_call.parent is not None:
-                value_to_init = value_to_call.parent
-            else:
-                value_to_init = value_to_call
-
-            obj_attrs = dict()
-            for key in value_to_init.symbol_table.symbols:
-                value = value_to_init.symbol_table.symbols[key]
-                if isinstance(value, List):
-                    obj_attrs[key] = value.true_copy()
-                else:
-                    obj_attrs[key] = value.copy()
-            object_ = Object(obj_attrs, value_to_init).set_pos(value_to_call.pos_start, value_to_call.pos_end)
-            object_.type_ = value_to_call.name
-            if call_with_module_context:
-                inner_ctx = Context(value_to_call.name, value_to_call.module_context)
-                inner_ctx.symbol_table = SymbolTable(value_to_call.module_context.symbol_table)
-            else:
-                inner_ctx = Context(value_to_call.name, outer_context)
-                inner_ctx.symbol_table = SymbolTable(outer_context.symbol_table)
-
-            inner_ctx.symbol_table.set("this", object_)
-            self.update_symbol_table(inner_ctx)
-            object_.inner_context = inner_ctx
-            for attr in obj_attrs.keys():
-                if isinstance(obj_attrs[attr], Method):
-                    obj_attrs[attr].object_ = object_
-
-            if result.should_return():  # check for errors
-                return result
-
-            # call the __init__ function if it exists
-            init_func = obj_attrs.get("__init__")
-            HAS_INIT = init_func is not None
-            if not HAS_INIT and len(node.arg_nodes) != 0:
+            if len(node.arg_nodes) != 0:
                 return result.failure(RTTypeError(
                     node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
-                    f"{value_to_call.name}() takes no arguments.",
+                    f"instanciation takes no arguments.",
                     outer_context,
                     origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
                 ))
 
-            if HAS_INIT:
-                if not isinstance(init_func, BaseFunction):
-                    init_func: Value
-                    return result.failure(RTTypeError(
-                        init_func.pos_start, init_func.pos_end,
-                        f"‘__init__’ should be a function, not ‘{init_func.type_}’.",
-                        outer_context,
-                        origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
-                    ))
-                for arg_node, mul in node.arg_nodes:  # we check the arguments
-                    if not mul:
-                        args.append(result.register(self.visit(arg_node, outer_context, methods_instead_of_funcs)))
-                        if result.should_return():
-                            return result
-                        continue
-
-                    list_: Value = result.register(self.visit(arg_node, outer_context, methods_instead_of_funcs))
-                    if result.should_return():
-                        return result
-                    if not isinstance(list_, List):
-                        return result.failure(RTTypeError(
-                            list_.pos_start, list_.pos_end,
-                            f"expected a list value after '*', but got '{list_.type_}.",
-                            outer_context,
-                            origin_file=f"{_ORIGIN_FILE}.visit_CallNode"
-                        ))
-                    args.extend(list_.elements)
-
-                __init__value = result.register(init_func.execute(
-                    args, Interpreter, self.run, self.noug_dir,
-                    exec_from=f"{value_to_call.name} from {outer_context.display_name}",
-                    use_context=inner_ctx))
-                if result.should_return():
-                    return result
-
-            if value_to_call.parent is not None:
-                value_to_call_attrs: dict = value_to_call.symbol_table.symbols.copy()
-                for key in value_to_call_attrs.keys():
-                    if key == "__init__":
-                        return result.failure(RunTimeError(
-                            value_to_call_attrs[key].pos_start, value_to_call_attrs[key].pos_end,
-                            "please don't use '__init__' in child objects.",
-                            outer_context,
-                            origin_file=f"f{_ORIGIN_FILE}.visit_CallNode"
-                        ))
-                    new_value = value_to_call_attrs[key]
-                    if isinstance(new_value, Method):
-                        new_value.object_ = object_
-                    object_.attributes[key] = new_value
-
-            return_value = object_.set_pos(node.pos_start, node.pos_end).set_context(outer_context)
-            return result.success(return_value)
+            return self._init_constructor(value_to_call, outer_context, result, node)
 
         elif isinstance(value_to_call, List):  # the value is a list
             # get the element at the given index
@@ -1218,6 +1130,69 @@ class Interpreter:
             ))
 
     # todo: separate call methods
+
+    def _init_constructor(self, constructor, outer_context, result, node, object_to_set_this=None) -> RTResult:
+        """Initialize a constructor. Recursive method."""
+        # todo finish
+
+        call_with_module_context: bool = constructor.call_with_module_context
+
+        obj_attrs = dict()
+        for key in constructor.symbol_table.symbols:
+            value = constructor.symbol_table.symbols[key]
+            if isinstance(value, List):
+                obj_attrs[key] = value.true_copy()
+            else:
+                obj_attrs[key] = value.copy()
+        object_ = Object(obj_attrs, constructor).set_pos(constructor.pos_start, constructor.pos_end)
+        object_.type_ = constructor.name
+        if call_with_module_context:
+            inner_ctx = Context(constructor.name, constructor.module_context)
+            inner_ctx.symbol_table = SymbolTable(constructor.module_context.symbol_table)
+        else:
+            inner_ctx = Context(constructor.name, outer_context)
+            inner_ctx.symbol_table = SymbolTable(constructor.symbol_table)
+
+        if object_to_set_this is None:
+            inner_ctx.symbol_table.set("this", object_)
+        else:
+            inner_ctx.symbol_table.set("this", object_to_set_this)
+        self.update_symbol_table(inner_ctx)
+        object_.inner_context = inner_ctx
+        for attr in obj_attrs.keys():
+            if isinstance(obj_attrs[attr], Method):
+                if object_to_set_this is None:
+                    obj_attrs[attr].object_ = object_
+                else:
+                    obj_attrs[attr].object_ = object_to_set_this
+
+        if result.should_return():  # check for errors
+            return result
+
+        if constructor.parent is not None:
+            if object_to_set_this is None:
+                parent: Object = result.register(
+                    self._init_constructor(constructor.parent, outer_context, result, node, object_)
+                )
+            else:
+                parent: Object = result.register(
+                    self._init_constructor(constructor.parent, outer_context, result, node, object_to_set_this)
+                )
+            if result.should_return():
+                return result
+
+            constructor_attrs = constructor.symbol_table.symbols.copy()
+            for key in parent.attributes.keys():
+                if key in constructor_attrs.keys():
+                    new_value = constructor_attrs[key]
+                    if isinstance(new_value, Method):
+                        new_value.object_ = object_
+                    object_.attributes[key] = new_value
+                else:
+                    object_.attributes[key] = parent.attributes[key]
+
+        return_value = object_.set_pos(node.pos_start, node.pos_end).set_context(outer_context)
+        return result.success(return_value)
 
     def visit_ReturnNode(self, node: ReturnNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit ReturnNode"""

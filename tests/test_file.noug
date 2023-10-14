@@ -191,10 +191,8 @@ def test_nougaro(print_OK)
     var c = 12
     class Test2
         void()
-
-        def __init__()
-            var this.test = 1
-        end
+        var test = 1
+        var d = 6
 
         def method()
             void()
@@ -209,6 +207,8 @@ def test_nougaro(print_OK)
         end
 
         def method2()
+            print(this.test)
+            print(this)
             assert this.test == 13
         end
     end
@@ -220,6 +220,8 @@ def test_nougaro(print_OK)
     assert type(d.method) == "method"
 
     class Test3(Test2)
+        var b = 4
+
         def method()
             return this.test
         end
@@ -229,6 +231,19 @@ def test_nougaro(print_OK)
         end
     end
     assert Test3().foo() == 7
+
+    class Test4(Test3)
+        def bar()
+            assert this.d == 6
+            assert this.b == 4
+            assert this.foo() == 7
+            var this.test = this.foo()
+            var this.test += 6
+            this.method2()
+            return this.test - 13
+        end
+    end
+    assert Test4().bar() == 0
 
     # builtin funcs
     print("Please test these builtin functions after the execution of the test:")

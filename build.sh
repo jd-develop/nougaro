@@ -10,6 +10,7 @@
 
 echo "WARNING: please execute this script ONLY in a safe environnement, like in a sandbox directory."
 echo "WARNING: this script may use Internet connection, and having an Internet connection is recommended. However, you can execute the script without any Internet connection."
+echo "INFO: it is recommended to test nougaro before building it. Run `sh run_tests.sh` to test it."
 read -p "Continue? [y/N] " -r c
 
 if [[ $c == [Yy] ]]; then
@@ -33,7 +34,7 @@ if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
 
     python3 -m nuitka --standalone --include-package=lib_ shell.py
 
-    cp -r example.noug LICENSE README.md shell.py CODE_OF_CONDUCT.md how_it_works.md tests/test_file.noug examples lib_ src config shell.dist/
+    cp -r example.noug LICENSE README.md shell.py CODE_OF_CONDUCT.md CONTRIBUTING.md how_it_works.md tests/test_file.noug examples lib_ src config repo-image.png shell.dist/
 
     echo "Renaming and compressing…"
     mv shell.dist nougaro-"$nougversion"-"$nougphase"-linux-bin

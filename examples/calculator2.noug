@@ -1,0 +1,42 @@
+example("stack")
+
+def calc(str_)
+    var stack = Stack()
+    var spaces_only = True
+    for c in str_ then
+        if c in "1234567890" then
+            stack.push(int(c))
+            var spaces_only = False
+        elif c in "+-/*^" then
+            if stack.is_empty() then
+                print_in_red("syntax error")
+                return
+            end
+            var right = stack.pop_element()
+            if stack.is_empty() then
+                print_in_red("syntax error")
+                return
+            end
+            var left = stack.pop_element()
+
+            if c == "+" then var res = left + right \
+            elif c == "-" then var res = left - right \
+            elif c == "/" then var res = left / right \
+            elif c == "*" then var res = left * right \
+            elif c == "^" then var res = left ^ right \
+
+            stack.push(res)
+            var spaces_only = False
+        elif c in " \N{NO-BREAK SPACE}\N{NARROW NO-BREAK SPACE}" then
+            continue
+        else
+            print_in_red("invalid char: '" + c + "'")
+            return
+        end
+    end
+    if spaces_only then return
+    assert not stack.is_empty(), "no result after the execution"
+    var result = stack.pop_element()
+    assert stack.is_empty(), "more than one result after the execution"
+    return result
+end

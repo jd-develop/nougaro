@@ -46,3 +46,4 @@ __Release date: october 14th, 2023__
 ## 1.0.0 release candidate (goal: october 2024)
 * [ ] create highlight extension for VSCode
 * [ ] if possible, implement `break (name)` and `continue (name)` where (name) is `if`, `for`, …
+* [ ] completely switch to semver

@@ -6,7 +6,7 @@
 
 
 def test_nougaro(print_OK)
-    assert __noug_version__ == "beta 0.15"
+    assert __noug_version__ == "0.15.0-beta"
     print("Hello Toulouse!")  # the entire world is actually Toulouse, trust me. If you say 'pain au chocolat', you're not in the world.
     # comment
     /* single-line multi-line comment */

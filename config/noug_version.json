@@ -1,4 +1,6 @@
 {
-    "noug_version": "0.15",
+    "major": 0,
+    "minor": 15,
+    "patch": 0,
     "phase": "beta"
 }

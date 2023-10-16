@@ -117,7 +117,11 @@ def main():
     with open(os.path.abspath(noug_dir + "/config/noug_version.json")) as ver_json:
         # we load the nougaro version stored in noug_version.json
         ver_json_loaded = json.load(ver_json)
-        version = ver_json_loaded.get("phase") + " " + ver_json_loaded.get("noug_version")
+        major = ver_json_loaded.get("major")
+        minor = ver_json_loaded.get("minor")
+        patch = ver_json_loaded.get("patch")
+        phase = ver_json_loaded.get("phase")
+        version = f"{major}.{minor}.{patch}-{phase}"
 
     if path == "<stdin>":  # we open the shell
         # this text is always printed when we start the shell

@@ -57,7 +57,11 @@ def run(file_name: str, text: str, noug_dir: str, version: str = None, exec_from
         with open(os.path.abspath(noug_dir + "/config/noug_version.json")) as ver_json:
             # we get the nougaro version from noug_version.json
             ver_json_loaded = json.load(ver_json)
-            version = ver_json_loaded.get("phase") + " " + ver_json_loaded.get("noug_version")
+            major = ver_json_loaded.get("major")
+            minor = ver_json_loaded.get("minor")
+            patch = ver_json_loaded.get("patch")
+            phase = ver_json_loaded.get("phase")
+            version = f"{major}.{minor}.{patch}-{phase}"
 
     # we set version and context in the symbol table
     global_symbol_table.set("__noug_version__", String(version))

@@ -227,7 +227,25 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            return result.success(ImportNode(identifier, pos_start, self.current_token.pos_start.copy()))
+            as_identifier = None
+            if self.current_token.matches(TT["KEYWORD"], "as"):
+                result.register_advancement()
+                self.advance()
+
+                if self.current_token.type != TT["IDENTIFIER"]:
+                    return result.failure(
+                        InvalidSyntaxError(
+                            self.current_token.pos_start, self.current_token.pos_end,
+                            "expected identifier after 'as'.",
+                            "src.parser.parser.Parser.statement"
+                        )
+                    )
+
+                as_identifier = self.current_token
+                result.register_advancement()
+                self.advance()
+
+            return result.success(ImportNode(identifier, pos_start, self.current_token.pos_start.copy(), as_identifier))
 
         if self.current_token.matches(TT["KEYWORD"], 'export'):
             # we advance
@@ -249,7 +267,25 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            return result.success(ExportNode(identifier, pos_start, self.current_token.pos_start.copy()))
+            as_identifier = None
+            if self.current_token.matches(TT["KEYWORD"], "as"):
+                result.register_advancement()
+                self.advance()
+
+                if self.current_token.type != TT["IDENTIFIER"]:
+                    return result.failure(
+                        InvalidSyntaxError(
+                            self.current_token.pos_start, self.current_token.pos_end,
+                            "expected identifier after 'as'.",
+                            "src.parser.parser.Parser.statement"
+                        )
+                    )
+
+                as_identifier = self.current_token
+                result.register_advancement()
+                self.advance()
+
+            return result.success(ExportNode(identifier, pos_start, self.current_token.pos_start.copy(), as_identifier))
 
         # KEYWORD:CONTINUE
         if self.current_token.matches(TT["KEYWORD"], 'continue'):

@@ -1225,6 +1225,11 @@ class Interpreter:
         result = RTResult()
         identifier: Token = node.identifier  # we get the module identifier token
         name_to_import = identifier.value  # we get the module identifier
+        as_identifier: Token = node.as_identifier
+        if as_identifier is None:
+            import_as_name = name_to_import
+        else:
+            import_as_name = as_identifier.value
 
         IS_NOUGARO_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}.noug"))
         IS_PYTHON_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}_.py"))
@@ -1260,7 +1265,7 @@ class Interpreter:
             ))
 
         module_value = Module(name_to_import, what_to_import)
-        ctx.symbol_table.set(name_to_import, module_value)
+        ctx.symbol_table.set(import_as_name, module_value)
         self.update_symbol_table(ctx)
 
         return result.success(module_value)
@@ -1276,12 +1281,19 @@ class Interpreter:
                 identifier.pos_start, identifier.pos_end, f"name '{name_to_export}' is not defined.", ctx,
                 f"{_ORIGIN_FILE}.visit_ExportNode"
             ))
+
+        as_identifier = node.as_identifier
+        if as_identifier is None:
+            export_as_name = name_to_export
+        else:
+            export_as_name = as_identifier.value
+
         if isinstance(value_to_export, BaseFunction):
             value_to_export.call_with_module_context = True
             value_to_export.module_context = ctx.copy()
-            ctx.what_to_export.set(name_to_export, value_to_export)
+            ctx.what_to_export.set(export_as_name, value_to_export)
         else:
-            ctx.what_to_export.set(name_to_export, value_to_export)
+            ctx.what_to_export.set(export_as_name, value_to_export)
 
         return RTResult().success(NoneValue(False))
 

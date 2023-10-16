@@ -22,7 +22,7 @@ __Release date: october 14th, 2023__
 * [ ] add optional arguments in functions
 
 ## 0.17 beta (goal: february 2024)
-* [ ] add `import ... as ...`
+* [X] add `import ... as ...` (finished 16/10/2023)
 * [ ] rewrite parser to make it faster and easier to read
 * [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
 * [ ] add builtin classes

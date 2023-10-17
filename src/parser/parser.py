@@ -340,7 +340,7 @@ class Parser:
             # if the current tok is not an identifier, return an error
             if self.current_token.type != TT["IDENTIFIER"]:
                 if self.current_token.type != TT["KEYWORD"]:
-                    if self.current_token.type not in TOKENS_TO_QUOTE:
+                    if self.current_token.type in TOKENS_NOT_TO_QUOTE:
                         error_msg = f"expected identifier, but got {self.current_token.type}."
                     else:
                         error_msg = f"expected identifier, but got '{self.current_token.type}'."
@@ -634,7 +634,7 @@ class Parser:
         if equal.type not in EQUALS:
             if self.current_token.type in [TT["EE"], TT["GT"], TT["LT"], TT["GTE"], TT["LTE"], TT["NE"]]:
                 error_msg = f"expected an assignation equal, but got a test equal ('{self.current_token.type}')."
-            elif self.current_token.type not in TOKENS_TO_QUOTE:
+            elif self.current_token.type in TOKENS_NOT_TO_QUOTE:
                 error_msg = f"expected an equal, but got {self.current_token.type}."
             else:
                 error_msg = f"expected an equal, but got '{self.current_token.type}'."
@@ -1305,7 +1305,7 @@ class Parser:
 
         if self.current_token.type != TT["IDENTIFIER"]:
             if self.current_token.type != TT["KEYWORD"]:
-                if self.current_token.type not in TOKENS_TO_QUOTE:
+                if self.current_token.type in TOKENS_NOT_TO_QUOTE:
                     error_msg = f"expected identifier, but got {self.current_token.type}."
                 else:
                     error_msg = f"expected identifier, but got '{self.current_token.type}'."
@@ -1376,7 +1376,7 @@ class Parser:
 
             return result.success(ForNodeList(var_name, body, iterable_))
         elif self.current_token.type != TT["EQ"]:
-            if self.current_token.type not in TOKENS_TO_QUOTE:
+            if self.current_token.type in TOKENS_NOT_TO_QUOTE:
                 error_msg = f"expected 'in' or '=', but got {self.current_token.type}."
             else:
                 error_msg = f"expected 'in' or '=', but got '{self.current_token.type}'."
@@ -1647,7 +1647,7 @@ class Parser:
                 # IDENTIFIER
                 if self.current_token.type != TT["IDENTIFIER"]:
                     if self.current_token.type != TT["KEYWORD"]:
-                        if self.current_token.type not in TOKENS_TO_QUOTE:
+                        if self.current_token.type in TOKENS_NOT_TO_QUOTE:
                             error_msg = f"expected identifier after comma, but got {self.current_token.type}."
                         else:
                             error_msg = f"expected identifier after comma, but got '{self.current_token.type}'."

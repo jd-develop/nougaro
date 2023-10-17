@@ -16,7 +16,7 @@ from src.runtime.values.functions.base_function import BaseFunction
 from src.constants import PROTECTED_VARS, KEYWORDS
 from src.parser.nodes import *
 from src.errors.errors import *
-from src.lexer.token_types import TT, TOKENS_TO_QUOTE
+from src.lexer.token_types import TT, TOKENS_NOT_TO_QUOTE
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
 from src.misc import CustomInterpreterVisitMethod, clear_screen
@@ -459,7 +459,7 @@ class Interpreter:
                             origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
                         )
                 elif isinstance(var_name[0], Token):
-                    if var_name[0].type in TOKENS_TO_QUOTE:
+                    if var_name[0].type not in TOKENS_NOT_TO_QUOTE:
                         err_msg = f"unexpected token: '{var_name[0].type}'."
                     else:
                         err_msg = f"unexpected token: {var_name[0].type}."
@@ -488,7 +488,7 @@ class Interpreter:
                                 origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
                             )
                     elif isinstance(var_name[0], Token):
-                        if node_or_tok.type in TOKENS_TO_QUOTE:
+                        if node_or_tok.type not in TOKENS_NOT_TO_QUOTE:
                             err_msg = f"unexpected token: '{node_or_tok.type}'."
                         else:
                             err_msg = f"unexpected token: {node_or_tok.type}."

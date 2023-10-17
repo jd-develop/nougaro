@@ -75,6 +75,15 @@ def test_nougaro(print_OK)
     assert (var a <<= 1) == 0
     assert (var a >== 1) == 0
     assert (var a >>= 1) == 0
+    var a++
+    assert a == 1
+    var a--
+    assert a == 0
+    var b = 9
+    var a, b ++
+    assert b == 10 and a == 1
+    var a, b --
+    assert b == 9 and a == 0
 
     if print_OK then print("OK var edit")
 
@@ -381,6 +390,7 @@ def test_nougaro(print_OK)
     assert sort([], "stalin") == []
     assert sort([-1, 0, -3], "stalin") == [-1, 0]
     assert reverse(sort([3, 1, 5, 6, 12, -4, 0, 9999999, 45])) == [9999999, 45, 12, 6, 5, 3, 1, 0, -4]
+    assert reverse("bépo") == "opéb" != "azerty"
     print("Executing sleep sort, this should take 4 seconds...")
     assert sort([1, 2, 3, 4, 3, 2, 1, 0, 4, 2, 4, 1, 2, 4, 3], "sleep") == [0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4]
     assert sort([0], "sleep") == [0]

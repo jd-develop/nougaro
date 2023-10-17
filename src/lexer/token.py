@@ -25,10 +25,10 @@ class Token:
 
         if pos_start is not None:  # if there is a pos start given
             self.pos_start = pos_start.copy()
-            self.pos_end = pos_start.copy()  # the pos end is pos_start + 1
-            self.pos_end.advance()
+            self.pos_end = pos_start.copy()
+            self.pos_end.advance()  # the pos end is pos_start + 1
         if pos_end is not None:
-            self.pos_end = pos_end.copy()  # if there is a pos_end, the pos_end is no longer pos_start+1
+            self.pos_end = pos_end.copy()
 
     def __repr__(self) -> str:
         if self.value is not None:

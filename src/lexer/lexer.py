@@ -275,7 +275,7 @@ class Lexer:
         return tokens, None
 
     def make_plus(self):
-        """Make + or += """
+        """Make + or += or ++ """
         token_type = TT["PLUS"]
         pos_start = self.pos.copy()
         self.advance()
@@ -283,11 +283,14 @@ class Lexer:
         if self.current_char == '=':  # +=
             self.advance()
             token_type = TT["PLUSEQ"]
+        elif self.current_char == "+":  # ++
+            self.advance()
+            token_type = TT["INCREMENT"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_minus_or_arrow(self):
-        """ Make - , -> or -= """
+        """ Make - , ->, -= or -- """
         token_type = TT["MINUS"]
         pos_start = self.pos.copy()
         self.advance()
@@ -298,11 +301,14 @@ class Lexer:
         elif self.current_char == '=':  # -=
             self.advance()
             token_type = TT["MINUSEQ"]
+        elif self.current_char == '-':  # --
+            self.advance()
+            token_type = TT["DECREMENT"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_mul(self):
-        """Make * or *= """
+        """Make * or *= or ** """
         token_type = TT["MUL"]
         pos_start = self.pos.copy()
         self.advance()
@@ -310,6 +316,9 @@ class Lexer:
         if self.current_char == '=':  # *=
             self.advance()
             token_type = TT["MULTEQ"]
+        elif self.current_char == "*":  # **
+            self.advance()
+            token_type = TT["SQUARE"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 

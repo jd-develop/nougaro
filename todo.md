@@ -17,7 +17,7 @@ __Release date: october 14th, 2023__
 * [X] add '\N{UNICODE CHARACTER NAME}' (finished 8/10/23)
 * [X] add `startswith` and `endswith` (finished 10/10/23)
 * [ ] add possibility to import files in current folder and sub-folders
-* [ ] add `var++`, and `var--`
+* [X] add `var++`, and `var--` (finished 17/10/23)
 * [ ] add possibility to read command line arguments
 * [ ] add optional arguments in functions
 * [X] switch to semantic versioning (finished 16/10/23)

@@ -75,13 +75,16 @@ class ListNode(Node):
 class VarAssignNode(Node):
     """Node for variable assign
     I’m too bored to rewrite examples. TODO: rewrite examples"""
-    def __init__(self, var_names: list[list[Token | Node]], value_nodes: list[Node], equal: Token = Token(TT["EQ"])):
+    def __init__(self, var_names: list[list[Token | Node]], value_nodes: list[Node] | None, equal: Token = Token(TT["EQ"])):
         self.var_names: list[list[Token | Node]] = var_names
         self.value_nodes = value_nodes
         self.equal = equal
 
         self.pos_start = self.var_names[0][0].pos_start
-        self.pos_end = self.value_nodes[-1].pos_end
+        if value_nodes is not None:
+            self.pos_end = self.value_nodes[-1].pos_end
+        else:
+            self.pos_end = self.equal.pos_end
 
     def __repr__(self):
         return f'var_assign:({self.var_names} {self.equal} {self.value_nodes})'

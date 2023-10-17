@@ -16,10 +16,14 @@ expr       : var_assign
            : KEYWORD:ASSERT expr (COMMA expr)?
            : comp_expr ((KEYWORD:AND|KEYWORD:OR|KEYWORD:XOR|BITWISEAND|BITWISEOR|BITWISEXOR) comp_expr)*
 
-var_assign : KEYWORD:VAR (IDENTIFIER (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?* DOT)?* IDENTIFIER
-             (COMMA (IDENTIFIER (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?* DOT)?* IDENTIFIER)?*
-             (EQ|PLUSEQ|MINUSEQ|MULTEQ|DIVEQ|POWEQ|FLOORDIVEQ|PERCEQ|OREQ|ANDEQ|XOREQ|BITWISEANDEQ|BITWISEOREQ|BITWISEXOREQ|EEEQ|GTEQ|GTEEQ|LTEQ|LTEEQ)
-             expr (COMMA expr)?*
+var_assign : KEYWORD:VAR assign_id (COMMA assign_id)?* assign_eq assign_expr
+           : KEYWORD:VAR assign_id (INCREMENT|DECREMENT)
+
+assign_id  : (IDENTIFIER (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?* DOT)?* IDENTIFIER
+
+assign_eq  : EQ|PLUSEQ|MINUSEQ|MULTEQ|DIVEQ|POWEQ|FLOORDIVEQ|PERCEQ|OREQ|ANDEQ|XOREQ|BITWISEANDEQ|BITWISEOREQ|BITWISEXOREQ|EEEQ|GTEQ|GTEEQ|LTEQ|LTEEQ
+
+assign_expr: expr (COMMA expr)?*
 
 comp_expr  : (KEYWORD:NOT|BITWISENOT) comp_expr
            : arith_expr ((EE|LT|GT|LTE|GTE|KEYWORD:IN) arith_expr)*

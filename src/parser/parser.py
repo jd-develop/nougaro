@@ -310,9 +310,7 @@ class Parser:
 
     def expr(self) -> ParseResult:
         """
-        expr    : KEYWORD:VAR power (COMMA power)?*
-                              (EQ|PLUSEQ|MINUSEQ|MULTEQ|DIVEQ|POWEQ|FLOORDIVEQ|PERCEQ|OREQ|ANDEQ|XOREQ|BITWISEANDEQ|
-                               BITWISEOREQ|BITWISEXOREQ|EEEQ|GTEQ|GTEEQ|LTEQ|LTEEQ) expr (COMMA expr)?*
+        expr    : var_assign
                 : KEYWORD:DEL IDENTIFIER
                 : KEYWORD:WRITE expr (TO|TO_AND_OVERWRITE) expr INT?
                 : KEYWORD:READ expr (TO IDENTIFIER)? INT?
@@ -323,7 +321,7 @@ class Parser:
         result = ParseResult()
         pos_start = self.current_token.pos_start.copy()
 
-        # KEYWORD:VAR power (COMMA power)?* (EQ|…) expr (COMMA expr)?*
+        # var_assign
         if self.current_token.matches(TT["KEYWORD"], 'var'):
             var_assign_node = result.register(self.var_assign())
             if result.error is not None:
@@ -478,13 +476,11 @@ class Parser:
 
         if self.current_token.matches(TT["KEYWORD"], "end"):
             if len(self.then_s) == 0:
-                return result.failure(
-                    InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "didn't expect 'end', because there is nothing to close.",
-                        "src.parser.parser.Parser.expr"
-                    )
-                )
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "didn't expect 'end', because there is nothing to close.",
+                    "src.parser.parser.Parser.expr"
+                ))
 
         # comp_expr ((KEYWORD:AND|KEYWORD:OR|KEYWORD:XOR|BITWISEAND|BITWISEOR|BITWISEXOR) comp_expr)*
         node = result.register(self.bin_op(self.comp_expr, (
@@ -503,30 +499,22 @@ class Parser:
 
     def var_assign(self) -> ParseResult:
         """
-        var_assign : KEYWORD:VAR (IDENTIFIER (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?* DOT)?*
-                     IDENTIFIER
-                     (COMMA (IDENTIFIER (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?* DOT)?*
-                     IDENTIFIER)?*
-                     (EQ|PLUSEQ|MINUSEQ|MULTEQ|DIVEQ|POWEQ|FLOORDIVEQ|PERCEQ|OREQ|ANDEQ|XOREQ|BITWISEANDEQ|BITWISEOREQ|
-                     BITWISEXOREQ|EEEQ|GTEQ|GTEEQ|LTEQ|LTEEQ)
-                     expr (COMMA expr)?*
+        var_assign : KEYWORD:VAR assign_id (COMMA assign_id)?* assign_eq assign_expr
+                   : KEYWORD:VAR assign_id (INCREMENT|DECREMENT)
         """
         result = ParseResult()
+        pos_start = self.current_token.pos_start
         if not self.current_token.matches(TT["KEYWORD"], "var"):
-            return result.failure(
-                InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected ‘var’ keyboard.",
-                    origin_file="src.parser.parser.Parser.var_assign"
-                )
-            )
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected ‘var’ keyboard.",
+                origin_file="src.parser.parser.Parser.var_assign"
+            ))
         result.register_advancement()
         self.advance()
         all_names_list: list[list[Node | Token]] = []
 
         while self.current_token.type not in EQUALS:
-            is_attr = False
-            current_name_nodes_and_tokens_list: list[Node | Token] = []
             # if current token is not identifier we have to register expr
             if self.current_token.type != TT["IDENTIFIER"]:
                 return result.failure(InvalidSyntaxError(
@@ -534,116 +522,40 @@ class Parser:
                     "expected identifier.", origin_file="src.parser.parser.Parser.var_assign"
                 ))
 
-            identifier_expected = False
-            while self.current_token.type == TT["IDENTIFIER"]:
-                identifier_expected = False
-                identifier = self.current_token
-                result.register_advancement()
-                self.advance()
+            current_name_nodes_and_tokens_list, error = self.assign_identifier()
+            if error is not None:
+                return result.failure(error)
 
-                is_call = False
-                call_node = identifier
-
-                if self.current_token.type == TT["LPAREN"]:
-                    call_node = VarAccessNode([identifier], is_attr)
-                    is_call = True
-
-                    while self.current_token.type == TT["LPAREN"]:
-                        result.register_advancement()
-                        self.advance()
-                        arg_nodes = []
-
-                        comma_expected = False
-                        mul = False
-                        # we check for the closing paren.
-                        if self.current_token.type == TT["RPAREN"]:
-                            result.register_advancement()
-                            self.advance()
-                        else:  # (MUL? expr (COMMA MUL? expr)?*)?
-                            if self.current_token.type == TT["MUL"]:  # MUL?
-                                mul = True
-                                # we advance
-                                result.register_advancement()
-                                self.advance()
-                            # expr
-                            arg_nodes.append((result.register(self.expr()), mul))
-                            if result.error is not None:
-                                return result
-                            while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
-                                mul = False
-                                # we advance
-                                result.register_advancement()
-                                self.advance()
-
-                                if self.current_token.type == TT["MUL"]:  # MUL?
-                                    mul = True
-                                    # we advance
-                                    result.register_advancement()
-                                    self.advance()
-                                # expr
-                                # we register an expr then check for an error
-                                arg_nodes.append((result.register(self.expr()), mul))
-                                if result.error is not None:
-                                    return result
-
-                            if self.current_token.type != TT["RPAREN"]:  # there is no paren (it is expected)
-                                return result.failure(InvalidSyntaxError(
-                                    self.current_token.pos_start, self.current_token.pos_end,
-                                    "expected ',' or ')'." if comma_expected else "expected ')'.",
-                                    "src.parser.parser.Parser.call"))
-
-                            result.register_advancement()
-                            self.advance()
-                        call_node = CallNode(call_node, arg_nodes)
-
-                if self.current_token.type == TT["DOT"]:
-                    is_attr = True
-                    current_name_nodes_and_tokens_list.append(call_node)  # call_node can be identifier token
-                    result.register_advancement()
-                    self.advance()
-                    identifier_expected = True
-                else:
-                    if is_call:
-                        return result.failure(
-                            InvalidSyntaxError(
-                                self.current_token.pos_start, self.current_token.pos_end,
-                                "expected dot.",
-                                origin_file="src.parser.parser.Parser.var_assign"
-                            )
-                        )
-                    else:
-                        current_name_nodes_and_tokens_list.append(call_node)
-                        break
-
-            if identifier_expected:
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected identifier after dot.",
-                    origin_file="src.parser.parser.Parser.var_assign"
-                ))
-
-            all_names_list.append(current_name_nodes_and_tokens_list.copy())
+            all_names_list.append(current_name_nodes_and_tokens_list)
             if self.current_token.type != TT["COMMA"]:
                 break
             else:
                 result.register_advancement()
                 self.advance()
 
-        # todo: list(index) = value
+        if len(all_names_list) == 0:
+            return result.failure(InvalidSyntaxError(
+                pos_start, self.current_token.pos_start,
+                "expected at least one identifier.",
+                origin_file="src.parser.parser.Parser.var_assign"
+            ))
+
         equal = self.current_token
-        if equal.type not in EQUALS:
+        if equal.type in [TT["INCREMENT"], TT["DECREMENT"]]:
+            result.register_advancement()
+            self.advance()
+            return result.success(VarAssignNode(all_names_list, None, equal))
+        elif equal.type not in EQUALS:
             if self.current_token.type in [TT["EE"], TT["GT"], TT["LT"], TT["GTE"], TT["LTE"], TT["NE"]]:
                 error_msg = f"expected an assignation equal, but got a test equal ('{self.current_token.type}')."
             elif self.current_token.type in TOKENS_NOT_TO_QUOTE:
                 error_msg = f"expected an equal, but got {self.current_token.type}."
             else:
                 error_msg = f"expected an equal, but got '{self.current_token.type}'."
-            return result.failure(
-                InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end, error_msg,
-                    "src.parser.parser.Parser.expr"
-                )
-            )
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end, error_msg,
+                "src.parser.parser.Parser.expr"
+            ))
         result.register_advancement()
         self.advance()
 
@@ -661,6 +573,102 @@ class Parser:
                 return result
 
         return result.success(VarAssignNode(all_names_list, expressions, equal))
+
+    def assign_identifier(self) -> tuple[list[Node | Token] | None, InvalidSyntaxError | None]:
+        """
+        assign_id  : (IDENTIFIER (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?* DOT)?* IDENTIFIER
+        """
+        result = ParseResult()
+        current_name_nodes_and_tokens_list: list[Node | Token] = []
+
+        identifier_expected = False
+        is_attr = False
+        while self.current_token.type == TT["IDENTIFIER"]:
+            identifier_expected = False
+            identifier = self.current_token
+            result.register_advancement()
+            self.advance()
+
+            is_call = False
+            call_node = identifier
+
+            if self.current_token.type == TT["LPAREN"]:
+                call_node = VarAccessNode([identifier], is_attr)
+                is_call = True
+
+                while self.current_token.type == TT["LPAREN"]:
+                    result.register_advancement()
+                    self.advance()
+                    arg_nodes = []
+
+                    comma_expected = False
+                    mul = False
+                    # we check for the closing paren.
+                    if self.current_token.type == TT["RPAREN"]:
+                        result.register_advancement()
+                        self.advance()
+                    else:  # (MUL? expr (COMMA MUL? expr)?*)?
+                        if self.current_token.type == TT["MUL"]:  # MUL?
+                            mul = True
+                            # we advance
+                            result.register_advancement()
+                            self.advance()
+                        # expr
+                        arg_nodes.append((result.register(self.expr()), mul))
+                        if result.error is not None:
+                            return None, result.error
+                        while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
+                            mul = False
+                            # we advance
+                            result.register_advancement()
+                            self.advance()
+
+                            if self.current_token.type == TT["MUL"]:  # MUL?
+                                mul = True
+                                # we advance
+                                result.register_advancement()
+                                self.advance()
+                            # expr
+                            # we register an expr then check for an error
+                            arg_nodes.append((result.register(self.expr()), mul))
+                            if result.error is not None:
+                                return None, result.error
+
+                        if self.current_token.type != TT["RPAREN"]:  # there is no paren (it is expected)
+                            return None, InvalidSyntaxError(
+                                self.current_token.pos_start, self.current_token.pos_end,
+                                "expected ',' or ')'." if comma_expected else "expected ')'.",
+                                "src.parser.parser.Parser.call"
+                            )
+
+                        result.register_advancement()
+                        self.advance()
+                    call_node = CallNode(call_node, arg_nodes)
+
+            if self.current_token.type == TT["DOT"]:
+                is_attr = True
+                current_name_nodes_and_tokens_list.append(call_node)  # call_node can be identifier token
+                result.register_advancement()
+                self.advance()
+                identifier_expected = True
+            else:
+                if is_call:
+                    return None, InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        "expected dot.",
+                        origin_file="src.parser.parser.Parser.var_assign"
+                    )
+                else:
+                    current_name_nodes_and_tokens_list.append(call_node)
+                    break
+
+        if identifier_expected:
+            return None, InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected identifier after dot.",
+                origin_file="src.parser.parser.Parser.var_assign"
+            )
+        return current_name_nodes_and_tokens_list, None
 
     def comp_expr(self) -> ParseResult:
         """
@@ -1646,24 +1654,21 @@ class Parser:
 
                 # IDENTIFIER
                 if self.current_token.type != TT["IDENTIFIER"]:
-                    if self.current_token.type != TT["KEYWORD"]:
-                        if self.current_token.type in TOKENS_NOT_TO_QUOTE:
-                            error_msg = f"expected identifier after comma, but got {self.current_token.type}."
-                        else:
-                            error_msg = f"expected identifier after comma, but got '{self.current_token.type}'."
-                        return result.failure(
-                            InvalidSyntaxError(
-                                self.current_token.pos_start, self.current_token.pos_end, error_msg,
-                                "src.parser.parser.Parser.func_def"
-                            )
-                        )
+                    if self.current_token.type == TT["KEYWORD"]:
+                        return result.failure(InvalidSyntaxError(
+                            self.current_token.pos_start, self.current_token.pos_end,
+                            f"expected identifier after coma. NB : use keyword as identifier is illegal.",
+                            "src.parser.parser.Parser.func_def"
+                        ))
+
+                    if self.current_token.type in TOKENS_NOT_TO_QUOTE:
+                        error_msg = f"expected identifier after comma, but got {self.current_token.type}."
                     else:
-                        return result.failure(
-                            InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                               f"expected identifier after coma. "
-                                               f"NB : use keyword as identifier is illegal.",
-                                               "src.parser.parser.Parser.func_def")
-                        )
+                        error_msg = f"expected identifier after comma, but got '{self.current_token.type}'."
+                    return result.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end, error_msg,
+                        "src.parser.parser.Parser.func_def"
+                    ))
 
                 param_names_tokens.append(self.current_token)
                 result.register_advancement()

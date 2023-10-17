@@ -423,14 +423,20 @@ class Interpreter:
         var_names: list[list[Token | Node]] = node.var_names
 
         values = []
-        for value_node in node.value_nodes:  # we get the values
-            values.append(result.register(self.visit(value_node, ctx, methods_instead_of_funcs)))
-            if result.should_return() or result.old_should_return:
-                return result
+        if node.value_nodes is not None:
+            for value_node in node.value_nodes:  # we get the values
+                values.append(result.register(self.visit(value_node, ctx, methods_instead_of_funcs)))
+                if result.should_return() or result.old_should_return:
+                    return result
 
         equal = node.equal.type  # we get the equal type
-        if result.should_return() or result.old_should_return:  # check for errors
-            return result
+
+        if equal in [TT["INCREMENT"], TT["DECREMENT"]]:
+            values = [Number(1).set_pos(node.equal.pos_start, node.equal.pos_end)] * len(var_names)
+            if equal == TT["INCREMENT"]:
+                equal = TT["PLUSEQ"]
+            else:
+                equal = TT["MINUSEQ"]
 
         if len(var_names) != len(values):
             return result.failure(RunTimeError(

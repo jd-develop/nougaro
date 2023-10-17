@@ -37,7 +37,9 @@ TT = {
     
     "EQ": '=',                   # =
     "PLUSEQ": '+=',              # +=
+    "INCREMENT": '++',           # ++
     "MINUSEQ": '-=',             # -=
+    "DECREMENT": '--',           # --
     "MULTEQ": '*=',              # *=
     "DIVEQ": '/=',               # /=
     "POWEQ": '^=',               # ^=

@@ -1528,17 +1528,25 @@ class BuiltInFunction(BaseBuiltInFunction):
 
     def execute_reverse(self, exec_ctx: Context):
         """Reverses a list, e.g. [1, 2, 3] becomes [3, 2, 1]"""
-        list_ = exec_ctx.symbol_table.getf("list_")
-        if not isinstance(list_, List):
-            return RTResult().failure(RTTypeError(
-                    list_.pos_start, list_.pos_end, list_, exec_ctx,
-                    origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_reverse"
+        list_or_str = exec_ctx.symbol_table.getf("list_or_str")
+        is_right_type = isinstance(list_or_str, List) or isinstance(list_or_str, String)
+        if not is_right_type:
+            return RTResult().failure(RTTypeErrorF(
+                list_or_str.pos_start, list_or_str.pos_end,
+                "first", "reverse", "list", list_or_str, exec_ctx,
+                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_reverse",
+                or_="str"
             ))
 
-        list_.elements.reverse()
-        return RTResult().success(list_)
+        if isinstance(list_or_str, List):
+            list_or_str.elements.reverse()
+        elif isinstance(list_or_str, String):
+            temp_list = list(list_or_str.value)
+            temp_list.reverse()
+            list_or_str.value = "".join(temp_list)
+        return RTResult().success(list_or_str)
 
-    execute_reverse.param_names = ["list_"]
+    execute_reverse.param_names = ["list_or_str"]
     execute_reverse.optional_params = []
     execute_reverse.should_respect_args_number = True
 

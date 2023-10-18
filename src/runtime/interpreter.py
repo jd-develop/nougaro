@@ -19,7 +19,7 @@ from src.errors.errors import *
 from src.lexer.token_types import TT, TOKENS_NOT_TO_QUOTE
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
-from src.misc import CustomInterpreterVisitMethod, clear_screen
+from src.misc import CustomInterpreterVisitMethod, clear_screen, print_in_red
 from src.runtime.symbol_table import SymbolTable
 from src.lexer.position import Position
 # built-in python imports
@@ -1229,7 +1229,12 @@ class Interpreter:
     def visit_ImportNode(self, node: ImportNode, ctx: Context) -> RTResult:
         """Visit ImportNode"""
         result = RTResult()
-        identifier: Token = node.identifier  # we get the module identifier token
+        identifiers: list[Token] = node.identifiers  # we get the module identifier token
+        if len(identifiers) != 1:
+            print_in_red(f"This feature is work in progress. "
+                         f"This will be interpreted as: `import {identifiers[0].value}`.")
+
+        identifier = identifiers[0]
         name_to_import = identifier.value  # we get the module identifier
         as_identifier: Token = node.as_identifier
         if as_identifier is None:

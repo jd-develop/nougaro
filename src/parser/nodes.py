@@ -75,7 +75,12 @@ class ListNode(Node):
 class VarAssignNode(Node):
     """Node for variable assign
     I’m too bored to rewrite examples. TODO: rewrite examples"""
-    def __init__(self, var_names: list[list[Token | Node]], value_nodes: list[Node] | None, equal: Token = Token(TT["EQ"])):
+    def __init__(
+            self,
+            var_names: list[list[Token | Node]],
+            value_nodes: list[Node] | None,
+            equal: Token = Token(TT["EQ"])
+    ):
         self.var_names: list[list[Token | Node]] = var_names
         self.value_nodes = value_nodes
         self.equal = equal
@@ -468,17 +473,18 @@ class ImportNode(Node):
     """Node for `import` structure.
     identifier is the name of the module to import. It is a token. Example: Token(TT_IDENTIFIER, 'math')
     """
-    def __init__(self, identifier: Token, pos_start, pos_end, as_identifier: Token | None = None):
-        self.identifier: Token = identifier
+    def __init__(self, identifiers: list[Token], pos_start, pos_end, as_identifier: Token | None = None):
+        self.identifiers: list[Token] = identifiers
         self.as_identifier: Token | None = as_identifier
 
         self.pos_start = pos_start
         self.pos_end = pos_end
 
     def __repr__(self):
+        names = [str(identifier) for identifier in self.identifiers]
         if self.as_identifier is None:
-            return f"import:{self.identifier}"
-        return f'import:{self.identifier}:as:{self.as_identifier}'
+            return f"import:{'.'.join(self.identifiers)}"
+        return f'import:{".".join(self.identifiers)}:as:{self.as_identifier}'
 
 
 class ExportNode(Node):

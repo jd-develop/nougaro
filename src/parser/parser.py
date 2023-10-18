@@ -113,16 +113,19 @@ class Parser:
                 break
             else:
                 if newline_count == 0:  # there was no new line between the last statement and this one: unexpected
+                    if self.current_token.type in TOKENS_NOT_TO_QUOTE:
+                        quote = ""
+                    else:
+                        quote = "'"
                     # token
                     if last_token_type == TT["IDENTIFIER"] and self.current_token.type in EQUALS:
                         # there was no new line but there is 'id =' (need 'var')
-                        return result.failure(
-                            InvalidSyntaxError(
-                                self.current_token.pos_start, self.current_token.pos_end,
-                                "unexpected token. To declare a variable, use 'var' keyword.",
-                                "src.parser.parser.Parser.statements"
-                            )
-                        )
+                        return result.failure(InvalidSyntaxError(
+                            self.current_token.pos_start, self.current_token.pos_end,
+                            f"unexpected token: {quote}{self.current_token}{quote}."
+                            f"To declare a variable, use 'var' keyword.",
+                            "src.parser.parser.Parser.statements"
+                        ))
                     if last_token_type == TT["IDENTIFIER"] and self.current_token.type == TT["COMMA"]:
                         result.register_advancement()
                         self.advance()
@@ -139,30 +142,25 @@ class Parser:
                             self.advance()
                         if missing_var and self.current_token.type in EQUALS:
                             # there was no new line but there is 'id1, id2, ... =' (need 'var')
-                            return result.failure(
-                                InvalidSyntaxError(
-                                    self.current_token.pos_start, self.current_token.pos_end,
-                                    "unexpected token. To declare a variable, use 'var' keyword.",
-                                    "src.parser.parser.Parser.statements"
-                                )
-                            )
-                    return result.failure(
-                        InvalidSyntaxError(
-                            self.current_token.pos_start, self.current_token.pos_end,
-                            f"unexpected token: {self.current_token}.",
-                            "src.parser.parser.Parser.statements"
-                        )
-                    )
+                            return result.failure(InvalidSyntaxError(
+                                self.current_token.pos_start, self.current_token.pos_end,
+                                f"unexpected token: {quote}{self.current_token}{quote}."
+                                f"To declare a variable, use 'var' keyword.",
+                                "src.parser.parser.Parser.statements"
+                            ))
+                    return result.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        f"unexpected token: {quote}{self.current_token}{quote}.",
+                        "src.parser.parser.Parser.statements"
+                    ))
 
             if self.current_token.type == TT["EOF"]:
                 if len(self.then_s) != 0:
-                    return result.failure(
-                        InvalidSyntaxError(
-                            self.then_s[-1][0], self.then_s[-1][1],
-                            "'end' expected to close a statement, surely this one.",
-                            "src.parser.parser.Parser.statements"
-                        )
-                    )
+                    return result.failure(InvalidSyntaxError(
+                        self.then_s[-1][0], self.then_s[-1][1],
+                        "'end' expected to close a statement, surely this one.",
+                        "src.parser.parser.Parser.statements"
+                    ))
 
             # we replace the last token type
             last_token_type = self.current_token.type
@@ -183,8 +181,8 @@ class Parser:
     def statement(self) -> ParseResult:  # only one statement
         """
         statement  : KEYWORD:RETURN expr?
-                   : KEYWORD:IMPORT IDENTIFIER
-                   : KEYWORD:EXPORT IDENTIFIER
+                   : KEYWORD:IMPORT IDENTIFIER (DOT IDENTIFIER)?* (AS IDENTIFIER)?
+                   : KEYWORD:EXPORT IDENTIFIER (DOT IDENTIFIER)?* (AS IDENTIFIER)?
                    : KEYWORD:CONTINUE
                    : KEYWORD:BREAK
                    : expr
@@ -214,18 +212,30 @@ class Parser:
 
             # we check for identifier
             if self.current_token.type != TT["IDENTIFIER"]:
-                return result.failure(
-                    InvalidSyntaxError(
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected identifier after 'import'.",
+                    "src.parser.parser.Parser.statement"
+                ))
+
+            identifiers = [self.current_token]
+            result.register_advancement()
+            self.advance()
+
+            while self.current_token.type == TT["DOT"]:
+                result.register_advancement()
+                self.advance()
+
+                if self.current_token.type != TT["IDENTIFIER"]:
+                    return result.failure(InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
                         "expected identifier after 'import'.",
                         "src.parser.parser.Parser.statement"
-                    )
-                )
+                    ))
 
-            identifier = self.current_token
-
-            result.register_advancement()
-            self.advance()
+                identifiers.append(self.current_token)
+                result.register_advancement()
+                self.advance()
 
             as_identifier = None
             if self.current_token.matches(TT["KEYWORD"], "as"):
@@ -233,19 +243,19 @@ class Parser:
                 self.advance()
 
                 if self.current_token.type != TT["IDENTIFIER"]:
-                    return result.failure(
-                        InvalidSyntaxError(
-                            self.current_token.pos_start, self.current_token.pos_end,
-                            "expected identifier after 'as'.",
-                            "src.parser.parser.Parser.statement"
-                        )
-                    )
+                    return result.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        "expected identifier after 'as'.",
+                        "src.parser.parser.Parser.statement"
+                    ))
 
                 as_identifier = self.current_token
                 result.register_advancement()
                 self.advance()
 
-            return result.success(ImportNode(identifier, pos_start, self.current_token.pos_start.copy(), as_identifier))
+            return result.success(ImportNode(
+                identifiers, pos_start, self.current_token.pos_start.copy(), as_identifier
+            ))
 
         if self.current_token.matches(TT["KEYWORD"], 'export'):
             # we advance
@@ -254,13 +264,11 @@ class Parser:
 
             # we check for identifier
             if self.current_token.type != TT["IDENTIFIER"]:
-                return result.failure(
-                    InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected identifier after 'export'.",
-                        "src.parser.parser.Parser.statement"
-                    )
-                )
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected identifier after 'export'.",
+                    "src.parser.parser.Parser.statement"
+                ))
 
             identifier = self.current_token
 
@@ -273,13 +281,11 @@ class Parser:
                 self.advance()
 
                 if self.current_token.type != TT["IDENTIFIER"]:
-                    return result.failure(
-                        InvalidSyntaxError(
-                            self.current_token.pos_start, self.current_token.pos_end,
-                            "expected identifier after 'as'.",
-                            "src.parser.parser.Parser.statement"
-                        )
-                    )
+                    return result.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        "expected identifier after 'as'.",
+                        "src.parser.parser.Parser.statement"
+                    ))
 
                 as_identifier = self.current_token
                 result.register_advancement()

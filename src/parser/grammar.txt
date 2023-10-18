@@ -3,8 +3,8 @@ This is the AST of the Nougaro language. This AST is computed by the Parser (src
 statements : NEWLINE* statement (NEWLINE+ statement)* NEWLINE*
 
 statement  : KEYWORD:RETURN expr?
-           : KEYWORD:IMPORT IDENTIFIER (AS IDENTIFIER)?
-           : KEYWORD:EXPORT IDENTIFIER (AS IDENTIFIER)?
+           : KEYWORD:IMPORT IDENTIFIER (DOT IDENTIFIER)?* (AS IDENTIFIER)?
+           : KEYWORD:EXPORT IDENTIFIER (DOT IDENTIFIER)?* (AS IDENTIFIER)?
            : KEYWORD:CONTINUE
            : KEYWORD:BREAK
            : expr

@@ -37,6 +37,9 @@ class Token:
             return f'{self.type}:{self.value}'
         return f'{self.type}'
 
+    def __str__(self):
+        return repr(self)
+
     def matches(self, type_, value):
         """Check if the token have the given type and the given value"""
         return self.type == type_ and self.value == value

@@ -25,6 +25,7 @@ __Release date: october 14th, 2023__
     * [ ] Get the directory of the main file which is executed or imported
     * [ ] Resolve all the imports depending on this directory
 * [X] add `var++`, and `var--` (finished 17/10/23)
+* [ ] Change `export` to `export (any node) as identifier` with `as identifier` being required
 * [ ] add possibility to read command line arguments
 * [ ] add optional arguments in functions
 * [X] switch to semantic versioning (finished 16/10/23)

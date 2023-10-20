@@ -1281,32 +1281,22 @@ class Interpreter:
 
         return result.success(module_value)
 
-    @staticmethod
-    def visit_ExportNode(node: ExportNode, ctx: Context) -> RTResult:
+    def visit_ExportNode(self, node: ExportNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit ExportNode"""
-        identifier: Token = node.identifier
-        name_to_export = identifier.value
-        value_to_export = ctx.symbol_table.get(name_to_export)
-        if value_to_export is None:
-            return RTResult().failure(RTNotDefinedError(
-                identifier.pos_start, identifier.pos_end, f"name '{name_to_export}' is not defined.", ctx,
-                f"{_ORIGIN_FILE}.visit_ExportNode"
-            ))
+        result = RTResult()
+        expr: Node = node.expr
 
-        as_identifier = node.as_identifier
-        if as_identifier is None:
-            export_as_name = name_to_export
-        else:
-            export_as_name = as_identifier.value
+        value_to_export = result.register(self.visit(expr, ctx, methods_instead_of_funcs=methods_instead_of_funcs))
+        if result.should_return():
+            return result
+        export_as_name = node.as_identifier.value
 
         if isinstance(value_to_export, BaseFunction):
             value_to_export.call_with_module_context = True
             value_to_export.module_context = ctx.copy()
-            ctx.what_to_export.set(export_as_name, value_to_export)
-        else:
-            ctx.what_to_export.set(export_as_name, value_to_export)
+        ctx.what_to_export.set(export_as_name, value_to_export)
 
-        return RTResult().success(NoneValue(False))
+        return result.success(value_to_export)
 
     def visit_WriteNode(self, node: WriteNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit WriteNode"""

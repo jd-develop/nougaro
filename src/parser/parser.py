@@ -182,7 +182,7 @@ class Parser:
         """
         statement  : KEYWORD:RETURN expr?
                    : KEYWORD:IMPORT IDENTIFIER (DOT IDENTIFIER)?* (AS IDENTIFIER)?
-                   : KEYWORD:EXPORT IDENTIFIER (DOT IDENTIFIER)?* (AS IDENTIFIER)?
+                   : KEYWORD:EXPORT expr AS IDENTIFIER
                    : KEYWORD:CONTINUE
                    : KEYWORD:BREAK
                    : expr
@@ -262,36 +262,30 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            # we check for identifier
-            if self.current_token.type != TT["IDENTIFIER"]:
+            # we register an expr
+            expr = result.register(self.expr())
+
+            if not self.current_token.matches(TT["KEYWORD"], "as"):
                 return result.failure(InvalidSyntaxError(
                     self.current_token.pos_start, self.current_token.pos_end,
-                    "expected identifier after 'export'.",
+                    "expected keyword 'as'.",
                     "src.parser.parser.Parser.statement"
                 ))
-
-            identifier = self.current_token
-
             result.register_advancement()
             self.advance()
 
-            as_identifier = None
-            if self.current_token.matches(TT["KEYWORD"], "as"):
-                result.register_advancement()
-                self.advance()
+            if self.current_token.type != TT["IDENTIFIER"]:
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected identifier after 'as'.",
+                    "src.parser.parser.Parser.statement"
+                ))
 
-                if self.current_token.type != TT["IDENTIFIER"]:
-                    return result.failure(InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected identifier after 'as'.",
-                        "src.parser.parser.Parser.statement"
-                    ))
+            as_identifier = self.current_token
+            result.register_advancement()
+            self.advance()
 
-                as_identifier = self.current_token
-                result.register_advancement()
-                self.advance()
-
-            return result.success(ExportNode(identifier, pos_start, self.current_token.pos_start.copy(), as_identifier))
+            return result.success(ExportNode(expr, as_identifier, pos_start, self.current_token.pos_start.copy()))
 
         # KEYWORD:CONTINUE
         if self.current_token.matches(TT["KEYWORD"], 'continue'):

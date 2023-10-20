@@ -55,4 +55,4 @@ def ipsum(paragraphs)
 end
 
 
-export ipsum
+export ipsum as ipsum

@@ -483,25 +483,23 @@ class ImportNode(Node):
     def __repr__(self):
         names = [str(identifier) for identifier in self.identifiers]
         if self.as_identifier is None:
-            return f"import:{'.'.join(self.identifiers)}"
-        return f'import:{".".join(self.identifiers)}:as:{self.as_identifier}'
+            return f"import:{'.'.join(names)}"
+        return f'import:{".".join(names)}:as:{self.as_identifier}'
 
 
 class ExportNode(Node):
     """Node for `export` structure.
     identifier is the name of the module to import. It is a token. Example: Token(TT_IDENTIFIER, 'lorem_ipsum')
     """
-    def __init__(self, identifier: Token, pos_start, pos_end, as_identifier: Token | None = None):
-        self.identifier: Token = identifier
-        self.as_identifier: Token | None = as_identifier
+    def __init__(self, expr: Node, as_identifier: Token, pos_start, pos_end):
+        self.expr: Node = expr
+        self.as_identifier: Token = as_identifier
 
         self.pos_start = pos_start
         self.pos_end = pos_end
 
     def __repr__(self):
-        if self.as_identifier is None:
-            return f"export:{self.identifier}:as:{self.as_identifier}"
-        return f'export:{self.identifier}'
+        return f"export:{self.expr}:as:{self.as_identifier}"
 
 
 # FILE NODES

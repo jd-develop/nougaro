@@ -8,3 +8,4 @@ This file is updated nearly every commit and copied to GH release changelog. Its
 * Switch to semantic versioning
 * Update `reverse` builtin function (fix error message + can now take strings as argument)
 * Add `var ... ++` and `var ... --`
+* Change `export id (as id)` to `export (any expr) as id`

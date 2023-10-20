@@ -48,13 +48,13 @@ def stop_print_context()
     print("PRINT CONTEXT debug option is now DISABLED.")
 end
 
-export is_debug_enabled
-export should_print_context
-export enable_all
-export disable_all
-export debug_mode_enable
+export is_debug_enabled as is_debug_enabled
+export should_print_context as should_print_context
+export enable_all as enable_all
+export disable_all as disable_all
+export debug_mode_enable as debug_mode_enable
 export debug_mode_enable as enable
-export debug_mode_disable
+export debug_mode_disable as debug_mode_disable
 export debug_mode_disable as disable
-export print_context
-export stop_print_context
+export print_context as print_context
+export stop_print_context as stop_print_context

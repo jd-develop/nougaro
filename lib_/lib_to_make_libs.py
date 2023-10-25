@@ -31,7 +31,7 @@ class ModuleFunction(BaseBuiltInFunction):
         return f'<built-in lib function {self.module_name}.{self.name}>'
 
     def execute(self, args, interpreter_, run, noug_dir_, exec_from: str = "<invalid>",
-                use_context: Context | None = None):
+                use_context: Context | None = None, cli_args=None):
         # execute a function of the 'math' module
         # create the result
         result = RTResult()
@@ -40,6 +40,11 @@ class ModuleFunction(BaseBuiltInFunction):
         exec_context = self.generate_new_context()
         exec_context.symbol_table.set("__exec_from__", String(exec_from))
         exec_context.symbol_table.set("__actual_context__", String(self.name))
+        if cli_args is None:
+            exec_context.symbol_table.set("__args__", List([]))
+        else:
+            cli_args = list(map(String, map(str, cli_args)))
+            exec_context.symbol_table.set("__args__", List(cli_args))
 
         # get the method name and the method
         method_name = f'execute_{self.module_name}_{self.name}'

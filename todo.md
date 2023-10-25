@@ -17,16 +17,16 @@ __Release date: october 14th, 2023__
 * [X] add '\N{UNICODE CHARACTER NAME}' (finished 8/10/23)
 * [X] add `startswith` and `endswith` (finished 10/10/23)
 * [ ] add possibility to import files in current folder and sub-folders
-  * [X] Syntax: (update parser)
+  * [X] Syntax: (update parser) (finished 18/10/2023)
     * `import file` if file is in current directory
     * `import dir.file` if dir is in current directory and file is in dir
-  * [X] Update ImportNode
+  * [X] Update ImportNode (finished 18/10/2023)
   * [ ] Runtime:
     * [ ] Get the directory of the main file which is executed or imported
     * [ ] Resolve all the imports depending on this directory
 * [X] add `var++`, and `var--` (finished 17/10/23)
-* [X] Change `export` to `export (any node) as identifier` with `as identifier` being required
-* [ ] add possibility to read command line arguments
+* [X] Change `export` to `export (any node) as identifier` with `as identifier` being required (finished 20/10/2023)
+* [X] add possibility to read command line arguments (finished 26/10/2023)
 * [ ] add optional arguments in functions
 * [X] switch to semantic versioning (finished 16/10/23)
 

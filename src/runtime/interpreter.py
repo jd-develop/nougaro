@@ -36,9 +36,10 @@ _ORIGIN_FILE = "src.runtime.interpreter.Interpreter"
 # ##########
 # noinspection PyPep8Naming
 class Interpreter:
-    def __init__(self, run, noug_dir_):
+    def __init__(self, run, noug_dir_, args):
         self.run = run
         self.noug_dir = noug_dir_
+        self.args = args
 
     @staticmethod
     def update_symbol_table(ctx: Context):
@@ -998,7 +999,8 @@ class Interpreter:
             return_value = result.register(value_to_call.execute(
                 args, Interpreter, self.run, self.noug_dir,
                 exec_from=exec_from,
-                use_context=use_context
+                use_context=use_context,
+                cli_args=self.args
             ))
 
             if result.should_return():  # check for errors

@@ -30,9 +30,10 @@ import subprocess
 class BuiltInFunction(BaseBuiltInFunction):
     def __init__(self, name, call_with_module_context=False):
         super().__init__(name, call_with_module_context)
+        self.cli_args = []
 
     def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
-                use_context: Context | None = None):
+                use_context: Context | None = None, cli_args=None):
         # execute a built-in function
         # create the result
         result = RTResult()
@@ -41,6 +42,13 @@ class BuiltInFunction(BaseBuiltInFunction):
         exec_context = self.generate_new_context()
         exec_context.symbol_table.set("__exec_from__", String(exec_from))
         exec_context.symbol_table.set("__actual_context__", String(self.name))
+        if cli_args is None:
+            self.cli_args = []
+            exec_context.symbol_table.set("__args__", List([]))
+        else:
+            self.cli_args = cli_args.copy()
+            cli_args = list(map(String, map(str, cli_args)))
+            exec_context.symbol_table.set("__args__", List(cli_args))
 
         # get the method name and the method
         method_name = f'execute_{self.name}'
@@ -959,7 +967,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we run the script
         value, error = run(file_name, script, noug_dir,
                            exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
-                           actual_context=f"{exec_ctx.parent.display_name}")
+                           actual_context=f"{exec_ctx.parent.display_name}",
+                           args=self.cli_args)
 
         # we check for errors
         if error is not None:
@@ -1020,7 +1029,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         # then we execute the file
         value, error = run(file_name, script, noug_dir,
                            exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
-                           actual_context=f"{exec_ctx.parent.display_name}")
+                           actual_context=f"{exec_ctx.parent.display_name}",
+                           args=self.cli_args)
 
         if error is not None:  # we check for errors
             return RTResult().failure(error)

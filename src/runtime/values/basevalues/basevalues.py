@@ -22,7 +22,10 @@ from typing import Literal
 class String(Value):
     def __init__(self, value):
         super().__init__()
-        self.value: str | Literal = value
+        if isinstance(value, String):
+            self.value: str | Literal = value.value
+        else:
+            self.value: str | Literal = value
         self.type_ = "str"
 
     def __repr__(self):

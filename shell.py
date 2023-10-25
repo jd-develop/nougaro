@@ -47,7 +47,7 @@ def main():
         print_context = bool(int(print_context_f.read()))
 
     # message for PR-makers: if you have a better idea to how to do these things with CLI arguments, make a PR :)
-    args = sys.argv
+    args = sys.argv.copy()
     # print(args)
 
     # print(f"Arguments count: {len(sys.argv)}")
@@ -56,17 +56,14 @@ def main():
 
     # Uncomment 3 last lines to understand the following code.
     # Tested on Windows and Linux. Tested after compiling with Nuitka on Windows and Linux.
-    # if 'shell' in args[0] or 'nougaro' in args[0]:  # shell.py, shell.exe, nougaro.exe, etc.
-    #     del args[0]
     del args[0]
-
-    # print(args)
 
     line_to_exec = None
     if len(args) != 0:  # there is a file to exec
         if args[0] == "-c" or args[0] == "-cd":
             path = "<commandline>"
-            line_to_exec = ' '.join(sys.argv[1:])
+            line_to_exec = args[1]
+            del args[1]
             # note that bash, zsh and fiSH automatically delete quotes.
             # TODO: test in windows cmd and powershell
             assert isinstance(line_to_exec, str), "please report this bug on GitHub: https://github.com/" \
@@ -150,7 +147,7 @@ def main():
                 result, error = None, None
             else:  # there's an input
                 try:  # we try to run it
-                    result, error = nougaro.run('<stdin>', text, noug_dir, version)
+                    result, error = nougaro.run('<stdin>', text, noug_dir, version, args=args)
                 except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
                     print_in_red("\nKeyboardInterrupt")
                     continue  # continue the `while True` loop
@@ -189,7 +186,7 @@ def main():
             sys.exit()
 
         try:  # we try to run it
-            result, error = nougaro.run('<commandline>', line_to_exec, noug_dir, version)
+            result, error = nougaro.run('<commandline>', line_to_exec, noug_dir, version, args=args)
         except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
             print_in_red("\nKeyboardInterrupt")
             sys.exit()
@@ -230,7 +227,7 @@ def main():
             result, error = None, None
         else:  # the file isn't empty, let's run it !
             try:
-                result, error = nougaro.run('<stdin>', file_content, noug_dir, version)
+                result, error = nougaro.run('<stdin>', file_content, noug_dir, version, args=args)
             except KeyboardInterrupt:  # if CTRL+C, just exit the Nougaro shell
                 print_in_red("\nKeyboardInterrupt")
                 sys.exit()

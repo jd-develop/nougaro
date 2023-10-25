@@ -26,7 +26,7 @@ import src.runtime.interpreter
 from src.runtime.symbol_table import SymbolTable
 from src.runtime.set_symbol_table import set_symbol_table
 from src.errors.errors import *
-from src.runtime.values.basevalues.basevalues import String
+from src.runtime.values.basevalues.basevalues import String, List
 # built-in python imports
 import json
 import os.path
@@ -44,7 +44,8 @@ default_symbol_table = global_symbol_table.copy()
 # RUN
 # ##########
 def run(file_name: str, text: str, noug_dir: str, version: str = None, exec_from: str = "(shell)",
-        actual_context: str = "<program>", use_default_symbol_table: bool = False, use_context: Context | None = None):
+        actual_context: str = "<program>", use_default_symbol_table: bool = False, use_context: Context | None = None,
+        args: list[str] | None = None):
     """Run the given code.
     The code is given through the `text` argument."""
     with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug_f:
@@ -64,6 +65,11 @@ def run(file_name: str, text: str, noug_dir: str, version: str = None, exec_from
             version = f"{major}.{minor}.{patch}-{phase}"
 
     # we set version and context in the symbol table
+    if args is None:
+        global_symbol_table.set("__args__", List([]))
+    else:
+        args = list(map(String, map(str, args)))
+        global_symbol_table.set("__args__", List(args))
     global_symbol_table.set("__noug_version__", String(version))
     global_symbol_table.set("__exec_from__", String(exec_from))
     global_symbol_table.set("__actual_context__", String(actual_context))
@@ -86,7 +92,7 @@ def run(file_name: str, text: str, noug_dir: str, version: str = None, exec_from
         print(ast)
 
     # run the code (interpreter)
-    interpreter = src.runtime.interpreter.Interpreter(run, noug_dir)
+    interpreter = src.runtime.interpreter.Interpreter(run, noug_dir, args)
     if use_context is None:
         context = Context('<program>')  # create the context of the interpreter
         # don't forget to change the context symbol table to the global symbol table

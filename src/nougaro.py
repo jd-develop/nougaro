@@ -27,6 +27,7 @@ from src.runtime.symbol_table import SymbolTable
 from src.runtime.set_symbol_table import set_symbol_table
 from src.errors.errors import *
 from src.runtime.values.basevalues.basevalues import String, List
+from src.misc import nice_str_from_idk
 # built-in python imports
 import json
 import os.path
@@ -68,7 +69,7 @@ def run(file_name: str, text: str, noug_dir: str, version: str = None, exec_from
     if args is None:
         global_symbol_table.set("__args__", List([]))
     else:
-        args = list(map(String, map(str, args)))
+        args = list(map(nice_str_from_idk, args))
         global_symbol_table.set("__args__", List(args))
     global_symbol_table.set("__noug_version__", String(version))
     global_symbol_table.set("__exec_from__", String(exec_from))

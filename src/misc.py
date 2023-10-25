@@ -11,6 +11,7 @@
 # nougaro modules imports
 from src.runtime.context import Context
 from src.parser.nodes import Node
+from src.runtime.values.basevalues.basevalues import String
 # built-in python imports
 from typing import Protocol, Any
 import os
@@ -59,6 +60,16 @@ def clear_screen():
     # if Linux, macOS or UNIX -> 'clear'
     # TODO: find more OSes to include here OR find another way to clear the screen
     os.system('cls' if (os.name.lower() == "nt" or os.name.lower().startswith("windows")) else 'clear')
+
+
+def nice_str_from_idk(idk):
+    """Returns a NOUGARO string from either a PYTHON value either a NOUGARO string"""
+    if isinstance(idk, String):
+        return idk
+    elif isinstance(idk, str):
+        return String(idk)
+    else:
+        return String(str(idk))
 
 
 # ##########

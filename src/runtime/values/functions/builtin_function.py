@@ -16,7 +16,7 @@ from src.runtime.values.basevalues.basevalues import *
 from src.runtime.values.number_constants import *
 from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam
 from src.misc import CustomBuiltInFuncMethodWithNougDirButNotRun
-from src.misc import print_in_red, is_keyword, does_tok_type_exist, clear_screen
+from src.misc import print_in_red, is_keyword, does_tok_type_exist, clear_screen, nice_str_from_idk
 from src.errors.errors import RTFileNotFoundError, RTTypeError, RTTypeErrorF
 from src.runtime.values.tools import py2noug
 # built-in python imports
@@ -47,7 +47,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             exec_context.symbol_table.set("__args__", List([]))
         else:
             self.cli_args = cli_args.copy()
-            cli_args = list(map(String, map(str, cli_args)))
+            cli_args = list(map(nice_str_from_idk, cli_args))
             exec_context.symbol_table.set("__args__", List(cli_args))
 
         # get the method name and the method

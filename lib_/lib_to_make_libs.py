@@ -43,7 +43,7 @@ class ModuleFunction(BaseBuiltInFunction):
         if cli_args is None:
             exec_context.symbol_table.set("__args__", List([]))
         else:
-            cli_args = list(map(String, map(str, cli_args)))
+            cli_args = list(map(nice_str_from_idk, cli_args))
             exec_context.symbol_table.set("__args__", List(cli_args))
 
         # get the method name and the method

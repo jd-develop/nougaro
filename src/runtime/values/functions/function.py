@@ -13,6 +13,7 @@ from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.values.basevalues.basevalues import NoneValue, String, List
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
+from src.misc import nice_str_from_idk
 # built-in python imports
 # no imports
 
@@ -46,7 +47,7 @@ class Function(BaseFunction):
         if cli_args is None:
             exec_context.symbol_table.set("__args__", List([]))
         else:
-            cli_args = list(map(String, map(str, cli_args)))
+            cli_args = cli_args = list(map(nice_str_from_idk, cli_args))
             exec_context.symbol_table.set("__args__", List(cli_args))
         # print(self.context)
 

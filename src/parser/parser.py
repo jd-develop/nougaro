@@ -183,6 +183,7 @@ class Parser:
         statement  : KEYWORD:RETURN expr?
                    : KEYWORD:IMPORT IDENTIFIER (DOT IDENTIFIER)?* (AS IDENTIFIER)?
                    : KEYWORD:EXPORT expr AS IDENTIFIER
+                   : KEYWORD:EXPORT IDENTIFIER (AS IDENTIFIER)
                    : KEYWORD:CONTINUE
                    : KEYWORD:BREAK
                    : expr
@@ -262,30 +263,46 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            # we register an expr
-            expr = result.register(self.expr())
+            is_identifier = self.current_token.type == TT["IDENTIFIER"]
+            next_tok = self.next_token()
+            next_is_as_or_newline = next_tok.matches(TT["KEYWORD"], 'as') or next_tok.type in [TT["NEWLINE"], TT["EOF"]]
+            if is_identifier and next_is_as_or_newline:
+                expr_or_identifier = self.current_token
+                as_required = False
+                result.register_advancement()
+                self.advance()
+            else:
+                # we register an expr
+                expr_or_identifier = result.register(self.expr())
+                as_required = True
 
-            if not self.current_token.matches(TT["KEYWORD"], "as"):
+            current_tok_is_as = self.current_token.matches(TT["KEYWORD"], "as")
+            if as_required and not current_tok_is_as:
                 return result.failure(InvalidSyntaxError(
                     self.current_token.pos_start, self.current_token.pos_end,
                     "expected keyword 'as'.",
                     "src.parser.parser.Parser.statement"
                 ))
-            result.register_advancement()
-            self.advance()
+            if current_tok_is_as:
+                result.register_advancement()
+                self.advance()
 
-            if self.current_token.type != TT["IDENTIFIER"]:
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected identifier after 'as'.",
-                    "src.parser.parser.Parser.statement"
-                ))
+                if self.current_token.type != TT["IDENTIFIER"]:
+                    return result.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        "expected identifier after 'as'.",
+                        "src.parser.parser.Parser.statement"
+                    ))
 
-            as_identifier = self.current_token
-            result.register_advancement()
-            self.advance()
+                as_identifier = self.current_token
+                result.register_advancement()
+                self.advance()
+            else:
+                as_identifier = None
 
-            return result.success(ExportNode(expr, as_identifier, pos_start, self.current_token.pos_start.copy()))
+            return result.success(
+                ExportNode(expr_or_identifier, as_identifier, pos_start, self.current_token.pos_start.copy())
+            )
 
         # KEYWORD:CONTINUE
         if self.current_token.matches(TT["KEYWORD"], 'continue'):

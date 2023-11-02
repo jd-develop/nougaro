@@ -1286,12 +1286,40 @@ class Interpreter:
     def visit_ExportNode(self, node: ExportNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit ExportNode"""
         result = RTResult()
-        expr: Node = node.expr
+        expr_or_identifier: Node | Token = node.expr_or_identifier
+        is_expr = isinstance(expr_or_identifier, Node)
 
-        value_to_export = result.register(self.visit(expr, ctx, methods_instead_of_funcs=methods_instead_of_funcs))
-        if result.should_return():
-            return result
-        export_as_name = node.as_identifier.value
+        if is_expr:
+            value_to_export = result.register(
+                self.visit(expr_or_identifier, ctx, methods_instead_of_funcs=methods_instead_of_funcs)
+            )
+            if result.should_return():
+                return result
+        else:
+            value_to_export = ctx.symbol_table.get(expr_or_identifier.value)
+            if value_to_export is None:
+                return self._undefined(
+                    expr_or_identifier.pos_start,
+                    expr_or_identifier.pos_end,
+                    expr_or_identifier.value,
+                    ctx,
+                    result,
+                    origin_file=f"{_ORIGIN_FILE}.visit_ExportNode"
+                )
+        if node.as_identifier is None:
+            if not is_expr:
+                export_as_name = expr_or_identifier.value
+            else:
+                export_as_name = None
+        else:
+            export_as_name = node.as_identifier.value
+
+        if export_as_name is None:
+            return result.failure(RunTimeError(
+                node.pos_start, node.pos_end,
+                "expected a name to export.",
+                ctx, origin_file=f"{_ORIGIN_FILE}.visit_ExportNode"
+            ))
 
         if isinstance(value_to_export, BaseFunction):
             value_to_export.call_with_module_context = True

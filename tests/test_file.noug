@@ -536,6 +536,13 @@ def test_nougaro(print_OK)
     assert not unicodedata.is_normalized("NFC", unicodedata.normalize("NFKD", "ềtřē øŭ ňę pàŝ êțrε"))
     assert split(unicodedata.unicodedata_version, ".")(0) in ["14", "13", "15"]  # depends on python version
 
+    if print_OK then print("OK unicodedata")
+
+    # export ... as ...
+    import debug
+    assert is_func(debug.disable)
+    assert debug.test_pi == 3.14
+
     # system_call
     print("Here it should print “hello”:")
     system_call("echo hello")

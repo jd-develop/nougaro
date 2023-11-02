@@ -5,6 +5,7 @@ statements : NEWLINE* statement (NEWLINE+ statement)* NEWLINE*
 statement  : KEYWORD:RETURN expr?
            : KEYWORD:IMPORT IDENTIFIER (DOT IDENTIFIER)?* (AS IDENTIFIER)?
            : KEYWORD:EXPORT expr AS IDENTIFIER
+           : KEYWORD:EXPORT IDENTIFIER (AS IDENTIFIER)?
            : KEYWORD:CONTINUE
            : KEYWORD:BREAK
            : expr

@@ -72,7 +72,11 @@ def run(
             minor = ver_json_loaded.get("minor")
             patch = ver_json_loaded.get("patch")
             phase = ver_json_loaded.get("phase")
+            phase_minor = ver_json_loaded.get("phase-minor")
             version = f"{major}.{minor}.{patch}-{phase}"
+            if phase_minor != 0:
+                version += f".{phase_minor}"
+
 
     # we set version and context in the symbol table
     if args is None:

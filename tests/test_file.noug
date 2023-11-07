@@ -538,10 +538,19 @@ def test_nougaro(print_OK)
 
     if print_OK then print("OK unicodedata")
 
+    # noug_version
+    import noug_version
+    assert noug_version.major == int(split(__noug_version__, ".")(0))
+    assert noug_version.minor == int(split(__noug_version__, ".")(1))
+
+    if print_OK then print("OK unicodedata")
+
     # export ... as ...
     import debug
     assert is_func(debug.disable)
     assert debug.test_pi == 3.14
+
+    if print_OK then print("export as")
 
     # system_call
     print("Here it should print “hello”:")

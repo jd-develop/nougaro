@@ -7,6 +7,7 @@ This file is updated nearly every commit and copied to GH release changelog. Its
 * Add `export (node) as ...`
 * `export` now returns the value to export
 * Switch to semantic versioning
+* Add `noug_version` lib
 * Update `reverse` builtin function (fix error message + can now take strings as argument)
 * Add `var ... ++` and `var ... --`
 * Add `__args__` to have access to CLI args (except in Nebraska)

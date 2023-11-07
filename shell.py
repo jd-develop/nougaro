@@ -122,7 +122,10 @@ def main():
         minor = ver_json_loaded.get("minor")
         patch = ver_json_loaded.get("patch")
         phase = ver_json_loaded.get("phase")
+        phase_minor = ver_json_loaded.get("phase-minor")
         version = f"{major}.{minor}.{patch}-{phase}"
+        if phase_minor != 0:
+            version += f".{phase_minor}"
 
     if path == "<stdin>":  # we open the shell
         work_dir = os.getcwd()

@@ -77,7 +77,6 @@ def run(
             if phase_minor != 0:
                 version += f".{phase_minor}"
 
-
     # we set version and context in the symbol table
     if args is None:
         global_symbol_table.set("__args__", List([]))

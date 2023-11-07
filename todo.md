@@ -22,7 +22,7 @@ __Release date: october 14th, 2023__
     * `import dir.file` if dir is in current directory and file is in dir
   * [X] Update ImportNode (finished 18/10/2023)
   * [ ] Runtime:
-    * [ ] Get the directory of the main file which is executed or imported
+    * [X] Get the directory of the main file which is executed or imported (finished 7/11/2023)
     * [ ] Resolve all the imports depending on this directory
 * [X] add `var++`, and `var--` (finished 17/10/23)
 * [X] Change `export` to `export (any node) as identifier` or `export identifier` (finished 2/11/2023)
@@ -51,6 +51,7 @@ __Release date: october 14th, 2023__
 ## 0.19.0 beta (goal: july 2024)
 * [ ] add unit tests
 * [ ] add complex numbers
+* [ ] add `-i` cli arg to execute a file then run a shell within it.
 
 ## 1.0.0 release candidate (goal: october 2024)
 * [ ] create highlight extension for VSCode

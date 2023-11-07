@@ -44,9 +44,18 @@ default_symbol_table = global_symbol_table.copy()
 # ##########
 # RUN
 # ##########
-def run(file_name: str, text: str, noug_dir: str, version: str = None, exec_from: str = "(shell)",
-        actual_context: str = "<program>", use_default_symbol_table: bool = False, use_context: Context | None = None,
-        args: list[str] | None = None):
+def run(
+        file_name: str,
+        text: str,
+        noug_dir: str,
+        version: str = None,
+        exec_from: str = "(shell)",
+        actual_context: str = "<program>",
+        use_default_symbol_table: bool = False,
+        use_context: Context | None = None,
+        args: list[str] | None = None,
+        work_dir: str | None = None
+):
     """Run the given code.
     The code is given through the `text` argument."""
     with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug_f:
@@ -93,7 +102,7 @@ def run(file_name: str, text: str, noug_dir: str, version: str = None, exec_from
         print(ast)
 
     # run the code (interpreter)
-    interpreter = src.runtime.interpreter.Interpreter(run, noug_dir, args)
+    interpreter = src.runtime.interpreter.Interpreter(run, noug_dir, args, work_dir)
     if use_context is None:
         context = Context('<program>')  # create the context of the interpreter
         # don't forget to change the context symbol table to the global symbol table
@@ -116,3 +125,7 @@ def run(file_name: str, text: str, noug_dir: str, version: str = None, exec_from
     # finally, return the value and the error given by the interpreter
     # errors are managed by the shell.py file that calls this `run` function
     return result.value, result.error
+
+
+if __name__ == "__main__":
+    print("Please use shell.py in the nougaro root directory in order to execute the Nougaro Python Interpreter")

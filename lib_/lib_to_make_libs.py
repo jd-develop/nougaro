@@ -31,7 +31,7 @@ class ModuleFunction(BaseBuiltInFunction):
         return f'<built-in lib function {self.module_name}.{self.name}>'
 
     def execute(self, args, interpreter_, run, noug_dir_, exec_from: str = "<invalid>",
-                use_context: Context | None = None, cli_args=None):
+                use_context: Context | None = None, cli_args=None, work_dir: str = None):
         # execute a function of the 'math' module
         # create the result
         result = RTResult()

@@ -33,7 +33,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         self.cli_args = []
 
     def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
-                use_context: Context | None = None, cli_args=None):
+                use_context: Context | None = None, cli_args=None, work_dir: str = None):
         # execute a built-in function
         # create the result
         result = RTResult()
@@ -69,7 +69,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # special built-in functions that needs the 'run' function (in nougaro.py) in their arguments
         if method_name in ['execute_run', 'execute_example', 'execute___test__']:
             method: CustomBuiltInFuncMethodWithRunParam  # re-define the custom type
-            return_value = result.register(method(exec_context, run, noug_dir))
+            return_value = result.register(method(exec_context, run, noug_dir, work_dir))
 
             # if there is any error
             if result.should_return():
@@ -921,7 +921,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_rickroll.optional_params = []
     execute_rickroll.should_respect_args_number = False
 
-    def execute_run(self, exec_ctx: Context, run, noug_dir):
+    def execute_run(self, exec_ctx: Context, run, noug_dir, work_dir):
         """Run code from another file. Param 'run' is the 'run' function in nougaro.py"""
         # Params :
         # * file_name
@@ -965,10 +965,13 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         # we run the script
-        value, error = run(file_name, script, noug_dir,
-                           exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
-                           actual_context=f"{exec_ctx.parent.display_name}",
-                           args=self.cli_args)
+        value, error = run(
+            file_name, script, noug_dir,
+            exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
+            actual_context=f"{exec_ctx.parent.display_name}",
+            args=self.cli_args,
+            work_dir=work_dir
+        )
 
         # we check for errors
         if error is not None:
@@ -980,7 +983,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_run.optional_params = []
     execute_run.should_respect_args_number = True
 
-    def execute_example(self, exec_ctx: Context, run, noug_dir):
+    def execute_example(self, exec_ctx: Context, run, noug_dir, work_dir):
         """Run code from an example file. Param 'run' is the 'run' function in nougaro.py"""
         # Params :
         # * example_name
@@ -1027,10 +1030,13 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         # then we execute the file
-        value, error = run(file_name, script, noug_dir,
-                           exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
-                           actual_context=f"{exec_ctx.parent.display_name}",
-                           args=self.cli_args)
+        value, error = run(
+            file_name, script, noug_dir,
+            exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
+            actual_context=f"{exec_ctx.parent.display_name}",
+            args=self.cli_args,
+            work_dir=work_dir
+        )
 
         if error is not None:  # we check for errors
             return RTResult().failure(error)
@@ -1251,7 +1257,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute___is_valid_token_type__.optional_params = []
     execute___is_valid_token_type__.should_respect_args_number = True
 
-    def execute___test__(self, exec_ctx: Context, run, noug_dir):
+    def execute___test__(self, exec_ctx: Context, run, noug_dir, work_dir):
         """Execute the test file."""
         # optional params:
         # * return
@@ -1269,9 +1275,9 @@ class BuiltInFunction(BaseBuiltInFunction):
             should_i_print_ok_f.write(str(int(should_i_print_ok.is_true())))
 
         if should_i_return.is_true():
-            return self.execute_run(exec_ctx, run, noug_dir)
+            return self.execute_run(exec_ctx, run, noug_dir, work_dir)
         else:
-            result = self.execute_run(exec_ctx, run, noug_dir)
+            result = self.execute_run(exec_ctx, run, noug_dir, work_dir)
             if result.error is not None:
                 return result
             return RTResult().success(NoneValue(False))

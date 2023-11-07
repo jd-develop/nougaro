@@ -30,13 +30,15 @@ class Function(BaseFunction):
         return f'<function {self.name}>'
 
     def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
-                use_context: Context | None = None, cli_args=None):
+                use_context: Context | None = None, cli_args=None, work_dir: str = None):
+        if work_dir is None:
+            work_dir = noug_dir
         # execute the function
         # create the result
         result = RTResult()
 
         # create an interpreter to run the code inside the function
-        interpreter = interpreter_(run, noug_dir, cli_args)
+        interpreter = interpreter_(run, noug_dir, cli_args, work_dir)
 
         if use_context is not None:
             self.context = use_context
@@ -47,7 +49,7 @@ class Function(BaseFunction):
         if cli_args is None:
             exec_context.symbol_table.set("__args__", List([]))
         else:
-            cli_args = cli_args = list(map(nice_str_from_idk, cli_args))
+            cli_args = list(map(nice_str_from_idk, cli_args))
             exec_context.symbol_table.set("__args__", List(cli_args))
         # print(self.context)
 

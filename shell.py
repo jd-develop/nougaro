@@ -62,8 +62,12 @@ def main():
     if len(args) != 0:  # there is a file to exec
         if args[0] == "-c" or args[0] == "-cd":
             path = "<commandline>"
-            line_to_exec = args[1]
-            del args[1]
+            try:
+                line_to_exec = args[1]
+                del args[1]
+            except IndexError:
+                print_in_red("Expected argument with '-c' and '-cd'.")
+                sys.exit(1)
             # note that bash, zsh and fiSH automatically delete quotes.
             # TODO: test in windows cmd and powershell
             assert isinstance(line_to_exec, str), "please report this bug on GitHub: https://github.com/" \
@@ -121,6 +125,10 @@ def main():
         version = f"{major}.{minor}.{patch}-{phase}"
 
     if path == "<stdin>":  # we open the shell
+        work_dir = os.getcwd()
+        endswith_slash = work_dir.endswith("/") or work_dir.endswith("\\")
+        if not endswith_slash:
+            work_dir += "/"
         # this text is always printed when we start the shell
         print(f"Welcome to Nougaro {version} on {platform.system()}! "
               f"Contribute: https://github.com/jd-develop/nougaro/")
@@ -128,6 +136,7 @@ def main():
               "This program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.")
         print("Found a bug? Feel free to report it at https://jd-develop.github.io/nougaro/bugreport.html")
         if debug_on:
+            print(f"Current working directory is {work_dir} ({type(work_dir)})")
             print("DEBUG mode is ENABLED")
         if print_context:
             print("PRINT CONTEXT debug option is ENABLED")
@@ -147,7 +156,7 @@ def main():
                 result, error = None, None
             else:  # there's an input
                 try:  # we try to run it
-                    result, error = nougaro.run('<stdin>', text, noug_dir, version, args=args)
+                    result, error = nougaro.run('<stdin>', text, noug_dir, version, args=args, work_dir=work_dir)
                 except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
                     print_in_red("\nKeyboardInterrupt")
                     continue  # continue the `while True` loop
@@ -182,11 +191,15 @@ def main():
             else:  # there is no error nor result. If you know when that happens, tell me, please.
                 continue
     elif path == "<commandline>":
+        work_dir = os.getcwd()
+        endswith_slash = work_dir.endswith("/") or work_dir.endswith("\\")
+        if not endswith_slash:
+            work_dir += "/"
         if line_to_exec == "":
             sys.exit()
 
         try:  # we try to run it
-            result, error = nougaro.run('<commandline>', line_to_exec, noug_dir, version, args=args)
+            result, error = nougaro.run('<commandline>', line_to_exec, noug_dir, version, args=args, work_dir=work_dir)
         except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
             print_in_red("\nKeyboardInterrupt")
             sys.exit()
@@ -221,13 +234,19 @@ def main():
                     print(f"The actual result is {result}, of type {type(result)}, error is {error}.")
 
     else:  # we don't open the shell because we have to run a file.
+        work_dir = os.path.dirname(os.path.realpath(path))
+        endswith_slash = work_dir.endswith("/") or work_dir.endswith("\\")
+        if endswith_slash:
+            work_dir += "/"
+        if debug_on:
+            print(f"Nougaro working directory is {work_dir} ({type(work_dir)})")
         with open(path, encoding="UTF-8") as file:
             file_content = str(file.read())
         if file_content == "" or file_content is None:  # no need to run this empty file
             result, error = None, None
         else:  # the file isn't empty, let's run it !
             try:
-                result, error = nougaro.run('<stdin>', file_content, noug_dir, version, args=args)
+                result, error = nougaro.run('<stdin>', file_content, noug_dir, version, args=args, work_dir=work_dir)
             except KeyboardInterrupt:  # if CTRL+C, just exit the Nougaro shell
                 print_in_red("\nKeyboardInterrupt")
                 sys.exit()

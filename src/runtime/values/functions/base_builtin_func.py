@@ -27,7 +27,7 @@ class BaseBuiltInFunction(BaseFunction):
         return f'<built-in function {self.name}>'
 
     def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
-                use_context: Context | None = None):
+                use_context: Context | None = None,  work_dir: str = None):
         return RTResult().success(NoneValue(False))
 
     def no_visit_method(self, exec_context: Context):

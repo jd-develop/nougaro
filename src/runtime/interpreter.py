@@ -36,10 +36,13 @@ _ORIGIN_FILE = "src.runtime.interpreter.Interpreter"
 # ##########
 # noinspection PyPep8Naming
 class Interpreter:
-    def __init__(self, run, noug_dir_, args):
+    def __init__(self, run, noug_dir_, args, work_dir: str):
         self.run = run
         self.noug_dir = noug_dir_
         self.args = args
+        self.work_dir: str = work_dir
+        assert self.work_dir is not None, ("please report this bug on "
+                                           "https://github.com/jd-develop/nougaro/issues/new/choose")
 
     @staticmethod
     def update_symbol_table(ctx: Context):
@@ -1000,7 +1003,8 @@ class Interpreter:
                 args, Interpreter, self.run, self.noug_dir,
                 exec_from=exec_from,
                 use_context=use_context,
-                cli_args=self.args
+                cli_args=self.args,
+                work_dir=self.work_dir
             ))
 
             if result.should_return():  # check for errors
@@ -1235,6 +1239,10 @@ class Interpreter:
         if len(identifiers) != 1:
             print_in_red(f"This feature is work in progress. "
                          f"This will be interpreted as: `import {identifiers[0].value}`.")
+            print("Debug info")
+            print("==========")
+            print(f"workdir is {self.work_dir}")
+            print("==========")
 
         identifier = identifiers[0]
         name_to_import = identifier.value  # we get the module identifier
@@ -1252,7 +1260,7 @@ class Interpreter:
                 text = lib_.read()
 
             value, error = self.run(file_name=f"{name_to_import} (lib)", text=text, noug_dir=self.noug_dir,
-                                    exec_from=ctx.display_name, use_default_symbol_table=True)
+                                    exec_from=ctx.display_name, use_default_symbol_table=True, work_dir=self.work_dir)
             value: Value
             if error is not None:
                 return result.failure(error)

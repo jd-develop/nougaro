@@ -16,18 +16,15 @@ import os
 import pathlib
 
 
-# parent twice (this file.parent = src, src.parent = nougaro root
-_noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.parent.absolute())
-with open(os.path.abspath(_noug_dir + "/config/debug.conf")) as debug:
-    _print_origin_file = bool(int(debug.read()))
-
-
 # ##########
 # ERRORS
 # ##########
 class Error:
     """Parent class for all the Nougaro errors."""
     def __init__(self, pos_start, pos_end, error_name, details, origin_file: str = "(undetermined)"):
+        noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.parent.absolute())
+        with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug:
+            self.print_origin_file = bool(int(debug.read()))
         self.pos_start = pos_start
         self.pos_end = pos_end
         self.error_name = error_name  # e.g. IllegalCharError
@@ -60,7 +57,7 @@ class Error:
                     except IndexError:
                         pass
 
-        if _print_origin_file:
+        if self.print_origin_file:
             result = f"(from {self.origin_file})\n" \
                      f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1} : " + '\n'
         else:
@@ -149,7 +146,7 @@ class RunTimeError(Error):
             pos = ctx.parent_entry_pos
             ctx = ctx.parent
 
-        if _print_origin_file:
+        if self.print_origin_file:
             return f"(from {self.origin_file})\nTraceback (most recent call last) :\n" + result
         else:
             return "Traceback (most recent call last) :\n" + result
@@ -204,8 +201,15 @@ class RTTypeErrorF(RTTypeError):
 
 class RTFileNotFoundError(RunTimeError):
     """File not found (like `open "this_file_does_not_exist"`)"""
-    def __init__(self, pos_start, pos_end, file_name, context: Context, origin_file: str = "(undetermined)"):
-        super().__init__(pos_start, pos_end, f"file ‘{file_name}’ does not exist.", context, rt_error=False,
+    def __init__(self, pos_start, pos_end, file_name, context: Context, origin_file: str = "(undetermined)",
+                 folder: bool = False, custom: bool = False):
+        if custom:
+            message = file_name
+        elif folder:
+            message = f"directory '{file_name}' does not exist."
+        else:
+            message = f"file '{file_name}' does not exist."
+        super().__init__(pos_start, pos_end, message, context, rt_error=False,
                          error_name="FileNotFoundError", origin_file=origin_file)
         self.context = context
 

@@ -37,6 +37,9 @@ _ORIGIN_FILE = "src.runtime.interpreter.Interpreter"
 # noinspection PyPep8Naming
 class Interpreter:
     def __init__(self, run, noug_dir_, args, work_dir: str):
+        noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.parent.absolute())
+        with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug_file:
+            self.debug = bool(int(debug_file.read()))
         self.run = run
         self.noug_dir = noug_dir_
         self.args = args
@@ -1236,27 +1239,76 @@ class Interpreter:
         """Visit ImportNode"""
         result = RTResult()
         identifiers: list[Token] = node.identifiers  # we get the module identifier token
-        if len(identifiers) != 1:
-            print_in_red(f"This feature is work in progress. "
-                         f"This will be interpreted as: `import {identifiers[0].value}`.")
+        IS_NOUGARO_LIB = IS_PYTHON_LIB = False
+        endswith_slash = self.work_dir.endswith("/") or self.work_dir.endswith("\\")
+        if not endswith_slash:
+            self.work_dir += "/"
+        if self.debug:
+            print("==========")
             print("Debug info")
             print("==========")
             print(f"workdir is {self.work_dir}")
-            print("==========")
 
-        identifier = identifiers[0]
-        name_to_import = identifier.value  # we get the module identifier
+        if len(identifiers) != 1:
+            path = self.work_dir
+            last_i = len(identifiers) - 1
+            for i, identifier in enumerate(identifiers):
+                should_be_dir = i != last_i
+
+                if should_be_dir:
+                    if not os.path.isdir(path + identifier.value):
+                        return result.failure(RTFileNotFoundError(
+                            identifier.pos_start, identifier.pos_end, identifier.value, ctx,
+                            origin_file=f"{_ORIGIN_FILE}.visit_ImportNode",
+                            folder=True
+                        ))
+                    path += identifier.value + "/"
+                    continue
+
+                noug_lib_exists = os.path.exists(path + identifier.value + ".noug")
+                if noug_lib_exists:
+                    path += identifier.value + ".noug"
+                    IS_NOUGARO_LIB = True
+                else:
+                    return result.failure(RTFileNotFoundError(
+                        identifier.pos_start, identifier.pos_end,
+                        f"{identifier.value}.noug",
+                        ctx,
+                        origin_file=f"{_ORIGIN_FILE}.visit_ImportNode"
+                    ))
+            name_to_import = identifiers[-1].value
+            path = os.path.abspath(path)
+        else:
+            identifier = identifiers[0]
+            name_to_import = identifier.value  # we get the module identifier
+            IS_LOCAL_LIB = os.path.exists(self.work_dir + f"{name_to_import}.noug")
+            IS_NOUGARO_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}.noug"))
+            IS_PYTHON_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}_.py"))
+            if IS_LOCAL_LIB:
+                path = os.path.abspath(self.work_dir + f"{name_to_import}.noug")
+                IS_NOUGARO_LIB = True
+            elif IS_NOUGARO_LIB:
+                path = os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}.noug")
+            elif IS_PYTHON_LIB:
+                path = os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}_.py")
+            else:
+                path = ""
+        identifier = identifiers[-1]
+
+        if self.debug:
+            print(f"path is {path}")
+            print(f"name to import is {name_to_import}")
+            print(f"{IS_NOUGARO_LIB=}, {IS_PYTHON_LIB=}")
+            print()
+
         as_identifier: Token = node.as_identifier
         if as_identifier is None:
             import_as_name = name_to_import
         else:
             import_as_name = as_identifier.value
 
-        IS_NOUGARO_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}.noug"))
-        IS_PYTHON_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}_.py"))
-
         if IS_NOUGARO_LIB:
-            with open(os.path.abspath(self.noug_dir + f"/lib_/{name_to_import}.noug")) as lib_:
+            with open(path) as lib_:
                 text = lib_.read()
 
             value, error = self.run(file_name=f"{name_to_import} (lib)", text=text, noug_dir=self.noug_dir,
@@ -1275,14 +1327,14 @@ class Interpreter:
             except ImportError:
                 return result.failure(RTNotDefinedError(
                     identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
-                    f"{_ORIGIN_FILE}.visit_ImportNode\n"
+                    origin_file=f"{_ORIGIN_FILE}.visit_ImportNode\n"
                     "(troubleshooting: is python importlib working?)"
                 ))
         else:
             return result.failure(RTNotDefinedError(
                 identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
-                f"{_ORIGIN_FILE}.visit_ImportNode\n"
-                "(troubleshooting: not involving importlib)"
+                origin_file=f"{_ORIGIN_FILE}.visit_ImportNode\n"
+                "(troubleshooting: not involving importlib. Is path detection working?)"
             ))
 
         module_value = Module(name_to_import, what_to_import)

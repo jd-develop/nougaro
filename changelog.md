@@ -1,7 +1,7 @@
 # Changelog
 This file is updated nearly every commit and copied to GH release changelog. Its content is deleted each new version.
 
-## 0.16.0 beta
+## 0.16.0-beta
 * Better error messages
 * Add `import ... as ...`
 * Add `export (node) as ...`
@@ -11,3 +11,6 @@ This file is updated nearly every commit and copied to GH release changelog. Its
 * Update `reverse` builtin function (fix error message + can now take strings as argument)
 * Add `var ... ++` and `var ... --`
 * Add `__args__` to have access to CLI args (except in Nebraska)
+* You can now import nougaro files from current folder and sub-folders.
+* Fixed an old bug with debug:
+  * When you activate the debug mode from the shell, you no longer need to restart it for errors to print their origin file.

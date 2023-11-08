@@ -16,14 +16,14 @@ __Release date: october 14th, 2023__
 * [X] add '\UXXXXXXXX' (finished 8/10/23)
 * [X] add '\N{UNICODE CHARACTER NAME}' (finished 8/10/23)
 * [X] add `startswith` and `endswith` (finished 10/10/23)
-* [ ] add possibility to import files in current folder and sub-folders
+* [X] add possibility to import files in current folder and sub-folders (finished 8/11/2023)
   * [X] Syntax: (update parser) (finished 18/10/2023)
     * `import file` if file is in current directory
     * `import dir.file` if dir is in current directory and file is in dir
   * [X] Update ImportNode (finished 18/10/2023)
-  * [ ] Runtime:
+  * [X] Runtime:
     * [X] Get the directory of the main file which is executed or imported (finished 7/11/2023)
-    * [ ] Resolve all the imports depending on this directory
+    * [X] Resolve all the imports depending on this directory (finished 8/11/2023)
 * [X] add `var++`, and `var--` (finished 17/10/23)
 * [X] Change `export` to `export (any node) as identifier` or `export identifier` (finished 2/11/2023)
 * [ ] add possibility to `export id.attr`

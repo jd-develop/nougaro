@@ -1186,18 +1186,9 @@ class BuiltInFunction(BaseBuiltInFunction):
                 os.startfile(os.path.realpath(noug_dir + "/LICENSE"))
             elif system == "Linux":  # Linux
                 subprocess.run(('xdg-open', os.path.abspath(noug_dir + "/LICENSE")))
-            elif system == "FreeBSD" or system == "OpenBSD":
-                text_editor = input("Choose your text editor [ee/vi/vim/gedit/cancel] ")
-                if text_editor == "ee":
-                    subprocess.run(('ee', os.path.abspath(noug_dir + "/LICENSE")))
-                elif text_editor == "vi":
-                    subprocess.run(("vi", os.path.abspath(noug_dir + "/LICENSE")))
-                elif text_editor == "vim":
-                    subprocess.run(("vim", os.path.abspath(noug_dir + "/LICENSE")))
-                elif text_editor == "gedit":
-                    subprocess.run(("gedit", os.path.abspath(noug_dir + "/LICENSE")))
-                else:
-                    pass
+            elif system == "FreeBSD" or system == "OpenBSD" or system.endswith("BSD"):
+                text_editor = input("Enter the command of your text editor (example: vim, emacs, …) ")
+                subprocess.run((text_editor, os.path.abspath(noug_dir + "/LICENSE")))
             else:
                 print(f"<built-in function __gpl__> said:\n"
                       f"Sorry, your OS is not recognized. (platform.system() is '{system}')\n"
@@ -1208,7 +1199,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                       f"https://www.gnu.org/licenses/gpl-3.0.txt")
                 print("However, you can enter the command to open your text editor, the argument of the file will be "
                       "automatically added.")
-                command = input("Enter the command of your text editor (example: nano, vim, ee): ")
+                command = input("Enter the command of your text editor (example: vim, emacs, …): ")
                 subprocess.run((command, os.path.abspath(noug_dir + "/LICENSE")))
             return RTResult().success(NoneValue(False))
 

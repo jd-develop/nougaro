@@ -16,3 +16,4 @@ This file is updated nearly every commit and copied to GH release changelog. Its
   * When you activate the debug mode from the shell, you no longer need to restart it for errors to print their origin file.
 * improve `__gpl__` builtin func on BSD:
   * now can take any command as text editor
+* add `__python__` builtin func

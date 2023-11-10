@@ -14,6 +14,7 @@ from src.runtime.context import Context
 # built-in python imports
 import os
 import pathlib
+import traceback
 
 
 # ##########
@@ -161,7 +162,6 @@ class RTIndexError(RunTimeError):
     def __init__(self, pos_start, pos_end, details, context: Context, origin_file: str = "(undetermined)"):
         super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="IndexError",
                          origin_file=origin_file)
-        self.context = context
 
 
 class RTArithmeticError(RunTimeError):
@@ -169,7 +169,6 @@ class RTArithmeticError(RunTimeError):
     def __init__(self, pos_start, pos_end, details, context: Context, origin_file: str = "(undetermined)"):
         super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="ArithmeticError",
                          origin_file=origin_file)
-        self.context = context
 
 
 class RTNotDefinedError(RunTimeError):
@@ -177,7 +176,6 @@ class RTNotDefinedError(RunTimeError):
     def __init__(self, pos_start, pos_end, details, context: Context, origin_file: str = "(undetermined)"):
         super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="NotDefinedError",
                          origin_file=origin_file)
-        self.context = context
 
 
 class RTTypeError(RunTimeError):
@@ -185,18 +183,19 @@ class RTTypeError(RunTimeError):
     def __init__(self, pos_start, pos_end, details, context: Context, origin_file: str = "(undetermined)"):
         super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="TypeError",
                          origin_file=origin_file)
-        self.context = context
 
 
 class RTTypeErrorF(RTTypeError):
     """Type error (like 'max("foo")'), for builtin functions"""
     def __init__(self, pos_start, pos_end, arg_num: str, func_name: str, type_: str, value, context: Context,
                  origin_file: str = "(undetermined)", or_: str = None):
-        super().__init__(pos_start, pos_end, f"type of the {arg_num} argument of builtin function ‘{func_name}’ "
-                                             f"should be ‘{type_}’{f' or ‘{or_}’' if or_ is not None else ''}, "
-                                             f"got ‘{value.type_}’ instead.", context,
-                         origin_file=origin_file)
-        self.context = context
+        super().__init__(
+            pos_start, pos_end,
+            f"type of the {arg_num} argument of builtin function ‘{func_name}’ "
+            f"should be ‘{type_}’{f' or ‘{or_}’' if or_ is not None else ''}, "
+            f"got ‘{value.type_}’ instead.", context,
+            origin_file=origin_file
+        )
 
 
 class RTFileNotFoundError(RunTimeError):
@@ -211,7 +210,6 @@ class RTFileNotFoundError(RunTimeError):
             message = f"file '{file_name}' does not exist."
         super().__init__(pos_start, pos_end, message, context, rt_error=False,
                          error_name="FileNotFoundError", origin_file=origin_file)
-        self.context = context
 
 
 class RTAssertionError(RunTimeError):
@@ -219,7 +217,6 @@ class RTAssertionError(RunTimeError):
     def __init__(self, pos_start, pos_end, errmsg, context: Context, origin_file: str = "(undetermined)"):
         super().__init__(pos_start, pos_end, errmsg, context, rt_error=False, error_name="AssertionError",
                          origin_file=origin_file)
-        self.context = context
 
 
 class RTAttributeError(RunTimeError):
@@ -228,7 +225,6 @@ class RTAttributeError(RunTimeError):
         errmsg = f"{obj_type} has no attribute '{attr_name}'."
         super().__init__(pos_start, pos_end, errmsg, context, rt_error=False, error_name="AttributeError",
                          origin_file=origin_file)
-        self.context = context
 
 
 class RTOverflowError(RunTimeError):
@@ -236,4 +232,22 @@ class RTOverflowError(RunTimeError):
     def __init__(self, pos_start, pos_end, errmsg, context: Context, origin_file: str = "(undetermined)"):
         super().__init__(pos_start, pos_end, errmsg, context, rt_error=False, error_name="OverflowError",
                          origin_file=origin_file)
-        self.context = context
+
+
+class PythonError(RunTimeError):
+    """Python error"""
+    def __init__(self, pos_start, pos_end, error: Exception, context: Context, origin_file: str = "(undetermined)"):
+        errmsg = f"{error.__class__.__name__}: {error}"
+        super().__init__(pos_start, pos_end, errmsg, context, rt_error=False, error_name="PythonError",
+                         origin_file=origin_file)
+        self.error: Exception = error
+
+    def generate_traceback(self):
+        tb = super().generate_traceback()
+        tb += "========= The following is python traceback =========\n"
+        py_tb = traceback.format_tb(self.error.__traceback__)
+        for line in py_tb:
+            tb += line
+        tb += "============ End of the python traceback ============\n"
+
+        return tb

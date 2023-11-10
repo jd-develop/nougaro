@@ -91,6 +91,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     # Technical
     symbol_table.set("exit", BuiltInFunction('exit'))
     symbol_table.set("system_call", BuiltInFunction('system_call'))
+    symbol_table.set("__python__", BuiltInFunction('__python__'))
     symbol_table.set('__os_name__', String(platform.system()))
     symbol_table.set('__os_release__', String(platform.uname().release))
     symbol_table.set('__os_version__', String(platform.uname().version))

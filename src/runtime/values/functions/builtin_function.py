@@ -14,10 +14,8 @@ from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.context import Context
 from src.runtime.values.basevalues.basevalues import *
 from src.runtime.values.number_constants import *
-from src.misc import CustomBuiltInFuncMethod, CustomBuiltInFuncMethodWithRunParam
-from src.misc import CustomBuiltInFuncMethodWithNougDirButNotRun
-from src.misc import print_in_red, is_keyword, does_tok_type_exist, clear_screen, nice_str_from_idk
-from src.errors.errors import RTFileNotFoundError, RTTypeError, RTTypeErrorF
+from src.misc import *
+from src.errors.errors import *
 from src.runtime.values.tools import py2noug
 # built-in python imports
 from os import system as os_system
@@ -1608,5 +1606,31 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute_endswith.param_names = ["str_", "endswith"]
     execute_endswith.optional_params = []
     execute_endswith.should_respect_args_number = True
+
+    def execute___python__(self, exec_ctx: Context) -> RTResult:
+        """Execute a python line. Same as python’s `eval()`"""
+        source = exec_ctx.symbol_table.getf("source")
+        if not isinstance(source, String):
+            return RTResult().failure(RTTypeErrorF(
+                source.pos_start, source.pos_end,
+                "first", "__python__", "str", source,
+                exec_ctx,
+                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute___python__"
+            ))
+        try:
+            v = eval(source.value)
+        except Exception as e:
+            return RTResult().failure(PythonError(
+                source.pos_start, source.pos_end,
+                e,
+                exec_ctx,
+                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute___python__"
+            ))
+        return RTResult().success(py2noug.py2noug(v))
+
+    execute___python__.param_names = ["source"]
+    execute___python__.optional_params = []
+    execute___python__.should_respect_args_number = True
+    # todo: add tests
 
     # ==================

@@ -38,8 +38,9 @@ else:
 # ##########
 # TOOLS
 # ##########
-def is_num(value: Any): return isinstance(value, int) or isinstance(value, float)  # returns True if the value is a
-#                                                                                    python int or float
+def is_num(value: Any):
+    """Return True if `value` is a python `int` or `float`. Return False in the other cases, including `bool`"""
+    return (isinstance(value, int) or isinstance(value, float)) and not isinstance(value, bool)
 
 
 def does_tok_type_exist(tok_type: str):

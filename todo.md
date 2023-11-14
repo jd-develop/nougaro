@@ -27,8 +27,14 @@ __Release date: october 14th, 2023__
 * [X] add `var++`, and `var--` (finished 17/10/23)
 * [X] Change `export` to `export (any node) as identifier` or `export identifier` (finished 2/11/2023)
 * [X] add possibility to read command line arguments (finished 26/10/2023)
-* [ ] add optional arguments in functions
 * [X] switch to semantic versioning (finished 16/10/23)
+* [ ] add optional arguments in functions
+  * [ ] Parser:
+    * [ ] Allow optional parameters, do not allow positional parameters after them
+    * [ ] Update node
+  * [ ] Runtime:
+    * [ ] Update Function value and methods
+    * [ ] Update Interpreter visit methods
 
 ## 0.17.0 beta (goal: february 2024)
 * [X] add `import ... as ...` (finished 16/10/23)

@@ -1631,6 +1631,5 @@ class BuiltInFunction(BaseBuiltInFunction):
     execute___python__.param_names = ["source"]
     execute___python__.optional_params = []
     execute___python__.should_respect_args_number = True
-    # todo: add tests
 
     # ==================

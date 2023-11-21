@@ -35,6 +35,7 @@ __Release date: october 14th, 2023__
   * [ ] Runtime:
     * [ ] Update Function value and methods
     * [ ] Update Interpreter visit methods
+* [ ] return None in loops, even when there is a continue of a break
 
 ## 0.17.0 beta (goal: february 2024)
 * [X] add `import ... as ...` (finished 16/10/23)

@@ -741,17 +741,18 @@ class Interpreter:
 
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
+                elements.append(NoneValue(False))
                 continue  # will continue the 'while condition()' -> the interpreted 'for' loop is continued
 
             if result.loop_should_break:
+                elements.append(NoneValue(False))
                 break  # will break the 'while condition()' -> the interpreted 'for' loop is break
 
             if result.should_return():
                 # if there is an error or a 'return' statement
                 return result
 
-            if not isinstance(value, NoneValue) or value.should_print:
-                elements.append(value)
+            elements.append(value)
 
         return result.success(
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
@@ -785,18 +786,19 @@ class Interpreter:
             self.update_symbol_table(ctx)
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
+                elements.append(NoneValue(False))
                 continue  # will continue the 'for e in iterable_.elements' -> the interpreted 'for' loop is
                 #           continued
 
             if result.loop_should_break:
+                elements.append(NoneValue(False))
                 break  # will break the 'for e in iterable_.elements' -> the interpreted 'for' loop is break
 
             if result.should_return():
                 # error or 'return' statement
                 return result
 
-            if not isinstance(value, NoneValue) or value.should_print:
-                elements.append(value)
+            elements.append(value)
 
         return result.success(
             List(elements).set_context(ctx).set_pos(node.pos_start, node.pos_end)
@@ -814,17 +816,18 @@ class Interpreter:
         while condition.is_true():
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
+                elements.append(NoneValue(False))
                 continue
 
             if result.loop_should_break:
+                elements.append(NoneValue(False))
                 break
 
             if result.should_return():
                 # error or 'return' statement
                 return result
 
-            if not isinstance(value, NoneValue) or value.should_print:
-                elements.append(value)
+            elements.append(value)
 
             condition = result.register(self.visit(node.condition_node, ctx, methods_instead_of_funcs))
             if result.should_return():  # check for errors
@@ -842,17 +845,18 @@ class Interpreter:
         while True:
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
+                elements.append(NoneValue(False))
                 continue
 
             if result.loop_should_break:
+                elements.append(NoneValue(False))
                 break
 
             if result.should_return():
                 # error or 'return' statement
                 return result
 
-            if not isinstance(value, NoneValue) or value.should_print:
-                elements.append(value)
+            elements.append(value)
 
             condition = result.register(self.visit(node.condition_node, ctx, methods_instead_of_funcs))
             if result.should_return():  # check for errors

@@ -14,6 +14,8 @@ This file is updated nearly every commit and copied to GH release changelog. Its
 * You can now import nougaro files from current folder and sub-folders.
 * Fixed an old bug with debug:
   * When you activate the debug mode from the shell, you no longer need to restart it for errors to print their origin file.
-* improve `__gpl__` builtin func on BSD:
+* Improve `__gpl__` builtin func on BSD:
   * now can take any command as text editor
-* add `__python__` builtin func
+* Add `__python__` builtin func
+* Loops now append `None` to their result even if the node is `None`, not printable, or if the loop is broke or continued.
+* Better retrocompatibility with python 3.10 in tests

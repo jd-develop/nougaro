@@ -28,6 +28,10 @@ __Release date: october 14th, 2023__
 * [X] Change `export` to `export (any node) as identifier` or `export identifier` (finished 2/11/2023)
 * [X] add possibility to read command line arguments (finished 26/10/2023)
 * [X] switch to semantic versioning (finished 16/10/23)
+* [X] return None in loops, even when there is a continue of a break (finished 24/11/2023)
+
+## 0.17.0 beta (goal: february 2024)
+* [X] add `import ... as ...` (finished 16/10/23)
 * [ ] add optional arguments in functions
   * [ ] Parser:
     * [ ] Allow optional parameters, do not allow positional parameters after them
@@ -35,10 +39,6 @@ __Release date: october 14th, 2023__
   * [ ] Runtime:
     * [ ] Update Function value and methods
     * [ ] Update Interpreter visit methods
-* [ ] return None in loops, even when there is a continue of a break
-
-## 0.17.0 beta (goal: february 2024)
-* [X] add `import ... as ...` (finished 16/10/23)
 * [ ] rewrite parser to make it faster and easier to read
 * [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
 * [ ] add builtin classes

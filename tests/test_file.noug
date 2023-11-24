@@ -163,7 +163,7 @@ def test_nougaro(print_OK)
 
     # loops
     assert (for i = 1 to 10 then i) == [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    assert (for i in [1, 2, 3, 4, 5, 6, 7, 8, 9] then if i%2 == 0 then i else continue) == [2, 4, 6, 8]
+    assert (for i in [1, 2, 3, 4, 5, 6, 7, 8, 9] then if i%2 == 0 then i else continue) == [None, 2, None, 4, None, 6, None, 8, None]
     assert (for i = -1 to -10 step -1 then i%2) == [1, 0, 1, 0, 1, 0, 1, 0, 1]
     var b = 1
     assert (while b<10 then; var b+=1; end) == [[2], [3], [4], [5], [6], [7], [8], [9], [10]]
@@ -436,12 +436,12 @@ def test_nougaro(print_OK)
     if print_OK then print("OK lists")
 
     # Loops
-    assert (while (assert True) == None then break) == []
+    assert (while (assert True) == None then break) == [None]
     assert (for i in [1, 2, 3] then i) == [1, 2, 3]
-    assert (for i = 0 to 9 step 2 then assert i%2 == 0) == []
-    assert (for j in for i = 1 to 100 then i then if j%25 == 0 then j) == [25, 50, 75]
-    assert not (for i = 0 to -9 step -2 then assert i%2 == 0)
-    assert (do assert True then loop while False) == []
+    assert (for i = 0 to 9 step 2 then assert i%2 == 0) == [None]*5
+    assert (for j in for i = 1 to 100 then i then if j%25 == 0 then j) == ([None]*24) * [25] * ([None]*24) * [50] * ([None]*24) * [75] * ([None]*24)
+    assert (for i = 0 to -9 step -2 then assert i%2 == 0) == [None]*5
+    assert (do assert True then loop while False) == [None]
     assert (do "hi" then loop while False) == ["hi"]
 
     if print_OK then print("OK loops 2")

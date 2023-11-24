@@ -40,8 +40,8 @@ class TestLexer(unittest.TestCase):
         self.assertEqual(len(tokens), 5)
         for i in range(4):
             self.assertIsInstance(tokens[i], src.lexer.token.Token)
-        self.assert_(tokens[0].matches(TT["KEYWORD"], "var"))
-        self.assert_(tokens[1].matches(TT["IDENTIFIER"], "identifier"))
-        self.assert_(tokens[2].matches(TT["KEYWORD"], "assert"))
-        self.assert_(tokens[3].matches(TT["IDENTIFIER"], "True"))
-        self.assert_(tokens[4].type == TT["EOF"])
+        self.assertTrue(tokens[0].matches(TT["KEYWORD"], "var"))
+        self.assertTrue(tokens[1].matches(TT["IDENTIFIER"], "identifier"))
+        self.assertTrue(tokens[2].matches(TT["KEYWORD"], "assert"))
+        self.assertTrue(tokens[3].matches(TT["IDENTIFIER"], "True"))
+        self.assertEqual(tokens[4].type, TT["EOF"])

@@ -11,7 +11,7 @@ __Release date: october 14th, 2023__
 * [X] add an error when things like `math.(assert 1)` (finished 3/10/23)
 * [X] add `time.time()` (finished 3/10/23)
 
-## 0.16.0 beta (goal: november 2023)
+## 0.16.0 beta (goal: november 26th, 2023)
 * [X] add '\xXX' and '\uXXXX' support (finished 6/10/23)
 * [X] add '\UXXXXXXXX' (finished 8/10/23)
 * [X] add '\N{UNICODE CHARACTER NAME}' (finished 8/10/23)

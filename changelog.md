@@ -1,5 +1,5 @@
 # Changelog
-This file is updated nearly every commit and copied to GH release changelog. Its content is deleted each new version.
+This file is updated nearly every commit and copied to GH release changelog.
 
 # 0.16.0-beta
 ## Syntax
@@ -30,3 +30,6 @@ This file is updated nearly every commit and copied to GH release changelog. Its
 * Switch to semantic versioning
 * Add `__args__` to have access to CLI args (except in Nebraska)
 * Better retrocompatibility with python 3.10 in tests
+* Add a reference to this changelog file in the intro text
+* Add backlines to the intro text to be more pleasant to read
+* Add python version to intro text in debug mode

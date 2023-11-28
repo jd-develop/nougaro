@@ -29,6 +29,7 @@ __Release date: october 14th, 2023__
 * [X] add possibility to read command line arguments (finished 26/10/2023)
 * [X] switch to semantic versioning (finished 16/10/23)
 * [X] return None in loops, even when there is a continue of a break (finished 24/11/2023)
+* [X] fix the fact that nougaro doesn’t crashes with an error code when there is an error
 
 ## 0.17.0 beta (goal: february 2024)
 * [X] add `import ... as ...` (finished 16/10/23)

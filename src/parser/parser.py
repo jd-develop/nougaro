@@ -37,11 +37,11 @@ class Parser:
         """Parse tokens and return a result that contain a main node"""
         result = self.statements()
         if result.error is not None and self.current_token.type != TT["EOF"]:
-            return result.failure(
-                InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                   "invalid syntax.",
-                                   "src.parser.parser.Parser.parse")
-            )
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "invalid syntax.",
+                "src.parser.parser.Parser.parse"
+            ))
         return result
 
     def advance(self):
@@ -359,12 +359,10 @@ class Parser:
                         error_msg = f"expected identifier, but got {self.current_token.type}."
                     else:
                         error_msg = f"expected identifier, but got '{self.current_token.type}'."
-                    return result.failure(
-                        InvalidSyntaxError(
-                            self.current_token.pos_start, self.current_token.pos_end, error_msg,
-                            "src.parser.parser.Parser.expr"
-                        )
-                    )
+                    return result.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end, error_msg,
+                        "src.parser.parser.Parser.expr"
+                    ))
                 else:
                     return result.failure(InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
@@ -392,13 +390,11 @@ class Parser:
 
             # (TO|TO_AND_OVERWRITE)
             if self.current_token.type not in [TT["TO"], TT["TO_AND_OVERWRITE"]]:
-                return result.failure(
-                    InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "'>>' or '!>>' is missing. The correct syntax is 'write () (!)>> ()'.",
-                        "src.parser.parser.Parser.expr"
-                    )
-                )
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "'>>' or '!>>' is missing. The correct syntax is 'write () (!)>> ()'.",
+                    "src.parser.parser.Parser.expr"
+                ))
             to_token = self.current_token
 
             result.register_advancement()
@@ -440,12 +436,10 @@ class Parser:
 
                 # we check for an identifier
                 if self.current_token.type != TT["IDENTIFIER"]:
-                    return result.failure(
-                        InvalidSyntaxError(
-                            self.current_token.pos_start, self.current_token.pos_end,
-                            f"expected identifier, got {self.current_token.type}.", "src.parser.parser.Parser.expr"
-                        )
-                    )
+                    return result.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        f"expected identifier, got {self.current_token.type}.", "src.parser.parser.Parser.expr"
+                    ))
 
                 identifier = self.current_token
 
@@ -815,12 +809,9 @@ class Parser:
                         result.register_advancement()
                         self.advance()
                     # expr
-                    arg_nodes.append(
-                        (
-                            result.register(self.expr()),
-                            mul
-                        )
-                    )
+                    expr_ = result.register(self.expr())
+                    expr_and_mul = (expr_, mul)
+                    arg_nodes.append(expr_and_mul)
                     if result.error is not None:
                         return result
                     while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
@@ -836,23 +827,18 @@ class Parser:
                             self.advance()
                         # expr
                         # we register an expr then check for an error
-                        arg_nodes.append(
-                            (
-                                result.register(self.expr()),
-                                mul
-                            )
-                        )
+                        expr_ = result.register(self.expr())
+                        expr_and_mul = (expr_, mul)
+                        arg_nodes.append(expr_and_mul)
                         if result.error is not None:
                             return result
 
                     if self.current_token.type != TT["RPAREN"]:  # there is no paren (it is expected)
-                        return result.failure(
-                            InvalidSyntaxError(
-                                self.current_token.pos_start, self.current_token.pos_end,
-                                "expected ',' or ')'." if comma_expected else "expected ')'.",
-                                "src.parser.parser.Parser.call"
-                            )
-                        )
+                        return result.failure(InvalidSyntaxError(
+                            self.current_token.pos_start, self.current_token.pos_end,
+                            "expected ',' or ')'." if comma_expected else "expected ')'.",
+                            "src.parser.parser.Parser.call"
+                        ))
 
                     result.register_advancement()
                     self.advance()
@@ -892,13 +878,11 @@ class Parser:
 
                 # INT
                 if self.current_token.type != TT["INT"]:
-                    return result.failure(
-                        InvalidSyntaxError(
-                            self.current_token.pos_start, self.current_token.pos_end,
-                            f"expected an int here, but got {self.current_token.type}.",
-                            "src.parser.parser.Parser.atom"
-                        )
-                    )
+                    return result.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        f"expected an int here, but got {self.current_token.type}.",
+                        "src.parser.parser.Parser.atom"
+                    ))
                 exp_token = self.current_token
 
                 # we advance
@@ -987,10 +971,11 @@ class Parser:
 
                 return result.success(expr)
             else:  # we return an error message
-                return result.failure(
-                    InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, "expected ')'.",
-                                       "src.parser.parser.Parser.atom")
-                )
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected ')'.",
+                    "src.parser.parser.Parser.atom"
+                ))
 
         elif token.type == TT["DOLLAR"]:
             result.register_advancement()
@@ -1052,16 +1037,17 @@ class Parser:
             return result.success(class_def)
 
         if self.current_token.matches(TT["KEYWORD"], "else"):
-            return result.failure(
-                InvalidSyntaxError(token.pos_start, token.pos_end,
-                                   "expected valid expression. Maybe you forgot to close an 'end'?",
-                                   "src.parser.parser.Parser.atom")
-            )
+            return result.failure(InvalidSyntaxError(
+                token.pos_start, token.pos_end,
+                "expected valid expression. Maybe you forgot to close an 'end'?",
+                "src.parser.parser.Parser.atom"
+            ))
 
-        return result.failure(
-            InvalidSyntaxError(token.pos_start, token.pos_end, "expected valid expression.",
-                               "src.parser.parser.Parser.atom")
-        )
+        return result.failure(InvalidSyntaxError(
+            token.pos_start, token.pos_end,
+            "expected valid expression.",
+            "src.parser.parser.Parser.atom"
+        ))
 
     def list_expr(self) -> ParseResult:
         """
@@ -1099,12 +1085,9 @@ class Parser:
                 self.advance()
             # expr
             # we register an expr then check for an error
-            element_nodes.append(
-                (
-                    result.register(self.expr()),
-                    mul
-                )
-            )
+            expr_ = result.register(self.expr())
+            expr_and_mul = (expr_, mul)
+            element_nodes.append(expr_and_mul)
             if result.error is not None:
                 return result
 
@@ -1121,23 +1104,18 @@ class Parser:
                     self.advance()
                 # expr
                 # we register an expr then check for an error
-                element_nodes.append(
-                    (
-                        result.register(self.expr()),
-                        mul
-                    )
-                )
+                expr_ = result.register(self.expr())
+                expr_and_mul = (expr_, mul)
+                element_nodes.append(expr_and_mul)
                 if result.error is not None:
                     return result
 
             if self.current_token.type != TT["RSQUARE"]:  # there is no ']' to close the list
-                return result.failure(
-                    InvalidSyntaxError(
-                        pos_start, first_tok_pos_end,
-                        "'[' was never closed.",
-                        "src.parser.parser.Parser.list_expr"
-                    )
-                )
+                return result.failure(InvalidSyntaxError(
+                    pos_start, first_tok_pos_end,
+                    "'[' was never closed.",
+                    "src.parser.parser.Parser.list_expr"
+                ))
 
             # we advance
             result.register_advancement()
@@ -1334,16 +1312,16 @@ class Parser:
                     error_msg = f"expected identifier, but got {self.current_token.type}."
                 else:
                     error_msg = f"expected identifier, but got '{self.current_token.type}'."
-                return result.failure(
-                    InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end, error_msg,
-                        "src.parser.parser.Parser.for_expr"
-                    )
-                )
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end, error_msg,
+                    "src.parser.parser.Parser.for_expr"
+                ))
             else:
-                return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                                         f"use keyword as identifier is illegal.",
-                                                         "src.parser.parser.Parser.for_expr"))
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    f"use keyword as identifier is illegal.",
+                    "src.parser.parser.Parser.for_expr"
+                ))
 
         # IDENTIFIER
         var_name = self.current_token
@@ -1362,9 +1340,11 @@ class Parser:
 
             # KEYWORD:THEN
             if not self.current_token.matches(TT["KEYWORD"], 'then'):
-                return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                                         "expected 'then'.",
-                                                         "src.parser.parser.Parser.for_expr"))
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected 'then'.",
+                    "src.parser.parser.Parser.for_expr"
+                ))
             then_tok = self.current_token.copy()
 
             result.register_advancement()
@@ -1405,12 +1385,10 @@ class Parser:
                 error_msg = f"expected 'in' or '=', but got {self.current_token.type}."
             else:
                 error_msg = f"expected 'in' or '=', but got '{self.current_token.type}'."
-            return result.failure(
-                InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end, error_msg,
-                    "src.parser.parser.Parser.for_expr"
-                )
-            )
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end, error_msg,
+                "src.parser.parser.Parser.for_expr"
+            ))
 
         # EQ expr KEYWORD:TO expr (KEYWORD:STEP expr)? KEYWORD:THEN statement | (NEWLINE statements KEYWORD:END)
         result.register_advancement()
@@ -1423,8 +1401,11 @@ class Parser:
 
         # KEYWORD:TO
         if not self.current_token.matches(TT["KEYWORD"], 'to'):
-            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                                     f"expected 'to'.", "src.parser.parser.Parser.for_expr"))
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                f"expected 'to'.",
+                "src.parser.parser.Parser.for_expr"
+            ))
 
         result.register_advancement()
         self.advance()
@@ -1448,8 +1429,11 @@ class Parser:
 
         # KEYWORD:THEN
         if not self.current_token.matches(TT["KEYWORD"], 'then'):
-            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                                     "expected 'then'.", "src.parser.parser.Parser.for_expr"))
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected 'then'.",
+                "src.parser.parser.Parser.for_expr"
+            ))
         then_tok = self.current_token.copy()
 
         result.register_advancement()
@@ -1492,8 +1476,11 @@ class Parser:
 
         # KEYWORD:WHILE expr KEYWORD:THEN statement | (NEWLINE statements KEYWORD:END)
         if not self.current_token.matches(TT["KEYWORD"], 'while'):
-            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                                     "expected 'while'.", "src.parser.parser.Parser.while_expr"))
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected 'while'.",
+                "src.parser.parser.Parser.while_expr"
+            ))
 
         result.register_advancement()
         self.advance()
@@ -1505,8 +1492,11 @@ class Parser:
 
         # KEYWORD:THEN
         if not self.current_token.matches(TT["KEYWORD"], 'then'):
-            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                                     "expected 'then'.", "src.parser.parser.Parser.while_expr"))
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected 'then'.",
+                "src.parser.parser.Parser.while_expr"
+            ))
         then_tok = self.current_token.copy()
 
         result.register_advancement()
@@ -1550,8 +1540,11 @@ class Parser:
         result = ParseResult()
 
         if not self.current_token.matches(TT["KEYWORD"], 'do'):
-            return result.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
-                                                     "expected 'do'.", "src.parser.parser.Parser.do_expr"))
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected 'do'.",
+                "src.parser.parser.Parser.do_expr"
+            ))
 
         result.register_advancement()
         self.advance()
@@ -1618,12 +1611,10 @@ class Parser:
         result = ParseResult()
 
         if not self.current_token.matches(TT["KEYWORD"], 'def'):
-            return result.failure(
-                InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected 'def'.", "src.parser.parser.Parser.func_def"
-                )
-            )
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected 'def'.", "src.parser.parser.Parser.func_def"
+            ))
         def_tok = self.current_token.copy()
 
         result.register_advancement()
@@ -1637,22 +1628,18 @@ class Parser:
 
             # LPAREN
             if self.current_token.type != TT["LPAREN"]:
-                return result.failure(
-                    InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected '('.", "src.parser.parser.Parser.func_def"
-                    )
-                )
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected '('.", "src.parser.parser.Parser.func_def"
+                ))
         else:
             var_name_token = None
             # LPAREN
             if self.current_token.type != TT["LPAREN"]:
-                return result.failure(
-                    InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected identifier or '('.", "src.parser.parser.Parser.func_def"
-                    )
-                )
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected identifier or '('.", "src.parser.parser.Parser.func_def"
+                ))
 
         result.register_advancement()
         self.advance()
@@ -1693,21 +1680,19 @@ class Parser:
 
             # RPAREN
             if self.current_token.type != TT["RPAREN"]:
-                return result.failure(
-                    InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected ',' or ')'.", "src.parser.parser.Parser.func_def"
-                    )
-                )
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected ',' or ')'.",
+                    "src.parser.parser.Parser.func_def"
+                ))
         else:
             # RPAREN
             if self.current_token.type != TT["RPAREN"]:
-                return result.failure(
-                    InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected identifier or ')'.", "src.parser.parser.Parser.func_def"
-                    )
-                )
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected identifier or ')'.",
+                    "src.parser.parser.Parser.func_def"
+                ))
 
         result.register_advancement()
         self.advance()
@@ -1731,12 +1716,11 @@ class Parser:
 
         # NEWLINE statements KEYWORD:END
         if self.current_token.type != TT["NEWLINE"]:
-            return result.failure(
-                InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected '->' or new line.", "src.parser.parser.Parser.func_def"
-                )
-            )
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected '->' or new line.",
+                "src.parser.parser.Parser.func_def"
+            ))
 
         result.register_advancement()
         self.advance()
@@ -1750,12 +1734,11 @@ class Parser:
 
         # KEYWORD:END
         if not self.current_token.matches(TT["KEYWORD"], 'end'):
-            return result.failure(
-                InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected 'end'.", "src.parser.parser.Parser.func_def"
-                )
-            )
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected 'end'.",
+                "src.parser.parser.Parser.func_def"
+            ))
         del self.then_s[-1]
 
         result.register_advancement()
@@ -1778,12 +1761,11 @@ class Parser:
         result = ParseResult()
 
         if not self.current_token.matches(TT["KEYWORD"], 'class'):
-            return result.failure(
-                InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected 'class'.", "src.parser.parser.Parser.class_def"
-                )
-            )
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected 'class'.",
+                "src.parser.parser.Parser.class_def"
+            ))
         class_tok = self.current_token.copy()
 
         result.register_advancement()
@@ -1813,12 +1795,11 @@ class Parser:
 
             # RPAREN
             if self.current_token.type != TT["RPAREN"]:
-                return result.failure(
-                    InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected ')'.", "src.parser.parser.Parser.class_def"
-                    )
-                )
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected ')'.",
+                    "src.parser.parser.Parser.class_def"
+                ))
 
             result.register_advancement()
             self.advance()
@@ -1844,12 +1825,11 @@ class Parser:
 
         # NEWLINE statements KEYWORD:END
         if self.current_token.type != TT["NEWLINE"]:
-            return result.failure(
-                InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected '->' or new line.", "src.parser.parser.Parser.func_def"
-                )
-            )
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected '->' or new line.",
+                "src.parser.parser.Parser.func_def"
+            ))
 
         result.register_advancement()
         self.advance()
@@ -1863,12 +1843,11 @@ class Parser:
 
         # KEYWORD:END
         if not self.current_token.matches(TT["KEYWORD"], 'end'):
-            return result.failure(
-                InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected 'end'.", "src.parser.parser.Parser.func_def"
-                )
-            )
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end,
+                "expected 'end'.",
+                "src.parser.parser.Parser.func_def"
+            ))
         del self.then_s[-1]
 
         result.register_advancement()

@@ -59,7 +59,8 @@ The nougaro code should be great to read: you can follow the PEP8 here too, as t
 * Write your messages in english.
 * Use the present tense ("Add feature" not "Added feature")
 * Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
-* Limit the first line to 72 characters or fewer.
+* Limit the first line to 50 characters or fewer.
+* If you number your commits, DO NOT use the <&nbsp;#&nbsp;> character, as it is used in GitHub.
 
 
 ## Thank you!

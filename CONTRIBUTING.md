@@ -65,4 +65,4 @@ The nougaro code should be great to read: you can follow the PEP8 here too, as t
 
 ## Thank you!
 I'm glad you read until here, and I hope you will help us to build the Nougaro programming language!
-If you have any question, please consider ask the community in the [GitHub discussions](https://github.com/jd-develop/nougaro/discussions), we will be happy to help you!
+If you have any question, please consider asking the community in the [GitHub discussions](https://github.com/jd-develop/nougaro/discussions), we will be happy to help you!

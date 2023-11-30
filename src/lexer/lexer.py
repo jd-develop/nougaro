@@ -25,12 +25,12 @@ class Lexer:
     """Transforms code into a list of tokens (lexical units)"""
     def __init__(self, file_name: str, text: str):
         self.file_name: str = file_name  # name of the file we're executing
-        self.text: str = text  # raw code we have to execute
-        self.pos: Position = Position(-1, 0, -1, file_name, text)  # actual position of the lexer
+        self.text = text  # raw code we have to execute
+        self.pos = Position(-1, 0, -1, file_name, text)  # actual position of the lexer
         self.current_char: str | None = None
         self.advance()
 
-    def get_char(self, pos):
+    def get_char(self, pos: Position):
         return self.text[pos.index] if pos.index < len(self.text) else None
 
     def advance(self):

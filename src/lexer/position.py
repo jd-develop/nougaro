@@ -27,7 +27,7 @@ class Position:
         self.file_name:   str = file_name
         self.file_txt:    str = file_txt
 
-    def advance(self, current_char=None):
+    def advance(self, current_char: str | None = None):
         """Add 1 to the index, automatically make back lines."""
         self.index += 1
         self.colon += 1

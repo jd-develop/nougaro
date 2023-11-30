@@ -9,6 +9,7 @@
 
 # IMPORTS
 # nougaro modules imports
+from src.lexer.position import Position
 from src.lexer.token import Token
 from src.lexer.token_types import TT
 # built-in python imports
@@ -62,7 +63,7 @@ class StringNode(Node):
 
 class ListNode(Node):
     """Node for list. self.element_nodes is a list of nodes. Needs pos_start and pos_end when init."""
-    def __init__(self, element_nodes: list[tuple[Node, bool]], pos_start, pos_end):
+    def __init__(self, element_nodes: list[tuple[Node, bool]], pos_start: Position, pos_end: Position):
         self.element_nodes = element_nodes
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -86,7 +87,7 @@ class VarAssignNode(Node):
         self.equal = equal
 
         self.pos_start = self.var_names[0][0].pos_start
-        if value_nodes is not None:
+        if self.value_nodes is not None:
             self.pos_end = self.value_nodes[-1].pos_end
         else:
             self.pos_end = self.equal.pos_end
@@ -117,8 +118,8 @@ class VarDeleteNode(Node):
     def __init__(self, var_name_token):
         self.var_name_token = var_name_token
 
-        self.pos_start = self.var_name_token.pos_start
-        self.pos_end = self.var_name_token.pos_end
+        self.pos_start: Position = self.var_name_token.pos_start
+        self.pos_end: Position = self.var_name_token.pos_end
 
     def __repr__(self):
         return f'var_delete:{self.var_name_token}'
@@ -140,7 +141,7 @@ class BinOpNode(Node):
                                         op_token is Token(TT_POW)
                                         right_node is a Number node with value INT:2
     """
-    def __init__(self, left_node, op_token, right_node):
+    def __init__(self, left_node: NumberNode, op_token, right_node):
         self.left_node = left_node
         self.op_token = op_token
         self.right_node = right_node

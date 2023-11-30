@@ -10,8 +10,10 @@
 # IMPORTS
 # nougaro modules imports
 from src.runtime.symbol_table import SymbolTable
+from src.lexer.position import Position
 # built-in python imports
 import pprint
+from typing import Self
 
 
 # ##########
@@ -19,10 +21,10 @@ import pprint
 # ##########
 class Context:
     """Class for the interpreter Context"""
-    def __init__(self, display_name: str, parent=None, parent_entry_pos=None):
+    def __init__(self, display_name: str, parent: Self | None = None, parent_entry_pos: Position | None = None):
         self.display_name = display_name  # name of the function we are in
-        self.parent: Context = parent  # parent context
-        self.parent_entry_pos = parent_entry_pos  # pos_start of the parent context, used in errors tracebacks
+        self.parent: Context | None = parent  # parent context
+        self.parent_entry_pos: Position | None = parent_entry_pos  # pos_start of the parent context, used in errors tracebacks
         # ABOUT self.parent_entry_pos:
         # I actually don't know why there is a parent_entry_pos to every context, but there is no pos_start.
         # The entry pos seems to be the pos start of a context, but... Well, I don't know....

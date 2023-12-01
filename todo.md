@@ -49,9 +49,6 @@ __Release date: october 14th, 2023__
 
 ## 0.18.0 beta (goal: may 2024)
 * [ ] add `tkinter`
-* [ ] add `turtle`
-* [ ] add `socket`
-* [ ] add `requests`
 * [ ] add `webbrowser`
 * [X] add `unicodedata` (finished 9/10/23)
 
@@ -64,3 +61,8 @@ __Release date: october 14th, 2023__
 * [ ] create highlight extension for VSCode
 * [ ] if possible, implement `break (name)` and `continue (name)` where (name) is `if`, `for`, …
 * [X] completely switch to semver (finished 7/11/2023)
+
+## Future realeases
+* [ ] add `turtle`
+* [ ] add `socket`
+* [ ] add `requests`

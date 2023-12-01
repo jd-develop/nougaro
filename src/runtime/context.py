@@ -31,7 +31,7 @@ class Context:
         self.symbol_table: SymbolTable | None = None
         self.what_to_export: SymbolTable = SymbolTable()
 
-    def dict_(self) -> dict:
+    def dict_(self):
         """Repr the context under a dict form."""
         repr_dict = {'symbol_table': self.symbol_table,
                      'parent': self.parent,

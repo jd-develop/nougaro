@@ -9,21 +9,23 @@
 
 # IMPORTS
 # nougaro modules imports
-# no imports
+from src.runtime.values.basevalues.value import Value
+from src.constants import KEYWORDS
 # built-in python imports
 import pprint
 import difflib
+from typing import Self
 
 
 # ##########
 # SYMBOL TABLE
 # ##########
 class SymbolTable:
-    def __init__(self, parent=None):
+    def __init__(self, parent: Self | None = None):
         self.symbols = {}
         self.parent = parent
 
-    def dict_(self) -> dict:
+    def dict_(self):
         return {'symbols': self.symbols,
                 'parent': self.parent}
 
@@ -40,35 +42,34 @@ class SymbolTable:
         """Like get, but with get_in_(grand)parent to False. For builtin functions and modules."""
         return self.get(name, False, False)
 
-    def set(self, name, value):
+    def set(self, name: str, value: Value):
         self.symbols[name] = value
 
-    def set_whole_table(self, new_table: dict):
+    def set_whole_table(self, new_table: dict[str, Value]):
         self.symbols = new_table.copy()
 
-    def remove(self, name):
+    def remove(self, name: str):
         del self.symbols[name]
 
-    def exists(self, name, look_in_parent: bool = False):
+    def exists(self, name: str, look_in_parent: bool = False):
         if not look_in_parent or self.parent is None:
             return name in self.symbols
         else:
             return name in self.symbols or self.parent.exists(name, True)
 
-    def set_parent(self, parent):
+    def set_parent(self, parent: Self):
         self.parent = parent
         return self
 
-    def best_match(self, name: str, keywords: list | None = None) -> str | None:
+    def best_match(self, name: str) -> str | None:
         """Return the name in the symbol table that is the closest to 'name'. Return None if there is no close match."""
-        if len(self.symbols) == 0 or name is None or name == "":
+        if len(self.symbols) == 0 or name == "":
             return None
         min_best_match = 0.3
         best_match = min_best_match
         best_match_name = ""
         list_to_check = list(self.symbols.keys())
-        if keywords is not None:
-            list_to_check.extend(keywords)
+        list_to_check.extend(KEYWORDS)
         for key in list_to_check:
             ratio = difflib.SequenceMatcher(None, name, key).ratio()
             if ratio > best_match:

@@ -81,7 +81,7 @@ class Interpreter:
                    edit: bool = False)\
             -> RTResult:
         """Returns a RTNotDefinedError with a proper message."""
-        close_match_in_symbol_table = ctx.symbol_table.best_match(var_name, keywords=KEYWORDS)
+        close_match_in_symbol_table = ctx.symbol_table.best_match(var_name)
         IS_NOUGARO_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{var_name}.noug"))
         IS_PYTHON_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{var_name}_.py"))
         if edit:

@@ -8,15 +8,20 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # IMPORTS
+# __future__ imports (must be first)
+from __future__ import annotations
 # nougaro modules imports
 from src.errors.strings_with_arrows import string_with_arrows
 from src.lexer.position import Position
 from src.runtime.context import Context
-from src.runtime.values.basevalues.value import Value
 # built-in python imports
 import os
 import pathlib
 import traceback
+# special typing import
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.runtime.values.basevalues.value import Value
 
 
 # ##########

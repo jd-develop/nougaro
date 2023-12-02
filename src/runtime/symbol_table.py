@@ -8,13 +8,18 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # IMPORTS
+# __future__ imports (must be first)
+from __future__ import annotations
 # nougaro modules imports
-from src.runtime.values.basevalues.value import Value
 from src.constants import KEYWORDS
 # built-in python imports
 import pprint
 import difflib
 from typing import Self
+# special typing import
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.runtime.values.basevalues.value import Value
 
 
 # ##########

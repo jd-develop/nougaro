@@ -15,9 +15,7 @@ from src.constants import KEYWORDS
 # built-in python imports
 import pprint
 import difflib
-# The next line should be uncommented when this project switches to python3.11, and the line which imports "Any" should be removed
-# from typing import Self
-from typing import Any
+from typing import Self
 # special typing import
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -28,7 +26,7 @@ if TYPE_CHECKING:
 # SYMBOL TABLE
 # ##########
 class SymbolTable:
-    def __init__(self, parent: Any | None = None): # switching to python3.11 will replace this "Any" by "Self"
+    def __init__(self, parent: Self | None = None):
         self.symbols = {}
         self.parent = parent
 
@@ -64,7 +62,7 @@ class SymbolTable:
         else:
             return name in self.symbols or self.parent.exists(name, True)
 
-    def set_parent(self, parent: Any): # switching to python3.11 will replace this "Any" by "Self"
+    def set_parent(self, parent: Self):
         self.parent = parent
         return self
 

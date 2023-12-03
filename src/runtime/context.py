@@ -13,9 +13,8 @@ from src.runtime.symbol_table import SymbolTable
 from src.lexer.position import Position
 # built-in python imports
 import pprint
-# The next line should be uncommented when this project switches to python3.11, and the line which imports "Any" should be removed
-# from typing import Self
-from typing import Any
+from typing import Self
+
 
 
 # ##########
@@ -23,7 +22,7 @@ from typing import Any
 # ##########
 class Context:
     """Class for the interpreter Context"""
-    def __init__(self, display_name: str, parent: Any | None = None, parent_entry_pos: Position | None = None): # switching to python3.11 will replace this "Any" by "Self"
+    def __init__(self, display_name: str, parent: Self | None = None, parent_entry_pos: Position | None = None):
         self.display_name = display_name  # name of the function we are in
         self.parent: Context | None = parent  # parent context
         self.parent_entry_pos: Position | None = parent_entry_pos  # pos_start of the parent context, used in errors tracebacks

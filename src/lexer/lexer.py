@@ -49,7 +49,7 @@ class Lexer:
         next_char = self.get_char(new_pos)
         return next_char
 
-    def make_tokens(self) -> tuple[list[Token], None | Error]:
+    def make_tokens(self) -> tuple[list[Token], Error]:
         """Returns a token list with self.text. Return tok_list, None or [], error."""
         tokens: list[Token] = []
 
@@ -78,11 +78,11 @@ class Lexer:
 
             elif self.current_char in DIGITS + '.':  # the char is a digit: we generate a number
                 there_is_a_space_or_a_tab_or_a_comment = False
-                number, error = self.make_number()
-                if error is None and number is not None:  # there is no error
-                    tokens.append(number)
+                number_with_error = self.make_number()
+                if number_with_error[1] is None:  # there is no error
+                    tokens.append(number_with_error[0])
                 else:  # there is an error, we return it
-                    return [], error
+                    return [], number_with_error[1]
             elif self.current_char in IDENTIFIERS_LEGAL_CHARS:  # the char is legal: identifier or keyword
                 tok = self.make_identifier()
                 try:
@@ -569,7 +569,7 @@ class Lexer:
         token_type = TT["KEYWORD"] if id_str in KEYWORDS else TT["IDENTIFIER"]  # KEYWORDS is the keywords list
         return Token(token_type, id_str, pos_start, self.pos)
 
-    def make_number(self, digits: str = DIGITS + '.', _0prefixes: bool = True, mode: str = "int") -> tuple[Token | None, Error | None]:
+    def make_number(self, digits: str = DIGITS + '.', _0prefixes: bool = True, mode: str = "int") -> tuple[Token, None] | tuple[None, Error]:
         """Make number, int or float"""
         num_str = ''
         dot_count = 0  # we can't have more than one dot, so we count them
@@ -639,10 +639,10 @@ class Lexer:
             if self.current_char in prefixes.keys() and self.current_char is not None:
                 prefix = prefixes[self.current_char]
                 self.advance()
-                num, error = self.make_number(prefix[0], False, prefix[1])
-                if error is not None:
-                    return None, error
-                return num, None
+                number_with_error = self.make_number(prefix[0], False, prefix[1])
+                if number_with_error[1] is not None:
+                    return None, number_with_error[1]
+                return number_with_error[0], None
 
         if mode == 'int':
             if dot_count == 0:  # if there is no dots, this is an INT, else this is a FLOAT

@@ -20,7 +20,7 @@ This is Nougaro beta 0.15.
 
  The code is compiled for Windows and Linux. Check it out in the [releases](https://github.com/jd-develop/nougaro/releases/) tab!
  
- Minimum : Python 3.10
+ Minimum : Python 3.11
  
  Supports Python 3.11
 
@@ -42,7 +42,7 @@ This is Nougaro beta 0.15.
  
  Le code est compilé pour Windows et Linux. Disponible dans l'onglet [releases](https://github.com/jd-develop/nougaro/releases/)&nbsp;!
  
- Minimum : Python 3.10
+ Minimum : Python 3.11
  
  Prend en charge Python 3.11
 

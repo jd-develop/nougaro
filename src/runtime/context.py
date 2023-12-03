@@ -13,7 +13,9 @@ from src.runtime.symbol_table import SymbolTable
 from src.lexer.position import Position
 # built-in python imports
 import pprint
-from typing import Self
+# The next line should be uncommented when this project switches to python3.11, and the line which imports "Any" should be removed
+# from typing import Self
+from typing import Any
 
 
 # ##########
@@ -21,7 +23,7 @@ from typing import Self
 # ##########
 class Context:
     """Class for the interpreter Context"""
-    def __init__(self, display_name: str, parent: Self | None = None, parent_entry_pos: Position | None = None):
+    def __init__(self, display_name: str, parent: Any | None = None, parent_entry_pos: Position | None = None): # switching to python3.11 will replace this "Any" by "Self"
         self.display_name = display_name  # name of the function we are in
         self.parent: Context | None = parent  # parent context
         self.parent_entry_pos: Position | None = parent_entry_pos  # pos_start of the parent context, used in errors tracebacks
@@ -57,7 +59,7 @@ class Context:
     def set_symbol_table_to_parent_symbol_table(self):
         """Sets symbol table to parent’s one then return self. If current symbol table is None and parent is None,
         create a blank symbol table."""
-        if self.parent is not None:
+        if self.parent is not None and self.parent.symbol_table is not None:
             self.symbol_table = self.parent.symbol_table.copy()
         elif self.symbol_table is None:
             self.symbol_table = SymbolTable()

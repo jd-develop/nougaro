@@ -15,7 +15,9 @@ from src.constants import KEYWORDS
 # built-in python imports
 import pprint
 import difflib
-from typing import Self
+# The next line should be uncommented when this project switches to python3.11, and the line which imports "Any" should be removed
+# from typing import Self
+from typing import Any
 # special typing import
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -26,7 +28,7 @@ if TYPE_CHECKING:
 # SYMBOL TABLE
 # ##########
 class SymbolTable:
-    def __init__(self, parent: Self | None = None):
+    def __init__(self, parent: Any | None = None): # switching to python3.11 will replace this "Any" by "Self"
         self.symbols = {}
         self.parent = parent
 
@@ -37,13 +39,13 @@ class SymbolTable:
     def __repr__(self) -> str:
         return pprint.pformat(self.dict_())
 
-    def get(self, name, get_in_parent: bool = True, get_in_grandparent: bool = True):
+    def get(self, name: str, get_in_parent: bool = True, get_in_grandparent: bool = True):
         value = self.symbols.get(name, None)
         if get_in_parent and value is None and self.parent is not None:
             return self.parent.get(name, get_in_grandparent)
         return value
 
-    def getf(self, name):
+    def getf(self, name: str):
         """Like get, but with get_in_(grand)parent to False. For builtin functions and modules."""
         return self.get(name, False, False)
 
@@ -62,7 +64,7 @@ class SymbolTable:
         else:
             return name in self.symbols or self.parent.exists(name, True)
 
-    def set_parent(self, parent: Self):
+    def set_parent(self, parent: Any): # switching to python3.11 will replace this "Any" by "Self"
         self.parent = parent
         return self
 

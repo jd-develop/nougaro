@@ -2,7 +2,9 @@
 <!-- check mark character: ✅ -->
 
 ## ✅ 0.15 beta (goal: october 20th, 2023)
-__Release date: october 14th, 2023__
+
+### Release date: october 14th, 2023
+
 * [X] add `var id.attr = value` (finished 4/10/23)
 * [X] fix bug where `this` is not defined in classes (finished 6/10/23)
 * [X] fix bug where methods are of type `functions` (finished 6/10/23)
@@ -12,6 +14,7 @@ __Release date: october 14th, 2023__
 * [X] add `time.time()` (finished 3/10/23)
 
 ## 0.16.0 beta (goal: november 26th, 2023)
+
 * [X] add '\xXX' and '\uXXXX' support (finished 6/10/23)
 * [X] add '\UXXXXXXXX' (finished 8/10/23)
 * [X] add '\N{UNICODE CHARACTER NAME}' (finished 8/10/23)
@@ -32,6 +35,7 @@ __Release date: october 14th, 2023__
 * [X] fix the fact that nougaro doesn’t crashes with an error code when there is an error
 
 ## 0.17.0 beta (goal: february 2024)
+
 * [X] add `import ... as ...` (finished 16/10/23)
 * [ ] add optional arguments in functions
   * [ ] Parser:
@@ -48,21 +52,25 @@ __Release date: october 14th, 2023__
 * [ ] add `assert ... crashes (on Error) (with message "...")`
 
 ## 0.18.0 beta (goal: may 2024)
+
 * [ ] add `tkinter`
 * [ ] add `webbrowser`
 * [X] add `unicodedata` (finished 9/10/23)
 
 ## 0.19.0 beta (goal: july 2024)
+
 * [ ] add unit tests
 * [ ] add complex numbers
 * [ ] add `-i` cli arg to execute a file then run a shell within it.
 
 ## 1.0.0 release candidate (goal: october 2024)
+
 * [ ] create highlight extension for VSCode
 * [ ] if possible, implement `break (name)` and `continue (name)` where (name) is `if`, `for`, …
 * [X] completely switch to semver (finished 7/11/2023)
 
 ## Future realeases
+
 * [ ] add `turtle`
 * [ ] add `socket`
 * [ ] add `requests`

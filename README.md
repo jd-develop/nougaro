@@ -22,9 +22,7 @@ This is Nougaro beta 0.15.
  
  Minimum : Python 3.11
  
- Supports Python 3.11
-
- Did not test in Python 3.12.
+ Supports Python 3.11 and 3.12
 
 ## French description
  Un langage de programmation. Interpréteur écrit en Python.
@@ -44,9 +42,7 @@ This is Nougaro beta 0.15.
  
  Minimum : Python 3.11
  
- Prend en charge Python 3.11
-
- Non testé sous Python 3.12
+ Prend en charge Python 3.11 et 3.12
 
 # Documentation
  Please refer to the [wiki](https://github.com/jd-develop/nougaro/wiki/) for documentation.

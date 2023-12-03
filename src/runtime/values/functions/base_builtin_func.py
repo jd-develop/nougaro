@@ -13,21 +13,23 @@ from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.context import Context
 from src.runtime.runtime_result import RTResult
 from src.runtime.values.basevalues.basevalues import NoneValue
+from src.runtime.interpreter import Interpreter
+from src.runtime.values.basevalues.value import Value
 # built-in python imports
-# no imports
+from typing import Callable
 
 
 class BaseBuiltInFunction(BaseFunction):
     """Parent class for all the built-in function classes (even in modules)"""
-    def __init__(self, name, call_with_module_context=False):
+    def __init__(self, name: str, call_with_module_context: bool = False):
         super().__init__(name, call_with_module_context)
         self.type_ = 'built-in func'
 
     def __repr__(self):
         return f'<built-in function {self.name}>'
 
-    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
-                use_context: Context | None = None,  work_dir: str = None):
+    def execute(self, args: list[Value], interpreter_: Interpreter, run: Callable, noug_dir: str, exec_from: str = "<invalid>",
+                use_context: Context | None = None,  work_dir: str | None = None):
         return RTResult().success(NoneValue(False))
 
     def no_visit_method(self, exec_context: Context):

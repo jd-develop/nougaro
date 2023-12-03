@@ -28,7 +28,7 @@ class Value:
         self.module_context = None
         self.should_print = True
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "BaseValue"
 
     def set_pos(self, pos_start=None, pos_end=None):

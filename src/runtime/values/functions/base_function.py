@@ -21,9 +21,9 @@ from src.runtime.symbol_table import SymbolTable
 
 class BaseFunction(Value):
     """Parent class for all the function classes (Function, BaseBuiltinFunction and its children)"""
-    def __init__(self, name, call_with_module_context=False):
+    def __init__(self, name: str | None, call_with_module_context: bool = False):
         super().__init__()
-        self.name = name if name is not None else '<function>'  # if 'name' is None, we have something like `def()->foo`
+        self.name: str = name if name is not None else '<function>'  # if 'name' is None, we have something like `def()->foo`
         self.type_ = 'BaseFunction'
         self.call_with_module_context: bool = call_with_module_context
 

@@ -23,6 +23,7 @@ from src.misc import CustomInterpreterVisitMethod, clear_screen, print_in_red
 from src.runtime.symbol_table import SymbolTable
 from src.lexer.position import Position
 # built-in python imports
+from typing import Callable
 from inspect import signature
 import os.path
 import importlib
@@ -36,7 +37,7 @@ _ORIGIN_FILE = "src.runtime.interpreter.Interpreter"
 # ##########
 # noinspection PyPep8Naming
 class Interpreter:
-    def __init__(self, run, noug_dir_, args, work_dir: str):
+    def __init__(self, run: Callable, noug_dir_, args, work_dir: str):
         noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.parent.absolute())
         with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug_file:
             self.debug = bool(int(debug_file.read()))

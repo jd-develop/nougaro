@@ -51,5 +51,5 @@ class Token:
         return Token(self.type, self.value, self.pos_start, self.pos_end)
 
     def set_value(self, value: str):
-        self.value: str | None = value
+        self.value: str | int | float | None = value
         return self

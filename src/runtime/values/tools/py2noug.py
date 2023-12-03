@@ -14,8 +14,10 @@ from src.runtime.values.basevalues.basevalues import *
 # built-in python imports
 from typing import Any
 
+# This next line should be uncommented when the project switches to python 3.12, and the type of the "value" argument in the "py2noug" function should be defined as "val"
+# type val = str | int | float | bool | list[val] | None
 
-def py2noug(value: Any):
+def py2noug(value: str | int | float | bool | list[Any] | None): # eek, i hope python 3.12 will be allowed soon on the project to remove this "Any"
     """Converts python values to nougaro ones"""
     if isinstance(value, str):
         return String(value)
@@ -32,7 +34,7 @@ def py2noug(value: Any):
         return Value()  # we just return a base value if there is no equivalent...
 
 
-def noug2py(value: Any, none_instead_of_raw_value=True):
+def noug2py(value: Value, none_instead_of_raw_value: bool=True) -> Any:
     """Converts nougaro values to python ones."""
     if isinstance(value, String) or isinstance(value, Number):
         return value.value

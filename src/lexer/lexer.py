@@ -54,8 +54,8 @@ class Lexer:
         tokens: list[Token] = []
 
         there_is_a_space_or_a_tab_or_a_comment = False
-        next_char = self.next_char()
         while self.current_char is not None:  # None is EOF
+            next_char = self.next_char()
             if self.current_char in ' \t':  # tab and space
                 there_is_a_space_or_a_tab_or_a_comment = True
                 self.advance()
@@ -97,6 +97,7 @@ class Lexer:
                 current_tok_is_positive_e_infix = (
                         current_tok_is_maybe_e_infix and tok.value is not None and tok.value[1:].isdigit() and self.current_char != "."
                 )
+                next_char = self.next_char()
                 if next_char is not None:
                     current_tok_is_negative_e_infix = (
                         current_tok_is_maybe_e_infix and self.current_char == "-" and next_char in DIGITS
@@ -162,7 +163,7 @@ class Lexer:
                 there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(self.make_mul())
             elif self.current_char == '/':
-                if next_char == "*":
+                if self.next_char() == "*":
                     there_is_a_space_or_a_tab_or_a_comment = True
                     self.skip_multiline_comment()
                 else:

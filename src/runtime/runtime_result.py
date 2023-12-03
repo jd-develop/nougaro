@@ -8,9 +8,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # IMPORTS
+# __future__ imports (must be first)
+from __future__ import annotations
 # nougaro modules imports: NO IMPORTS
 # built-in python imports
 import pprint
+# special typing import
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.runtime.values.basevalues.value import Value
+
 
 
 # ##########
@@ -55,7 +62,7 @@ class RTResult:
 
         return result.value  # we return the other result value
 
-    def success(self, value):  # success, we clean up our attrs, we write the new value, and we return self
+    def success(self, value: Value):  # success, we clean up our attrs, we write the new value, and we return self
         self.reset()
         self.value = value
         return self

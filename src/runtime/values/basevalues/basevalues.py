@@ -392,9 +392,9 @@ Number.TRUE = Number(1)
 
 
 class List(Value):
-    def __init__(self, elements: list):
+    def __init__(self, elements: list[Value]):
         super().__init__()
-        self.elements: list = elements
+        self.elements = elements
         self.type_ = 'list'
         self.update_should_print()
 

@@ -10,11 +10,12 @@
 # IMPORTS
 # __future__ imports (must be first)
 from __future__ import annotations
-# nougaro modules imports: NO IMPORTS
+# nougaro modules imports
+from src.errors.errors import RunTimeError
 # built-in python imports
 import pprint
 # special typing import
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 if TYPE_CHECKING:
     from src.runtime.values.basevalues.value import Value
 
@@ -46,7 +47,7 @@ class RTResult:
         self.loop_should_break = False
         self.old_should_return = False
 
-    def register(self, result):
+    def register(self, result: Self):
         """Register another result in this result"""
         if not self.old_should_return:  # True -> DON'T TOUCH IT, False -> change to the new
             self.old_should_return = self.should_return()
@@ -67,7 +68,7 @@ class RTResult:
         self.value = value
         return self
 
-    def success_return(self, value):  # same as self.success for self.function_return_value
+    def success_return(self, value: Value):  # same as self.success for self.function_return_value
         self.reset()
         self.function_return_value = value
         return self
@@ -82,7 +83,7 @@ class RTResult:
         self.loop_should_break = True
         return self
 
-    def failure(self, error):  # same as self.success for self.error
+    def failure(self, error: RunTimeError):  # same as self.success for self.error
         self.reset()
         self.error = error
         return self

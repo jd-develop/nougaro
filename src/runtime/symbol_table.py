@@ -37,7 +37,7 @@ class SymbolTable:
     def __repr__(self) -> str:
         return pprint.pformat(self.dict_())
 
-    def get(self, name: str, get_in_parent: bool = True, get_in_grandparent: bool = True):
+    def get(self, name: str, get_in_parent: bool = True, get_in_grandparent: bool = True) -> Value | None:
         value = self.symbols.get(name, None)
         if get_in_parent and value is None and self.parent is not None:
             return self.parent.get(name, get_in_grandparent)
@@ -56,7 +56,7 @@ class SymbolTable:
     def remove(self, name: str):
         del self.symbols[name]
 
-    def exists(self, name: str, look_in_parent: bool = False):
+    def exists(self, name: str, look_in_parent: bool = False) -> bool:
         if not look_in_parent or self.parent is None:
             return name in self.symbols
         else:

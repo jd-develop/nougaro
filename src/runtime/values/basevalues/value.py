@@ -13,8 +13,7 @@ from src.runtime.context import Context
 from src.runtime.runtime_result import RTResult
 from src.errors.errors import RunTimeError
 # built-in python imports
-# no imports
-
+from typing import Self, Any
 
 class Value:
     """The parent class to all the value classes (String, Number, List...)"""
@@ -37,12 +36,12 @@ class Value:
         self.pos_end = pos_end
         return self
 
-    def set_context(self, context: Context = None):
+    def set_context(self, context: Context | None = None):
         """Change self.context."""
         self.context = context
         return self
 
-    def added_to(self, other):
+    def added_to(self, other: Self) -> tuple[Any, RunTimeError | None]: # added_to is overridden a lot of times, can't specify them all here
         """Add the other's value to self.value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         E.g. : num_1 is a Number object that have a value of 1 and num_2 is another Number object with a value of 1 too.
@@ -54,7 +53,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def subbed_by(self, other):
+    def subbed_by(self, other: Self):
         """Subtract the other's value from self.value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         E.g. : num_1 is a Number object that have a value of 1 and num_2 is another Number object with a value of 1 too.
@@ -66,7 +65,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def multiplied_by(self, other):
+    def multiplied_by(self, other: Self) -> tuple[Any, RunTimeError | None]:
         """Multiply the other's value with self.value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         E.g. : num_1 is a Number object that have a value of 3 and num_2 is another Number object with a value of 2.
@@ -80,7 +79,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def modded_by(self, other):
+    def modded_by(self, other: Self):
         """self.value modded by other's value (modulo).
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -88,7 +87,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def floor_dived_by(self, other):
+    def floor_dived_by(self, other: Self):
         """Floor division between self.value and other's value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -96,7 +95,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def dived_by(self, other):
+    def dived_by(self, other: Self):
         """Division between self.value and other's value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -104,7 +103,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def powered_by(self, other):
+    def powered_by(self, other: Self):
         """self.value powered by other's value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -112,7 +111,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def get_comparison_eq(self, other):
+    def get_comparison_eq(self, other: Self):
         """self.value==other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -120,7 +119,7 @@ class Value:
         """
         return None, self.can_not_compare(other)
 
-    def get_comparison_ne(self, other):
+    def get_comparison_ne(self, other: Self):
         """self.value!=other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -128,7 +127,7 @@ class Value:
         """
         return None, self.can_not_compare(other)
 
-    def get_comparison_lt(self, other):
+    def get_comparison_lt(self, other: Self):
         """self.value<other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -136,7 +135,7 @@ class Value:
         """
         return None, self.can_not_compare(other)
 
-    def get_comparison_gt(self, other):
+    def get_comparison_gt(self, other: Self):
         """self.value>other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -144,7 +143,7 @@ class Value:
         """
         return None, self.can_not_compare(other)
 
-    def get_comparison_lte(self, other):
+    def get_comparison_lte(self, other: Self):
         """self.value<=other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -152,7 +151,7 @@ class Value:
         """
         return None, self.can_not_compare(other)
 
-    def get_comparison_gte(self, other):
+    def get_comparison_gte(self, other: Self):
         """self.value>=other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -160,7 +159,7 @@ class Value:
         """
         return None, self.can_not_compare(other)
 
-    def is_in(self, other):
+    def is_in(self, other: Self):
         """self.value in other.value (basically if an element is in a list)
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -168,7 +167,7 @@ class Value:
         """
         return None, self.can_not_be_in(other)
 
-    def and_(self, other):
+    def and_(self, other: Self):
         """logical operation: self.value and other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -176,7 +175,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def or_(self, other):
+    def or_(self, other: Self):
         """logical operation: self.value or other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -192,7 +191,7 @@ class Value:
         """
         return None, self.illegal_operation()
 
-    def xor_(self, other):
+    def xor_(self, other: Self):
         """logical operation: self.value xor other.value (exclusive or)
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -200,7 +199,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def bitwise_and(self, other):
+    def bitwise_and(self, other: Self):
         """bitwise operation: self.value and other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -208,7 +207,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def bitwise_or(self, other):
+    def bitwise_or(self, other: Self):
         """bitwise operation: self.value or other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -216,7 +215,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def bitwise_xor(self, other):
+    def bitwise_xor(self, other: Self):
         """bitwise operation: self.value xor other.value (exclusive or)
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -244,19 +243,19 @@ class Value:
         """
         return RTResult().failure(self.illegal_operation())
 
-    def to_str_(self):
+    def to_str_(self) -> tuple[str, None] | tuple[None, RTResult]:
         """Converts to str.
         Returns (str, None) or (None, Error)
         """
         return None, RTResult().failure(self.illegal_operation())
 
-    def to_int_(self):
+    def to_int_(self) -> tuple[int, None] | tuple[None, RTResult]:
         """Converts to int.
         Returns (int, None) or (None, Error)
         """
         return None, RTResult().failure(self.illegal_operation())
 
-    def to_float_(self):
+    def to_float_(self) -> tuple[float, None] | tuple[None, RTResult]:
         """Converts to float.
         Returns (float, None) or (None, Error)
         """
@@ -268,23 +267,23 @@ class Value:
         """
         return None, RTResult().failure(self.illegal_operation())
 
-    def is_int(self):
+    def is_int(self) -> bool:
         """Return PYTHON BOOLEAN True or False depending on if the value's type is INT or not"""
         return False
 
-    def is_float(self):
+    def is_float(self) -> bool:
         """Return PYTHON BOOLEAN True or False depending on if the value's type is FLOAT or not"""
         return False
 
-    def is_true(self):
+    def is_true(self) -> bool:
         """Return PYTHON BOOLEAN True or False depending on if the value is the NOUGARO VALUE for True or not"""
         return False
 
-    def is_false(self):
+    def is_false(self) -> bool:
         """Return PYTHON BOOLEAN True or False depending on if the value is the NOUGARO VALUE for False or not"""
         return not self.is_true()
 
-    def illegal_operation(self, other=None):
+    def illegal_operation(self, other: "Value"=None):
         """Returns a RunTimeError with message 'illegal operation (with self/between self and other)"""
         assert self.pos_start is not None
         if other is None:
@@ -299,14 +298,14 @@ class Value:
             origin_file="src.values.value.Value.illegal_operation"
         )
 
-    def can_not_compare(self, other):
+    def can_not_compare(self, other: Self):
         """Returns a RunTimeError with message 'can not compare self and other'"""
         return RunTimeError(
             self.pos_start, other.pos_end, f'can not compare {self.type_} and {other.type_}.', self.context,
             origin_file="src.values.value.Value.can_not_compare"
         )
 
-    def can_not_be_in(self, other):
+    def can_not_be_in(self, other: Self):
         """Returns a RunTimeError with message 'other is not iterable or can not contain self'"""
         return RunTimeError(
             self.pos_start, other.pos_end, f'{other.type_} is not iterable or can not contain {self.type_}.',

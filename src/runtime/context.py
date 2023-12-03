@@ -29,7 +29,7 @@ class Context:
         # ABOUT self.parent_entry_pos:
         # I actually don't know why there is a parent_entry_pos to every context, but there is no pos_start.
         # The entry pos seems to be the pos start of a context, but... Well, I don't know....
-        self.symbol_table: SymbolTable | None = None
+        self.symbol_table = None
         self.what_to_export: SymbolTable = SymbolTable()
 
     def dict_(self):
@@ -66,7 +66,7 @@ class Context:
 
     def set_symbol_table_with_parent_symbol_table_as_parent(self, new_symbol_table: SymbolTable):
         """Sets symbol table, sets its parent to parent’s one (if it exists) then return self."""
-        if self.parent is not None:
+        if self.parent is not None and self.parent.symbol_table is not None:
             self.symbol_table = new_symbol_table.copy().set_parent(self.parent.symbol_table)
         elif self.symbol_table is None:
             self.symbol_table = new_symbol_table.copy()
@@ -75,5 +75,6 @@ class Context:
     def copy(self):
         """Return a copy of self."""
         new_ctx = Context(self.display_name, self.parent, self.parent_entry_pos)
+        assert self.symbol_table is not None
         new_ctx.symbol_table = self.symbol_table.copy()
         return new_ctx

@@ -48,7 +48,7 @@ def run(
         file_name: str,
         text: str,
         noug_dir: str,
-        version: str = None,
+        version: str | None = None,
         exec_from: str = "(shell)",
         actual_context: str = "<program>",
         use_default_symbol_table: bool = False,

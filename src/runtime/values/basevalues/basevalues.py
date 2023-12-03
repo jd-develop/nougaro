@@ -13,19 +13,19 @@ from src.runtime.values.basevalues.value import Value
 from src.runtime.runtime_result import RTResult
 from src.errors.errors import RunTimeError, RTArithmeticError, RTIndexError, RTOverflowError
 # built-in python imports
-from typing import Literal
+from typing import Self
 
 
 # IMPORTANT NOTE : THE DOC FOR ALL THE FUNCTIONS IN THIS FILE ARE IN value.py :)
 
 
 class String(Value):
-    def __init__(self, value):
+    def __init__(self, value: Self | str):
         super().__init__()
         if isinstance(value, String):
-            self.value: str | Literal = value.value
+            self.value: str = value.value
         else:
-            self.value: str | Literal = value
+            self.value: str = value
         self.type_ = "str"
 
     def __repr__(self):
@@ -38,13 +38,13 @@ class String(Value):
         """Returns self.value, as a python str"""
         return self.value
 
-    def added_to(self, other):
+    def added_to(self, other: Self):
         if isinstance(other, String):
             return String(self.value + other.value).set_context(self.context), None
         else:
             return None, self.illegal_operation(other)
 
-    def multiplied_by(self, other):
+    def multiplied_by(self, other: Value):
         if isinstance(other, Number) and other.is_int():
             return String(self.value * other.value).set_context(self.context), None
         else:
@@ -589,24 +589,24 @@ class Module(Value):
         else:
             return False
 
-    def get_comparison_eq(self, other):
+    def get_comparison_eq(self, other: Value):
         return Number(int(self.is_eq(other))).set_context(self.context), None
 
-    def get_comparison_ne(self, other):
+    def get_comparison_ne(self, other: Value):
         return Number(int(not self.is_eq(other))).set_context(self.context), None
 
-    def get_comparison_gt(self, other):
+    def get_comparison_gt(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_gte(self, other):
+    def get_comparison_gte(self, other: Value):
         if self.is_eq(other):
             return Number.TRUE.copy().set_context(self.context), None
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lt(self, other):
+    def get_comparison_lt(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lte(self, other):
+    def get_comparison_lte(self, other: Value):
         if self.is_eq(other):
             return Number.TRUE.copy().set_context(self.context), None
         return Number.FALSE.copy().set_context(self.context), None
@@ -651,22 +651,22 @@ class Constructor(Value):
     def is_true(self):
         return False
 
-    def get_comparison_eq(self, other):
+    def get_comparison_eq(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_ne(self, other):
+    def get_comparison_ne(self, other: Value):
         return Number.TRUE.copy().set_context(self.context), None
 
-    def get_comparison_gt(self, other):
+    def get_comparison_gt(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_gte(self, other):
+    def get_comparison_gte(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lt(self, other):
+    def get_comparison_lt(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lte(self, other):
+    def get_comparison_lte(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
     def and_(self, other: Value):
@@ -705,22 +705,22 @@ class Object(Value):
     def __repr__(self):
         return f"<{self.type_} object>"
 
-    def get_comparison_eq(self, other):
+    def get_comparison_eq(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_ne(self, other):
+    def get_comparison_ne(self, other: Value):
         return Number.TRUE.copy().set_context(self.context), None
 
-    def get_comparison_gt(self, other):
+    def get_comparison_gt(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_gte(self, other):
+    def get_comparison_gte(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lt(self, other):
+    def get_comparison_lt(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lte(self, other):
+    def get_comparison_lte(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
     def and_(self, other: Value):
@@ -760,30 +760,30 @@ class NoneValue(Value):
     def __str__(self):
         return 'None'
 
-    def get_comparison_eq(self, other):
+    def get_comparison_eq(self, other: Value):
         if isinstance(other, NoneValue):
             return Number.TRUE.copy(), None
         else:
             return Number.FALSE.copy(), None
 
-    def get_comparison_ne(self, other):
+    def get_comparison_ne(self, other: Value):
         if isinstance(other, NoneValue):
             return Number.FALSE.copy(), None
         else:
             return Number.TRUE.copy(), None
 
-    def get_comparison_gt(self, other):
+    def get_comparison_gt(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_gte(self, other):
+    def get_comparison_gte(self, other: Value):
         if isinstance(other, NoneValue):
             return Number.TRUE.copy().set_context(self.context), None
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lt(self, other):
+    def get_comparison_lt(self, other: Value):
         return Number.FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lte(self, other):
+    def get_comparison_lte(self, other: Value):
         if isinstance(other, NoneValue):
             return Number.TRUE.copy().set_context(self.context), None
         return Number.FALSE.copy().set_context(self.context), None
@@ -791,7 +791,7 @@ class NoneValue(Value):
     def and_(self, other: Value):
         return Number(int(self.is_true() and other.is_true())), None
 
-    def or_(self, other):
+    def or_(self, other: Value):
         return Number(int(self.is_true() or other.is_true())), None
 
     def xor_(self, other: Value):
@@ -815,7 +815,7 @@ class NoneValue(Value):
     def to_float_(self):
         return Number(0.0).set_context(self.context), None
 
-    def is_in(self, other):
+    def is_in(self, other: Self):
         if isinstance(other, List):
             for element in other.elements:
                 if isinstance(element, NoneValue):

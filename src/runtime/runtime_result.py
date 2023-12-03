@@ -88,7 +88,7 @@ class RTResult:
         self.error = error
         return self
 
-    def should_return(self) -> bool:  # if we should stop the interpretation because of an error, or a statement
+    def should_return(self):  # if we should stop the interpretation because of an error, or a statement
         #                               (return, break, continue)
         return (
             self.error or

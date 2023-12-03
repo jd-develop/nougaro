@@ -37,7 +37,7 @@ _ORIGIN_FILE = "src.runtime.interpreter.Interpreter"
 # ##########
 # noinspection PyPep8Naming
 class Interpreter:
-    def __init__(self, run: Callable, noug_dir_: str, args: list[Token], work_dir: str):
+    def __init__(self, run: Callable, noug_dir_: str, args: list[String], work_dir: str):
         noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.parent.absolute())
         with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug_file:
             self.debug = bool(int(debug_file.read()))

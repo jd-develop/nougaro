@@ -9,6 +9,7 @@
 
 # IMPORTS
 # nougaro modules imports
+from src.lexer.position import Position
 from src.runtime.context import Context
 from src.runtime.runtime_result import RTResult
 from src.errors.errors import RunTimeError
@@ -30,7 +31,7 @@ class Value:
     def __repr__(self) -> str:
         return "BaseValue"
 
-    def set_pos(self, pos_start=None, pos_end=None):
+    def set_pos(self, pos_start: Position | None = None, pos_end: Position | None = None):
         """Change self.pos_start and self.pos_end"""
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -283,7 +284,7 @@ class Value:
         """Return PYTHON BOOLEAN True or False depending on if the value is the NOUGARO VALUE for False or not"""
         return not self.is_true()
 
-    def illegal_operation(self, other: "Value"=None):
+    def illegal_operation(self, other: Self | None = None):
         """Returns a RunTimeError with message 'illegal operation (with self/between self and other)"""
         assert self.pos_start is not None
         if other is None:

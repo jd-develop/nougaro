@@ -9,6 +9,7 @@
 
 # IMPORTS
 # nougaro modules imports
+from src.lexer.token import Token
 from src.parser.nodes import Node
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.values.basevalues.basevalues import NoneValue, String, List
@@ -20,7 +21,7 @@ from src.misc import nice_str_from_idk
 
 
 class Function(BaseFunction):
-    def __init__(self, name: str, body_node: Node, param_names: str, should_auto_return: bool, call_with_module_context: bool = False):
+    def __init__(self, name: str, body_node: Node, param_names: list[str], should_auto_return: bool, call_with_module_context: bool = False):
         super().__init__(name, call_with_module_context)
         self.body_node = body_node
         self.param_names = param_names
@@ -30,8 +31,8 @@ class Function(BaseFunction):
     def __repr__(self):
         return f'<function {self.name}>'
 
-    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
-                use_context: Context | None = None, cli_args=None, work_dir: str = None):
+    def execute(self, args: list[Token], interpreter_: type, run, noug_dir: str, exec_from: str = "<invalid>",
+                use_context: Context | None = None, cli_args: list[String] | None = None, work_dir: str | None = None):
         if work_dir is None:
             work_dir = noug_dir
         # execute the function
@@ -45,6 +46,7 @@ class Function(BaseFunction):
             self.context = use_context
         # generate the context and update symbol table
         exec_context = self.generate_new_context(True)
+        assert exec_context.symbol_table is not None
         exec_context.symbol_table.set("__exec_from__", String(exec_from))
         exec_context.symbol_table.set("__actual_context__", String(self.name))
         if cli_args is None:
@@ -89,7 +91,7 @@ class Function(BaseFunction):
 
 class Method(Function):
     """Parent class for methods (functions in classes)"""
-    def __init__(self, name, body_node, param_names, should_auto_return,
+    def __init__(self, name: str, body_node: Node, param_names: list[str], should_auto_return: bool,
                  call_with_module_context: bool = False):
         super().__init__(name, body_node, param_names, should_auto_return, call_with_module_context)
         self.type_ = "method"

@@ -40,7 +40,7 @@ class BaseFunction(Value):
             new_context.symbol_table = SymbolTable(new_context.parent.symbol_table)
         return new_context
 
-    def check_args(self, param_names, args, optional_params: list = None, should_respect_args_number: bool = True):
+    def check_args(self, param_names: list[str], args, optional_params: list = None, should_respect_args_number: bool = True):
         """Check if the number of args match with the number of params/optional params"""
         # create a result
         result = RTResult()
@@ -111,7 +111,7 @@ class BaseFunction(Value):
                     # a param. Breaking here may improve performance in some specific contexts
                     break
 
-    def check_and_populate_args(self, param_names, args, exec_context: Context, optional_params: list = None,
+    def check_and_populate_args(self, param_names: list[str], args, exec_context: Context, optional_params: list = None,
                                 should_respect_args_number: bool = True):
         """self.check_args() then self.populate_args()"""
         # We still need the context for the symbol table ;)

@@ -63,7 +63,7 @@ def clear_screen():
     os.system('cls' if (os.name.lower() == "nt" or os.name.lower().startswith("windows")) else 'clear')
 
 
-def nice_str_from_idk(idk):
+def nice_str_from_idk(idk: Any):
     """Returns a NOUGARO string from either a PYTHON value either a NOUGARO string"""
     if isinstance(idk, String):
         return idk
@@ -84,7 +84,7 @@ class CustomBuiltInFuncMethod(Protocol):
     optional_params: list[str]
     should_respect_args_number: bool
 
-    def __call__(self, exec_context: Context = None) -> Any:
+    def __call__(self, exec_context: Context | None = None) -> Any:
         ...
 
 
@@ -92,7 +92,7 @@ class CustomBuiltInFuncMethodWithRunParam(CustomBuiltInFuncMethod):
     """The type of the methods `execute_{name}` with `run` parameter in BuiltInFunction"""
     # This class was made to bypass a pycharm bug.
 
-    def __call__(self, exec_context: Context = None, run=None, noug_dir: str = None, work_dir: str = None) -> Any:
+    def __call__(self, exec_context: Context | None = None, run=None, noug_dir: str | None = None, work_dir: str | None = None) -> Any:
         ...
 
 
@@ -100,7 +100,7 @@ class CustomBuiltInFuncMethodWithNougDirButNotRun(CustomBuiltInFuncMethod):
     """The type of the methods `execute_{name}` with `run` parameter in BuiltInFunction"""
     # This class was made to bypass a pycharm bug.
 
-    def __call__(self, exec_context: Context = None, noug_dir: str = None) -> Any:
+    def __call__(self, exec_context: Context | None = None, noug_dir: str = None) -> Any:
         ...
 
 
@@ -110,6 +110,6 @@ class CustomBuiltInFuncMethodWithNougDirButNotRun(CustomBuiltInFuncMethod):
 class CustomInterpreterVisitMethod(Protocol):
     """The type of the methods `visit_{name}` in Interpreter"""
     # This class was made to bypass a pycharm bug.
-    def __call__(self, node: Node = None, exec_context: Context = None,
-                 other_context: Context = None, methods_instead_of_funcs: bool = False) -> Any:
+    def __call__(self, node: Node | None = None, exec_context: Context | None = None,
+                 other_context: Context | None = None, methods_instead_of_funcs: bool = False) -> Any:
         ...

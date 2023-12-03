@@ -26,8 +26,8 @@ class Parser:
         Please see grammar.txt for AST.
     """
 
-    def __init__(self, tokens: list):
-        self.tokens: list = tokens  # tokens from the lexer
+    def __init__(self, tokens: list[Token]):
+        self.tokens = tokens  # tokens from the lexer
         self.token_index = -1  # we start at -1, because we advance 2 lines after, so the index will be 0
         self.current_token: Token | None = None  # Token is imported in src.nodes
         self.advance()
@@ -36,6 +36,7 @@ class Parser:
     def parse(self):
         """Parse tokens and return a result that contain a main node"""
         result = self.statements()
+        assert self.current_token is not None
         if result.error is not None and self.current_token.type != TT["EOF"]:
             return result.failure(InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
@@ -71,11 +72,13 @@ class Parser:
 
     # GRAMMARS ATOMS (AST) :
 
-    def statements(self, stop: list[tuple[Any, str] | str] = None) -> ParseResult:
+    def statements(self, stop: list[tuple[Any, str] | str] | None = None) -> ParseResult:
         """
         statements : NEWLINE* statement (NEWLINE+ statement)* NEWLINE
 
         The returned node in the parse result is ALWAYS a ListNode here."""
+        assert self.current_token is not None
+        assert self.current_token.pos_start is not None
         if stop is None:
             stop = [TT["EOF"]]  # token(s) that stops parser in this function
         result = ParseResult()  # we create the result

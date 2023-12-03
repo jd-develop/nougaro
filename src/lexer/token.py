@@ -20,7 +20,7 @@ from src.lexer.position import Position
 class Token:
     """Token class.
     A token have a type (keyboard, int, str, statement, ...) and sometimes a value ("foo", 123, break)"""
-    def __init__(self, type_: str, value: str | None = None, pos_start: Position | None = None, pos_end: Position | None = None):
+    def __init__(self, type_: str, value: str | int | float | None = None, pos_start: Position | None = None, pos_end: Position | None = None):
         self.type = type_  # type
         self.value = value  # value
         self.pos_start = self.pos_end = None

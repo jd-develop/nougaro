@@ -29,12 +29,12 @@ if TYPE_CHECKING:
 # ##########
 class Error:
     """Parent class for all the Nougaro errors."""
-    def __init__(self, pos_start: Position, pos_end: Position, error_name: str, details: str, origin_file: str = "(undetermined)"):
+    def __init__(self, pos_start: Position | None, pos_end: Position | None, error_name: str, details: str, origin_file: str = "(undetermined)"):
         noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.parent.absolute())
         with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug:
             self.print_origin_file = bool(int(debug.read()))
-        self.pos_start: Position = pos_start
-        self.pos_end: Position = pos_end
+        self.pos_start = pos_start
+        self.pos_end = pos_end
         self.error_name = error_name  # e.g. IllegalCharError
         self.details = details  # e.g. "'ù' is an illegal character."
         self.origin_file: str = origin_file
@@ -85,7 +85,7 @@ class IllegalCharError(Error):
 
 class InvalidSyntaxError(Error):
     """Invalid Syntax"""
-    def __init__(self, pos_start: Position, pos_end: Position, details: str, origin_file: str = "(undetermined)"):
+    def __init__(self, pos_start: Position | None, pos_end: Position | None, details: str, origin_file: str = "(undetermined)"):
         super().__init__(pos_start, pos_end, "InvalidSyntaxError", details, origin_file=origin_file)
 
 

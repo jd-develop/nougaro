@@ -54,7 +54,7 @@ class Lexer:
         tokens: list[Token] = []
 
         there_is_a_space_or_a_tab_or_a_comment = False
-
+        next_char = self.next_char()
         while self.current_char is not None:  # None is EOF
             if self.current_char in ' \t':  # tab and space
                 there_is_a_space_or_a_tab_or_a_comment = True
@@ -62,7 +62,7 @@ class Lexer:
             elif self.current_char == '#':  # for comments
                 there_is_a_space_or_a_tab_or_a_comment = True
                 self.skip_comment()
-            elif self.current_char == '\\' and self.next_char() is not None and self.next_char() in ';\n':
+            elif self.current_char == '\\' and next_char is not None and next_char in ';\n':
                 self.advance()
                 self.advance()
             elif self.current_char == "\\":  # and next char is invalid
@@ -79,7 +79,7 @@ class Lexer:
             elif self.current_char in DIGITS + '.':  # the char is a digit: we generate a number
                 there_is_a_space_or_a_tab_or_a_comment = False
                 number, error = self.make_number()
-                if error is None:  # there is no error
+                if error is None and number is not None:  # there is no error
                     tokens.append(number)
                 else:  # there is an error, we return it
                     return [], error
@@ -91,15 +91,15 @@ class Lexer:
                     last_tok_is_number = False
                 current_tok_is_identifier = tok.type == TT['IDENTIFIER']
                 current_tok_is_maybe_e_infix = (
-                        last_tok_is_number and current_tok_is_identifier and
+                        tok.value is not None and last_tok_is_number and current_tok_is_identifier and
                         (tok.value.startswith('e') or tok.value.startswith('E'))
                 )
                 current_tok_is_positive_e_infix = (
-                        current_tok_is_maybe_e_infix and tok.value[1:].isdigit() and self.current_char != "."
+                        current_tok_is_maybe_e_infix and tok.value is not None and tok.value[1:].isdigit() and self.current_char != "."
                 )
-                if self.next_char() is not None:
+                if next_char is not None:
                     current_tok_is_negative_e_infix = (
-                        current_tok_is_maybe_e_infix and self.current_char == "-" and self.next_char() in DIGITS
+                        current_tok_is_maybe_e_infix and self.current_char == "-" and next_char in DIGITS
                     )
                 else:
                     current_tok_is_negative_e_infix = False
@@ -108,7 +108,7 @@ class Lexer:
                     tokens.append(tok)
                 elif there_is_a_space_or_a_tab_or_a_comment:
                     tokens.append(tok)
-                elif current_tok_is_positive_e_infix:
+                elif current_tok_is_positive_e_infix and tok.pos_start is not None and tok.value is not None:
                     tokens.append(Token(
                         TT['E_INFIX'],
                         pos_start=tok.pos_start,
@@ -124,10 +124,9 @@ class Lexer:
                     self.advance()
 
                     num, error = self.make_number(_0prefixes=False)
-                    if error is not None:
+                    if error is not None or num is None:
                         return [], error
 
-                    num: Token
                     if num.type == TT["FLOAT"]:
                         return [], InvalidSyntaxError(
                             num.pos_start, num.pos_end,
@@ -138,7 +137,7 @@ class Lexer:
                         tokens.append(Token(
                             TT['E_INFIX'],
                             pos_start=tok.pos_start,
-                            pos_end=tok.pos_start.copy().advance()
+                            pos_end=tok.pos_start.copy().advance() if tok.pos_start is not None else None
                         ))
                         tokens.append(num.set_value(-1*num.value))
                 else:
@@ -147,7 +146,7 @@ class Lexer:
             elif self.current_char == '"' or self.current_char == "'":  # the char is a quote: str
                 there_is_a_space_or_a_tab_or_a_comment = False
                 string_, error = self.make_string(self.current_char)
-                if error is None:  # there is no error
+                if error is None and string_ is not None:  # there is no error
                     tokens.append(string_)
                 else:  # there is an error: we return it
                     return [], error
@@ -163,7 +162,7 @@ class Lexer:
                 there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(self.make_mul())
             elif self.current_char == '/':
-                if self.next_char() == "*":
+                if next_char == "*":
                     there_is_a_space_or_a_tab_or_a_comment = True
                     self.skip_multiline_comment()
                 else:
@@ -172,7 +171,7 @@ class Lexer:
             elif self.current_char == '^':
                 there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_pow()
-                if error is not None:
+                if error is not None or token is None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == '%':
@@ -183,13 +182,13 @@ class Lexer:
             elif self.current_char == "|":
                 there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_or()
-                if error is not None:
+                if error is not None or token is None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == "&":
                 there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_and()
-                if error is not None:
+                if error is not None or token is None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == "~":
@@ -219,7 +218,7 @@ class Lexer:
             elif self.current_char == '!':
                 there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_not_equals()
-                if error is not None:
+                if error is not None or token is None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == '=':
@@ -228,13 +227,13 @@ class Lexer:
             elif self.current_char == '<':
                 there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_less_than()
-                if error is not None:
+                if error is not None or token is None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == '>':
                 there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_greater_than()
-                if error is not None:
+                if error is not None or token is None:
                     return [], error
                 tokens.append(token)
 
@@ -425,7 +424,7 @@ class Lexer:
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 
-    def make_string(self, quote='"'):
+    def make_string(self, quote: str = '"'):
         """Make string. We need quote to know where to stop"""
         string_ = ''
         if quote == '"':
@@ -569,7 +568,7 @@ class Lexer:
         token_type = TT["KEYWORD"] if id_str in KEYWORDS else TT["IDENTIFIER"]  # KEYWORDS is the keywords list
         return Token(token_type, id_str, pos_start, self.pos)
 
-    def make_number(self, digits=DIGITS + '.', _0prefixes=True, mode="int"):
+    def make_number(self, digits: str = DIGITS + '.', _0prefixes: bool = True, mode: str = "int") -> tuple[Token | None, Error | None]:
         """Make number, int or float"""
         num_str = ''
         dot_count = 0  # we can't have more than one dot, so we count them
@@ -636,7 +635,7 @@ class Lexer:
                 "b": ("01", "bin"),
                 "B": ("01", "bin"),
             }
-            if self.current_char in prefixes.keys():
+            if self.current_char in prefixes.keys() and self.current_char is not None:
                 prefix = prefixes[self.current_char]
                 self.advance()
                 num, error = self.make_number(prefix[0], False, prefix[1])

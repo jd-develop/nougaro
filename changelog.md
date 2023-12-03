@@ -1,38 +1,40 @@
-# Changelog of 0.16.0-beta
+# Changelog
 
 This file is updated nearly every commit and copied to GH release changelog.
 
-## Syntax
+## 0.16.0-beta
+
+### Syntax
 
 * Add `var ... ++` and `var ... --`
 
-## Loops
+### Loops
 
 * Loops now append `None` to their result even if the node is `None`, not printable, or if the loop is broke or continued.
 
-## Modules
+### Modules
 
-### Import and export
+#### Import and export
 
 * Add `import ... as ...`
 * You can now import nougaro files from current folder and sub-folders.
 * Add `export (node) as ...`
 * `export` now returns the value to export
 
-### Builtin libs
+#### Builtin libs
 
 * Add `noug_version` lib
 * Fixed an old bug in the `debug` lib:
   * When you activate the debug mode from the shell, you no longer need to restart it for errors to print their origin file.
 
-## Builtin functions
+### Builtin functions
 
 * Add `__python__` builtin func
 * Update `reverse` builtin function (fix error message + can now take strings as argument)
 * Improve `__gpl__` builtin func on BSD:
   * now can take any command as text editor
 
-## Misc
+### Misc
 
 * Better error messages
 * Switch to semantic versioning

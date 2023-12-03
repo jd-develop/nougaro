@@ -37,7 +37,7 @@ _ORIGIN_FILE = "src.runtime.interpreter.Interpreter"
 # ##########
 # noinspection PyPep8Naming
 class Interpreter:
-    def __init__(self, run: Callable, noug_dir_, args, work_dir: str):
+    def __init__(self, run: Callable, noug_dir_: str, args: list[Token], work_dir: str):
         noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.parent.absolute())
         with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug_file:
             self.debug = bool(int(debug_file.read()))
@@ -454,6 +454,7 @@ class Interpreter:
             ))
 
         final_values = []
+        assert ctx.symbol_table is not None
         for i, var_name in enumerate(var_names):
             IS_SINGLE_VAR_NAME = len(var_name) == 1
             if not IS_SINGLE_VAR_NAME:  # var a.b.(...).z = value
@@ -530,7 +531,7 @@ class Interpreter:
                         ctx, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
                     ))
 
-                final_var_name = var_name[-1].value
+                final_var_name: str = var_name[-1].value
                 VARIABLE_EXISTS = final_var_name in value.attributes
                 if VARIABLE_EXISTS:
                     var_actual_value: Value | None = value.attributes[var_name[-1].value]
@@ -544,7 +545,7 @@ class Interpreter:
                         "excepted identifier.",
                         ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
                     ))
-                final_var_name = var_name[0].value
+                final_var_name: str = var_name[0].value
 
                 VARIABLE_IS_PROTECTED = final_var_name in PROTECTED_VARS
                 if VARIABLE_IS_PROTECTED:
@@ -564,6 +565,7 @@ class Interpreter:
             if equal == TT["EQ"]:  # just a regular equal, we can modify/create the variable in the symbol table
                 final_value, error = values[i], None  # we want to return the new value of the variable
             elif VARIABLE_EXISTS:  # edit variable
+                assert isinstance(var_actual_value, Value) # a little cheesy
                 if equal == TT["PLUSEQ"]:
                     final_value, error = var_actual_value.added_to(values[i])
                 elif equal == TT["MINUSEQ"]:
@@ -1156,7 +1158,7 @@ class Interpreter:
 
     # todo: separate call methods
 
-    def _init_constructor(self, constructor, outer_context, result, node, object_to_set_this=None) -> RTResult:
+    def _init_constructor(self, constructor: Constructor, outer_context: Context, result: RTResult, node: Node, object_to_set_this: Object | None = None) -> RTResult:
         """Initialize a constructor. Recursive method."""
         call_with_module_context: bool = constructor.call_with_module_context
 

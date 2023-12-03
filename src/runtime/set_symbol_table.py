@@ -123,7 +123,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("__test__", BuiltInFunction("__test__"))
     symbol_table.set("__how_many_lines_of_code__", BuiltInFunction("__how_many_lines_of_code__"))
 
-    symbols_copy: dict = symbol_table.symbols.copy()
+    symbols_copy: dict[str, Value] = symbol_table.symbols.copy()
     if '__symbol_table__' in symbols_copy.keys():
         del symbols_copy['__symbol_table__']
     symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))

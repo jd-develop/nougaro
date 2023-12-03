@@ -9,6 +9,7 @@
 
 # IMPORTS
 # nougaro modules imports
+from src.parser.nodes import Node
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.values.basevalues.basevalues import NoneValue, String, List
 from src.runtime.runtime_result import RTResult
@@ -19,7 +20,7 @@ from src.misc import nice_str_from_idk
 
 
 class Function(BaseFunction):
-    def __init__(self, name, body_node, param_names, should_auto_return, call_with_module_context=False):
+    def __init__(self, name: str, body_node: Node, param_names: str, should_auto_return: bool, call_with_module_context: bool = False):
         super().__init__(name, call_with_module_context)
         self.body_node = body_node
         self.param_names = param_names

@@ -11,8 +11,8 @@ This is Nougaro beta 0.15.
  Python builtins that are not always builtin (why?):
   * `colorama` (`pip install colorama`)
 
- <!-- Under Linux:
-  * `readline` (`pip install readline`) -->
+ Under Linux:
+  * `readline` (`pip install readline`)
 
 ### Run
  Execute the shell with `python3 shell.py`. Open files with `python3 shell.py filename.extension`.
@@ -31,8 +31,8 @@ This is Nougaro beta 0.15.
  Modules pas toujours fournis avec Python (pourquoi&nbsp;?)&nbsp;:
   * `colorama` (`pip install colorama`)
 
- <!-- Sous Linux&nbsp;:
-  * `readline` (`pip install readline`) -->
+ Sous Linux&nbsp;:
+  * `readline` (`pip install readline`)
  
 ### Exécuter
  Exécutez le shell avec `python3 shell.py`. Ouvrez des fichiers avec `python3 shell.py nomdufichier.extention`.

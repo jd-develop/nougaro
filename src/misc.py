@@ -19,6 +19,10 @@ try:
     from colorama import init as colorama_init, Fore
     colorama_installed = True
 except ModuleNotFoundError:
+    colorama_init = lambda: None  # this is to avoid type checking errors
+    class Fore:
+        RED = ""
+        RESET = ""
     colorama_installed = False
 
 if colorama_installed:
@@ -32,7 +36,7 @@ if colorama_installed:
 if colorama_installed:
     def print_in_red(txt: str = ""): print(Fore.RED + txt + Fore.RESET)
 else:
-    print_in_red = print
+    def print_in_red(txt: str = ""): print(txt)
 
 
 # ##########
@@ -91,6 +95,9 @@ class CustomBuiltInFuncMethod(Protocol):
 class CustomBuiltInFuncMethodWithRunParam(CustomBuiltInFuncMethod):
     """The type of the methods `execute_{name}` with `run` parameter in BuiltInFunction"""
     # This class was made to bypass a pycharm bug.
+    param_names: list[str]
+    optional_params: list[str]
+    should_respect_args_number: bool
 
     def __call__(self, exec_context: Context | None = None, run=None, noug_dir: str | None = None, work_dir: str | None = None) -> Any:
         ...
@@ -99,6 +106,9 @@ class CustomBuiltInFuncMethodWithRunParam(CustomBuiltInFuncMethod):
 class CustomBuiltInFuncMethodWithNougDirButNotRun(CustomBuiltInFuncMethod):
     """The type of the methods `execute_{name}` with `run` parameter in BuiltInFunction"""
     # This class was made to bypass a pycharm bug.
+    param_names: list[str]
+    optional_params: list[str]
+    should_respect_args_number: bool
 
     def __call__(self, exec_context: Context | None = None, noug_dir: str = None) -> Any:
         ...

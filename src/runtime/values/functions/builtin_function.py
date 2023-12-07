@@ -26,12 +26,12 @@ import subprocess
 
 
 class BuiltInFunction(BaseBuiltInFunction):
-    def __init__(self, name, call_with_module_context=False):
+    def __init__(self, name: str, call_with_module_context: bool = False):
         super().__init__(name, call_with_module_context)
         self.cli_args = []
 
     def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
-                use_context: Context | None = None, cli_args=None, work_dir: str = None):
+                use_context: Context | None = None, cli_args = None, work_dir: str | None = None):
         # execute a built-in function
         # create the result
         result = RTResult()

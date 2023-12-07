@@ -401,7 +401,7 @@ class Number(Value):
             return None, self.can_not_be_in(other)
 
     def is_int(self):
-        return self.type_ == 'int'
+        return isinstance(self.value, int)
 
     def is_float(self):
         return not self.is_int()

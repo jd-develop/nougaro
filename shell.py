@@ -23,7 +23,9 @@
 # nougaro modules imports
 import src.nougaro as nougaro
 from src.misc import print_in_red
+from src.runtime.values.basevalues.value import Value
 from src.runtime.values.basevalues.basevalues import List
+from src.errors.errors import Error
 # built in python imports
 import json
 import sys
@@ -37,7 +39,7 @@ import pathlib
 #         pass
 
 
-def check_arguments(args, noug_dir, version):
+def check_arguments(args: list[str], noug_dir: str, version: str):
     line_to_exec = None
     if len(args) == 0:  # there is a file to exec
         return "<stdin>", None
@@ -81,7 +83,7 @@ def check_arguments(args, noug_dir, version):
     return path, line_to_exec
 
 
-def execute_file(path, debug_on, noug_dir, version, args):
+def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: list[str]):
     work_dir = os.path.dirname(os.path.realpath(path))
     endswith_slash = work_dir.endswith("/") or work_dir.endswith("\\")
     if endswith_slash:
@@ -92,11 +94,11 @@ def execute_file(path, debug_on, noug_dir, version, args):
     with open(path, encoding="UTF-8") as file:
         file_content = str(file.read())
 
-    if file_content == "" or file_content is None:  # no need to run this empty file
-        result, error = None, None
+    if file_content == "":  # no need to run this empty file
+        error = None
     else:  # the file isn't empty, let's run it !
         try:
-            result, error = nougaro.run('<stdin>', file_content, noug_dir, version, args=args, work_dir=work_dir)
+            error = nougaro.run('<stdin>', file_content, noug_dir, version, args=args, work_dir=work_dir)[1]
         except KeyboardInterrupt:  # if CTRL+C, just exit the Nougaro shell
             print_in_red("\nKeyboardInterrupt")
             sys.exit()
@@ -109,7 +111,7 @@ def execute_file(path, debug_on, noug_dir, version, args):
         sys.exit(1)
 
 
-def print_result_and_error(result, error, args, exit_on_cd: bool = False):
+def print_result_and_error(result: Value | None, error: Error | None, args: list[str], exit_on_cd: bool = False):
     if error is not None:  # there is an error, we print it in RED because OMG AN ERROR
         print_in_red(error.as_string())
         return
@@ -216,7 +218,7 @@ def main():
                 print_in_red("\nEOF")
                 break  # breaks the `while True` loop to the end of the file
 
-            if str(text) == "" or text is None:  # nothing was entered: we don't do anything
+            if str(text) == "":  # nothing was entered: we don't do anything
                 result, error = None, None
                 continue
             try:  # we try to run it

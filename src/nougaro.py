@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
-import os.path
 
 # Nougaro : a python-interpreted high-level programming language
 # Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
@@ -26,7 +25,7 @@ import src.runtime.interpreter
 from src.runtime.symbol_table import SymbolTable
 from src.runtime.set_symbol_table import set_symbol_table
 from src.errors.errors import *
-from src.runtime.values.basevalues.basevalues import String, List
+from src.runtime.values.basevalues.basevalues import String, List, NoneValue
 from src.misc import nice_str_from_idk
 # built-in python imports
 import json
@@ -46,7 +45,7 @@ default_symbol_table = global_symbol_table.copy()
 # ##########
 def run(
         file_name: str,
-        text: str,
+        text: str | None,
         noug_dir: str,
         version: str | None = None,
         exec_from: str = "(shell)",
@@ -55,7 +54,7 @@ def run(
         use_context: Context | None = None,
         args: list[str] | None = None,
         work_dir: str | None = None
-):
+) -> tuple[Value, None] | tuple[None, Error]:
     """Run the given code.
     The code is given through the `text` argument."""
     with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug_f:
@@ -89,6 +88,8 @@ def run(
     global_symbol_table.set("__noug_dir__", String(noug_dir))
 
     # we make tokens with the Lexer
+    if text is None:
+        return NoneValue(False), None
     lexer = Lexer(file_name, text)
     tokens, error = lexer.make_tokens()
     if error is not None:  # if there is any error, we just stop

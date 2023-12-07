@@ -32,12 +32,11 @@ import sys
 import os
 import platform
 import pathlib
-# if platform.system() in ["Linux", "Darwin"] or "BSD" in platform.system():
-#     try:
-#         import readline  # browse command history
-#     except ImportError:
-#         pass
-
+if platform.system() in ["Linux", "Darwin"] or "BSD" in platform.system():
+    try:
+        import readline  # browse command history # type: ignore
+    except ImportError:
+        pass
 
 def check_arguments(args: list[str], noug_dir: str, version: str):
     line_to_exec = None

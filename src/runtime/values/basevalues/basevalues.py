@@ -11,6 +11,8 @@
 # nougaro modules imports
 from src.runtime.values.basevalues.value import Value
 from src.runtime.runtime_result import RTResult
+from src.runtime.symbol_table import SymbolTable
+from src.runtime.context import Context
 from src.errors.errors import RunTimeError, RTArithmeticError, RTIndexError, RTOverflowError
 # built-in python imports
 from typing import Self
@@ -45,7 +47,7 @@ class String(Value):
             return None, self.illegal_operation(other)
 
     def multiplied_by(self, other: Value):
-        if isinstance(other, Number) and other.is_int():
+        if isinstance(other, Number) and isinstance(other.value, int):
             return String(self.value * other.value).set_context(self.context), None
         else:
             return None, self.illegal_operation(other)
@@ -128,7 +130,7 @@ class String(Value):
     def and_(self, other: Value):
         return Number(int(self.is_true() and other.is_true())), None
 
-    def or_(self, other):
+    def or_(self, other: Value):
         return Number(int(self.is_true() or other.is_true())), None
 
     def xor_(self, other: Value):
@@ -143,7 +145,7 @@ class String(Value):
     def is_in(self, other):
         if isinstance(other, List):
             for x in other.elements:
-                if self.value == x.value:
+                if self.get_comparison_eq(x)[0].is_true():
                     return TRUE.copy().set_context(self.context), None
             return FALSE.set_context(self.context), None
         elif isinstance(other, String):
@@ -165,7 +167,7 @@ class Number(Value):
     def __init__(self, value: int | float):
         super().__init__()
         self.value = value
-        if isinstance(self.value, int):
+        if self.is_int():
             self.type_ = 'int'
         else:
             self.type_ = 'float'
@@ -203,9 +205,9 @@ class Number(Value):
     def multiplied_by(self, other):  # MULTIPLICATION
         if isinstance(other, Number):
             return Number(self.value * other.value).set_context(self.context), None
-        elif isinstance(other, String) and self.is_int():
-            return String(self.value * other.value).set_context(self.context), None
-        elif isinstance(other, List) and self.is_int():
+        elif isinstance(other, String) and isinstance(self.value, int):
+            return String(other.value * self.value).set_context(self.context), None
+        elif isinstance(other, List) and isinstance(self.value, int):
             new_list = other.copy()
             new_list.elements = new_list.elements * self.value
             return new_list, None
@@ -217,13 +219,24 @@ class Number(Value):
             try:
                 val = self.value / other.value
             except ZeroDivisionError:
+                assert other.pos_start is not None
+                assert other.pos_end is not None
+                assert self.context is not None
                 return None, RTArithmeticError(
-                    other.pos_start, other.pos_end, 'division by zero is not possible.', self.context,
+                    other.pos_start, other.pos_end,
+                    'division by zero is not possible.',
+                    self.context,
                     "src.values.basevalues.Number.dived_by"
                 )
             except OverflowError as e:  # I hate python
+                errmsg = str(e)
+                assert self.pos_start is not None
+                assert other.pos_end is not None
+                assert self.context is not None
                 return None, RTOverflowError(
-                    self.pos_start, other.pos_end, e, self.context,
+                    self.pos_start, other.pos_end,
+                    errmsg,
+                    self.context,
                     "src.values.basevalues.Number.dived_by"
                 )
             return Number(val).set_context(self.context), None
@@ -233,8 +246,13 @@ class Number(Value):
     def modded_by(self, other):  # MODULO
         if isinstance(other, Number):
             if other.value == 0:
+                assert other.pos_start is not None
+                assert other.pos_end is not None
+                assert self.context is not None
                 return None, RTArithmeticError(
-                    other.pos_start, other.pos_end, 'division by zero is not possible.', self.context,
+                    other.pos_start, other.pos_end,
+                    'division by zero is not possible.',
+                    self.context,
                     "src.values.basevalues.Number.modded_by"
                 )
             return Number(self.value % other.value).set_context(self.context), None
@@ -325,31 +343,33 @@ class Number(Value):
         return Number(1 if self.value == 0 else 0).set_context(self.context), None
 
     def bitwise_and(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) and isinstance(self.value, int) and isinstance(other.value, int):
             return Number(self.value & other.value).set_context(self.context), None
         else:
             return None, self.illegal_operation(other)
 
     def bitwise_or(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) and isinstance(self.value, int) and isinstance(other.value, int):
             return Number(self.value | other.value).set_context(self.context), None
         else:
             return None, self.illegal_operation(other)
 
     def bitwise_xor(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) and isinstance(self.value, int) and isinstance(other.value, int):
             return Number(self.value ^ other.value).set_context(self.context), None
         else:
             return None, self.illegal_operation(other)
 
     def bitwise_not(self):
+        if not isinstance(self.value, int):
+            return None, self.illegal_operation()
         return Number(~self.value).set_context(self.context), None
 
     def is_true(self):
         return self.value != 0
 
     def abs_(self):
-        return Number(abs(self.value))
+        return Number(abs(self.value)), None
 
     def to_str_(self):
         return String(self.__repr__()).set_context(self.context), None
@@ -361,35 +381,22 @@ class Number(Value):
         return Number(float(self.value)).set_context(self.context), None
 
     def to_list_(self):
-        list_ = []
-        for element in self.to_str_()[0].to_list_()[0]:
-            if isinstance(element, String):
-                if element.value == "0":
-                    list_.append(Number(0))
-                elif element.value == "-":
-                    list_.append(String('-'))
-                elif element.value == ".":
-                    list_.append(String('.'))
-                elif element.value == "e":  # try 10^-100 -> 10e-100
-                    list_.append(String('e'))
-                else:
-                    element_to_int = element.to_int_()[0]
-                    if element_to_int is None:
-                        list_.append(NoneValue())
-                    else:
-                        list_.append(element.to_int_()[0])
-            elif element is None:  # error in converting...
-                list_.append(NoneValue())
+        list_: list[Value] = []
+        for element in str(self.value):
+            if element.isnumeric():
+                list_.append(Number(int(element)))
+            else:
+                list_.append(String(element))
         return List(list_).set_context(self.context), None
 
     def is_in(self, other):
         if isinstance(other, List):
             for x in other.elements:
-                if self.value == x.value:
+                if self.get_comparison_eq(x)[0].is_true():
                     return TRUE.copy().set_context(self.context), None
             return FALSE.set_context(self.context), None
         elif isinstance(other, String):
-            return Number(int(self.to_str_()[0].value in other.value)).set_context(self.context), None
+            return Number(int(str(self.value) in other.value)).set_context(self.context), None
         else:
             return None, self.can_not_be_in(other)
 
@@ -424,9 +431,9 @@ class List(Value):
     def __repr__(self):
         return f'[{", ".join([x.__str__() for x in self.elements])}]'
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: int):
         """If there is foo[bar] in the python code and that foo is a Nougaro List, it works ^^ !!"""
-        return self.elements.__getitem__(item)
+        return self.elements[item]
 
     def update_should_print(self):
         should_print = False
@@ -447,7 +454,7 @@ class List(Value):
         return new_list, None
 
     def subbed_by(self, other: Value):
-        if isinstance(other, Number):
+        if isinstance(other, Number) and isinstance(other.value, int):
             new_list = self.copy()
             try:
                 new_list.elements.pop(other.value)
@@ -469,7 +476,7 @@ class List(Value):
             new_list = self.copy()
             new_list.elements.extend(other.elements)
             return new_list, None
-        elif isinstance(other, Number):
+        elif isinstance(other, Number) and isinstance(other.value, int):
             if other.is_int():
                 new_list = self.copy()
                 new_list.elements = new_list.elements * other.value
@@ -480,7 +487,7 @@ class List(Value):
             return None, self.illegal_operation(other)
 
     def dived_by(self, other: Value):
-        if isinstance(other, Number):
+        if isinstance(other, Number) and isinstance(other.value, int):
             try:
                 return self.elements[other.value], None
             except IndexError:
@@ -501,7 +508,7 @@ class List(Value):
     def to_list_(self):
         return self.copy(), None
 
-    def is_eq(self, other):
+    def is_eq(self, other: Value):
         # think this is very slow
         # TODO: maybe find something to improve speed of this method (is_eq in List)
         if isinstance(other, List):
@@ -567,9 +574,7 @@ class List(Value):
             return FALSE.copy().set_context(self.context), None
 
     def is_in(self, other):
-        if isinstance(other, List):
-            return Number(int(self.elements in other.elements)).set_context(self.context), None
-        elif isinstance(other, String):
+        if isinstance(other, String):
             return Number(int(self.to_str_()[0].value in other.value)).set_context(self.context), None
         else:
             return None, self.can_not_be_in(other)
@@ -600,7 +605,7 @@ class List(Value):
 
 
 class Module(Value):
-    def __init__(self, name: str, functions_and_constants: dict):
+    def __init__(self, name: str, functions_and_constants: dict[str, Value]):
         super().__init__()
         self.name = name
         self.type_ = "module"
@@ -612,7 +617,7 @@ class Module(Value):
     def is_true(self):
         return False
 
-    def is_eq(self, other):
+    def is_eq(self, other: Value):
         if isinstance(other, Module) and other.name == self.name:
             return True
         else:
@@ -666,7 +671,7 @@ class Module(Value):
 
 
 class Constructor(Value):
-    def __init__(self, name: str, symbol_table, attributes: dict, parent: Self | None = None):
+    def __init__(self, name: str | None, symbol_table: SymbolTable, attributes: dict[str, Value], parent: Self | None = None):
         super().__init__()
         self.name = name if name is not None else '<class>'
         self.symbol_table = symbol_table
@@ -724,7 +729,7 @@ class Constructor(Value):
 
 
 class Object(Value):
-    def __init__(self, attributes: dict, constructor: Constructor, inner_ctx=None):
+    def __init__(self, attributes: dict[str, Value], constructor: Constructor, inner_ctx: Context | None =None):
         super().__init__()
         self.attributes = attributes.copy()
         self.constructor: Constructor = constructor

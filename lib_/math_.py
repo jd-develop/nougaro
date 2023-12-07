@@ -330,7 +330,9 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_abs"
             ))
 
-        value_to_return = value.abs_()
+        value_to_return, error = value.abs_()
+        if error is not None:
+            return RTResult().failure(error)
 
         return RTResult().success(value_to_return)
 

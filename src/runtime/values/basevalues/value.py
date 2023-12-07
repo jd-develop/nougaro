@@ -16,7 +16,7 @@ from src.runtime.context import Context
 from src.runtime.runtime_result import RTResult
 from src.errors.errors import RunTimeError
 # built-in python imports
-from typing import Self, Any
+from typing import Self
 # special typing import
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -49,7 +49,7 @@ class Value:
         self.context = context
         return self
 
-    def added_to(self, other: Self) -> tuple[Any, RunTimeError | None]: # added_to is overridden a lot of times, can't specify them all here
+    def added_to(self, other: Self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """Add the other's value to self.value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         E.g. : num_1 is a Number object that have a value of 1 and num_2 is another Number object with a value of 1 too.
@@ -61,7 +61,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def subbed_by(self, other: Self):
+    def subbed_by(self, other: Self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """Subtract the other's value from self.value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         E.g. : num_1 is a Number object that have a value of 1 and num_2 is another Number object with a value of 1 too.
@@ -73,7 +73,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def multiplied_by(self, other: Self) -> tuple[Any, RunTimeError | None]:
+    def multiplied_by(self, other: Self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """Multiply the other's value with self.value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         E.g. : num_1 is a Number object that have a value of 3 and num_2 is another Number object with a value of 2.
@@ -87,7 +87,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def modded_by(self, other: Self):
+    def modded_by(self, other: Self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """self.value modded by other's value (modulo).
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -95,7 +95,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def floor_dived_by(self, other: Self):
+    def floor_dived_by(self, other: Self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """Floor division between self.value and other's value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -103,7 +103,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def dived_by(self, other: Self):
+    def dived_by(self, other: Self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """Division between self.value and other's value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -111,7 +111,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def powered_by(self, other: Self):
+    def powered_by(self, other: Self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """self.value powered by other's value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -175,7 +175,7 @@ class Value:
         """
         return None, self.can_not_be_in(other)
 
-    def and_(self, other: Self):
+    def and_(self, other: Self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """logical operation: self.value and other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -183,7 +183,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def or_(self, other: Self):
+    def or_(self, other: Self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """logical operation: self.value or other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -191,7 +191,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def not_(self):
+    def not_(self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """logical operation: not self.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -199,7 +199,7 @@ class Value:
         """
         return None, self.illegal_operation()
 
-    def xor_(self, other: Self):
+    def xor_(self, other: Self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """logical operation: self.value xor other.value (exclusive or)
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -207,7 +207,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def bitwise_and(self, other: Self):
+    def bitwise_and(self, other: Self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """bitwise operation: self.value and other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -215,7 +215,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def bitwise_or(self, other: Self):
+    def bitwise_or(self, other: Self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """bitwise operation: self.value or other.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -223,7 +223,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def bitwise_xor(self, other: Self):
+    def bitwise_xor(self, other: Self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """bitwise operation: self.value xor other.value (exclusive or)
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -231,7 +231,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def bitwise_not(self):
+    def bitwise_not(self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """bitwise operation: not self.value
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -245,11 +245,11 @@ class Value:
         Returns a result"""
         return RTResult().failure(self.illegal_operation())
 
-    def abs_(self):
+    def abs_(self) -> tuple[Self, None] | tuple[None, RunTimeError]:
         """Absolute value
         Returns a result
         """
-        return RTResult().failure(self.illegal_operation())
+        return None, self.illegal_operation()
 
     def to_str_(self) -> tuple[String, None] | tuple[None, RTResult]:
         """Converts to str.

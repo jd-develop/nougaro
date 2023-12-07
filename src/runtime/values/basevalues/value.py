@@ -8,6 +8,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # IMPORTS
+# __future__ imports (must be first)
+from __future__ import annotations
 # nougaro modules imports
 from src.lexer.position import Position
 from src.runtime.context import Context
@@ -15,6 +17,10 @@ from src.runtime.runtime_result import RTResult
 from src.errors.errors import RunTimeError
 # built-in python imports
 from typing import Self, Any
+# special typing import
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.runtime.interpreter import Interpreter
 
 class Value:
     """The parent class to all the value classes (String, Number, List...)"""
@@ -23,7 +29,7 @@ class Value:
         self.set_pos()
         self.set_context()
         self.type_ = "BaseValue"
-        self.attributes: dict = {}
+        self.attributes: dict[str, Value] = {}
         self.call_with_module_context = False
         self.module_context = None
         self.should_print = True
@@ -232,7 +238,7 @@ class Value:
         """
         return None, self.illegal_operation()
 
-    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
+    def execute(self, args: list[Value], interpreter_: Interpreter, run, noug_dir: str, exec_from: str = "<invalid>",
                 use_context: Context | None = None):
         """Execute the function.
         Returns a result"""
@@ -289,11 +295,13 @@ class Value:
         assert self.pos_start is not None
         if other is None:
             assert self.pos_end is not None
+            assert self.context is not None
             return RunTimeError(
                 self.pos_start, self.pos_end, f'illegal operation with {self.type_}.', self.context,
                 origin_file="src.values.value.Value.illegal_operation"
             )
         assert other.pos_end is not None
+        assert self.context is not None
         return RunTimeError(
             self.pos_start, other.pos_end, f'illegal operation between {self.type_} and {other.type_}.', self.context,
             origin_file="src.values.value.Value.illegal_operation"
@@ -301,6 +309,9 @@ class Value:
 
     def can_not_compare(self, other: Self):
         """Returns a RunTimeError with message 'can not compare self and other'"""
+        assert self.context is not None
+        assert self.pos_start is not None
+        assert other.pos_end is not None
         return RunTimeError(
             self.pos_start, other.pos_end, f'can not compare {self.type_} and {other.type_}.', self.context,
             origin_file="src.values.value.Value.can_not_compare"
@@ -308,12 +319,15 @@ class Value:
 
     def can_not_be_in(self, other: Self):
         """Returns a RunTimeError with message 'other is not iterable or can not contain self'"""
+        assert self.context is not None
+        assert self.pos_start is not None
+        assert other.pos_end is not None
         return RunTimeError(
             self.pos_start, other.pos_end, f'{other.type_} is not iterable or can not contain {self.type_}.',
             self.context, origin_file="src.values.value.Value.can_not_be_in"
         )
 
-    def set_attr(self, attribute: str, value):
+    def set_attr(self, attribute: str, value: Self):
         self.attributes[attribute] = value
 
     def del_attr(self, attribute: str):

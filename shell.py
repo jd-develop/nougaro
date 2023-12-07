@@ -192,14 +192,15 @@ def main():
               f"Contribute: https://github.com/jd-develop/nougaro/")
         print(f"Changelog: see {noug_dir}/changelog.md")
         print()
-        print("This program is under GPL license. For more details, type __gpl__() or __gpl__(1) to stay in terminal.\n"
-              "This program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.")
+        print("This program is under GPL license. For more details, type __gpl__() or __gpl__(1) to stay in terminal."
+              "\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.")
         print()
         print("Found a bug? Feel free to report it at https://jd-develop.github.io/nougaro/bugreport.html")
         if debug_on:
             print()
             print(f"Current working directory is {work_dir} ({type(work_dir)})")
-            print(f"Python version is {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]} ({list(sys.version_info)})")
+            print(f"Python version is {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]} "
+                  f"({list(sys.version_info)})")
             print("DEBUG mode is ENABLED")
         if print_context:
             if not debug_on:

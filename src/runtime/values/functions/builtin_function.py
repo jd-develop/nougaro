@@ -143,7 +143,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         value = exec_context.symbol_table.getf('value')
         if value is not None:  # if the value is defined
             try:
-                print(value.to_str())
+                print(value.to_python_str())
             except AttributeError:
                 print(str(value))
         else:  # the value is not defined, we just print a new line like in regular print() python builtin func
@@ -161,7 +161,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         value = exec_context.symbol_table.getf('value')
         if value is not None:  # if the value is defined
             try:
-                print_in_red(value.to_str())
+                print_in_red(value.to_python_str())
             except AttributeError:
                 print_in_red(str(value))
         else:  # the value is not defined, we just print a new line like in regular print() python builtin func
@@ -179,8 +179,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         value = exec_context.symbol_table.getf('value')
         if value is not None:  # if the value is defined
             try:
-                print(value.to_str())
-                return RTResult().success(String(value.to_str()))
+                print(value.to_python_str())
+                return RTResult().success(String(value.to_python_str()))
             except AttributeError:
                 print(str(value))
                 return RTResult().success(String(str(value)))
@@ -201,8 +201,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         value = exec_context.symbol_table.getf('value')
         if value is not None:  # if the value is defined
             try:
-                print_in_red(value.to_str())
-                return RTResult().success(String(value.to_str()))
+                print_in_red(value.to_python_str())
+                return RTResult().success(String(value.to_python_str()))
             except AttributeError:
                 print_in_red(str(value))
                 return RTResult().success(String(str(value)))

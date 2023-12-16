@@ -17,26 +17,21 @@ from typing import Protocol, Any
 import os
 try:
     from colorama import init as colorama_init, Fore
-    colorama_installed = True
+    ForeRED: str = Fore.RED
+    ForeRESET: str = Fore.RESET
 except ModuleNotFoundError:
     colorama_init = lambda: None  # this is to avoid type checking errors
-    class Fore:
-        RED = ""
-        RESET = ""
-    colorama_installed = False
+    ForeRED: str = ""
+    ForeRESET: str = ""
 
-if colorama_installed:
-    colorama_init()
+colorama_init()
 
 
 # ##########
 # COLORS
 # ##########
 # prints text in red.
-if colorama_installed:
-    def print_in_red(txt: str = ""): print(Fore.RED + txt + Fore.RESET)
-else:
-    def print_in_red(txt: str = ""): print(txt)
+def print_in_red(txt: str = ""): print(ForeRED + txt + ForeRESET)
 
 
 # ##########

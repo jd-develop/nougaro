@@ -36,7 +36,7 @@ class String(Value):
     def __len__(self):
         return len(self.value)
 
-    def to_str(self):
+    def to_python_str(self) -> str:
         """Returns self.value, as a python str"""
         return self.value
 
@@ -177,6 +177,10 @@ class Number(Value):
             return str(self.value)
         except ValueError:
             return "This number can not be displayed. However, Nougaro can deal with it."
+    
+    def to_python_str(self) -> str:
+        """Returns self.value, as a python str"""
+        return self.__repr__()
 
     def added_to(self, other):  # ADDITION
         if isinstance(other, Number):
@@ -430,6 +434,9 @@ class List(Value):
 
     def __repr__(self):
         return f'[{", ".join([x.__str__() for x in self.elements])}]'
+    
+    def to_python_str(self) -> str:
+        return self.__repr__()
 
     def __getitem__(self, item: int):
         """If there is foo[bar] in the python code and that foo is a Nougaro List, it works ^^ !!"""
@@ -613,6 +620,9 @@ class Module(Value):
 
     def __repr__(self):
         return f"<module {self.name}>"
+    
+    def to_python_str(self) -> str:
+        return self.__repr__()
 
     def is_true(self):
         return False
@@ -681,6 +691,9 @@ class Constructor(Value):
 
     def __repr__(self):
         return f"<class {self.name}>"
+    
+    def to_python_str(self) -> str:
+        return self.__repr__()
 
     def is_true(self):
         return False
@@ -738,6 +751,9 @@ class Object(Value):
 
     def __repr__(self):
         return f"<{self.type_} object>"
+    
+    def to_python_str(self) -> str:
+        return self.__repr__()
 
     def get_comparison_eq(self, other: Value):
         return FALSE.copy().set_context(self.context), None
@@ -793,6 +809,9 @@ class NoneValue(Value):
 
     def __str__(self):
         return 'None'
+    
+    def to_python_str(self) -> str:
+        return self.__repr__()
 
     def get_comparison_eq(self, other: Value):
         if isinstance(other, NoneValue):

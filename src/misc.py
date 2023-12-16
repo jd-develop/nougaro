@@ -37,9 +37,13 @@ def print_in_red(txt: str = ""): print(ForeRED + txt + ForeRESET)
 # ##########
 # TOOLS
 # ##########
-def is_num(value: Any):
+def is_num(value: Any) -> bool:
     """Return True if `value` is a python `int` or `float`. Return False in the other cases, including `bool`"""
-    return (isinstance(value, int) or isinstance(value, float)) and not isinstance(value, bool)
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, int) or isinstance(value, float):
+        return True
+    return False
 
 
 def does_tok_type_exist(tok_type: str):

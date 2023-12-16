@@ -22,6 +22,8 @@ def py2noug(value: str | int | float | bool | list[Any] | None): # eek, i hope p
     if isinstance(value, str):
         return String(value)
     elif is_num(value):
+        # sometimes, type checking strict is very dumb
+        assert isinstance(value, int) or isinstance(value, float)
         return Number(value)
     elif isinstance(value, bool):
         return Number(int(value))

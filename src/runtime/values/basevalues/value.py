@@ -37,6 +37,9 @@ class Value:
 
     def __repr__(self) -> str:
         return "BaseValue"
+    
+    def to_python_str(self) -> str:
+        return "BaseValue"
 
     def set_pos(self, pos_start: Position | None = None, pos_end: Position | None = None):
         """Change self.pos_start and self.pos_end"""

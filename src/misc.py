@@ -67,7 +67,7 @@ def clear_screen():
     os.system('cls' if (os.name.lower() == "nt" or os.name.lower().startswith("windows")) else 'clear')
 
 
-def nice_str_from_idk(idk: Any):
+def nice_str_from_idk(idk: Any) -> String:
     """Returns a NOUGARO string from either a PYTHON value either a NOUGARO string"""
     if isinstance(idk, String):
         return idk

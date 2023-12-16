@@ -32,9 +32,9 @@ class BaseBuiltInFunction(BaseFunction):
                 use_context: Context | None = None,  work_dir: str | None = None):
         return RTResult().success(NoneValue(False))
 
-    def no_visit_method(self, exec_context: Context):
+    def no_visit_method(self, exec_ctx: Context):
         """Method called when the func name given through self.name is not defined"""
-        print(exec_context)
+        print(exec_ctx)
         print(f"NOUGARO INTERNAL ERROR : No execute_{self.name} method defined in "
               f"src.values.functions.builtin_function.BaseBuiltInFunction.\n"
               f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all informations "

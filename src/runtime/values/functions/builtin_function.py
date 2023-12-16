@@ -8,6 +8,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # IMPORTS
+# Future import
+from __future__ import annotations
 # nougaro modules imports
 from src.runtime.values.functions.base_builtin_func import BaseBuiltInFunction
 from src.runtime.values.functions.base_function import BaseFunction
@@ -23,6 +25,9 @@ import os.path
 import random
 import sys
 import subprocess
+from typing import TypedDict, TYPE_CHECKING, Callable
+if TYPE_CHECKING:
+    from src.runtime.interpreter import Interpreter
 
 
 class BuiltInFunction(BaseBuiltInFunction):
@@ -30,23 +35,24 @@ class BuiltInFunction(BaseBuiltInFunction):
         super().__init__(name, call_with_module_context)
         self.cli_args = []
 
-    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
-                use_context: Context | None = None, cli_args = None, work_dir: str | None = None):
+    def execute(self, args: list[Value], interpreter_: Interpreter, run: Callable, noug_dir: str, exec_from: str = "<invalid>",
+                use_context: Context | None = None, cli_args: list[str | String] | None = None, work_dir: str | None = None):
         # execute a built-in function
         # create the result
         result = RTResult()
 
         # generate the context and change the symbol table for the context
-        exec_context = self.generate_new_context()
-        exec_context.symbol_table.set("__exec_from__", String(exec_from))
-        exec_context.symbol_table.set("__actual_context__", String(self.name))
+        exec_ctx = self.generate_new_context()
+        assert exec_ctx.symbol_table is not None
+        exec_ctx.symbol_table.set("__exec_from__", String(exec_from))
+        exec_ctx.symbol_table.set("__actual_context__", String(self.name))
         if cli_args is None:
             self.cli_args = []
-            exec_context.symbol_table.set("__args__", List([]))
+            exec_ctx.symbol_table.set("__args__", List([]))
         else:
             self.cli_args = cli_args.copy()
-            cli_args = list(map(nice_str_from_idk, cli_args))
-            exec_context.symbol_table.set("__args__", List(cli_args))
+            new_cli_args: list[Value] = list(map(nice_str_from_idk, cli_args))
+            exec_ctx.symbol_table.set("__args__", List(new_cli_args))
 
         # get the method name and the method
         method_name = f'execute_{self.name}'
@@ -54,11 +60,13 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         # populate arguments
         try:
-            result.register(self.check_and_populate_args(method.param_names, args, exec_context,
-                                                         optional_params=method.optional_params,
-                                                         should_respect_args_number=method.should_respect_args_number))
+            result.register(self.check_and_populate_args(
+                method.param_names, args, exec_ctx,
+                optional_params=method.optional_params,
+                should_respect_args_number=method.should_respect_args_number
+            ))
         except AttributeError:  # it is self.no_visit_method :)
-            method(exec_context)
+            method(exec_ctx)
 
         # if there is an error
         if result.should_return():
@@ -67,7 +75,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # special built-in functions that needs the 'run' function (in nougaro.py) in their arguments
         if method_name in ['execute_run', 'execute_example', 'execute___test__']:
             method: CustomBuiltInFuncMethodWithRunParam  # re-define the custom type
-            return_value = result.register(method(exec_context, run, noug_dir, work_dir))
+            return_value = result.register(method(exec_ctx, run, noug_dir, work_dir))
 
             # if there is any error
             if result.should_return():
@@ -77,29 +85,29 @@ class BuiltInFunction(BaseBuiltInFunction):
         # special built-in functions that needs the 'noug_dir' value
         if method_name in ['execute___how_many_lines_of_code__', 'execute___gpl__']:
             method: CustomBuiltInFuncMethodWithNougDirButNotRun  # re-define the custom type
-            return_value = result.register(method(exec_context, noug_dir))
+            return_value = result.register(method(exec_ctx, noug_dir))
 
             # if there is any error
-            if result.should_return():
+            if result.should_return() or return_value is None:
                 return result
             return result.success(return_value)
 
         try:
             # we try to execute the function
-            return_value = result.register(method(exec_context))
-        except TypeError:  # there is no `exec_context` parameter
+            return_value = result.register(method(exec_ctx))
+        except TypeError:  # there is no `exec_ctx` parameter
             try:
                 return_value = result.register(method())
             except TypeError:  # it only executes when coding
-                return_value = result.register(method(exec_context))
-        if result.should_return():  # check for any error
+                return_value = result.register(method(exec_ctx))
+        if result.should_return() or return_value is None:  # check for any error
             return result
         # if all is OK, return what we should return
         return result.success(return_value)
 
-    def no_visit_method(self, exec_context: Context):
+    def no_visit_method(self, exec_ctx: Context):
         """Method called when the func name given through self.name is not defined"""
-        print(exec_context)
+        print(exec_ctx)
         print(f"NOUGARO INTERNAL ERROR : No execute_{self.name} method defined in "
               f"src.runtime.values.functions.builtin_function.BuiltInFunction.\n"
               f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all informations "
@@ -116,7 +124,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         return copy
 
     # ==================
-    # BUILD IN FUNCTIONS
+    # BUILT-IN FUNCTIONS
     # ==================
 
     def execute_void(self):

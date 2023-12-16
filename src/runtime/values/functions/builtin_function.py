@@ -1302,7 +1302,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         try:
-            return RTResult().success(Number(ord(chr_.to_str())))
+            return RTResult().success(Number(ord(chr_.to_python_str())))
         except Exception as e:
             return RTResult().failure(
                 RunTimeError(

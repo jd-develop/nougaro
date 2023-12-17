@@ -25,7 +25,7 @@ import os.path
 import random
 import sys
 import subprocess
-from typing import TypedDict, TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Coroutine
 if TYPE_CHECKING:
     from src.runtime.interpreter import Interpreter
 
@@ -1912,7 +1912,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                     ))
                 list_to_sort_only_nums.append(i.value)
 
-            async def execute_coroutine_list(_list: list):
+            async def execute_coroutine_list(_list: list[Coroutine[Any, Any, None]]):
                 await asyncio.gather(*_list)
 
             async def wait_and_append(i_: int):

@@ -11,9 +11,12 @@
 # nougaro modules imports
 from src.runtime.context import Context
 from src.parser.nodes import Node
+from src.errors.errors import Error
 from src.runtime.values.basevalues.basevalues import String
+from src.runtime.values.basevalues.value import Value
+from src.runtime.runtime_result import RTResult
 # built-in python imports
-from typing import Protocol, Any
+from typing import Protocol, Any, TypedDict, Callable
 import os
 try:
     from colorama import init as colorama_init, Fore
@@ -76,41 +79,56 @@ def nice_str_from_idk(idk: Any) -> String:
         return String(str(idk))
 
 
+class RunFunction(Protocol):
+    """The type of the run function found in nougaro.py"""
+
+    def __call__(
+        self,
+        file_name: str,
+        text: str | None,
+        noug_dir: str,
+        version: str | None = None,
+        exec_from: str = "(shell)",
+        actual_context: str = "<program>",
+        use_default_symbol_table: bool = False,
+        use_context: Context | None = None,
+        args: list[str | String] | None = None,
+        work_dir: str | None = None
+    ) -> tuple[Value, None] | tuple[None, Error]:
+        ...
+
 # ##########
 # CUSTOM BUILTIN FUNC METHODS
-# thanks to lancelote (https://github.com/lancelote) that works at JetBrains for these tricks
+# thanks to lancelote (https://github.com/lancelote) who works at JetBrains for these tricks
 # ##########
 class CustomBuiltInFuncMethod(Protocol):
     """The type of the methods `execute_{name}` in BuiltInFunction"""
-    # This class was made to bypass a pycharm bug.
-    param_names: list[str]
-    optional_params: list[str]
-    should_respect_args_number: bool
 
-    def __call__(self, exec_context: Context | None = None) -> Any:
+    def __call__(self, exec_context: Context | None = None) -> RTResult:
         ...
 
 
 class CustomBuiltInFuncMethodWithRunParam(CustomBuiltInFuncMethod):
     """The type of the methods `execute_{name}` with `run` parameter in BuiltInFunction"""
-    # This class was made to bypass a pycharm bug.
-    param_names: list[str]
-    optional_params: list[str]
-    should_respect_args_number: bool
 
-    def __call__(self, exec_context: Context | None = None, run=None, noug_dir: str | None = None, work_dir: str | None = None) -> Any:
+    def __call__(self, exec_context: Context | None = None, run: RunFunction | None = None, noug_dir: str | None = None, work_dir: str | None = None) -> RTResult:
         ...
 
 
 class CustomBuiltInFuncMethodWithNougDirButNotRun(CustomBuiltInFuncMethod):
     """The type of the methods `execute_{name}` with `run` parameter in BuiltInFunction"""
-    # This class was made to bypass a pycharm bug.
-    param_names: list[str]
-    optional_params: list[str]
-    should_respect_args_number: bool
 
-    def __call__(self, exec_context: Context | None = None, noug_dir: str = None) -> Any:
+    def __call__(self, exec_context: Context | None = None, noug_dir: str | None = None) -> RTResult:
         ...
+
+
+class builtin_function_dict(TypedDict):
+        function: Callable
+        param_names: list[str]
+        optional_params: list[str]
+        should_respect_args_number: bool
+        run_noug_dir_work_dir: bool
+        noug_dir: bool  # if run_noug_dir_work_dir is True then this is False
 
 
 # ##########

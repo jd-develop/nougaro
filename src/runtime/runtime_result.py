@@ -11,7 +11,7 @@
 # __future__ imports (must be first)
 from __future__ import annotations
 # nougaro modules imports
-from src.errors.errors import RunTimeError
+from src.errors.errors import Error
 # built-in python imports
 import pprint
 # special typing import
@@ -83,7 +83,7 @@ class RTResult:
         self.loop_should_break = True
         return self
 
-    def failure(self, error: RunTimeError):  # same as self.success for self.error
+    def failure(self, error: Error):  # same as self.success for self.error
         self.reset()
         self.error = error
         return self

@@ -53,7 +53,7 @@ def run(
         actual_context: str = "<program>",
         use_default_symbol_table: bool = False,
         use_context: Context | None = None,
-        args: list[str] | None = None,
+        args: list[str | String] | None = None,
         work_dir: str | None = None
 ) -> tuple[Value, None] | tuple[None, Error]:
     """Run the given code.
@@ -79,10 +79,11 @@ def run(
 
     # we set version and context in the symbol table
     if args is None:
+        new_args: list[String] = []
         global_symbol_table.set("__args__", List([]))
     else:
-        args = list(map(nice_str_from_idk, args))
-        global_symbol_table.set("__args__", List(args))
+        new_args: list[String] = list(map(nice_str_from_idk, args))
+        global_symbol_table.set("__args__", List(new_args))
     global_symbol_table.set("__noug_version__", String(version))
     global_symbol_table.set("__exec_from__", String(exec_from))
     global_symbol_table.set("__actual_context__", String(actual_context))
@@ -95,6 +96,7 @@ def run(
     tokens, error = lexer.make_tokens()
     if error is not None:  # if there is any error, we just stop
         return None, error
+    assert tokens is not None
     if debug_on:
         print(tokens)
 
@@ -103,11 +105,14 @@ def run(
     ast = parser.parse()
     if ast.error is not None:  # if there is any error, we just stop
         return None, ast.error
+    assert ast.node is not None
     if debug_on:
         print(ast)
 
     # run the code (interpreter)
-    interpreter = src.runtime.interpreter.Interpreter(run, noug_dir, args, work_dir)
+    if work_dir is None:
+        work_dir = noug_dir
+    interpreter = src.runtime.interpreter.Interpreter(run, noug_dir, new_args, work_dir)
     if use_context is None:
         context = Context('<program>')  # create the context of the interpreter
         # don't forget to change the context symbol table to the global symbol table
@@ -126,10 +131,13 @@ def run(
     result = interpreter.visit(ast.node, context, False)  # visit the main node of the AST with the created context
     if print_context:
         print(context.__str__())
+    if result.error is not None:
+        return None, result.error
+    assert result.value is not None
 
     # finally, return the value and the error given by the interpreter
     # errors are managed by the shell.py file that calls this `run` function
-    return result.value, result.error
+    return result.value, None
 
 
 if __name__ == "__main__":

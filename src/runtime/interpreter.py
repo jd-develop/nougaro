@@ -13,13 +13,13 @@ from src.runtime.values.basevalues.basevalues import Number, String, List, NoneV
 from src.runtime.values.number_constants import FALSE, TRUE
 from src.runtime.values.functions.function import Function, Method
 from src.runtime.values.functions.base_function import BaseFunction
-from src.constants import PROTECTED_VARS, KEYWORDS
+from src.constants import PROTECTED_VARS
 from src.parser.nodes import *
 from src.errors.errors import *
 from src.lexer.token_types import TT, TOKENS_NOT_TO_QUOTE
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
-from src.misc import CustomInterpreterVisitMethod, clear_screen, print_in_red
+from src.misc import CustomInterpreterVisitMethod, clear_screen
 from src.runtime.symbol_table import SymbolTable
 from src.lexer.position import Position
 # built-in python imports
@@ -55,7 +55,7 @@ class Interpreter:
             del symbols_copy['__symbol_table__']
         ctx.symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
 
-    def visit(self, node: Node, ctx: Context, methods_instead_of_funcs: bool, other_ctx: Context = None):
+    def visit(self, node: Node, ctx: Context, methods_instead_of_funcs: bool, other_ctx: Context | None = None) -> RTResult:
         """Visit a node."""
         method_name = f'visit_{type(node).__name__}'
         method: CustomInterpreterVisitMethod = getattr(self, method_name, self.no_visit_method)

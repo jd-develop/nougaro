@@ -35,8 +35,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         super().__init__(name, call_with_module_context)
         self.cli_args = []
 
-    def execute(self, args: list[Value], interpreter_: Interpreter, run: Callable, noug_dir: str, exec_from: str = "<invalid>",
-                use_context: Context | None = None, cli_args: list[str | String] | None = None, work_dir: str | None = None):
+    def execute(self, args: list[Value], interpreter_: Interpreter, run: RunFunction, noug_dir: str, exec_from: str = "<invalid>",
+                use_context: Context | None = None, work_dir: str | None = None, cli_args: list[str | String] | None = None) -> RTResult:
         # execute a built-in function
         # create the result
         result = RTResult()
@@ -55,9 +55,11 @@ class BuiltInFunction(BaseBuiltInFunction):
             exec_ctx.symbol_table.set("__args__", List(new_cli_args))
 
         # get the method name and the method
-        method_dict = self.builtin_functions.get(self.name)
-        if method_dict is None:
+        try:
+            method_dict: builtin_function_dict = self.builtin_functions[self.name]
+        except KeyError:
             self.no_visit_method(exec_ctx)
+            return result
         method = method_dict["function"]
 
         # populate arguments
@@ -78,6 +80,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             # if there is any error
             if result.should_return():
                 return result
+            assert return_value is not None
             return result.success(return_value)
 
         # special built-in functions that needs the 'noug_dir' value
@@ -119,14 +122,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         copy.set_pos(self.pos_start, self.pos_end)
         copy.attributes = self.attributes.copy()
         return copy
-
-    class builtin_function_dict(TypedDict):
-        function: Callable
-        param_names: list[str]
-        optional_params: list[str]
-        should_respect_args_number: bool
-        run_noug_dir_work_dir: bool
-        noug_dir: bool  # if run_noug_dir_work_dir is True then this is False
 
     builtin_functions: dict[str, builtin_function_dict] = {}
 
@@ -1182,7 +1177,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "noug_dir": False
     }
 
-    def execute_run(self, exec_ctx: Context, run, noug_dir: str, work_dir: str):
+    def execute_run(self, exec_ctx: Context, run: RunFunction, noug_dir: str, work_dir: str):
         """Run code from another file. Param 'run' is the 'run' function in nougaro.py"""
         # Params :
         # * file_name
@@ -1244,6 +1239,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we check for errors
         if error is not None:
             return RTResult().failure(error)
+        assert value is not None
 
         return RTResult().success(value)
 
@@ -1256,7 +1252,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "noug_dir": False
     }
 
-    def execute_example(self, exec_ctx: Context, run, noug_dir: str, work_dir: str):
+    def execute_example(self, exec_ctx: Context, run: RunFunction, noug_dir: str, work_dir: str):
         """Run code from an example file. Param 'run' is the 'run' function in nougaro.py"""
         # Params :
         # * example_name
@@ -1321,6 +1317,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         if error is not None:  # we check for errors
             return RTResult().failure(error)
+        assert value is not None
 
         if return_example_value:
             return RTResult().success(value)
@@ -1599,7 +1596,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "noug_dir": False
     }
 
-    def execute___test__(self, exec_ctx: Context, run, noug_dir: str, work_dir: str):
+    def execute___test__(self, exec_ctx: Context, run: RunFunction, noug_dir: str, work_dir: str):
         """Execute the test file."""
         # optional params:
         # * return

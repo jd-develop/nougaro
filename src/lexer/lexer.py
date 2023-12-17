@@ -49,7 +49,7 @@ class Lexer:
         next_char = self.get_char(new_pos)
         return next_char
 
-    def make_tokens(self) -> tuple[list[Token], Error]:
+    def make_tokens(self) -> tuple[list[Token], None] | tuple[None, Error]:
         """Returns a token list with self.text. Return tok_list, None or [], error."""
         tokens: list[Token] = []
 

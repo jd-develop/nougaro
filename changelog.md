@@ -2,6 +2,11 @@
 
 This file is updated nearly every commit and copied to GH release changelog.
 
+## Next version
+
+* Fix some crashes and some bugs
+* Rewrite and type hint the source code
+
 ## 0.16.0-beta
 
 ### Syntax

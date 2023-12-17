@@ -165,6 +165,7 @@ def test_nougaro(print_OK)
     assert (for i = 1 to 10 then i) == [1, 2, 3, 4, 5, 6, 7, 8, 9]
     assert (for i in [1, 2, 3, 4, 5, 6, 7, 8, 9] then if i%2 == 0 then i else continue) == [None, 2, None, 4, None, 6, None, 8, None]
     assert (for i = -1 to -10 step -1 then i%2) == [1, 0, 1, 0, 1, 0, 1, 0, 1]
+    for c in "abc" then assert c in "abc"
     var b = 1
     assert (while b<10 then; var b+=1; end) == [[2], [3], [4], [5], [6], [7], [8], [9], [10]]
     assert b == 10

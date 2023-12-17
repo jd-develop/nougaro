@@ -773,7 +773,7 @@ class Interpreter:
         if isinstance(iterable_, List):
             python_iterable = iterable_.elements
         elif isinstance(iterable_, String):
-            python_iterable = iterable_.to_str()
+            python_iterable = iterable_.to_python_str()
         else:  # this is not a list nor a str
             return result.failure(RTTypeError(
                 node.list_node.pos_start, node.list_node.pos_end,
@@ -1560,7 +1560,7 @@ class Interpreter:
         elif ctx.symbol_table.exists(node.identifier.value, True):
             value_to_return = ctx.symbol_table.get(node.identifier.value)
             try:
-                print(value_to_return.to_str())
+                print(value_to_return.to_python_str())
             except AttributeError:
                 print(str(value_to_return))
         else:

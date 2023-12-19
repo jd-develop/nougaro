@@ -50,6 +50,6 @@ class Token:
         """Returns a copy of self"""
         return Token(self.type, self.value, self.pos_start, self.pos_end)
 
-    def set_value(self, value: str):
-        self.value: str | int | float | None = value
+    def set_value(self, value: str | int | float | None):
+        self.value = value
         return self

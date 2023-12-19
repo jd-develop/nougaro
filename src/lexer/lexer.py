@@ -49,7 +49,7 @@ class Lexer:
         next_char = self.get_char(new_pos)
         return next_char
 
-    def make_tokens(self) -> tuple[list[Token], None] | tuple[None, Error]:
+    def make_tokens(self) -> tuple[list[Token], None | Error]:
         """Returns a token list with self.text. Return tok_list, None or [], error."""
         tokens: list[Token] = []
 
@@ -85,12 +85,13 @@ class Lexer:
                     return [], number_with_error[1]
             elif self.current_char in IDENTIFIERS_LEGAL_CHARS:  # the char is legal: identifier or keyword
                 tok = self.make_identifier()
+                assert tok.value is None or isinstance(tok.value, str)
                 try:
                     last_tok_is_number = tokens[-1].type in (TT['INT'], TT['FLOAT'])
                 except IndexError:
                     last_tok_is_number = False
                 current_tok_is_identifier = tok.type == TT['IDENTIFIER']
-                current_tok_is_maybe_e_infix = (
+                current_tok_is_maybe_e_infix: bool = (
                         tok.value is not None and last_tok_is_number and current_tok_is_identifier and
                         (tok.value.startswith('e') or tok.value.startswith('E'))
                 )
@@ -128,6 +129,7 @@ class Lexer:
                     if error is not None or num is None:
                         return [], error
 
+                    assert isinstance(num.value, int) or isinstance(num.value, float)
                     if num.type == TT["FLOAT"]:
                         return [], InvalidSyntaxError(
                             num.pos_start, num.pos_end,
@@ -234,8 +236,9 @@ class Lexer:
             elif self.current_char == '>':
                 there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_greater_than()
-                if error is not None or token is None:
+                if error is not None:
                     return [], error
+                assert token is not None
                 tokens.append(token)
 
             # syntax 'var a = b ? c ? d ? e ? f'
@@ -308,7 +311,7 @@ class Lexer:
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_mul(self):
-        """Make * or *= or ** """
+        """Make * or *= """
         token_type = TT["MUL"]
         pos_start = self.pos.copy()
         self.advance()
@@ -316,9 +319,6 @@ class Lexer:
         if self.current_char == '=':  # *=
             self.advance()
             token_type = TT["MULTEQ"]
-        elif self.current_char == "*":  # **
-            self.advance()
-            token_type = TT["SQUARE"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
@@ -726,7 +726,7 @@ class Lexer:
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 
-    def make_greater_than(self):
+    def make_greater_than(self) -> tuple[Token, None] | tuple[None, Error]:
         """Make > , >= , >== , >> , >>= """
         token_type = TT["GT"]
         pos_start = self.pos.copy()

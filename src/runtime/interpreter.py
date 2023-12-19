@@ -19,7 +19,7 @@ from src.errors.errors import *
 from src.lexer.token_types import TT, TOKENS_NOT_TO_QUOTE
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
-from src.misc import CustomInterpreterVisitMethod, clear_screen
+from src.misc import CustomInterpreterVisitMethod, clear_screen, RunFunction
 from src.runtime.symbol_table import SymbolTable
 from src.lexer.position import Position
 # built-in python imports
@@ -37,7 +37,7 @@ _ORIGIN_FILE = "src.runtime.interpreter.Interpreter"
 # ##########
 # noinspection PyPep8Naming
 class Interpreter:
-    def __init__(self, run: Callable, noug_dir_: str, args: list[String], work_dir: str):
+    def __init__(self, run: RunFunction, noug_dir_: str, args: list[String], work_dir: str):
         noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.parent.absolute())
         with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug_file:
             self.debug = bool(int(debug_file.read()))

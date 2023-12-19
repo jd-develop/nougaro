@@ -9,14 +9,15 @@
 
 # IMPORTS
 # nougaro modules imports
+from src.runtime.values.basevalues.value import Value
+from src.runtime.values.basevalues.basevalues import NoneValue
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.context import Context
 from src.runtime.runtime_result import RTResult
-from src.runtime.values.basevalues.basevalues import NoneValue
 from src.runtime.interpreter import Interpreter
-from src.runtime.values.basevalues.value import Value
+from src.misc import RunFunction
 # built-in python imports
-from typing import Callable
+# no imports
 
 
 class BaseBuiltInFunction(BaseFunction):
@@ -28,7 +29,7 @@ class BaseBuiltInFunction(BaseFunction):
     def __repr__(self):
         return f'<built-in function {self.name}>'
 
-    def execute(self, args: list[Value], interpreter_: Interpreter, run: Callable, noug_dir: str, exec_from: str = "<invalid>",
+    def execute(self, args: list[Value], interpreter_: Interpreter, run: RunFunction, noug_dir: str, exec_from: str = "<invalid>",
                 use_context: Context | None = None,  work_dir: str | None = None):
         return RTResult().success(NoneValue(False))
 

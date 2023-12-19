@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
+from __future__ import annotations
 
 # Nougaro : a python-interpreted high-level programming language
 # Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
@@ -9,15 +10,19 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.lexer.token import Token
 from src.parser.nodes import Node
 from src.runtime.values.functions.base_function import BaseFunction
+from src.runtime.values.basevalues.value import Value
 from src.runtime.values.basevalues.basevalues import NoneValue, String, List
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
-from src.misc import nice_str_from_idk
+from src.misc import nice_str_from_idk, RunFunction
 # built-in python imports
 # no imports
+# special typing imports
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.runtime.interpreter import Interpreter
 
 
 class Function(BaseFunction):
@@ -31,13 +36,15 @@ class Function(BaseFunction):
     def __repr__(self):
         return f'<function {self.name}>'
 
-    def execute(self, args: list[Token], interpreter_: type, run, noug_dir: str, exec_from: str = "<invalid>",
+    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str, exec_from: str = "<invalid>",
                 use_context: Context | None = None, cli_args: list[String] | None = None, work_dir: str | None = None):
         if work_dir is None:
             work_dir = noug_dir
         # execute the function
         # create the result
         result = RTResult()
+        if cli_args is None:
+            cli_args = []
 
         # create an interpreter to run the code inside the function
         interpreter = interpreter_(run, noug_dir, cli_args, work_dir)
@@ -49,11 +56,9 @@ class Function(BaseFunction):
         assert exec_context.symbol_table is not None
         exec_context.symbol_table.set("__exec_from__", String(exec_from))
         exec_context.symbol_table.set("__actual_context__", String(self.name))
-        if cli_args is None:
-            exec_context.symbol_table.set("__args__", List([]))
-        else:
-            cli_args = list(map(nice_str_from_idk, cli_args))
-            exec_context.symbol_table.set("__args__", List(cli_args))
+
+        cli_args_value: list[Value] = list(map(nice_str_from_idk, cli_args))
+        exec_context.symbol_table.set("__args__", List(cli_args_value))
         # print(self.context)
 
         # populate argument and check for errors

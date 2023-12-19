@@ -79,11 +79,13 @@ def run(
 
     # we set version and context in the symbol table
     if args is None:
-        new_args: list[String] = []
+        new_args_values: list[Value] = []
+        new_args_strings: list[String] = []
         global_symbol_table.set("__args__", List([]))
     else:
-        new_args: list[String] = list(map(nice_str_from_idk, args))
-        global_symbol_table.set("__args__", List(new_args))
+        new_args_values: list[Value] = list(map(nice_str_from_idk, args))
+        new_args_strings: list[String] = list(map(nice_str_from_idk, args))
+        global_symbol_table.set("__args__", List(new_args_values))
     global_symbol_table.set("__noug_version__", String(version))
     global_symbol_table.set("__exec_from__", String(exec_from))
     global_symbol_table.set("__actual_context__", String(actual_context))
@@ -112,7 +114,7 @@ def run(
     # run the code (interpreter)
     if work_dir is None:
         work_dir = noug_dir
-    interpreter = src.runtime.interpreter.Interpreter(run, noug_dir, new_args, work_dir)
+    interpreter = src.runtime.interpreter.Interpreter(run, noug_dir, new_args_strings, work_dir)
     if use_context is None:
         context = Context('<program>')  # create the context of the interpreter
         # don't forget to change the context symbol table to the global symbol table

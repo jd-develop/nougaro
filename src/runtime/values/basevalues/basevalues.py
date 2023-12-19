@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
+from __future__ import annotations
 
 # Nougaro : a python-interpreted high-level programming language
 # Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
@@ -15,14 +16,14 @@ from src.runtime.symbol_table import SymbolTable
 from src.runtime.context import Context
 from src.errors.errors import RunTimeError, RTArithmeticError, RTIndexError, RTOverflowError
 # built-in python imports
-from typing import Self
+# no imports
 
 
 # IMPORTANT NOTE: THE DOC FOR ALL THE FUNCTIONS IN THIS FILE ARE IN value.py :)
 
 
 class String(Value):
-    def __init__(self, value: Self | str):
+    def __init__(self, value: String | str):
         super().__init__()
         if isinstance(value, String):
             self.value: str = value.value
@@ -40,7 +41,7 @@ class String(Value):
         """Returns self.value, as a python str"""
         return self.value
 
-    def added_to(self, other: Self):
+    def added_to(self, other: Value):
         if isinstance(other, String):
             return String(self.value + other.value).set_context(self.context), None
         else:
@@ -55,7 +56,7 @@ class String(Value):
     def is_true(self):
         return len(self.value) > 0
 
-    def to_str_(self) -> tuple[Self, None] | tuple[None, RTResult]:
+    def to_str_(self) -> tuple[String, None]:
         return self.copy(), None
 
     def to_int_(self):
@@ -102,25 +103,25 @@ class String(Value):
         else:
             return FALSE.copy().set_context(self.context), None
 
-    def get_comparison_ne(self, other):
+    def get_comparison_ne(self, other: Value):
         is_eq = bool(self.get_comparison_eq(other)[0].value)
         is_ne = not is_eq
         return Number(int(is_ne)), None
 
-    def get_comparison_gt(self, other):
+    def get_comparison_gt(self, other: Value):
         return FALSE.copy().set_context(self.context), None
 
-    def get_comparison_gte(self, other):
+    def get_comparison_gte(self, other: Value):
         is_eq = bool(self.get_comparison_eq(other)[0].value)
         if is_eq:
             return TRUE.copy().set_context(self.context), None
         else:
             return FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lt(self, other):
+    def get_comparison_lt(self, other: Value):
         return FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lte(self, other):
+    def get_comparison_lte(self, other: Value):
         is_eq = bool(self.get_comparison_eq(other)[0].value)
         if is_eq:
             return TRUE.copy().set_context(self.context), None
@@ -142,7 +143,7 @@ class String(Value):
         else:
             return FALSE.copy().set_context(self.context), None
 
-    def is_in(self, other):
+    def is_in(self, other: Value):
         if isinstance(other, List):
             for x in other.elements:
                 if self.get_comparison_eq(x)[0].is_true():
@@ -182,7 +183,7 @@ class Number(Value):
         """Returns self.value, as a python str"""
         return self.__repr__()
 
-    def added_to(self, other):  # ADDITION
+    def added_to(self, other: Value):  # ADDITION
         if isinstance(other, Number):
             try:
                 return Number(self.value + other.value).set_context(self.context), None
@@ -206,7 +207,7 @@ class Number(Value):
         else:
             return None, self.illegal_operation(other)
 
-    def multiplied_by(self, other):  # MULTIPLICATION
+    def multiplied_by(self, other: Value):  # MULTIPLICATION
         if isinstance(other, Number):
             return Number(self.value * other.value).set_context(self.context), None
         elif isinstance(other, String) and isinstance(self.value, int):
@@ -218,7 +219,7 @@ class Number(Value):
         else:
             return None, self.illegal_operation(other)
 
-    def dived_by(self, other):  # DIVISION
+    def dived_by(self, other: Value):  # DIVISION
         if isinstance(other, Number):
             try:
                 val = self.value / other.value
@@ -247,7 +248,7 @@ class Number(Value):
         else:
             return None, self.illegal_operation(other)
 
-    def modded_by(self, other):  # MODULO
+    def modded_by(self, other: Value):  # MODULO
         if isinstance(other, Number):
             if other.value == 0:
                 assert other.pos_start is not None
@@ -291,7 +292,7 @@ class Number(Value):
         else:
             return FALSE.copy().set_context(self.context), None
 
-    def get_comparison_ne(self, other):
+    def get_comparison_ne(self, other: Value):
         is_eq = bool(self.get_comparison_eq(other)[0].value)
         is_ne = not is_eq
         return Number(int(is_ne)), None
@@ -308,7 +309,7 @@ class Number(Value):
         else:
             return FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lte(self, other):
+    def get_comparison_lte(self, other: Value):
         if isinstance(other, Number):
             return Number(int(self.value <= other.value)).set_context(self.context), None
         else:
@@ -318,7 +319,7 @@ class Number(Value):
             else:
                 return FALSE.copy().set_context(self.context), None
 
-    def get_comparison_gte(self, other):
+    def get_comparison_gte(self, other: Value):
         if isinstance(other, Number):
             return Number(int(self.value >= other.value)).set_context(self.context), None
         else:
@@ -331,7 +332,7 @@ class Number(Value):
     def and_(self, other: Value):
         return Number(int(self.is_true() and other.is_true())), None
 
-    def or_(self, other):
+    def or_(self, other: Value):
         return Number(int(self.is_true() or other.is_true())), None
 
     def xor_(self, other: Value):
@@ -346,19 +347,19 @@ class Number(Value):
     def not_(self):
         return Number(1 if self.value == 0 else 0).set_context(self.context), None
 
-    def bitwise_and(self, other):
+    def bitwise_and(self, other: Value):
         if isinstance(other, Number) and isinstance(self.value, int) and isinstance(other.value, int):
             return Number(self.value & other.value).set_context(self.context), None
         else:
             return None, self.illegal_operation(other)
 
-    def bitwise_or(self, other):
+    def bitwise_or(self, other: Value):
         if isinstance(other, Number) and isinstance(self.value, int) and isinstance(other.value, int):
             return Number(self.value | other.value).set_context(self.context), None
         else:
             return None, self.illegal_operation(other)
 
-    def bitwise_xor(self, other):
+    def bitwise_xor(self, other: Value):
         if isinstance(other, Number) and isinstance(self.value, int) and isinstance(other.value, int):
             return Number(self.value ^ other.value).set_context(self.context), None
         else:
@@ -393,7 +394,7 @@ class Number(Value):
                 list_.append(String(element))
         return List(list_).set_context(self.context), None
 
-    def is_in(self, other):
+    def is_in(self, other: Value):
         if isinstance(other, List):
             for x in other.elements:
                 if self.get_comparison_eq(x)[0].is_true():
@@ -455,7 +456,7 @@ class List(Value):
 
         self.should_print = should_print
 
-    def added_to(self, other):
+    def added_to(self, other: Value):
         new_list = self.copy()
         new_list.elements.append(other)
         return new_list, None
@@ -478,7 +479,7 @@ class List(Value):
         else:
             return None, self.illegal_operation(other)
 
-    def multiplied_by(self, other):
+    def multiplied_by(self, other: Value):
         if isinstance(other, List):
             new_list = self.copy()
             new_list.elements.extend(other.elements)
@@ -531,7 +532,7 @@ class List(Value):
         else:
             return None
 
-    def get_comparison_eq(self, other):
+    def get_comparison_eq(self, other: Value):
         is_eq = self.is_eq(other)
         if is_eq is None:
             return None, self.can_not_compare(other)
@@ -540,7 +541,7 @@ class List(Value):
         else:
             return FALSE.copy().set_context(self.context), None
 
-    def get_comparison_ne(self, other):
+    def get_comparison_ne(self, other: Value):
         is_eq = self.is_eq(other)
         if is_eq is None:
             return None, self.can_not_compare(other)
@@ -549,18 +550,18 @@ class List(Value):
         else:
             return TRUE.copy().set_context(self.context), None
 
-    def get_comparison_gt(self, other):
+    def get_comparison_gt(self, other: Value):
         return FALSE.copy().set_context(self.context), None
 
-    def get_comparison_gte(self, other):
+    def get_comparison_gte(self, other: Value):
         if self.is_eq(other):
             return TRUE.copy().set_context(self.context), None
         return FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lt(self, other):
+    def get_comparison_lt(self, other: Value):
         return FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lte(self, other):
+    def get_comparison_lte(self, other: Value):
         if self.is_eq(other):
             return TRUE.copy().set_context(self.context), None
         return FALSE.copy().set_context(self.context), None
@@ -568,7 +569,7 @@ class List(Value):
     def and_(self, other: Value):
         return Number(int(self.is_true() and other.is_true())), None
 
-    def or_(self, other):
+    def or_(self, other: Value):
         return Number(int(self.is_true() or other.is_true())), None
 
     def xor_(self, other: Value):
@@ -580,7 +581,7 @@ class List(Value):
         else:
             return FALSE.copy().set_context(self.context), None
 
-    def is_in(self, other):
+    def is_in(self, other: Value):
         if isinstance(other, String):
             return Number(int(self.to_str_()[0].value in other.value)).set_context(self.context), None
         else:
@@ -658,7 +659,7 @@ class Module(Value):
     def and_(self, other: Value):
         return Number(int(self.is_true() and other.is_true())), None
 
-    def or_(self, other):
+    def or_(self, other: Value):
         return Number(int(self.is_true() or other.is_true())), None
 
     def xor_(self, other: Value):
@@ -681,7 +682,7 @@ class Module(Value):
 
 
 class Constructor(Value):
-    def __init__(self, name: str | None, symbol_table: SymbolTable, attributes: dict[str, Value], parent: Self | None = None):
+    def __init__(self, name: str | None, symbol_table: SymbolTable, attributes: dict[str, Value], parent: Constructor | None = None):
         super().__init__()
         self.name = name if name is not None else '<class>'
         self.symbol_table = symbol_table
@@ -719,7 +720,7 @@ class Constructor(Value):
     def and_(self, other: Value):
         return Number(int(self.is_true() and other.is_true())), None
 
-    def or_(self, other):
+    def or_(self, other: Value):
         return Number(int(self.is_true() or other.is_true())), None
 
     def xor_(self, other: Value):
@@ -776,7 +777,7 @@ class Object(Value):
     def and_(self, other: Value):
         return Number(int(self.is_true() and other.is_true())), None
 
-    def or_(self, other):
+    def or_(self, other: Value):
         return Number(int(self.is_true() or other.is_true())), None
 
     def xor_(self, other: Value):
@@ -868,7 +869,7 @@ class NoneValue(Value):
     def to_float_(self):
         return Number(0.0).set_context(self.context), None
 
-    def is_in(self, other: Self):
+    def is_in(self, other: Value):
         if isinstance(other, List):
             for element in other.elements:
                 if isinstance(element, NoneValue):

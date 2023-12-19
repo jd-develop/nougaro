@@ -16,7 +16,7 @@ from src.runtime.values.basevalues.basevalues import String
 from src.runtime.values.basevalues.value import Value
 from src.runtime.runtime_result import RTResult
 # built-in python imports
-from typing import Protocol, Any, TypedDict, Callable
+from typing import Protocol, Any, TypedDict
 import os
 try:
     from colorama import init as colorama_init, Fore
@@ -123,7 +123,7 @@ class CustomBuiltInFuncMethodWithNougDirButNotRun(CustomBuiltInFuncMethod):
 
 
 class builtin_function_dict(TypedDict):
-        function: Callable
+        function: CustomBuiltInFuncMethod | CustomBuiltInFuncMethodWithRunParam | CustomBuiltInFuncMethodWithNougDirButNotRun
         param_names: list[str]
         optional_params: list[str]
         should_respect_args_number: bool

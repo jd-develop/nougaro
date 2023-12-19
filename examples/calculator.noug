@@ -13,6 +13,13 @@ print("  (1 + 1) * (12 + 13) will be 1 1 + 12 13 + *")
 print()
 print("Type 'help' for all the operators and constants.")
 print()
+print("Nougaro  Copyright (C) 2023  Jean Dubois")
+print("This program comes with ABSOLUTELY NO WARRANTY.")
+print("This is free software, and you are welcome to redistribute it")
+print("under certain conditions.")
+print("You should have received a copy of the GNU General Public License")
+print("along with this program.  If not, see <https://www.gnu.org/licenses/>.")
+print()
 
 var answer = 0
 var increment = 0

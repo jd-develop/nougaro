@@ -95,10 +95,9 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set('__os_name__', String(platform.system()))
     symbol_table.set('__os_release__', String(platform.uname().release))
     symbol_table.set('__os_version__', String(platform.uname().version))
-    symbol_table.set('__python_version__',
-                     String(
-                         str(sys.version_info[0]) + "." + str(sys.version_info[1]) + "." + str(sys.version_info[2])
-                     ))
+    symbol_table.set(
+        '__python_version__',
+        String(str(sys.version_info[0]) + "." + str(sys.version_info[1]) + "." + str(sys.version_info[2])))
     # platform.system() may be 'Linux', 'Windows', 'Darwin', 'Java', etc. according to Python doc
     # it can also be 'FreeBSD', 'OpenBSD', [add here other OSes where you tested platform.system()]
     symbol_table.set('__base_value__', Value())
@@ -106,7 +105,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     # GPL
     symbol_table.set('__disclaimer_of_warranty__',
                      String(
-                         "GNU GPL 3.0, 15, Disclaimer of Warranty :\n\n"
+                         "GNU GPL 3.0, 15, Disclaimer of Warranty:\n\n"
                          "  THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY\n"
                          "APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT\n"
                          "HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY\n"

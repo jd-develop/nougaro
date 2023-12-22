@@ -102,7 +102,7 @@ class VarAccessNode(Node):
     example: `foo`: var_name_tokens_list is [Token(TT_IDENTIFIER, 'foo')]
     example 2: `foo ? bar`: var_name_tokens_list is [Token(TT_IDENTIFIER, 'foo'), Token(TT_IDENTIFIER, 'bar')]
     """
-    def __init__(self, var_name_tokens_list: list[Token], attr: bool = False):
+    def __init__(self, var_name_tokens_list: list[Token | Node], attr: bool = False):
         self.var_name_tokens_list = var_name_tokens_list
         self.attr = attr
 

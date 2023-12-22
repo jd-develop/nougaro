@@ -422,15 +422,18 @@ class Interpreter:
         result = RTResult()
         var_names_list: list[Token | Node] = node.var_name_tokens_list  # there is a list because it can be `a ? b ? c`
         value = None
-        var_name = var_names_list[0]  # first we take the first identifier
-        for i, var_name in enumerate(var_names_list):  # we check for all the identifiers
+        var_name: Token | Node = var_names_list[0]  # first we take the first identifier
+        for var_name in var_names_list:  # we check for all the identifiers
             IS_IDENTIFIER = isinstance(var_name, Token) and var_name.type == TT["IDENTIFIER"]
             if not IS_IDENTIFIER:
-                var_name: Node
+                assert isinstance(var_name, Node)
                 value = result.register(self.visit(var_name, ctx, methods_instead_of_funcs))  # here var_name is an expr
                 if result.should_return():
                     return result
                 break
+            assert ctx.symbol_table is not None
+            assert isinstance(var_name, Token)
+            assert isinstance(var_name.value, str)
             value = ctx.symbol_table.get(var_name.value)  # we get the value of the variable
             if value is not None:  # if the variable is defined, we can stop here
                 break
@@ -438,6 +441,10 @@ class Interpreter:
         VARIABLE_IS_DEFINED = value is not None
         if not VARIABLE_IS_DEFINED:
             if attribute_error:
+                assert node.pos_start is not None
+                assert node.pos_end is not None
+                assert isinstance(var_name, Token)
+                assert isinstance(var_name.value, str)
                 return result.failure(RTAttributeError(
                     node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
                     f"{_ORIGIN_FILE}.visit_varAccessNode"
@@ -445,9 +452,16 @@ class Interpreter:
 
             SINGLE_IDENTIFIER = len(var_names_list) == 1
             if SINGLE_IDENTIFIER:
-                return self._undefined(node.pos_start, node.pos_end, var_name.value, ctx, result,
-                                       f"{_ORIGIN_FILE}.visit_VarAccessNode")
+                assert node.pos_start is not None
+                assert node.pos_end is not None
+                assert isinstance(var_name, Token)
+                assert isinstance(var_name.value, str)
+                return self._undefined(
+                    node.pos_start, node.pos_end, var_name.value, ctx, result, f"{_ORIGIN_FILE}.visit_VarAccessNode"
+                )
             else:  # none of the identifiers is defined
+                assert node.pos_start is not None
+                assert node.pos_end is not None
                 return result.failure(RTNotDefinedError(
                     node.pos_start, node.pos_end, f"none of the given identifiers is defined.", ctx,
                     f"{_ORIGIN_FILE}.visit_varAccessNode"
@@ -462,12 +476,13 @@ class Interpreter:
         result = RTResult()
         var_names: list[list[Token | Node]] = node.var_names
 
-        values = []
+        values: list[Value] = []
         if node.value_nodes is not None:
             for value_node in node.value_nodes:  # we get the values
-                values.append(result.register(self.visit(value_node, ctx, methods_instead_of_funcs)))
-                if result.should_return() or result.old_should_return:
+                value = result.register(self.visit(value_node, ctx, methods_instead_of_funcs))
+                if result.should_return() or result.old_should_return or value is None:
                     return result
+                values.append(value)
 
         equal = node.equal.type  # we get the equal type
 
@@ -479,9 +494,12 @@ class Interpreter:
                 equal = TT["MINUSEQ"]
 
         if len(var_names) != len(values):
+            assert node.pos_start is not None
+            assert node.pos_end is not None
             return result.failure(RunTimeError(
-                node.pos_start, node.pos_end, f"there should be the same amount of identifiers and values. "
-                                              f"There are {len(var_names)} identifiers and {len(values)} values.",
+                node.pos_start, node.pos_end,
+                f"there should be the same amount of identifiers and values. "
+                f"There are {len(var_names)} identifiers and {len(values)} values.",
                 ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
             ))
 

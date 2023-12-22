@@ -50,7 +50,8 @@ class Interpreter:
 
     @staticmethod
     def update_symbol_table(ctx: Context):
-        symbols_copy: dict = ctx.symbol_table.symbols.copy()
+        assert ctx.symbol_table is not None
+        symbols_copy: dict[str, Value] = ctx.symbol_table.symbols.copy()
         if '__symbol_table__' in symbols_copy.keys():
             del symbols_copy['__symbol_table__']
         ctx.symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
@@ -72,16 +73,18 @@ class Interpreter:
 
         return method(node, ctx)
 
-    def _undefined(self,
-                   pos_start: Position,
-                   pos_end: Position,
-                   var_name: str,
-                   ctx: Context,
-                   result: RTResult,
-                   origin_file: str = f"{_ORIGIN_FILE}._undefined",
-                   edit: bool = False)\
-            -> RTResult:
+    def _undefined(
+            self,
+            pos_start: Position,
+            pos_end: Position,
+            var_name: str,
+            ctx: Context,
+            result: RTResult,
+            origin_file: str = f"{_ORIGIN_FILE}._undefined",
+            edit: bool = False
+        ) -> RTResult:
         """Returns a RTNotDefinedError with a proper message."""
+        assert ctx.symbol_table is not None
         close_match_in_symbol_table = ctx.symbol_table.best_match(var_name)
         IS_NOUGARO_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{var_name}.noug"))
         IS_PYTHON_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{var_name}_.py"))
@@ -116,16 +119,18 @@ class Interpreter:
                 ctx, origin_file
             ))
 
-    def _visit_value_that_can_have_attributes(self, node_or_list: Node | list, result, context,
-                                              methods_instead_of_funcs: bool) -> Value:
+    def _visit_value_that_can_have_attributes(
+            self, node_or_list: Node | list[Node], result: RTResult, context: Context,
+            methods_instead_of_funcs: bool
+        ) -> RTResult | Value:
         """If node_or_list is Node, visit is and return it. If it is a list, visit the value and its attributes."""
         if not isinstance(node_or_list, list):
             value = result.register(self.visit(node_or_list, context, methods_instead_of_funcs))
-            if result.should_return():  # check for errors
+            if result.should_return() or value is None:  # check for errors
                 return result
         else:  # attributes
-            value: Value = result.register(self.visit(node_or_list[0], context, methods_instead_of_funcs))
-            if result.should_return():  # check for errors
+            value = result.register(self.visit(node_or_list[0], context, methods_instead_of_funcs))
+            if result.should_return() or value is None:  # check for errors
                 return result
             if len(node_or_list) != 1:
                 for node_ in node_or_list[1:]:
@@ -135,6 +140,8 @@ class Interpreter:
                     new_ctx.symbol_table.parent = context.symbol_table
 
                     if not (isinstance(node_, VarAccessNode) or isinstance(node_, CallNode)):
+                        assert node_.pos_start is not None
+                        assert node_.pos_end is not None
                         return result.failure(RunTimeError(
                             node_.pos_start, node_.pos_end,
                             f"unexpected node: {node_.__class__.__name__}.",
@@ -144,13 +151,13 @@ class Interpreter:
 
                     node_.attr = True
                     attr_ = result.register(self.visit(node_, new_ctx, methods_instead_of_funcs, other_ctx=context))
-                    if result.should_return():
+                    if result.should_return() or attr_ is None:
                         return result
                     value = attr_
         return value
 
     @staticmethod
-    def no_visit_method(node, ctx: Context):
+    def no_visit_method(node: Node, ctx: Context):
         """The method visit_FooNode (with FooNode given in self.visit) does not exist."""
         print(ctx)
         print(f"NOUGARO INTERNAL ERROR : No visit_{type(node).__name__} method defined in {_ORIGIN_FILE}.\n"
@@ -161,11 +168,17 @@ class Interpreter:
     @staticmethod
     def visit_NumberNode(node: NumberNode, ctx: Context) -> RTResult:
         """Visit NumberNode."""
+        assert node.token.value is not None
+        assert not isinstance(node.token.value, str)
         return RTResult().success(Number(node.token.value).set_context(ctx).set_pos(node.pos_start, node.pos_end))
 
     @staticmethod
     def visit_NumberENumberNode(node: NumberENumberNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit NumberENumberNode."""
+        assert node.exponent_token.value is not None
+        assert not isinstance(node.exponent_token.value, str)
+        assert node.num_token.value is not None
+        assert not isinstance(node.num_token.value, str)
         value = node.num_token.value * (10 ** node.exponent_token.value)
         if isinstance(value, int) or isinstance(value, float):
             return RTResult().success(Number(value).set_context(ctx).set_pos(node.pos_start, node.pos_end))
@@ -180,6 +193,7 @@ class Interpreter:
     @staticmethod
     def visit_StringNode(node: StringNode, ctx: Context) -> RTResult:
         """Visit StringNode"""
+        assert isinstance(node.token.value, str)
         return RTResult().success(
             String(node.token.value).set_context(ctx).set_pos(node.pos_start, node.pos_end)
         )
@@ -187,18 +201,21 @@ class Interpreter:
     def visit_ListNode(self, node: ListNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit ListNode"""
         result = RTResult()
-        elements = []
+        elements: list[Value] = []
 
         for element_node, mul in node.element_nodes:  # we visit every node from the list
             if not mul:
-                elements.append(result.register(self.visit(element_node, ctx, methods_instead_of_funcs)))
-                if result.should_return():  # if there is an error
+                value = result.register(self.visit(element_node, ctx, methods_instead_of_funcs))
+                if result.should_return() or value is None:  # if there is an error
                     return result
+                elements.append(value)
             else:
-                extend_list_: Value = result.register(self.visit(element_node, ctx, methods_instead_of_funcs))
-                if result.should_return():  # if there is an error
+                extend_list_: Value | None = result.register(self.visit(element_node, ctx, methods_instead_of_funcs))
+                if result.should_return() or extend_list_ is None:  # if there is an error
                     return result
                 if not isinstance(extend_list_, List):
+                    assert extend_list_.pos_start is not None
+                    assert extend_list_.pos_end is not None
                     return result.failure(RTTypeError(
                         extend_list_.pos_start, extend_list_.pos_end,
                         f"expected a list value after '*', but got {extend_list_.type_}.",
@@ -215,6 +232,7 @@ class Interpreter:
         left = self._visit_value_that_can_have_attributes(node.left_node, res, ctx, methods_instead_of_funcs)
         if res.should_return():
             return res
+        assert isinstance(left, Value)
 
         if node.op_token.matches(TT["KEYWORD"], 'and') and left.is_false():
             # operator is "and" and the value is false
@@ -227,6 +245,7 @@ class Interpreter:
         right = self._visit_value_that_can_have_attributes(node.right_node, res, ctx, methods_instead_of_funcs)
         if res.should_return():
             return res
+        assert isinstance(right, Value)
 
         # we check for what is the operator token, then we execute the corresponding method
         if node.op_token.type == TT["PLUS"]:
@@ -278,8 +297,9 @@ class Interpreter:
 
         if error is not None:  # there is an error
             return res.failure(error)
-        else:
-            return res.success(result.set_pos(node.pos_start, node.pos_end))
+        
+        assert result is not None
+        return res.success(result.set_pos(node.pos_start, node.pos_end))
 
     def visit_BinOpCompNode(self, node: BinOpCompNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit BinOpCompNode"""
@@ -287,22 +307,28 @@ class Interpreter:
         nodes_and_tokens_list = node.nodes_and_tokens_list
         IS_COMPARISON = len(nodes_and_tokens_list) != 1
         if not IS_COMPARISON:
-            value = self._visit_value_that_can_have_attributes(nodes_and_tokens_list[0], res, ctx,
-                                                               methods_instead_of_funcs)
+            assert isinstance(nodes_and_tokens_list[0], Node) or isinstance(nodes_and_tokens_list[0], list)
+            value = self._visit_value_that_can_have_attributes(
+                nodes_and_tokens_list[0], res, ctx, methods_instead_of_funcs
+            )
             if res.should_return():
                 return res
+            assert isinstance(value, Value)
             return res.success(value)
 
-        visited_nodes_and_tokens_list = []
+        visited_nodes_and_tokens_list: list[Value | Token] = []
 
         # just list of visited nodes
         for index, element in enumerate(nodes_and_tokens_list):
             if index % 2 == 0:  # we take only nodes and not ops
+                assert isinstance(element, Node) or isinstance(element, list)
                 value = self._visit_value_that_can_have_attributes(element, res, ctx, methods_instead_of_funcs)
                 if res.should_return():
                     return res
+                assert isinstance(value, Value)
                 visited_nodes_and_tokens_list.append(value)
             else:
+                assert isinstance(element, Token)
                 visited_nodes_and_tokens_list.append(element)
 
         test_result = FALSE.copy()  # FALSE is Nougaro False
@@ -310,11 +336,14 @@ class Interpreter:
         for index, element in enumerate(visited_nodes_and_tokens_list):
             if index % 2 != 0:  # we take only nodes and not ops
                 continue
+            assert isinstance(element, Value)
 
             # test
             try:
                 op_token = visited_nodes_and_tokens_list[index + 1]
                 right = visited_nodes_and_tokens_list[index + 2]
+                assert isinstance(op_token, Token)
+                assert isinstance(right, Value)
             except IndexError:
                 break
 
@@ -345,6 +374,7 @@ class Interpreter:
                                 f"{_ORIGIN_FILE}.visit_BinOpCompNode")
             if error is not None:  # there is an error
                 return res.failure(error)
+            assert test_result is not None
             if test_result.value == FALSE.value:  # the test is false so far: no need to continue
                 return res.success(test_result.set_pos(node.pos_start, node.pos_end))
         return res.success(test_result.set_pos(node.pos_start, node.pos_end))
@@ -367,6 +397,7 @@ class Interpreter:
             value = result.register(self.visit(node.node, ctx, methods_instead_of_funcs))
         if result.should_return():
             return result
+        assert value is not None
 
         error = None
 
@@ -381,8 +412,9 @@ class Interpreter:
 
         if error is not None:  # there is an error
             return result.failure(error)
-        else:
-            return result.success(value.set_pos(node.pos_start, node.pos_end))
+        
+        assert value is not None
+        return result.success(value.set_pos(node.pos_start, node.pos_end))
 
     def visit_VarAccessNode(self, node: VarAccessNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit VarAccessNode"""

@@ -1867,7 +1867,7 @@ class Parser:
             self,
             func_a: Callable | list[Node],
             ops: Iterable[str | tuple[str, Any]],
-            func_b: Callable | list[Node] = None,
+            func_b: Callable | list[Node] | None = None,
             left_has_priority: bool = True
     ) -> ParseResult:
         """Binary operator such as 1+1 or 3==2

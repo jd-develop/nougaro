@@ -127,20 +127,9 @@ class VarDeleteNode(Node):
 # OPERATOR NODES
 class BinOpNode(Node):
     """Node for binary operations.
-    Examples:
-        in the binary op `3 * 4`, left_node is a NumberNode which have this number token: Token(TT_INT, 3)
-                                  op_token is Token(TT_MUL)
-                                  right_node is a NumberNode which have this number token: Token(TT_INT, 4)
-        in the binary op `foo // bar`, left_node is a VarAccessNode which his var_name_tokens_list is\
-                                                                                        [Token(TT_IDENTIFIER, 'foo')]
-                                       op_token is Token(TT_FLOORDIV)
-                                       right_node is a VarAccessNode which his var_name_tokens_list is\
-                                                                                        [Token(TT_IDENTIFIER, 'bar')]
-        in the binary op `foo.bar ^ 2`, left_node is this python list: [TT_IDENTIFIER:foo, TT_IDENTIFIER:bar]
-                                        op_token is Token(TT_POW)
-                                        right_node is a Number node with value INT:2
+    Todo: rewrite examples
     """
-    def __init__(self, left_node: NumberNode | list[Token], op_token: Token, right_node: NumberNode | list[Token]):
+    def __init__(self, left_node: Node | list[Node], op_token: Token, right_node: Node | list[Node]):
         self.left_node = left_node
         self.op_token = op_token
         self.right_node = right_node
@@ -166,7 +155,7 @@ class BinOpCompNode(Node):
     Yeah, you can use ReadNodes here x)
     But IDK who makes that, because results of 'read' statement are often put into a variable...
     """
-    def __init__(self, nodes_and_tokens_list: list[Node | Token | list[Node | Token]]):
+    def __init__(self, nodes_and_tokens_list: list[Node | Token | list[Node]]):
         self.nodes_and_tokens_list = nodes_and_tokens_list
 
         if isinstance(self.nodes_and_tokens_list[0], list):
@@ -189,17 +178,8 @@ class UnaryOpNode(Node):
                                                                                                 Token(TT_BITWISENOT)
         node is the node after the operator. In these examples, these are both NumberNode, the first with the number
                                              tok Token(TT_INT, 1) and the second with Token(TT_INT, 12)
-
-
-        I write this doc in a plane between Stockholm and Amsterdam. I have a connexion in Amsterdam where I take
-        another plane to Toulouse, where I live. Stockholm is a beautiful city. If you have the opportunity to visit it,
-        I recommend you to visit some museums such as the Vasa museum or the Nobel Prize Museum. Take your time too to
-        visit the old town, on the island of Gamla Stan.
-        In the Arlanda Airport I bought a book written by Stephen Hawking, "Brief Answers to the Big Questions". I read
-        it in English because there was no book in French in the bookshop. Au moins je m'améliore en anglais, mais c'est
-        compliqué...
     """
-    def __init__(self, op_token: Token, node: Node | list[Token]):
+    def __init__(self, op_token: Token, node: Node | list[Node]):
         self.op_token = op_token
         self.node = node
 

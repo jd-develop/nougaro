@@ -19,6 +19,9 @@ def test_nougaro(print_OK)
     assert $test == "$test"
     var a = 1
     assert $a == 1
+    assert b?a == 1
+    assert b?c?2 == 2
+    assert b?c?d?a?e?4 == 1
 
     if print_OK then /* comment */ assert $print("OK print & comments") == None /* comment */ # comment
 

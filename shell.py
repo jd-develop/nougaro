@@ -39,9 +39,10 @@ if platform.system() in ["Linux", "Darwin"] or "BSD" in platform.system():
     except ImportError:
         pass
 
+
 def check_arguments(args: list[str], noug_dir: str, version: str):
     line_to_exec = None
-    if len(args) == 0:  # there is a file to exec
+    if len(args) == 0:  # there is no file to exec
         return "<stdin>", None
 
     if args[0] == "-c" or args[0] == "-cd":
@@ -55,7 +56,7 @@ def check_arguments(args: list[str], noug_dir: str, version: str):
         # note that bash, zsh and fiSH automatically delete quotes.
         # TODO: test in windows cmd and powershell
         assert isinstance(line_to_exec, str), "please report this bug on GitHub: https://github.com/" \
-                                              "jd-develop/nougaro"
+                                              "jd-develop/nougaro/issues"
     elif args[0] == "--help" or args[0] == "-h":
         with open(os.path.abspath(noug_dir + "/config/help"), "r+", encoding="UTF-8") as help_file:
             what_to_print = help_file.readlines()[1:]

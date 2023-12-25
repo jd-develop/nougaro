@@ -32,6 +32,7 @@ import sys
 import os
 import platform
 import pathlib
+from datetime import datetime
 if platform.system() in ["Linux", "Darwin"] or "BSD" in platform.system():
     try:
         import readline  # browse command history # type: ignore
@@ -196,6 +197,12 @@ def main():
               "\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.")
         print()
         print("Found a bug? Feel free to report it at https://jd-develop.github.io/nougaro/bugreport.html")
+        # idea: cowsay?
+        now = datetime.now()
+        if now.month == 12 and 24 <= now.day <= 26:
+            print("\nMerry Christmas!")
+        elif now.month == now.day == 1:
+            print(f"\nHappy new year {now.year}!")
         if debug_on:
             print()
             print(f"Current working directory is {work_dir} ({type(work_dir)})")

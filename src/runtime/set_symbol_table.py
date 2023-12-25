@@ -72,6 +72,7 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("len", BuiltInFunction('len'))
     symbol_table.set("sort", BuiltInFunction('sort'))
     symbol_table.set("reverse", BuiltInFunction('reverse'))
+    symbol_table.set("esrever", BuiltInFunction('reverse'))
 
     symbol_table.set("split", BuiltInFunction('split'))
     symbol_table.set("upper", BuiltInFunction('upper'))

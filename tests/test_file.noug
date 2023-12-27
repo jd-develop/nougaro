@@ -191,10 +191,15 @@ def test_nougaro(print_OK)
         return "str"
     end
 
+    def this_is_a_function(x); if x then; return; elif x == None then; return 3; else; return; end; end
+
     if print_OK then print("OK func")
 
     ## call
     assert (def()->"str")() == func()
+    assert this_is_a_function(12) == None
+    assert this_is_a_function(False) == None
+    assert this_is_a_function(None) == 3
 
     if print_OK then print("OK call")
 

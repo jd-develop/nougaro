@@ -1277,6 +1277,7 @@ class Interpreter:
             value = result.register(self.visit(node.node_to_return, ctx, methods_instead_of_funcs))
             if result.should_return():  # check for errors
                 return result
+            assert value is not None
         else:  # only 'return'
             value = NoneValue(False)
 

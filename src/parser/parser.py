@@ -53,7 +53,7 @@ class Parser:
 
     def next_token(self):
         """Return the next token, or the current one if EOF"""
-        if 0 <= self.token_index < len(self.tokens):
+        if 0 <= self.token_index + 1 < len(self.tokens):
             return self.tokens[self.token_index + 1]
         else:
             return self.current_token
@@ -82,7 +82,7 @@ class Parser:
         if stop is None:
             stop = [TT["EOF"]]  # token(s) that stops parser in this function
         result = ParseResult()  # we create the result
-        statements = []  # list of statements
+        statements: list[tuple[Node, bool]] = []  # list of statements
         pos_start = self.current_token.pos_start.copy()  # pos_start
 
         # NEWLINE*
@@ -99,6 +99,7 @@ class Parser:
         statement = result.register(self.statement())  # we register a statement
         if result.error is not None:  # we check for errors
             return result
+        assert statement is not None
         statements.append((statement, False))  # we append the statement to our list of there is no error
 
         # (NEWLINE+ statement)*
@@ -114,48 +115,47 @@ class Parser:
             # I made a HUGE optimization here: there was a 'for' loop (git blame for date)
             if self.current_token.type in stop or (self.current_token.type, self.current_token.value) in stop:
                 break
-            else:
-                if newline_count == 0:  # there was no new line between the last statement and this one: unexpected
-                    if self.current_token.type in TOKENS_NOT_TO_QUOTE:
-                        quote = ""
-                    else:
-                        quote = "'"
-                    # token
-                    if last_token_type == TT["IDENTIFIER"] and self.current_token.type in EQUALS:
-                        # there was no new line but there is 'id =' (need 'var')
+            if newline_count == 0:  # there was no new line between the last statement and this one: unexpected
+                if self.current_token.type in TOKENS_NOT_TO_QUOTE:
+                    quote = ""
+                else:
+                    quote = "'"
+                # token
+                if last_token_type == TT["IDENTIFIER"] and self.current_token.type in EQUALS:
+                    # there was no new line but there is 'id =' (need 'var')
+                    return result.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,
+                        f"unexpected token: {quote}{self.current_token}{quote}."
+                        f"To declare a variable, use 'var' keyword.",
+                        "src.parser.parser.Parser.statements"
+                    ))
+                if last_token_type == TT["IDENTIFIER"] and self.current_token.type == TT["COMMA"]:
+                    result.register_advancement()
+                    self.advance()
+                    missing_var = True
+                    while self.current_token.type == TT["IDENTIFIER"]:
+                        result.register_advancement()
+                        self.advance()
+                        if self.current_token.type in EQUALS:
+                            break  # missing_var is already True
+                        if self.current_token.type != TT["COMMA"] and self.current_token.type not in EQUALS:
+                            missing_var = False
+                            break
+                        result.register_advancement()
+                        self.advance()
+                    if missing_var and self.current_token.type in EQUALS:
+                        # there was no new line but there is 'id1, id2, ... =' (need 'var')
                         return result.failure(InvalidSyntaxError(
                             self.current_token.pos_start, self.current_token.pos_end,
                             f"unexpected token: {quote}{self.current_token}{quote}."
                             f"To declare a variable, use 'var' keyword.",
                             "src.parser.parser.Parser.statements"
                         ))
-                    if last_token_type == TT["IDENTIFIER"] and self.current_token.type == TT["COMMA"]:
-                        result.register_advancement()
-                        self.advance()
-                        missing_var = True
-                        while self.current_token.type == TT["IDENTIFIER"]:
-                            result.register_advancement()
-                            self.advance()
-                            if self.current_token.type in EQUALS:
-                                break  # missing_var is already True
-                            if self.current_token.type != TT["COMMA"] and self.current_token.type not in EQUALS:
-                                missing_var = False
-                                break
-                            result.register_advancement()
-                            self.advance()
-                        if missing_var and self.current_token.type in EQUALS:
-                            # there was no new line but there is 'id1, id2, ... =' (need 'var')
-                            return result.failure(InvalidSyntaxError(
-                                self.current_token.pos_start, self.current_token.pos_end,
-                                f"unexpected token: {quote}{self.current_token}{quote}."
-                                f"To declare a variable, use 'var' keyword.",
-                                "src.parser.parser.Parser.statements"
-                            ))
-                    return result.failure(InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        f"unexpected token: {quote}{self.current_token}{quote}.",
-                        "src.parser.parser.Parser.statements"
-                    ))
+                return result.failure(InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    f"unexpected token: {quote}{self.current_token}{quote}.",
+                    "src.parser.parser.Parser.statements"
+                ))
 
             if self.current_token.type == TT["EOF"]:
                 if len(self.then_s) != 0:
@@ -173,8 +173,10 @@ class Parser:
             statement = result.register(self.statement())
             if result.error is not None:
                 return result
+            assert statement is not None
             statements.append((statement, False))
 
+        assert self.current_token.pos_end is not None
         return result.success(ListNode(  # we put all the nodes parsed here into a ListNode
             statements,
             pos_start,
@@ -193,6 +195,8 @@ class Parser:
         """
         # we create the result and get the pos start from the current token
         result = ParseResult()
+        assert self.current_token is not None
+        assert self.current_token.pos_start is not None
         pos_start = self.current_token.pos_start.copy()
 
         # we check for tokens
@@ -206,6 +210,7 @@ class Parser:
             expr = result.try_register(self.expr())  # we try to register an expression
             if expr is None:  # there is no expr : we reverse
                 self.reverse(result.to_reverse_count)
+            # assert expr is not None
             return result.success(ReturnNode(expr, pos_start, self.current_token.pos_start.copy()))
 
         # KEYWORD:IMPORT IDENTIFIER
@@ -268,6 +273,7 @@ class Parser:
 
             is_identifier = self.current_token.type == TT["IDENTIFIER"]
             next_tok = self.next_token()
+            assert next_tok is not None
             next_is_as_or_newline = next_tok.matches(TT["KEYWORD"], 'as') or next_tok.type in [TT["NEWLINE"], TT["EOF"]]
             if is_identifier and next_is_as_or_newline:
                 expr_or_identifier = self.current_token
@@ -277,6 +283,9 @@ class Parser:
             else:
                 # we register an expr
                 expr_or_identifier = result.register(self.expr())
+                if result.error is not None:
+                    return result
+                assert expr_or_identifier is not None
                 as_required = True
 
             current_tok_is_as = self.current_token.matches(TT["KEYWORD"], "as")
@@ -915,6 +924,11 @@ class Parser:
                 self.advance()
 
                 while self.current_token.type == TT["NEWLINE"]:
+                    next = self.next_token()
+                    if next is None:
+                        break
+                    if next.type not in (TT["NEWLINE"], TT["STRING"]):
+                        break
                     result.register_advancement()
                     self.advance()
 

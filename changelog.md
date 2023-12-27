@@ -8,6 +8,8 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Rewrite and type hint the source code
 * Fix bugs in calculator
 * Better error messages
+* Add some edge-cases tests
+* Now works with pipe operator in (...)sh
 
 ## 0.16.0-beta
 

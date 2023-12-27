@@ -438,8 +438,8 @@ class ReturnNode(Node):
     """Node for `return` structure.
     node_to_return is the node after the 'return' keyword. It may be None
     """
-    def __init__(self, node_to_return: Node, pos_start: Position, pos_end: Position):
-        self.node_to_return: Node = node_to_return
+    def __init__(self, node_to_return: Node | None, pos_start: Position, pos_end: Position):
+        self.node_to_return: Node | None = node_to_return
 
         self.pos_start = pos_start
         self.pos_end = pos_end

@@ -112,7 +112,7 @@ def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: l
         sys.exit(1)
 
 
-def print_result_and_error(result: Value | None, error: Error | None, args: list[str], exit_on_cd: bool = False):
+def print_result_and_error(result: Value | None, error: Error | None, args: list[str], exit_on_cd: bool = False, should_print_stuff: bool = True):
     if error is not None:  # there is an error, we print it in RED because OMG AN ERROR
         print_in_red(error.as_string())
         return
@@ -127,6 +127,8 @@ def print_result_and_error(result: Value | None, error: Error | None, args: list
         print(f"The actual result is {result}, of type {type(result)}, error is {error}.")
         return
 
+    if not should_print_stuff:
+        return
     if len(result.elements) == 1:  # there is one single result, let's print it without the "[]".
         if result.elements[0].should_print:  # if the value should be printed, let's print it!
             print(result.elements[0])
@@ -188,42 +190,52 @@ def main():
     if not endswith_slash:
         work_dir += "/"
 
+
+    # We print stuff if this is an interactive shell.
+    # HOWEVER, if we are in a pipe, like `echo "$" | nougaro`, we don’t want our prompt to be printed
+    should_print_stuff = sys.stdin.isatty()
+
     if path == "<stdin>":  # we open the shell
-        # this text is always printed when we start the shell
-        print(f"Welcome to Nougaro {version} on {platform.system()}! "
-              f"Contribute: https://github.com/jd-develop/nougaro/")
-        print(f"Changelog: see {noug_dir}/changelog.md")
-        print()
-        print("This program is under GPL license. For more details, type __gpl__() or __gpl__(1) to stay in terminal."
-              "\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.")
-        print()
-        print("Found a bug? Feel free to report it at https://jd-develop.github.io/nougaro/bugreport.html")
-        # idea: cowsay?
-        now = datetime.now()
-        if now.month == 12 and 24 <= now.day <= 26:
-            print("\nMerry Christmas!")
-        elif now.month == now.day == 1:
-            print(f"\nHappy new year {now.year}!")
-        if debug_on:
+        if should_print_stuff:
+            # this text is always printed when we start the shell
+            print(f"Welcome to Nougaro {version} on {platform.system()}! "
+                f"Contribute: https://github.com/jd-develop/nougaro/")
+            print(f"Changelog: see {noug_dir}/changelog.md")
             print()
-            print(f"Current working directory is {work_dir} ({type(work_dir)})")
-            print(f"Python version is {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]} "
-                  f"({list(sys.version_info)})")
-            print("DEBUG mode is ENABLED")
-        if print_context:
-            if not debug_on:
+            print("This program is under GPL license. For more details, type __gpl__() or __gpl__(1) to stay in terminal."
+                "\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.")
+            print()
+            print("Found a bug? Feel free to report it at https://jd-develop.github.io/nougaro/bugreport.html")
+            # idea: cowsay?
+            now = datetime.now()
+            if now.month == 12 and 24 <= now.day <= 26:
+                print("\nMerry Christmas!")
+            elif now.month == now.day == 1:
+                print(f"\nHappy new year {now.year}!")
+            if debug_on:
                 print()
-            print("PRINT CONTEXT debug option is ENABLED")
-        print()  # blank line
+                print(f"Current working directory is {work_dir} ({type(work_dir)})")
+                print(f"Python version is {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]} "
+                    f"({list(sys.version_info)})")
+                print("DEBUG mode is ENABLED")
+            if print_context:
+                if not debug_on:
+                    print()
+                print("PRINT CONTEXT debug option is ENABLED")
+            print()  # blank line
 
         while True:  # the shell loop (like game loop in a video game but, obviously, Nougaro isn't a video game)
             try:  # we ask for an input to be interpreted
-                text = input("nougaro> ")
+                if should_print_stuff:
+                    text = input("nougaro> ")
+                else:
+                    text = input()
             except KeyboardInterrupt:  # if CTRL+C, exit the shell
                 print_in_red("\nKeyboardInterrupt")
                 break  # breaks the `while True` loop to the end of the file
             except EOFError:
-                print_in_red("\nEOF")
+                if should_print_stuff:
+                    print_in_red("\nEOF")
                 break  # breaks the `while True` loop to the end of the file
 
             if str(text) == "":  # nothing was entered: we don't do anything
@@ -238,7 +250,7 @@ def main():
                 print_in_red("\nEOF")
                 break  # breaks the `while True` loop to the end of the file
 
-            print_result_and_error(result, error, args)
+            print_result_and_error(result, error, args, should_print_stuff=should_print_stuff)
     elif path == "<commandline>":
         if line_to_exec == "":
             sys.exit()

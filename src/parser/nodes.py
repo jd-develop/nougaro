@@ -535,9 +535,9 @@ class ReadNode(Node):
               line_number is Python int 6
 
     """
-    def __init__(self, file_name_expr: Node, identifier: Token, line_number: int | str, pos_start: Position, pos_end: Position):
+    def __init__(self, file_name_expr: Node, identifier: Token | None, line_number: int | str, pos_start: Position, pos_end: Position):
         self.file_name_expr: Node = file_name_expr
-        self.identifier: Token = identifier
+        self.identifier: Token | None = identifier
         self.line_number: int | str = line_number
 
         self.pos_start = pos_start

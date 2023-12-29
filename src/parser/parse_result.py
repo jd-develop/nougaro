@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
+from __future__ import annotations
 
 # Nougaro : a python-interpreted high-level programming language
 # Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
@@ -17,7 +18,7 @@ from src.errors.errors import Error
 class ParseResult:
     """Result of parsed tokens, with a parent node."""
     def __init__(self):
-        self.error = None  # any error that may have been encountered
+        self.error: Error | None = None  # any error that may have been encountered
         self.node: Node | None = None  # parent node of the code (the parent node is a ListNode)
         self.advance_count = 0
         self.to_reverse_count = 0
@@ -29,14 +30,14 @@ class ParseResult:
         """Register an advancement of 1 token"""
         self.advance_count += 1
 
-    def register(self, result: "ParseResult"):
+    def register(self, result: ParseResult):
         """Register a node"""
         self.advance_count += result.advance_count
         if result.error is not None:
             self.error = result.error
         return result.node
 
-    def try_register(self, result: "ParseResult"):
+    def try_register(self, result: ParseResult):
         """Try register a node"""
         if result.error is not None:
             self.to_reverse_count = result.advance_count

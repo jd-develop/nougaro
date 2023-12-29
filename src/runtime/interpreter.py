@@ -1070,7 +1070,7 @@ class Interpreter:
             if result.should_return():  # check for errors
                 return result
 
-            return_value = return_value.copy().set_pos(node.pos_start, node.pos_end).set_context(outer_context)
+            return_value = return_value.set_pos(node.pos_start, node.pos_end).set_context(outer_context)
             return result.success(return_value)
 
         elif isinstance(value_to_call, Constructor):  # the value is an object constructor

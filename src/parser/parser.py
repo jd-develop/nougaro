@@ -10,7 +10,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.lexer.token_types import *
-from src.errors.errors import InvalidSyntaxError
+from src.errors.errors import InvalidSyntaxError, Error
 from src.parser.parse_result import ParseResult
 from src.parser.nodes import *  # src.tokens.Token is imported in src.nodes
 from src.lexer.position import Position
@@ -622,7 +622,7 @@ class Parser:
 
         return result.success(VarAssignNode(all_names_list, expressions, equal))
 
-    def assign_identifier(self) -> tuple[list[Node | Token] | None, InvalidSyntaxError | None]:
+    def assign_identifier(self) -> tuple[list[Node | Token], None] | tuple[None, Error]:
         """
         assign_id  : (IDENTIFIER (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?* DOT)?* IDENTIFIER
         """
@@ -641,58 +641,69 @@ class Parser:
             is_call = False
             call_node = identifier
 
-            if self.current_token.type == TT["LPAREN"]:
-                call_node = VarAccessNode([identifier], is_attr)
+            IS_LPAREN = self.current_token.type == TT["LPAREN"]
+            if IS_LPAREN:
+                call_node_node = VarAccessNode([identifier], is_attr)
                 is_call = True
+            else:
+                call_node_node = VarAccessNode([identifier], is_attr)
 
-                while self.current_token.type == TT["LPAREN"]:
+            while self.current_token.type == TT["LPAREN"]:
+                result.register_advancement()
+                self.advance()
+                arg_nodes: list[tuple[Node, bool]] = []
+
+                comma_expected = False
+                mul = False
+                # we check for the closing paren.
+                if self.current_token.type == TT["RPAREN"]:
                     result.register_advancement()
                     self.advance()
-                    arg_nodes = []
-
-                    comma_expected = False
-                    mul = False
-                    # we check for the closing paren.
-                    if self.current_token.type == TT["RPAREN"]:
+                else:  # (MUL? expr (COMMA MUL? expr)?*)?
+                    if self.current_token.type == TT["MUL"]:  # MUL?
+                        mul = True
+                        # we advance
                         result.register_advancement()
                         self.advance()
-                    else:  # (MUL? expr (COMMA MUL? expr)?*)?
+                    # expr
+                    expr_node = result.register(self.expr())
+                    if result.error is not None:
+                        return None, result.error
+                    assert expr_node is not None
+                    arg_nodes.append((expr_node, mul))
+                    while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
+                        mul = False
+                        # we advance
+                        result.register_advancement()
+                        self.advance()
+
                         if self.current_token.type == TT["MUL"]:  # MUL?
                             mul = True
                             # we advance
                             result.register_advancement()
                             self.advance()
                         # expr
-                        arg_nodes.append((result.register(self.expr()), mul))
+                        # we register an expr then check for an error
+                        expr_node = result.register(self.expr())
                         if result.error is not None:
-                            return None, result.error
-                        while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
-                            mul = False
-                            # we advance
-                            result.register_advancement()
-                            self.advance()
+                            # type ignore is required because type checking strict is DUMB
+                            return None, result.error  # type: ignore
+                        assert expr_node is not None
+                        arg_nodes.append((expr_node, mul))
 
-                            if self.current_token.type == TT["MUL"]:  # MUL?
-                                mul = True
-                                # we advance
-                                result.register_advancement()
-                                self.advance()
-                            # expr
-                            # we register an expr then check for an error
-                            arg_nodes.append((result.register(self.expr()), mul))
-                            if result.error is not None:
-                                return None, result.error
+                    if self.current_token.type != TT["RPAREN"]:  # there is no paren (it is expected)
+                        return None, InvalidSyntaxError(
+                            self.current_token.pos_start, self.current_token.pos_end,
+                            "expected ',' or ')'." if comma_expected else "expected ')'.",
+                            "src.parser.parser.Parser.call"
+                        )
 
-                        if self.current_token.type != TT["RPAREN"]:  # there is no paren (it is expected)
-                            return None, InvalidSyntaxError(
-                                self.current_token.pos_start, self.current_token.pos_end,
-                                "expected ',' or ')'." if comma_expected else "expected ')'.",
-                                "src.parser.parser.Parser.call"
-                            )
+                    result.register_advancement()
+                    self.advance()
+                call_node_node = CallNode(call_node_node, arg_nodes)
 
-                        result.register_advancement()
-                        self.advance()
-                    call_node = CallNode(call_node, arg_nodes)
+            if IS_LPAREN:
+                call_node = call_node_node
 
             if self.current_token.type == TT["DOT"]:
                 is_attr = True
@@ -738,6 +749,7 @@ class Parser:
             node = result.register(self.comp_expr())
             if result.error is not None:
                 return result
+            assert node is not None
             return result.success(UnaryOpNode(op_token, node))
 
         # arith_expr ((EE|LT|GT|LTE|GTE|KEYWORD:IN) arith_expr)*

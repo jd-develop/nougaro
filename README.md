@@ -2,7 +2,7 @@
 
 ![Nougaro. A programming Language.](repo-image.png)
 
-This is Nougaro beta 0.15.
+This is Nougaro beta 0.16.0.
 
 ## English description
 

@@ -32,9 +32,9 @@ if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
     read -p "Nougaro version: " -r nougversion
     read -p "Phase (beta for example): " -r nougphase
 
-    python3 -m nuitka --standalone --include-package=lib_ shell.py
+    python3 -m nuitka --standalone --include-package=lib_ --no-deployment-flag=self-execution shell.py
 
-    cp -r example.noug LICENSE README.md shell.py CODE_OF_CONDUCT.md CONTRIBUTING.md how_it_works.md tests/test_file.noug examples lib_ src config repo-image.png shell.dist/
+    cp -r example.noug LICENSE README.md shell.py CODE_OF_CONDUCT.md CONTRIBUTING.md how_it_works.md tests/ examples lib_ src config repo-image.png shell.dist/
 
     echo "Renaming and compressing…"
     mv shell.dist nougaro-"$nougversion"-"$nougphase"-linux-bin

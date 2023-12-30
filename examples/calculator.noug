@@ -13,6 +13,13 @@ print("  (1 + 1) * (12 + 13) will be 1 1 + 12 13 + *")
 print()
 print("Type 'help' for all the operators and constants.")
 print()
+print("Nougaro  Copyright (C) 2023  Jean Dubois")
+print("This program comes with ABSOLUTELY NO WARRANTY.")
+print("This is free software, and you are welcome to redistribute it")
+print("under certain conditions.")
+print("You should have received a copy of the GNU General Public License")
+print("along with this program.  If not, see <https://www.gnu.org/licenses/>.")
+print()
 
 var answer = 0
 var increment = 0
@@ -63,6 +70,8 @@ while True then
                     append(tokens, -int(char))
                 elif tokens(-1) == '.' then
                     pop(tokens, -1)
+                    if len(tokens) == 0 then append(tokens, 0)
+                    if tokens(-1) == "space" then append(tokens, 0)
                     var floating_point += 1
                     if tokens(-1) >= 0 then
                         replace(tokens, -1, float(tokens(-1)) + float(char)/10)
@@ -154,7 +163,7 @@ while True then
             if stack(-1) >= 0 then
                 replace(stack, -1, math.sqrt(stack(-1)))
             else
-                print("Error: a negative number (" + str(stack(-1)) + ") doesn't have a square root.")
+                print("Error: a negative number (" + str(stack(-1)) + ") doesn't have a square root (this calculator does not support complex numbers).")
                 var should_continue = True
                 break
            end
@@ -165,6 +174,11 @@ while True then
         elif token == "mod" and len(stack) > 1 and is_num(stack(-1)) and is_num(stack(-2)) then
             var num1 = stack(-2)
             var num2 = stack(-1)
+            if num2 == 0 then
+                print("Error: can not divide by 0")
+                var should_continue = True
+                break
+            end
             var mod = num1 % num2
             pop(stack, -1)
             pop(stack, -1)

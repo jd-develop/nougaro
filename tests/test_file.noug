@@ -300,6 +300,7 @@ def test_nougaro(print_OK)
     assert type([1, 2, 3]) == "list"
     assert type(def()->null) == "func"
     assert type(type) == "built-in func"
+    assert "List" in __py_type__([])
     # type(method) is tested in classes
 
     if print_OK then print("OK builtin funcs 2")

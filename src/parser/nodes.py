@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -200,9 +200,9 @@ class IfNode(Node):
     condition and expression are both Nodes, and should_return_node is a bool
     An else case is a Node
     """
-    def __init__(self, cases: list[tuple[Node, Node]], else_case: Node, debug: bool = False):
+    def __init__(self, cases: list[tuple[Node, Node]], else_case: Node | None, debug: bool = False):
         self.cases: list[tuple[Node, Node]] = cases
-        self.else_case: Node = else_case
+        self.else_case: Node | None = else_case
 
         self.pos_start = self.cases[0][0].pos_start
 
@@ -255,14 +255,14 @@ class ForNode(Node):
             var_name_token: Token,
             start_value_node: Node,
             end_value_node: Node,
-            step_value_node: Node,
+            step_value_node: Node | None,
             body_node: Node,
     ):
         # by default step_value_node is None
         self.var_name_token: Token = var_name_token
         self.start_value_node: Node = start_value_node
         self.end_value_node: Node = end_value_node
-        self.step_value_node: Node = step_value_node
+        self.step_value_node: Node | None = step_value_node
         self.body_node: Node = body_node
 
         self.pos_start = self.var_name_token.pos_start

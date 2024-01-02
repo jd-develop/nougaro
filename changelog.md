@@ -4,12 +4,16 @@ This file is updated nearly every commit and copied to GH release changelog.
 
 ## 0.16.1-beta
 
+### Technical
 * Fix some crashes and some bugs
 * Rewrite and type hint the source code
-* Fix bugs in calculator
 * Better error messages
 * Add some edge-cases tests
 * Now works with pipe operator in (...)sh
+
+### Calculator
+* Add `e` in calculator
+* Fix bugs in calculator
 
 ## 0.16.0-beta
 

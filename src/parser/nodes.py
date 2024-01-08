@@ -223,8 +223,8 @@ class AssertNode(Node):
     errmsg can be None, like in `assert False`.
     """
     def __init__(self, assertion: Node, pos_start: Position, pos_end: Position, errmsg: Node | None = None):
-        self.assertion= assertion
-        self.errmsg= errmsg
+        self.assertion = assertion
+        self.errmsg = errmsg
         if self.errmsg is None:
             self.errmsg = StringNode(Token(
                 TT["STRING"],

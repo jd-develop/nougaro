@@ -23,7 +23,6 @@ from src.misc import CustomInterpreterVisitMethod, clear_screen, RunFunction
 from src.runtime.symbol_table import SymbolTable
 from src.lexer.position import Position
 # built-in python imports
-from typing import Callable
 from inspect import signature
 import os.path
 import importlib
@@ -482,6 +481,7 @@ class Interpreter:
                 value = result.register(self.visit(value_node, ctx, methods_instead_of_funcs))
                 if result.should_return() or result.old_should_return or value is None:
                     return result
+                assert value is not None
                 values.append(value)
 
         equal = node.equal.type  # we get the equal type
@@ -503,31 +503,66 @@ class Interpreter:
                 ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
             ))
 
-        final_values = []
+        final_values: list[Value] = []
         assert ctx.symbol_table is not None
         for i, var_name in enumerate(var_names):
             IS_SINGLE_VAR_NAME = len(var_name) == 1
-            if not IS_SINGLE_VAR_NAME:  # var a.b.(...).z = value
+            if IS_SINGLE_VAR_NAME:
                 NAME_IS_IDENTIFIER = isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"]
-                if NAME_IS_IDENTIFIER and var_name[0].value in PROTECTED_VARS:
+                if not NAME_IS_IDENTIFIER:
+                    assert var_name[0].pos_start is not None
+                    assert var_name[0].pos_end is not None
+                    return result.failure(RunTimeError(
+                        var_name[0].pos_start, var_name[0].pos_end,
+                        "excepted identifier.",
+                        ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
+                    ))
+                
+                assert isinstance(var_name[0], Token)
+                assert isinstance(var_name[0].value, str)
+                final_var_name: str = var_name[0].value
+
+                VARIABLE_IS_PROTECTED = final_var_name in PROTECTED_VARS
+                if VARIABLE_IS_PROTECTED:
+                    assert node.pos_start is not None
+                    assert node.pos_end is not None
+                    return result.failure(RunTimeError(
+                        node.pos_start, node.pos_end,
+                        f"can not create or edit a variable with builtin name '{final_var_name}'.",
+                        ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
+                    ))
+
+                variable_exists = final_var_name in ctx.symbol_table.symbols
+                if variable_exists:
+                    var_actual_value: Value | None = ctx.symbol_table.get(final_var_name)
+                else:
+                    var_actual_value: Value | None = None
+                value: Value | None = None
+            else:  # var a.b.(...).z = value
+                if isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"] and var_name[0].value in PROTECTED_VARS:
+                    assert var_name[0].pos_start is not None
+                    assert var_name[0].pos_end is not None
                     return result.failure(RunTimeError(
                         var_name[0].pos_start, var_name[0].pos_end,
                         f"can not edit a variable with builtin name '{var_name[0].value}'.",
                         ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
                     ))
 
-                if NAME_IS_IDENTIFIER:
+                if isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"]:
+                    assert isinstance(var_name[0].value, str)
                     value = ctx.symbol_table.get(var_name[0].value)
                     if value is None:
+                        assert var_name[0].pos_start is not None
+                        assert var_name[0].pos_end is not None
                         return self._undefined(
                             var_name[0].pos_start, var_name[0].pos_end, var_name[0].value, ctx, result,
                             origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
                         )
                 elif isinstance(var_name[0], Token):
-                    if var_name[0].type not in TOKENS_NOT_TO_QUOTE:
-                        err_msg = f"unexpected token: '{var_name[0].type}'."
-                    else:
+                    if var_name[0].type in TOKENS_NOT_TO_QUOTE:
                         err_msg = f"unexpected token: {var_name[0].type}."
+                    else:
+                        err_msg = f"unexpected token: '{var_name[0].type}'."
                     return result.failure(InvalidSyntaxError(
                         var_name[0].pos_start, var_name[0].pos_end,
                         err_msg, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
@@ -536,8 +571,8 @@ class Interpreter:
                     value = result.register(self.visit(var_name[0], ctx, methods_instead_of_funcs))
                     if result.should_return():
                         return result
-
-                value: Value
+                
+                assert isinstance(value, Value)
 
                 for node_or_tok in var_name[1:-1]:
                     new_ctx = Context(display_name=value.__repr__(), parent=ctx)
@@ -546,23 +581,28 @@ class Interpreter:
                     new_ctx.symbol_table.parent = ctx.symbol_table
 
                     if isinstance(node_or_tok, Token) and node_or_tok.type == TT["IDENTIFIER"]:
+                        assert isinstance(node_or_tok.value, str)
                         value = new_ctx.symbol_table.get(node_or_tok.value)
                         if value is None:
+                            assert node_or_tok.pos_start is not None
+                            assert node_or_tok.pos_end is not None
                             return self._undefined(
                                 node_or_tok.pos_start, node_or_tok.pos_end, node_or_tok.value, new_ctx, result,
                                 origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
                             )
-                    elif isinstance(var_name[0], Token):
-                        if node_or_tok.type not in TOKENS_NOT_TO_QUOTE:
-                            err_msg = f"unexpected token: '{node_or_tok.type}'."
-                        else:
+                    elif isinstance(node_or_tok, Token):
+                        if node_or_tok.type in TOKENS_NOT_TO_QUOTE:
                             err_msg = f"unexpected token: {node_or_tok.type}."
+                        else:
+                            err_msg = f"unexpected token: '{node_or_tok.type}'."
                         return result.failure(InvalidSyntaxError(
                             node_or_tok.pos_start, node_or_tok.pos_end,
                             err_msg, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
                         ))
                     else:
                         if not (isinstance(node_or_tok, VarAccessNode) or isinstance(node_or_tok, CallNode)):
+                            assert node_or_tok.pos_start is not None
+                            assert node_or_tok.pos_end is not None
                             return result.failure(RunTimeError(
                                 node_or_tok.pos_start, node_or_tok.pos_end,
                                 f"unexpected node: {node_or_tok.__class__.__name__}.",
@@ -572,49 +612,30 @@ class Interpreter:
                                                            other_ctx=ctx))
                         if result.should_return():
                             return result
+                        assert value is not None
 
-                NAME_IS_IDENTIFIER = isinstance(var_name[-1], Token) and var_name[-1].type == TT["IDENTIFIER"]
-                if not NAME_IS_IDENTIFIER:
+                assert isinstance(var_name[-1], Token)
+                TOKEN_IS_IDENTIFIER = var_name[-1].type == TT["IDENTIFIER"]
+                if not TOKEN_IS_IDENTIFIER:
+                    assert var_name[-1].pos_start is not None
+                    assert var_name[-1].pos_end is not None
                     return result.failure(RunTimeError(
                         var_name[-1].pos_start, var_name[-1].pos_end,
                         "expected valid identifier.",
                         ctx, origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
                     ))
 
+                assert isinstance(var_name[-1].value, str)
                 final_var_name: str = var_name[-1].value
-                VARIABLE_EXISTS = final_var_name in value.attributes
-                if VARIABLE_EXISTS:
+                variable_exists = final_var_name in value.attributes
+                if variable_exists:
                     var_actual_value: Value | None = value.attributes[var_name[-1].value]
                 else:
                     var_actual_value: Value | None = None
-            else:  # single var name
-                NAME_IS_IDENTIFIER = isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"]
-                if not NAME_IS_IDENTIFIER:
-                    return result.failure(RunTimeError(
-                        var_name[0].pos_start, var_name[0].pos_end,
-                        "excepted identifier.",
-                        ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
-                    ))
-                final_var_name: str = var_name[0].value
-
-                VARIABLE_IS_PROTECTED = final_var_name in PROTECTED_VARS
-                if VARIABLE_IS_PROTECTED:
-                    return result.failure(RunTimeError(
-                        node.pos_start, node.pos_end,
-                        f"can not create or edit a variable with builtin name '{final_var_name}'.",
-                        ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
-                    ))
-
-                VARIABLE_EXISTS = final_var_name in ctx.symbol_table.symbols
-                if VARIABLE_EXISTS:
-                    var_actual_value: Value | None = ctx.symbol_table.get(final_var_name)
-                else:
-                    var_actual_value: Value | None = None
-                value: Value | None = None
 
             if equal == TT["EQ"]:  # just a regular equal, we can modify/create the variable in the symbol table
                 final_value, error = values[i], None  # we want to return the new value of the variable
-            elif VARIABLE_EXISTS:  # edit variable
+            elif variable_exists:  # edit variable
                 assert isinstance(var_actual_value, Value) # a little cheesy
                 if equal == TT["PLUSEQ"]:
                     final_value, error = var_actual_value.added_to(values[i])
@@ -664,16 +685,25 @@ class Interpreter:
                     error = None
                     final_value = values[i]
             else:  # variable does not exist
+                assert node.pos_start is not None
+                assert node.pos_end is not None
                 return self._undefined(node.pos_start, node.pos_end, final_var_name, ctx, result,
                                        f"{_ORIGIN_FILE}.visit_VarAssignNode", edit=True)
 
             if error is not None:  # there is an error
+                assert node.pos_start is not None
+                assert node.pos_end is not None
                 error.set_pos(node.pos_start, node.pos_end)
                 return result.failure(error)
 
             if not IS_SINGLE_VAR_NAME:
+                assert value is not None
+                assert isinstance(var_name[-1], Token)
+                assert isinstance(var_name[-1].value, str)
+                assert final_value is not None
                 value.attributes[var_name[-1].value] = final_value
             else:
+                assert final_value is not None
                 ctx.symbol_table.set(final_var_name, final_value)
 
             final_values.append(final_value)
@@ -687,13 +717,19 @@ class Interpreter:
         """Visit VarDeleteNode"""
         result = RTResult()
         var_name = node.var_name_token.value  # we get the var name
+        assert isinstance(var_name, str)
+        assert ctx.symbol_table is not None
 
         if var_name not in ctx.symbol_table.symbols:  # the variable is not defined, so we can't delete it
+            assert node.pos_start is not None
+            assert node.pos_end is not None
             return self._undefined(node.pos_start, node.pos_end, var_name, ctx, result,
                                    f"{_ORIGIN_FILE}.visit_varDeleteNode")
 
         IS_VAR_NAME_PROTECTED = var_name in PROTECTED_VARS
         if IS_VAR_NAME_PROTECTED:
+            assert node.pos_start is not None
+            assert node.pos_end is not None
             return result.failure(RunTimeError(
                 node.pos_start, node.pos_end,
                 f"can not delete builtin name '{var_name}'.",
@@ -713,19 +749,22 @@ class Interpreter:
             condition_value = result.register(self.visit(condition, ctx, methods_instead_of_funcs))
             if result.should_return():  # check for errors
                 return result
+            assert condition_value is not None
 
             if condition_value.is_true():  # if it is true: we execute the body code then we return the value
                 expr_value = result.register(self.visit(body_expr, ctx, methods_instead_of_funcs))
                 if result.should_return():  # check for errors
                     return result
+                assert expr_value is not None
                 return result.success(expr_value)
 
         ELSE_CASE = node.else_case is not None
         if ELSE_CASE:
-            expr = node.else_case
-            else_value = result.register(self.visit(expr, ctx, methods_instead_of_funcs))
+            assert node.else_case is not None
+            else_value = result.register(self.visit(node.else_case, ctx, methods_instead_of_funcs))
             if result.should_return():  # check for errors
                 return result
+            assert else_value is not None
             return result.success(else_value)
 
         return result.success(NoneValue(False))
@@ -736,11 +775,18 @@ class Interpreter:
         assertion = result.register(self.visit(node.assertion, ctx, methods_instead_of_funcs))  # we get the assertion
         if result.should_return():  # check for errors
             return result
-        errmsg = result.register(self.visit(node.errmsg, ctx, methods_instead_of_funcs))  # we get the error message
-        if result.should_return():  # check for errors
-            return result
+        assert assertion is not None
+        if node.errmsg is None:
+            errmsg = String("").set_pos(node.pos_start, node.pos_end).set_context(ctx)
+        else:
+            errmsg = result.register(self.visit(node.errmsg, ctx, methods_instead_of_funcs))  # we get the error message
+            if result.should_return():  # check for errors
+                return result
+            assert errmsg is not None
 
         if not isinstance(errmsg, String):  # we check if the error message is a String
+            assert errmsg.pos_start is not None
+            assert errmsg.pos_end is not None
             return result.failure(RTTypeError(
                 errmsg.pos_start, errmsg.pos_end,
                 f"error message should be a str, not {errmsg.type_}.",
@@ -748,6 +794,8 @@ class Interpreter:
             ))
 
         if assertion.is_false():  # the assertion is not true, we return an error
+            assert assertion.pos_start is not None
+            assert assertion.pos_end is not None
             return result.failure(RTAssertionError(
                 assertion.pos_start, assertion.pos_end,
                 errmsg.value,

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -17,13 +17,13 @@ from src.runtime.values.basevalues.basevalues import String
 from src.runtime.values.basevalues.value import Value
 from src.runtime.runtime_result import RTResult
 # built-in python imports
-from typing import Protocol, Any, TypedDict, TYPE_CHECKING
+from typing import Protocol, Any, TypedDict, Sequence, TYPE_CHECKING
 import os
 try:
     from colorama import init as colorama_init, Fore
     ForeRED: str = Fore.RED
     ForeRESET: str = Fore.RESET
-except ModuleNotFoundError:
+except (ModuleNotFoundError, ImportError):
     colorama_init = lambda: None  # this is to avoid type checking errors
     ForeRED: str = ""
     ForeRESET: str = ""
@@ -96,7 +96,7 @@ class RunFunction(Protocol):
         actual_context: str = "<program>",
         use_default_symbol_table: bool = False,
         use_context: Context | None = None,
-        args: list[str | String] | None = None,
+        args: Sequence[str | String] | None = None,
         work_dir: str | None = None
     ) -> tuple[Value, None] | tuple[None, Error]:
         ...

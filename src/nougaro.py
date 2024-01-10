@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ from src.misc import nice_str_from_idk
 # built-in python imports
 import json
 import os.path
+from typing import Sequence
 
 # ##########
 # SYMBOL TABLE
@@ -53,7 +54,7 @@ def run(
         actual_context: str = "<program>",
         use_default_symbol_table: bool = False,
         use_context: Context | None = None,
-        args: list[str | String] | None = None,
+        args: Sequence[str | String] | None = None,
         work_dir: str | None = None
 ) -> tuple[Value, None] | tuple[None, Error]:
     """Run the given code.

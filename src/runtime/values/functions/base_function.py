@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -27,6 +27,9 @@ class BaseFunction(Value):
         self.name: str = name if name is not None else '<function>'  # if 'name' is None, we have something like `def()->foo`
         self.type_ = 'BaseFunction'
         self.call_with_module_context: bool = call_with_module_context
+    
+    def to_python_str(self) -> str:
+        return "BaseFunction"
 
     def generate_new_context(self, use_self_context_ctx_table: bool = False):
         """Generates a new context with the right name, the right parent context and the right position"""
@@ -131,14 +134,14 @@ class BaseFunction(Value):
         self.populate_args(param_names, args, exec_context, optional_params, should_respect_args_number)
         return result.success(NoneValue())
 
-    def get_comparison_eq(self, other):
+    def get_comparison_eq(self, other: Value):
         return FALSE.copy().set_context(self.context), None
 
-    def get_comparison_ne(self, other):
+    def get_comparison_ne(self, other: Value):
         return TRUE.copy().set_context(self.context), None
 
-    def get_comparison_gte(self, other):
+    def get_comparison_gte(self, other: Value):
         return FALSE.copy().set_context(self.context), None
 
-    def get_comparison_lte(self, other):
+    def get_comparison_lte(self, other: Value):
         return FALSE.copy().set_context(self.context), None

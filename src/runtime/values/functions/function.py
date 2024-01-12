@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 
 class Function(BaseFunction):
-    def __init__(self, name: str, body_node: Node, param_names: list[str], should_auto_return: bool, call_with_module_context: bool = False):
+    def __init__(self, name: str | None, body_node: Node, param_names: list[str], should_auto_return: bool, call_with_module_context: bool = False):
         super().__init__(name, call_with_module_context)
         self.body_node = body_node
         self.param_names = param_names
@@ -35,6 +35,9 @@ class Function(BaseFunction):
 
     def __repr__(self):
         return f'<function {self.name}>'
+    
+    def to_python_str(self):
+        return self.__repr__()
 
     def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str, exec_from: str = "<invalid>",
                 use_context: Context | None = None, cli_args: list[String] | None = None, work_dir: str | None = None):
@@ -96,11 +99,11 @@ class Function(BaseFunction):
 
 class Method(Function):
     """Parent class for methods (functions in classes)"""
-    def __init__(self, name: str, body_node: Node, param_names: list[str], should_auto_return: bool,
+    def __init__(self, name: str | None, body_node: Node, param_names: list[str], should_auto_return: bool,
                  call_with_module_context: bool = False):
         super().__init__(name, body_node, param_names, should_auto_return, call_with_module_context)
         self.type_ = "method"
-        self.object_ = None
+        self.object_: Value | None = None
 
     def __repr__(self):
         return f'<method {self.name}>'

@@ -92,7 +92,7 @@ class RunFunction(Protocol):
         text: str | None,
         noug_dir: str,
         version: str | None = None,
-        exec_from: str = "(shell)",
+        exec_from: str | None = "(shell)",
         actual_context: str = "<program>",
         use_default_symbol_table: bool = False,
         use_context: Context | None = None,

@@ -50,7 +50,7 @@ def run(
         text: str | None,
         noug_dir: str,
         version: str | None = None,
-        exec_from: str = "(shell)",
+        exec_from: str | None = "(shell)",
         actual_context: str = "<program>",
         use_default_symbol_table: bool = False,
         use_context: Context | None = None,
@@ -88,7 +88,7 @@ def run(
         new_args_strings: list[String] = list(map(nice_str_from_idk, args))
         global_symbol_table.set("__args__", List(new_args_values))
     global_symbol_table.set("__noug_version__", String(version))
-    global_symbol_table.set("__exec_from__", String(exec_from))
+    global_symbol_table.set("__exec_from__", String(str(exec_from)))
     global_symbol_table.set("__actual_context__", String(actual_context))
     global_symbol_table.set("__noug_dir__", String(noug_dir))
 
@@ -122,7 +122,7 @@ def run(
         if use_default_symbol_table:
             context.symbol_table = default_symbol_table.copy()
             context.symbol_table.set("__noug_version__", String(version))
-            context.symbol_table.set("__exec_from__", String(exec_from))
+            context.symbol_table.set("__exec_from__", String(str(exec_from)))
             context.symbol_table.set("__actual_context__", String(actual_context))
             context.symbol_table.set("__noug_dir__", String(noug_dir))
         else:

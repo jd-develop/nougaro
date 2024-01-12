@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -28,6 +28,9 @@ class BaseBuiltInFunction(BaseFunction):
 
     def __repr__(self):
         return f'<built-in function {self.name}>'
+    
+    def to_python_str(self):
+        return self.__repr__()
 
     def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str, exec_from: str = "<invalid>",
                 use_context: Context | None = None,  work_dir: str | None = None):

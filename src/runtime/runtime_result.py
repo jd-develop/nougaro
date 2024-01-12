@@ -37,6 +37,7 @@ class RTResult:
         self.old_should_return = False  # The old value of self.should_return()
 
         self.break_or_continue_pos: tuple[Position, Position] | None = None
+        self.return_pos: tuple[Position, Position] | None = None
 
         self.reset()
 
@@ -51,6 +52,7 @@ class RTResult:
         self.old_should_return = False
 
         self.break_or_continue_pos = None
+        self.return_pos = None
 
     def register(self, result: Self):
         """Register another result in this result"""
@@ -66,6 +68,7 @@ class RTResult:
         self.loop_should_continue = result.loop_should_continue
         self.loop_should_break = result.loop_should_break
         self.break_or_continue_pos = result.break_or_continue_pos
+        self.return_pos = result.return_pos
 
         return result.value  # we return the other result value
 
@@ -74,9 +77,10 @@ class RTResult:
         self.value = value
         return self
 
-    def success_return(self, value: Value):  # same as self.success for self.function_return_value
+    def success_return(self, value: Value, pos_start: Position, pos_end: Position):  # same as self.success for self.function_return_value
         self.reset()
         self.function_return_value = value
+        self.return_pos = (pos_start, pos_end)
         return self
 
     def success_continue(self, pos_start: Position, pos_end: Position):  # same as self.success for self.loop_should_continue
@@ -116,5 +120,6 @@ class RTResult:
             "loop_should_continue": self.loop_should_continue,
             "loop_should_break": self.loop_should_break,
             "old_should_return": self.old_should_return,
-            "break_or_continue_pos": self.break_or_continue_pos
+            "break_or_continue_pos": self.break_or_continue_pos,
+            "return_pos": self.return_pos
         })

@@ -19,7 +19,7 @@ from src.errors.errors import *
 from src.lexer.token_types import TT, TOKENS_NOT_TO_QUOTE
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
-from src.misc import CustomInterpreterVisitMethod, clear_screen, RunFunction
+from src.misc import clear_screen, RunFunction
 from src.runtime.symbol_table import SymbolTable
 from src.lexer.position import Position
 # built-in python imports
@@ -122,6 +122,13 @@ class Interpreter:
                 return result.failure(RunTimeError(
                     result.break_or_continue_pos[0], result.break_or_continue_pos[1],
                     "'continue' outside of a loop.", ctx,
+                    origin_file=f"{_ORIGIN_FILE}.visit"
+                ))
+            if result.function_return_value is not None:
+                assert result.return_pos is not None
+                return result.failure(RunTimeError(
+                    result.return_pos[0], result.return_pos[1],
+                    "'return' outside of a function.", ctx,
                     origin_file=f"{_ORIGIN_FILE}.visit"
                 ))
         return result
@@ -1413,7 +1420,7 @@ class Interpreter:
         else:  # only 'return'
             value = NoneValue(False)
 
-        return result.success_return(value)
+        return result.success_return(value, node.pos_start, node.pos_end)
 
     @staticmethod
     def visit_ContinueNode(node: ContinueNode) -> RTResult:

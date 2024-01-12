@@ -152,5 +152,5 @@ class CustomInterpreterVisitMethod(Protocol):
     """The type of the methods `visit_{name}` in Interpreter"""
     # This class was made to bypass a pycharm bug.
     def __call__(self, node: Node | None = None, exec_context: Context | None = None,
-                 other_context: Context | None = None, methods_instead_of_funcs: bool = False) -> Any:
+                 other_context: Context | None = None, methods_instead_of_funcs: bool = False) -> RTResult:
         ...

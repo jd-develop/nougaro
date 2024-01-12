@@ -5,10 +5,10 @@ This file is updated nearly every commit and copied to GH release changelog.
 ## 0.16.1-beta
 
 ### Technical
-* Fix some crashes and some bugs
+* Fix a lot of crashes and a lot of bugs
 * Rewrite and type hint the source code
 * Better error messages
-* Add some edge-cases tests
+* Add some edge-case tests
 * Now works with pipe operator in (...)sh
 
 ### Calculator

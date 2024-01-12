@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -44,8 +44,43 @@ class Interpreter:
         self.noug_dir = noug_dir_
         self.args = args
         self.work_dir: str = work_dir
+        self._methods = None
+        self.init_methods()
+        assert self._methods is not None
         assert self.work_dir is not None, ("please report this bug on "
                                            "https://github.com/jd-develop/nougaro/issues/new/choose")
+        
+    def init_methods(self):
+        self._methods = {
+            "AssertNode": self.visit_AssertNode,
+            "BinOpCompNode": self.visit_BinOpCompNode,
+            "BinOpNode": self.visit_BinOpNode,
+            "BreakNode" : self.visit_BreakNode,
+            "CallNode" : self.visit_CallNode,
+            "ClassNode" : self.visit_ClassNode,
+            "ContinueNode" : self.visit_ContinueNode,
+            "DoWhileNode" : self.visit_DoWhileNode,
+            "DollarPrintNode" : self.visit_DollarPrintNode,
+            "ExportNode" : self.visit_ExportNode,
+            "ForNode" : self.visit_ForNode,
+            "ForNodeList" : self.visit_ForNodeList,
+            "FuncDefNode" : self.visit_FuncDefNode,
+            "IfNode" : self.visit_IfNode,
+            "ImportNode" : self.visit_ImportNode,
+            "ListNode" : self.visit_ListNode,
+            "NoNode" : self.visit_NoNode,
+            "NumberENumberNode" : self.visit_NumberENumberNode,
+            "NumberNode" : self.visit_NumberNode,
+            "ReadNode" : self.visit_ReadNode,
+            "ReturnNode" : self.visit_ReturnNode,
+            "StringNode" : self.visit_StringNode,
+            "UnaryOpNode" : self.visit_UnaryOpNode,
+            "VarAccessNode" : self.visit_VarAccessNode,
+            "VarAssignNode" : self.visit_VarAssignNode,
+            "VarDeleteNode" : self.visit_VarDeleteNode,
+            "WhileNode" : self.visit_WhileNode,
+            "WriteNode" : self.visit_WriteNode,
+        }
 
     @staticmethod
     def update_symbol_table(ctx: Context):
@@ -55,22 +90,41 @@ class Interpreter:
             del symbols_copy['__symbol_table__']
         ctx.symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
 
-    def visit(self, node: Node, ctx: Context, methods_instead_of_funcs: bool, other_ctx: Context | None = None) -> RTResult:
+    def visit(self, node: Node, ctx: Context, methods_instead_of_funcs: bool, other_ctx: Context | None = None, main_visit: bool = False) -> RTResult:
         """Visit a node."""
-        method_name = f'visit_{type(node).__name__}'
-        method: CustomInterpreterVisitMethod = getattr(self, method_name, self.no_visit_method)
+        method_name = f'{type(node).__name__}'
+        assert self._methods is not None
+        method = self._methods.get(method_name, self.no_visit_method)
         if other_ctx is None:
             other_ctx = ctx.copy()
 
         PARAMETERS = signature(method).parameters
-        if len(PARAMETERS) <= 1:  # def method(self) is 1 param, def staticmethod() is 0 param
-            return method()
+        if len(PARAMETERS) == 0:  # def method(self) is 1 param, def staticmethod() is 0 param
+            result = method()
+        elif len(PARAMETERS) == 1:  # def method(self) is 1 param, def staticmethod() is 0 param
+            result = method(node)
         elif len(PARAMETERS) == 3:
-            return method(node, ctx, methods_instead_of_funcs=methods_instead_of_funcs)
+            result = method(node, ctx, methods_instead_of_funcs=methods_instead_of_funcs)
         elif len(PARAMETERS) == 4:
-            return method(node, ctx, other_ctx, methods_instead_of_funcs=methods_instead_of_funcs)
-
-        return method(node, ctx)
+            result = method(node, ctx, other_ctx, methods_instead_of_funcs=methods_instead_of_funcs)
+        else:
+            result = method(node, ctx)
+        if main_visit:
+            if result.loop_should_break:
+                assert result.break_or_continue_pos is not None
+                return result.failure(RunTimeError(
+                    result.break_or_continue_pos[0], result.break_or_continue_pos[1],
+                    "'break' outside of a loop.", ctx,
+                    origin_file=f"{_ORIGIN_FILE}.visit"
+                ))
+            if result.loop_should_continue:
+                assert result.break_or_continue_pos is not None
+                return result.failure(RunTimeError(
+                    result.break_or_continue_pos[0], result.break_or_continue_pos[1],
+                    "'continue' outside of a loop.", ctx,
+                    origin_file=f"{_ORIGIN_FILE}.visit"
+                ))
+        return result
 
     def _undefined(
             self,
@@ -812,18 +866,44 @@ class Interpreter:
         start_value = result.register(self.visit(node.start_value_node, ctx, methods_instead_of_funcs))
         if result.should_return():  # check for errors
             return result
+        assert start_value is not None
+        if not (isinstance(start_value, Number) and isinstance(start_value.value, int)):
+            assert start_value.pos_start is not None
+            assert start_value.pos_end is not None
+            return result.failure(RTTypeError(
+                start_value.pos_start, start_value.pos_end,
+                f"start value should be an integer, not {start_value.type_}.",
+                ctx, origin_file=f"{_ORIGIN_FILE}.visit_ForNode"
+            ))
 
         end_value = result.register(self.visit(node.end_value_node, ctx, methods_instead_of_funcs))
         if result.should_return():  # check for errors
             return result
+        assert end_value is not None
+        if not (isinstance(end_value, Number) and isinstance(end_value.value, int)):
+            assert end_value.pos_start is not None
+            assert end_value.pos_end is not None
+            return result.failure(RTTypeError(
+                end_value.pos_start, end_value.pos_end,
+                f"end value should be an integer, not {end_value.type_}.",
+                ctx, origin_file=f"{_ORIGIN_FILE}.visit_ForNode"
+            ))
 
-        STEP_VALUE_IS_DEFINED = node.step_value_node is not None
-        if STEP_VALUE_IS_DEFINED:  # we get the step value, if there is one
+        if node.step_value_node is not None:  # we get the step value, if there is one
             step_value = result.register(self.visit(node.step_value_node, ctx, methods_instead_of_funcs))
             if result.should_return():  # check for errors
                 return result
+            assert step_value is not None
         else:
             step_value = Number(1)  # no step value: default is 1
+        if not (isinstance(step_value, Number) and isinstance(step_value.value, int)):
+            assert step_value.pos_start is not None
+            assert step_value.pos_end is not None
+            return result.failure(RTTypeError(
+                step_value.pos_start, step_value.pos_end,
+                f"step value should be an integer, not {step_value.type_}.",
+                ctx, origin_file=f"{_ORIGIN_FILE}.visit_ForNode"
+            ))
 
         # we make an end condition
         # if step value is *positive*, the end value is *more* than the initial value
@@ -834,6 +914,9 @@ class Interpreter:
             condition = (lambda: i < end_value.value)
         else:
             condition = (lambda: i > end_value.value)
+
+        assert ctx.symbol_table is not None
+        assert isinstance(node.var_name_token.value, str)
 
         while condition():
             ctx.symbol_table.set(node.var_name_token.value, Number(i))  # we set the iterating variable
@@ -852,6 +935,7 @@ class Interpreter:
             if result.should_return():
                 # if there is an error or a 'return' statement
                 return result
+            assert value is not None
 
             elements.append(value)
 
@@ -1332,14 +1416,14 @@ class Interpreter:
         return result.success_return(value)
 
     @staticmethod
-    def visit_ContinueNode() -> RTResult:
+    def visit_ContinueNode(node: ContinueNode) -> RTResult:
         """Visit ContinueNode"""
-        return RTResult().success_continue()  # set RTResult().loop_should_continue to True
+        return RTResult().success_continue(node.pos_start, node.pos_end)  # set RTResult().loop_should_continue to True
 
     @staticmethod
-    def visit_BreakNode() -> RTResult:
+    def visit_BreakNode(node: BreakNode) -> RTResult:
         """Visit BreakNode"""
-        return RTResult().success_break()  # set RTResult().loop_should_continue to True
+        return RTResult().success_break(node.pos_start, node.pos_end)  # set RTResult().loop_should_continue to True
 
     def visit_ImportNode(self, node: ImportNode, ctx: Context) -> RTResult:
         """Visit ImportNode"""

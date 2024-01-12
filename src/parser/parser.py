@@ -1157,6 +1157,7 @@ class Parser:
         self.advance()
 
         if self.current_token.type == TT["RSQUARE"]:  # ] : we close the list
+            pos_end = self.current_token.pos_end.copy()
             result.register_advancement()
             self.advance()
         else:  # there are elements
@@ -1201,13 +1202,15 @@ class Parser:
                     "'[' was never closed.",
                     "src.parser.parser.Parser.list_expr"
                 ))
+            
+            pos_end = self.current_token.pos_end.copy()
 
             # we advance
             result.register_advancement()
             self.advance()
 
         return result.success(ListNode(
-            element_nodes, pos_start, self.current_token.pos_end.copy()
+            element_nodes, pos_start, pos_end
         ))
 
     def if_expr(self) -> ParseResult:

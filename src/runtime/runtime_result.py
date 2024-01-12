@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -12,6 +12,7 @@
 from __future__ import annotations
 # nougaro modules imports
 from src.errors.errors import Error
+from src.lexer.position import Position
 # built-in python imports
 import pprint
 # special typing import
@@ -35,6 +36,8 @@ class RTResult:
         self.loop_should_break = False  # there is a 'break' statement
         self.old_should_return = False  # The old value of self.should_return()
 
+        self.break_or_continue_pos: tuple[Position, Position] | None = None
+
         self.reset()
 
     def reset(self):
@@ -46,6 +49,8 @@ class RTResult:
         self.loop_should_continue = False
         self.loop_should_break = False
         self.old_should_return = False
+
+        self.break_or_continue_pos = None
 
     def register(self, result: Self):
         """Register another result in this result"""
@@ -60,6 +65,7 @@ class RTResult:
         self.function_return_value = result.function_return_value
         self.loop_should_continue = result.loop_should_continue
         self.loop_should_break = result.loop_should_break
+        self.break_or_continue_pos = result.break_or_continue_pos
 
         return result.value  # we return the other result value
 
@@ -73,13 +79,15 @@ class RTResult:
         self.function_return_value = value
         return self
 
-    def success_continue(self):  # same as self.success for self.loop_should_continue
+    def success_continue(self, pos_start: Position, pos_end: Position):  # same as self.success for self.loop_should_continue
         self.reset()
+        self.break_or_continue_pos = (pos_start, pos_end)
         self.loop_should_continue = True
         return self
 
-    def success_break(self):  # same as self.success for self.loop_should_break
+    def success_break(self, pos_start: Position, pos_end: Position):  # same as self.success for self.loop_should_break
         self.reset()
+        self.break_or_continue_pos = (pos_start, pos_end)
         self.loop_should_break = True
         return self
 
@@ -101,11 +109,12 @@ class RTResult:
         return self.__str__()
 
     def __str__(self):
-        return "RTResult: " + pprint.pformat(
-            {"value": self.value,
-             "function_return_value": self.function_return_value,
-             "error": self.error,
-             "loop_should_continue": self.loop_should_continue,
-             "loop_should_break": self.loop_should_break,
-             "old_should_return": self.old_should_return}
-        )
+        return "RTResult: " + pprint.pformat({
+            "value": self.value,
+            "function_return_value": self.function_return_value,
+            "error": self.error,
+            "loop_should_continue": self.loop_should_continue,
+            "loop_should_break": self.loop_should_break,
+            "old_should_return": self.old_should_return,
+            "break_or_continue_pos": self.break_or_continue_pos
+        })

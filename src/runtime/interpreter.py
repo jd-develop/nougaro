@@ -1440,11 +1440,12 @@ class Interpreter:
         self.update_symbol_table(inner_ctx)
         object_.inner_context = inner_ctx
         for attr in obj_attrs.keys():
-            if isinstance(obj_attrs[attr], Method):
+            value_to_set_object = obj_attrs[attr]
+            if isinstance(value_to_set_object, Method):
                 if object_to_set_this is None:
-                    obj_attrs[attr].object_ = object_
+                    value_to_set_object.object_ = object_
                 else:
-                    obj_attrs[attr].object_ = object_to_set_this
+                    value_to_set_object.object_ = object_to_set_this
 
         if result.should_return():  # check for errors
             return result

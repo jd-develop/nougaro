@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -23,7 +23,7 @@ from typing import Literal
 
 class RTStatisticsError(RunTimeError):
     """StatisticsError is an error that can be triggered ONLY via functions in this module."""
-    def __init__(self, pos_start, pos_end, details, context: Context, origin_file: str = "lib_.statistics_"):
+    def __init__(self, pos_start: Position, pos_end: Position, details: str, context: Context, origin_file: str = "lib_.statistics_"):
         super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="StatisticsError",
                          origin_file=origin_file)
         self.context = context
@@ -31,8 +31,10 @@ class RTStatisticsError(RunTimeError):
 
 class Statistics(ModuleFunction):
     """ Statistics module """
-    def __init__(self, name):
-        super().__init__("statistics", name)
+    functions: dict[str, builtin_function_dict] = {}
+
+    def __init__(self, name: str):
+        super().__init__("statistics", name, functions=self.functions)
 
     def copy(self):
         """Return a copy of self"""
@@ -80,9 +82,14 @@ class Statistics(ModuleFunction):
 
         return RTResult().success(Number(mean_))
 
-    execute_statistics_mean.param_names = ['data']
-    execute_statistics_mean.optional_params = []
-    execute_statistics_mean.should_respect_args_number = True
+    functions["mean"] = {
+        "function": execute_statistics_mean,
+        "param_names": ["data"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_statistics_geometric_mean(self, exec_ctx: Context):
         """Returns the geometric mean of a statistical series"""
@@ -133,9 +140,14 @@ class Statistics(ModuleFunction):
 
         return RTResult().success(Number(geometric_mean_))
 
-    execute_statistics_geometric_mean.param_names = ['data']
-    execute_statistics_geometric_mean.optional_params = []
-    execute_statistics_geometric_mean.should_respect_args_number = True
+    functions["geometric_mean"] = {
+        "function": execute_statistics_geometric_mean,
+        "param_names": ["data"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_statistics_harmonic_mean(self, exec_ctx: Context):
         """Returns the harmonic mean of a statistical series"""
@@ -227,9 +239,14 @@ class Statistics(ModuleFunction):
 
         return RTResult().success(Number(harmonic_mean_))
 
-    execute_statistics_harmonic_mean.param_names = ['data']
-    execute_statistics_harmonic_mean.optional_params = ['weights']
-    execute_statistics_harmonic_mean.should_respect_args_number = True
+    functions["harmonic_mean"] = {
+        "function": execute_statistics_harmonic_mean,
+        "param_names": ["data"],
+        "optional_params": ["weights"],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_statistics_median(self, exec_ctx: Context):
         """Calculates the median of a statistical series"""
@@ -269,9 +286,14 @@ class Statistics(ModuleFunction):
 
         return RTResult().success(Number(median_))
 
-    execute_statistics_median.param_names = ['data']
-    execute_statistics_median.optional_params = []
-    execute_statistics_median.should_respect_args_number = True
+    functions["median"] = {
+        "function": execute_statistics_median,
+        "param_names": ["data"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     # HERE THE DISCLAIMER BEFORE THE DECLARATION OF PYTHON statistics.quantiles FUNCTION:
 
@@ -413,9 +435,14 @@ class Statistics(ModuleFunction):
         new_quantiles = [py2noug(q) for q in quantiles_]
         return RTResult().success(List(new_quantiles))
 
-    execute_statistics_quantiles.param_names = ['data']
-    execute_statistics_quantiles.optional_params = ['n', 'method']
-    execute_statistics_quantiles.should_respect_args_number = True
+    functions["quantiles"] = {
+        "function": execute_statistics_quantiles,
+        "param_names": ["data"],
+        "optional_params": ["n", "method"],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
     
     def execute_statistics_scope(self, exec_ctx: Context):
         """Returns the scope of a list, i.e. the difference between the max and the min value."""
@@ -448,9 +475,14 @@ class Statistics(ModuleFunction):
         scope = max(data_) - min(data_)  # we calculate the scope
         return RTResult().success(Number(scope))
 
-    execute_statistics_scope.param_names = ['data']
-    execute_statistics_scope.optional_params = []
-    execute_statistics_scope.should_respect_args_number = True
+    functions["scope"] = {
+        "function": execute_statistics_scope,
+        "param_names": ["data"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_statistics_mode(self, exec_ctx: Context):
         """The mode of a list, i.e. the most common value."""
@@ -483,9 +515,14 @@ class Statistics(ModuleFunction):
         mode = statistics.mode(data_)  # we calculate the mode
         return RTResult().success(Number(mode))
 
-    execute_statistics_mode.param_names = ['data']
-    execute_statistics_mode.optional_params = []
-    execute_statistics_mode.should_respect_args_number = True
+    functions["mode"] = {
+        "function": execute_statistics_mode,
+        "param_names": ["data"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_statistics_multimode(self, exec_ctx: Context):
         """The list of the modes of a list/str, i.e. the most common values."""
@@ -520,9 +557,14 @@ class Statistics(ModuleFunction):
         new_multimode = [py2noug(e) for e in multimode]
         return RTResult().success(List(new_multimode))
 
-    execute_statistics_multimode.param_names = ['data']
-    execute_statistics_multimode.optional_params = []
-    execute_statistics_multimode.should_respect_args_number = True
+    functions["multimode"] = {
+        "function": execute_statistics_multimode,
+        "param_names": ["data"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
 
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported

@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -22,8 +22,10 @@ import random
 
 class Random(ModuleFunction):
     """ Random module """
-    def __init__(self, name):
-        super().__init__("random", name)
+    functions: dict[str, builtin_function_dict] = {}
+
+    def __init__(self, name: str):
+        super().__init__("random", name, functions=self.functions)
 
     def copy(self):
         """Return a copy of self"""
@@ -64,18 +66,28 @@ class Random(ModuleFunction):
         random_number = random.randint(a.value, b.value)
         return RTResult().success(Number(random_number))
 
-    execute_random_randint.param_names = ['a', 'b']
-    execute_random_randint.optional_params = []
-    execute_random_randint.should_respect_args_number = True
+    functions["randint"] = {
+        "function": execute_random_randint,
+        "param_names": ["a", "b"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_random_random(self):
         """Pick randomly a 16-digits float between 0 included and 1 included"""
         # No params.
         return RTResult().success(Number(random.random()))
 
-    execute_random_random.param_names = []
-    execute_random_random.optional_params = []
-    execute_random_random.should_respect_args_number = True
+    functions["random"] = {
+        "function": execute_random_random,
+        "param_names": [],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_random_choice(self, exec_ctx: Context):
         """Return a random element of a list"""
@@ -95,9 +107,14 @@ class Random(ModuleFunction):
             ))
         return RTResult().success(random.choice(list_.elements))  # then we return a random element of the list
 
-    execute_random_choice.param_names = ['list_']
-    execute_random_choice.optional_params = []
-    execute_random_choice.should_respect_args_number = True
+    functions["choice"] = {
+        "function": execute_random_choice,
+        "param_names": ["list_"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_random_shuffle(self, exec_ctx: Context):
         """Shuffle a list and returns it."""
@@ -116,9 +133,14 @@ class Random(ModuleFunction):
 
         return RTResult().success(list_)
     
-    execute_random_shuffle.param_names = ['list_']
-    execute_random_shuffle.optional_params = []
-    execute_random_shuffle.should_respect_args_number = True
+    functions["shuffle"] = {
+        "function": execute_random_shuffle,
+        "param_names": ["list_"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
     
     def execute_random_seed(self, exec_ctx: Context):
         """Set the seed to generate pseudo-random numbers."""
@@ -133,9 +155,14 @@ class Random(ModuleFunction):
         random.seed(seed.value)
         return RTResult().success(NoneValue(False))
     
-    execute_random_seed.param_names = ['seed']
-    execute_random_seed.optional_params = []
-    execute_random_seed.should_respect_args_number = True
+    functions["seed"] = {
+        "function": execute_random_seed,
+        "param_names": ["seed"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
 
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported

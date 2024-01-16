@@ -15,6 +15,7 @@ from __future__ import annotations
 from src.runtime.values.functions.builtin_function import *
 from src.runtime.values.tools.py2noug import *
 from src.errors.errors import *
+from src.misc import builtin_function_dict
 # Above line : Context, RTResult, errors and values are imported in builtin_function.py
 # built-in python imports
 # no imports
@@ -22,11 +23,21 @@ from src.errors.errors import *
 
 class ModuleFunction(BaseBuiltInFunction):
     """ Parent class for all the modules """
-    def __init__(self, module_name: str, function_name: str,
-                 link_for_bug_report: str = "https://jd-develop.github.io/nougaro/bugreport.html"):
+    def __init__(
+            self, module_name: str, function_name: str,
+            link_for_bug_report: str = "https://jd-develop.github.io/nougaro/bugreport.html",
+            functions: dict[str, builtin_function_dict] | None = None
+        ):
         super().__init__(function_name)
         self.module_name = module_name
         self.link_for_bug_report: str = link_for_bug_report
+        if functions is None:
+            self.functions: dict[str, builtin_function_dict] = {}
+        else:
+            self.functions = functions
+
+    def add_function(self, name: str, func_dict: builtin_function_dict):
+        self.functions[name] = func_dict
 
     def __repr__(self):
         return f'<built-in lib function {self.module_name}.{self.name}>'
@@ -50,28 +61,53 @@ class ModuleFunction(BaseBuiltInFunction):
             exec_context.symbol_table.set("__args__", List(cli_args_values))
 
         # get the method name and the method
-        method_name = f'execute_{self.module_name}_{self.name}'
-        method: CustomBuiltInFuncMethod = getattr(self, method_name, self.no_visit_method)
+        try:
+            method_dict: builtin_function_dict = self.functions[self.name]
+        except KeyError:
+            print(self.functions, self.name)
+            self.no_visit_method(exec_context)
+            return result
+        method = method_dict["function"]
 
         # populate arguments
         result.register(self.check_and_populate_args(
-            method.param_names, args, exec_context, optional_params=method.optional_params,
-            should_respect_args_number=method.should_respect_args_number
+            method_dict["param_names"], args, exec_context,
+            optional_params=method_dict["optional_params"],
+            should_respect_args_number=method_dict["should_respect_args_number"]
         ))
 
         # if there is any error
         if result.should_return():
             return result
 
+        # special built-in functions that needs the 'run' function (in nougaro.py) in their arguments
+        if method_dict["run_noug_dir_work_dir"]:
+            return_value = result.register(method(self, exec_context, run, noug_dir, work_dir))
+
+            # if there is any error
+            if result.should_return():
+                return result
+            assert return_value is not None
+            return result.success(return_value)
+
+        # special built-in functions that needs the 'noug_dir' value
+        if method_dict["noug_dir"]:
+            return_value = result.register(method(self, exec_context, noug_dir))
+
+            # if there is any error
+            if result.should_return() or return_value is None:
+                return result
+            return result.success(return_value)
+
         try:
             # we try to execute the function
-            return_value = result.register(method(exec_context))
-        except TypeError:  # there is no `exec_context` parameter
+            return_value = result.register(method(self, exec_context))
+        except TypeError:  # there is no `exec_ctx` parameter
             try:
-                return_value = result.register(method())
+                return_value = result.register(method(self))
             except TypeError:  # it only executes when coding
-                return_value = result.register(method(exec_context))
-        if result.should_return():  # check for any error
+                return_value = result.register(method(self, exec_context))
+        if result.should_return() or return_value is None:  # check for any error
             return result
         # if all is OK, return what we should return
         return result.success(return_value)

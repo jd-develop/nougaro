@@ -34,13 +34,14 @@ class Lexer:
         return self.text[pos.index] if pos.index < len(self.text) else None
 
     def advance(self):
-        """Advance of 1 char in self.text"""
+        """Advance of 1 char in self.text, and return the new char"""
         self.pos.advance(self.current_char)  # advance in position
         # set the new current char - the next one in the code or None if this is EOF (end of file)
         self.current_char = self.get_char(self.pos)
         # USEFUL to know where tf you are in the file when it throws at you an unclear error
         # if self.pos.index in [7583, 5547]:
         #     print(self.pos.index, self.pos.line_number, self.current_char, self.next_char())
+        return self.current_char
 
     def next_char(self):
         """Returns the next char without advancing"""
@@ -329,9 +330,9 @@ class Lexer:
         self.advance()
 
         if self.current_char == '/':  # //
-            self.advance()
             token_type = TT["FLOORDIV"]
-            if self.current_char == '=':  # //=
+            new_char = self.advance()
+            if new_char == '=':  # //=
                 self.advance()
                 token_type = TT["FLOORDIVEQ"]
         elif self.current_char == '=':  # /=
@@ -354,14 +355,14 @@ class Lexer:
             self.advance()
             token_type = TT["POWEQ"]
         elif self.current_char == '^':  # ^^
-            self.advance()
             token_type = TT["BITWISEXOR"]
-            if self.current_char == '=':  # ^^=
+            new_char = self.advance()
+            if new_char == '=':  # ^^=
                 self.advance()
                 token_type = TT["BITWISEXOREQ"]
             elif self.current_char == '^':  # ^^^
-                self.advance()
-                if self.current_char != "=":
+                newest_char = self.advance()
+                if newest_char != "=":
                     return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '^^^'.",
                                                     "src.lexer.lexer.Lexer.make_pow")
                 token_type = TT["XOREQ"]  # ^^^=
@@ -394,8 +395,8 @@ class Lexer:
             token_type = TT["BITWISEOREQ"]
             self.advance()
         elif self.current_char == '|':  # ||
-            self.advance()
-            if self.current_char != "=":
+            new_char = self.advance()
+            if new_char != "=":
                 return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '||'.",
                                                 "src.lexer.lexer.Lexer.make_or")
             token_type = TT["OREQ"]  # ||=
@@ -416,8 +417,8 @@ class Lexer:
             token_type = TT["BITWISEANDEQ"]
             self.advance()
         elif self.current_char == '&':  # &&
-            self.advance()
-            if self.current_char != "=":
+            new_char = self.advance()
+            if new_char != "=":
                 return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '&&'.",
                                                 "src.lexer.lexer.Lexer.make_and")
             token_type = TT["ANDEQ"]  # &&=
@@ -712,8 +713,8 @@ class Lexer:
                 self.advance()
                 token_type = TT["LTEEQ"]
         elif self.current_char == '<':  # <<
-            self.advance()
-            if self.current_char == '=':  # <<=
+            new_char = self.advance()
+            if new_char == '=':  # <<=
                 self.advance()
                 token_type = TT["LTEQ"]
             else:
@@ -739,9 +740,9 @@ class Lexer:
                 self.advance()
                 token_type = TT["GTEEQ"]
         elif self.current_char == '>':
-            self.advance()
+            new_char = self.advance()
             token_type = TT["TO"]
-            if self.current_char == '=':
+            if new_char == '=':
                 self.advance()
                 token_type = TT["GTEQ"]
 
@@ -786,6 +787,6 @@ class Lexer:
         while self.current_char is not None and not (self.current_char == "*" and self.next_char() == "/"):
             self.advance()
         if self.current_char == "*":
-            self.advance()
-            if self.current_char == "/":
+            new_char = self.advance()
+            if new_char == "/":
                 self.advance()

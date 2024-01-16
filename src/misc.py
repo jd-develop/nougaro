@@ -17,7 +17,7 @@ from src.runtime.values.basevalues.basevalues import String
 from src.runtime.values.basevalues.value import Value
 from src.runtime.runtime_result import RTResult
 # built-in python imports
-from typing import Protocol, Any, TypedDict, Sequence, TYPE_CHECKING
+from typing import Protocol, Any, TypedDict, Sequence, Callable
 import os
 try:
     from colorama import init as colorama_init, Fore
@@ -27,9 +27,6 @@ except (ModuleNotFoundError, ImportError):
     colorama_init = lambda: None  # this is to avoid type checking errors
     ForeRED: str = ""
     ForeRESET: str = ""
-
-if TYPE_CHECKING:
-    from src.runtime.values.functions.base_builtin_func import BaseBuiltInFunction
 
 colorama_init()
 
@@ -105,39 +102,8 @@ class RunFunction(Protocol):
 # CUSTOM BUILTIN FUNC METHODS
 # thanks to lancelote (https://github.com/lancelote) who works at JetBrains for these tricks
 # ##########
-class CustomBuiltInFuncMethodWithoutContext(Protocol):
-    """The type of the methods `execute_{name}` in BuiltInFunction"""
-
-    def __call__(self: BaseBuiltInFunction) -> RTResult:
-        ...
-
-class CustomBuiltInFuncMethod(Protocol):
-    """The type of the methods `execute_{name}` in BuiltInFunction"""
-
-    def __call__(self: BaseBuiltInFunction, exec_context: Context | None = None) -> RTResult:
-        ...
-
-
-class CustomBuiltInFuncMethodWithRunParam(Protocol):
-    """The type of the methods `execute_{name}` with `run` parameter in BuiltInFunction"""
-
-    def __call__(self: BaseBuiltInFunction, exec_context: Context | None = None, run: RunFunction | None = None, noug_dir: str | None = None, work_dir: str | None = None) -> RTResult:
-        ...
-
-
-class CustomBuiltInFuncMethodWithNougDirButNotRun(Protocol):
-    """The type of the methods `execute_{name}` with `run` parameter in BuiltInFunction"""
-
-    def __call__(self: BaseBuiltInFunction, exec_context: Context | None = None, noug_dir: str | None = None) -> RTResult:
-        ...
-
-
-builtin_function_method = CustomBuiltInFuncMethod | CustomBuiltInFuncMethodWithNougDirButNotRun | CustomBuiltInFuncMethodWithRunParam | \
-                          CustomBuiltInFuncMethodWithoutContext
-
-
 class builtin_function_dict(TypedDict):
-        function: builtin_function_method
+        function: Callable[..., RTResult]
         param_names: list[str]
         optional_params: list[str]
         should_respect_args_number: bool

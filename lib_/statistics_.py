@@ -48,6 +48,7 @@ class Statistics(ModuleFunction):
         """Returns the mean of a statistical series"""
         # Params:
         # * data
+        assert exec_ctx.symbol_table is not None
         data = exec_ctx.symbol_table.getf('data')  # we get the data
         if not isinstance(data, List):  # we check if the data is under the form of a list
             return RTResult().failure(RTTypeErrorF(
@@ -95,6 +96,7 @@ class Statistics(ModuleFunction):
         """Returns the geometric mean of a statistical series"""
         # Params:
         # * data
+        assert exec_ctx.symbol_table is not None
         data = exec_ctx.symbol_table.getf('data')  # we get the data
         if not isinstance(data, List):  # the data must be a list
             return RTResult().failure(RTTypeErrorF(
@@ -155,6 +157,7 @@ class Statistics(ModuleFunction):
         # * data
         # Optional params:
         # * weights
+        assert exec_ctx.symbol_table is not None
         data = exec_ctx.symbol_table.getf('data')  # we get the data
         if not isinstance(data, List):  # the data must be a list
             return RTResult().failure(RTTypeErrorF(
@@ -252,6 +255,7 @@ class Statistics(ModuleFunction):
         """Calculates the median of a statistical series"""
         # Params:
         # * data
+        assert exec_ctx.symbol_table is not None
         data = exec_ctx.symbol_table.getf('data')  # we get the data
         if not isinstance(data, List):  # data must be a list
             return RTResult().failure(RTTypeErrorF(

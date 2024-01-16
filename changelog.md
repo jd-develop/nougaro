@@ -10,6 +10,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Better error messages
 * Add some edge-case tests
 * Now works with pipe operator in (...)sh
+* Change lib API
 
 ### Calculator
 * Add `e` in calculator

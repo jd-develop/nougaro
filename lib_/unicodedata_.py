@@ -82,6 +82,7 @@ class UnicodeData(ModuleFunction):
         """ Like python unicodedata.lookup """
         # Params:
         # * name
+        assert exec_ctx.symbol_table is not None
         name = exec_ctx.symbol_table.getf("name")
         if not isinstance(name, String):
             return RTResult().failure(RTTypeErrorF(
@@ -113,6 +114,7 @@ class UnicodeData(ModuleFunction):
         """ Like python unicodedata.name """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "name")
         if is_unicode_char is not None:
@@ -146,6 +148,7 @@ class UnicodeData(ModuleFunction):
         """ Like python unicodedata.category """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "category")
         if is_unicode_char is not None:
@@ -166,6 +169,7 @@ class UnicodeData(ModuleFunction):
         """ Like python unicodedata.bidirectional """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "bidirectional")
         if is_unicode_char is not None:
@@ -186,6 +190,7 @@ class UnicodeData(ModuleFunction):
         """ Like python unicodedata.combining """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "combining")
         if is_unicode_char is not None:
@@ -206,6 +211,7 @@ class UnicodeData(ModuleFunction):
         """ Like python unicodedata.east_asian_width """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "east_asian_width")
         if is_unicode_char is not None:
@@ -226,6 +232,7 @@ class UnicodeData(ModuleFunction):
         """ Like python unicodedata.mirrored """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "mirrored")
         if is_unicode_char is not None:
@@ -246,6 +253,7 @@ class UnicodeData(ModuleFunction):
         """ Like python unicodedata.decomposition """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "decomposition")
         if is_unicode_char is not None:
@@ -267,6 +275,7 @@ class UnicodeData(ModuleFunction):
         # Params:
         # * form
         # * uni_str
+        assert exec_ctx.symbol_table is not None
         form = exec_ctx.symbol_table.getf("form")
         uni_str = exec_ctx.symbol_table.getf("uni_str")
         is_valid_form_and_uni_str = self.is_valid_form_and_uni_str(form, uni_str, exec_ctx, "normalize")
@@ -289,6 +298,7 @@ class UnicodeData(ModuleFunction):
         # Params:
         # * form
         # * uni_str
+        assert exec_ctx.symbol_table is not None
         form = exec_ctx.symbol_table.getf("form")
         uni_str = exec_ctx.symbol_table.getf("uni_str")
         is_valid_form_and_uni_str = self.is_valid_form_and_uni_str(form, uni_str, exec_ctx, "is_normalized")

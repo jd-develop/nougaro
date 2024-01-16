@@ -42,6 +42,7 @@ class Time(ModuleFunction):
         """Like python time.sleep()"""
         # Params:
         # * seconds
+        assert exec_ctx.symbol_table is not None
         seconds = exec_ctx.symbol_table.getf('seconds')  # we get the number of seconds we have to sleep
         if not isinstance(seconds, Number):  # we check if it is a number
             return RTResult().failure(RTTypeErrorF(
@@ -65,6 +66,7 @@ class Time(ModuleFunction):
         """Like python time.sleep() but the value is in milliseconds"""
         # Params:
         # * milliseconds
+        assert exec_ctx.symbol_table is not None
         milliseconds = exec_ctx.symbol_table.getf('milliseconds')  # we get the number of milliseconds we have to sleep
         if not isinstance(milliseconds, Number) or not milliseconds.is_int():  # we check if it is a number
             return RTResult().failure(RTTypeErrorF(

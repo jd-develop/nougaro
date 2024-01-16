@@ -41,6 +41,7 @@ class Random(ModuleFunction):
         # * a
         # * b
         # we get 'a' and 'b' values
+        assert exec_ctx.symbol_table is not None
         a = exec_ctx.symbol_table.getf("a")
         b = exec_ctx.symbol_table.getf("b")
         if not isinstance(a, Number) or not a.is_int():  # we check if 'a' is an integer
@@ -93,6 +94,7 @@ class Random(ModuleFunction):
         """Return a random element of a list"""
         # Params:
         # * list_
+        assert exec_ctx.symbol_table is not None
         list_ = exec_ctx.symbol_table.getf("list_")  # we get the 'list' argument
         if not isinstance(list_, List):  # we check if it is a list
             return RTResult().failure(RTTypeErrorF(
@@ -120,6 +122,7 @@ class Random(ModuleFunction):
         """Shuffle a list and returns it."""
         # Params:
         # * list_
+        assert exec_ctx.symbol_table is not None
         list_ = exec_ctx.symbol_table.getf("list_")  # we get the 'list' argument
         if not isinstance(list_, List):  # we check if it is a list
             return RTResult().failure(RTTypeErrorF(
@@ -146,6 +149,7 @@ class Random(ModuleFunction):
         """Set the seed to generate pseudo-random numbers."""
         # Params:
         # * seed
+        assert exec_ctx.symbol_table is not None
         seed = exec_ctx.symbol_table.getf("seed")
         if not (isinstance(seed, Number) or isinstance(seed, String)):
             return RTResult().failure(RTTypeErrorF(

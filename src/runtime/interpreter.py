@@ -99,16 +99,17 @@ class Interpreter:
             other_ctx = ctx.copy()
 
         PARAMETERS = signature(method).parameters
-        if len(PARAMETERS) == 0:  # def method(self) is 1 param, def staticmethod() is 0 param
-            result = method()
-        elif len(PARAMETERS) == 1:  # def method(self) is 1 param, def staticmethod() is 0 param
-            result = method(node)
-        elif len(PARAMETERS) == 3:
-            result = method(node, ctx, methods_instead_of_funcs=methods_instead_of_funcs)
-        elif len(PARAMETERS) == 4:
-            result = method(node, ctx, other_ctx, methods_instead_of_funcs=methods_instead_of_funcs)
-        else:
-            result = method(node, ctx)
+        match len(PARAMETERS):
+            case 0:  # def method(self) is 1 param, def staticmethod() is 0 param
+                result = method()  # type: ignore
+            case 1:  # def method(self) is 1 param, def staticmethod() is 0 param
+                result = method(node)  # type: ignore
+            case 3:
+                result = method(node, ctx, methods_instead_of_funcs=methods_instead_of_funcs)  # type: ignore
+            case 4:
+                result = method(node, ctx, other_ctx, methods_instead_of_funcs=methods_instead_of_funcs)  # type: ignore
+            case _:
+                result = method(node, ctx)  # type: ignore
         if main_visit:
             if result.loop_should_break:
                 assert result.break_or_continue_pos is not None

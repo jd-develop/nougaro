@@ -2008,12 +2008,12 @@ class Parser:
                 result.register_advancement()  # we advance
                 self.advance()
                 if not isinstance(func_b, list):  # we check if func_b is a list or a function
-                    right = result.register(func_b())
+                    right: Node | None | list[Node] = result.register(func_b())
                     if result.error is not None:
                         return result
                     assert right is not None
                 else:
-                    right = func_b  # it is a list
+                    right: Node | None | list[Node] = func_b  # it is a list
                 left = BinOpNode(left, op_token, right)  # we update our left, and we loop to the next operand
             return result.success(left)
         else:
@@ -2024,12 +2024,12 @@ class Parser:
                 result.register_advancement()
                 self.advance()
                 if not isinstance(func_b, list):
-                    right = result.register(func_b())
+                    right: Node | None | list[Node] = result.register(func_b())
                     if result.error is not None:
                         return result
                     assert right is not None
                 else:
-                    right = func_b
+                    right: Node | None | list[Node] = func_b
                 # we add our operator and operand to our list
                 nodes_and_tokens_list.append(op_token)
                 nodes_and_tokens_list.append(right)

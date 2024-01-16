@@ -90,8 +90,8 @@ class Math(ModuleFunction):
             assert value.pos_start is not None
             assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
-                value.pos_start, value.pos_end, "first", "math.sqrt", "int", value,
-                exec_context, "lib_.math_.Math.execute_math_sqrt"
+                value.pos_start, value.pos_end, "first", "math.isqrt", "int", value,
+                exec_context, "lib_.math_.Math.execute_math_isqrt"
             ))
 
         if value.value < 0:  # we check if the value is greater than (or equal to) 0
@@ -100,7 +100,7 @@ class Math(ModuleFunction):
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
                 "first argument of the built-in function 'math.isqrt' must be greater than (or equal to) 0.",
-                exec_context, "lib_.math_.Math.execute_math_sqrt"
+                exec_context, "lib_.math_.Math.execute_math_isqrt"
             ))
 
         sqrt_ = math.isqrt(value.value)  # we calculate the square root

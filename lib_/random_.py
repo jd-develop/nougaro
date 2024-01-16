@@ -44,19 +44,27 @@ class Random(ModuleFunction):
         assert exec_ctx.symbol_table is not None
         a = exec_ctx.symbol_table.getf("a")
         b = exec_ctx.symbol_table.getf("b")
-        if not isinstance(a, Number) or not a.is_int():  # we check if 'a' is an integer
+        if not (isinstance(a, Number) and isinstance(a.value, int)):  # we check if 'a' is an integer
+            assert a is not None
+            assert a.pos_start is not None
+            assert a.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 a.pos_start, a.pos_end, "first", "random.randint", "int", a,
                 exec_ctx, "lib_.random_.Random.execute_random_randint"
             ))
 
-        if not isinstance(b, Number) or not b.is_int():  # we check if 'b' is an integer
+        if not (isinstance(b, Number) and isinstance(b.value, int)):  # we check if 'b' is an integer
+            assert b is not None
+            assert b.pos_start is not None
+            assert b.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 b.pos_start, b.pos_end, "second", "random.randint", "int", b,
                 exec_ctx, "lib_.random_.Random.execute_random_randint"
             ))
 
         if a.value > b.value:  # e.g. randint(4, -3) : it does not make ANY sense x)
+            assert a.pos_start is not None
+            assert b.pos_end is not None
             return RTResult().failure(RunTimeError(
                 a.pos_start, b.pos_end,
                 "first argument of the built-in function 'random.randint' MUST be less than or equal to its second"
@@ -97,11 +105,16 @@ class Random(ModuleFunction):
         assert exec_ctx.symbol_table is not None
         list_ = exec_ctx.symbol_table.getf("list_")  # we get the 'list' argument
         if not isinstance(list_, List):  # we check if it is a list
+            assert list_ is not None
+            assert list_.pos_start is not None
+            assert list_.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 list_.pos_start, list_.pos_end, "first", "random.choice", "list", list_,
                 exec_ctx, "lib_.random_.Random.execute_random_choice"
             ))
         if len(list_.elements) == 0:  # if the list is empty, we raise an error
+            assert list_.pos_start is not None
+            assert list_.pos_end is not None
             return RTResult().failure(RunTimeError(
                 list_.pos_start, list_.pos_end,
                 "list is empty.",
@@ -125,6 +138,9 @@ class Random(ModuleFunction):
         assert exec_ctx.symbol_table is not None
         list_ = exec_ctx.symbol_table.getf("list_")  # we get the 'list' argument
         if not isinstance(list_, List):  # we check if it is a list
+            assert list_ is not None
+            assert list_.pos_start is not None
+            assert list_.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 list_.pos_start, list_.pos_end, "first", "random.shuffle", "list", list_,
                 exec_ctx, "lib_.random_.Random.execute_random_shuffle"
@@ -152,6 +168,9 @@ class Random(ModuleFunction):
         assert exec_ctx.symbol_table is not None
         seed = exec_ctx.symbol_table.getf("seed")
         if not (isinstance(seed, Number) or isinstance(seed, String)):
+            assert seed is not None
+            assert seed.pos_start is not None
+            assert seed.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 seed.pos_start, seed.pos_end, "first", "random.seed", "number or string", seed,
                 exec_ctx, "lib_.random_.Random.execute_random_seed"

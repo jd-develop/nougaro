@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -22,7 +22,7 @@ from typing import Self
 # ##########
 class Context:
     """Class for the interpreter Context"""
-    def __init__(self, display_name: str, parent: Self | None = None, parent_entry_pos: Position | None = None):
+    def __init__(self, display_name: str | None, parent: Self | None = None, parent_entry_pos: Position | None = None):
         self.display_name = display_name  # name of the function we are in
         self.parent: Context | None = parent  # parent context
         self.parent_entry_pos: Position | None = parent_entry_pos  # pos_start of the parent context, used in errors tracebacks

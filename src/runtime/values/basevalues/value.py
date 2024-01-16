@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -33,7 +33,7 @@ class Value:
         self.type_ = "BaseValue"
         self.attributes: dict[str, Value] = {}
         self.call_with_module_context = False
-        self.module_context = None
+        self.module_context: Context | None = None
         self.should_print = True
 
     def __repr__(self) -> str:
@@ -244,7 +244,7 @@ class Value:
         return None, self.illegal_operation()
 
     def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str, exec_from: str = "<invalid>",
-                use_context: Context | None = None):
+                use_context: Context | None = None, cli_args: list[String] | None = None, work_dir: str | None = None):
         """Execute the function.
         Returns a result"""
         return RTResult().failure(self.illegal_operation())

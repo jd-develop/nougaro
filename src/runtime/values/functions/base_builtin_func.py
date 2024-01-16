@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -10,7 +10,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.runtime.values.basevalues.value import Value
-from src.runtime.values.basevalues.basevalues import NoneValue
+from src.runtime.values.basevalues.basevalues import NoneValue, String
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.context import Context
 from src.runtime.runtime_result import RTResult
@@ -28,9 +28,12 @@ class BaseBuiltInFunction(BaseFunction):
 
     def __repr__(self):
         return f'<built-in function {self.name}>'
+    
+    def to_python_str(self):
+        return self.__repr__()
 
     def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str, exec_from: str = "<invalid>",
-                use_context: Context | None = None,  work_dir: str | None = None):
+                use_context: Context | None = None, cli_args: list[String] | None = None, work_dir: str | None = None):
         return RTResult().success(NoneValue(False))
 
     def no_visit_method(self, exec_ctx: Context):

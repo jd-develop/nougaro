@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: l
         error = None
     else:  # the file isn't empty, let's run it !
         try:
-            error = nougaro.run('<stdin>', file_content, noug_dir, version, args=args, work_dir=work_dir)[1]
+            _, error = nougaro.run('<stdin>', file_content, noug_dir, version, args=args, work_dir=work_dir)
         except KeyboardInterrupt:  # if CTRL+C, just exit the Nougaro shell
             print_in_red("\nKeyboardInterrupt")
             sys.exit()
@@ -198,14 +198,17 @@ def main():
     if path == "<stdin>":  # we open the shell
         if should_print_stuff:
             # this text is always printed when we start the shell
-            print(f"Welcome to Nougaro {version} on {platform.system()}! "
-                f"Contribute: https://github.com/jd-develop/nougaro/")
+            print(f"Welcome to Nougaro {version} on {platform.system()}!")
+            print(f"Contribute: https://github.com/jd-develop/nougaro/")
             print(f"Changelog: see {noug_dir}/changelog.md")
             print()
-            print("This program is under GPL license. For more details, type __gpl__() or __gpl__(1) to stay in terminal."
-                "\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.")
+            print("This program is under GPL license. For more details, type __gpl__()")
+            print("or __gpl__(1) to stay in terminal.")
+            print("This program comes with ABSOLUTELY NO WARRANTY; for details type")
+            print("`__disclaimer_of_warranty__'.")
             print()
-            print("Found a bug? Feel free to report it at https://jd-develop.github.io/nougaro/bugreport.html")
+            print("Found a bug? Feel free to report it at")
+            print("https://jd-develop.github.io/nougaro/bugreport.html")
             # idea: cowsay?
             now = datetime.now()
             if now.month == 12 and 24 <= now.day <= 26:

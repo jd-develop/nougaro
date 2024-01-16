@@ -1157,6 +1157,7 @@ class Parser:
         self.advance()
 
         if self.current_token.type == TT["RSQUARE"]:  # ] : we close the list
+            pos_end = self.current_token.pos_end.copy()
             result.register_advancement()
             self.advance()
         else:  # there are elements
@@ -1201,13 +1202,15 @@ class Parser:
                     "'[' was never closed.",
                     "src.parser.parser.Parser.list_expr"
                 ))
+            
+            pos_end = self.current_token.pos_end.copy()
 
             # we advance
             result.register_advancement()
             self.advance()
 
         return result.success(ListNode(
-            element_nodes, pos_start, self.current_token.pos_end.copy()
+            element_nodes, pos_start, pos_end
         ))
 
     def if_expr(self) -> ParseResult:
@@ -1992,9 +1995,10 @@ class Parser:
             left = result.register(func_a())  # we register func_a as the left operand
             if result.error is not None:
                 return result
+            assert left is not None
         else:
             left = func_a  # func_a is a list: this is the left operand
-            assert func_b is not None
+        assert func_b is not None
         
         assert self.current_token is not None
 
@@ -2007,12 +2011,13 @@ class Parser:
                     right = result.register(func_b())
                     if result.error is not None:
                         return result
+                    assert right is not None
                 else:
                     right = func_b  # it is a list
                 left = BinOpNode(left, op_token, right)  # we update our left, and we loop to the next operand
             return result.success(left)
         else:
-            nodes_and_tokens_list = [left]
+            nodes_and_tokens_list: list[Node | Token | list[Node]] = [left]
             while self.current_token.type in ops or (self.current_token.type, self.current_token.value) in ops:
                 # check comments above
                 op_token = self.current_token
@@ -2022,6 +2027,7 @@ class Parser:
                     right = result.register(func_b())
                     if result.error is not None:
                         return result
+                    assert right is not None
                 else:
                     right = func_b
                 # we add our operator and operand to our list

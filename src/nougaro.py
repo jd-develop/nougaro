@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ from src.misc import nice_str_from_idk
 # built-in python imports
 import json
 import os.path
+from typing import Sequence
 
 # ##########
 # SYMBOL TABLE
@@ -49,11 +50,11 @@ def run(
         text: str | None,
         noug_dir: str,
         version: str | None = None,
-        exec_from: str = "(shell)",
+        exec_from: str | None = "(shell)",
         actual_context: str = "<program>",
         use_default_symbol_table: bool = False,
         use_context: Context | None = None,
-        args: list[str | String] | None = None,
+        args: Sequence[str | String] | None = None,
         work_dir: str | None = None
 ) -> tuple[Value, None] | tuple[None, Error]:
     """Run the given code.
@@ -87,7 +88,7 @@ def run(
         new_args_strings: list[String] = list(map(nice_str_from_idk, args))
         global_symbol_table.set("__args__", List(new_args_values))
     global_symbol_table.set("__noug_version__", String(version))
-    global_symbol_table.set("__exec_from__", String(exec_from))
+    global_symbol_table.set("__exec_from__", String(str(exec_from)))
     global_symbol_table.set("__actual_context__", String(actual_context))
     global_symbol_table.set("__noug_dir__", String(noug_dir))
 
@@ -121,7 +122,7 @@ def run(
         if use_default_symbol_table:
             context.symbol_table = default_symbol_table.copy()
             context.symbol_table.set("__noug_version__", String(version))
-            context.symbol_table.set("__exec_from__", String(exec_from))
+            context.symbol_table.set("__exec_from__", String(str(exec_from)))
             context.symbol_table.set("__actual_context__", String(actual_context))
             context.symbol_table.set("__noug_dir__", String(noug_dir))
         else:
@@ -130,7 +131,7 @@ def run(
         context = use_context  # do not .copy() here
     interpreter.update_symbol_table(context)
 
-    result = interpreter.visit(ast.node, context, False)  # visit the main node of the AST with the created context
+    result = interpreter.visit(ast.node, context, False, main_visit=True)  # visit the main node of the AST with the created context
     if print_context:
         print(context.__str__())
     if result.error is not None:

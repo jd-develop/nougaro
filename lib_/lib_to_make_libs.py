@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -32,8 +32,8 @@ class ModuleFunction(BaseBuiltInFunction):
         return f'<built-in lib function {self.module_name}.{self.name}>'
 
     def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
-                exec_from: str = "<invalid>", use_context: Context | None = None, work_dir: str | None = None,
-                cli_args: list[str | String] | None = None):
+                exec_from: str = "<invalid>", use_context: Context | None = None, cli_args: list[String] | None = None,
+                work_dir: str | None = None):
         # execute a function of the 'math' module
         # create the result
         result = RTResult()

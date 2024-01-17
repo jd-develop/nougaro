@@ -37,12 +37,16 @@ class UnicodeData(ModuleFunction):
     @staticmethod
     def is_unicode_char(char: Value, exec_ctx: Context, function: str) -> RTResult | None:
         if not isinstance(char, String):
+            assert char.pos_start is not None
+            assert char.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 char.pos_start, char.pos_end,
                 "first", f"unicodedata.{function}", "str", char, exec_ctx,
                 origin_file=f"lib_.unicodedata_.UnicodeData.is_unicode_char"
             ))
         if len(char) != 1:
+            assert char.pos_start is not None
+            assert char.pos_end is not None
             return RTResult().failure(RunTimeError(
                 char.pos_start, char.pos_end,
                 f"first argument of function unicodedata.{function} should be only one unicode character, not "
@@ -55,12 +59,16 @@ class UnicodeData(ModuleFunction):
     @staticmethod
     def is_valid_form_and_uni_str(form: Value, uni_str: Value, exec_ctx: Context, function: str) -> RTResult | None:
         if not isinstance(form, String):
+            assert form.pos_start is not None
+            assert form.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 form.pos_start, form.pos_end,
                 "first", f"unicodedata.{function}", "str", form, exec_ctx,
                 origin_file="lib_.unicodedata_.UnicodeData.is_valid_form_and_uni_str"
             ))
         if form.value not in ["NFC", "NFKC", "NFD", "NFKD"]:
+            assert form.pos_start is not None
+            assert form.pos_end is not None
             return RTResult().failure(RunTimeError(
                 form.pos_start, form.pos_end,
                 f"first argument of builtin function unicodedata.{function} should be 'NFC', 'NFKC', 'NFD' or 'NFKD', "
@@ -68,6 +76,8 @@ class UnicodeData(ModuleFunction):
                 exec_ctx, origin_file="lib_.unicodedata_.UnicodeData.is_valid_form_and_uni_str"
             ))
         if not isinstance(uni_str, String):
+            assert uni_str.pos_start is not None
+            assert uni_str.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 uni_str.pos_start, uni_str.pos_end,
                 "second", f"unicodedata.{function}", "str", uni_str, exec_ctx,
@@ -85,6 +95,9 @@ class UnicodeData(ModuleFunction):
         assert exec_ctx.symbol_table is not None
         name = exec_ctx.symbol_table.getf("name")
         if not isinstance(name, String):
+            assert name is not None
+            assert name.pos_start is not None
+            assert name.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 name.pos_start, name.pos_end,
                 "first", "unicodedata.lookup", "str", name, exec_ctx,
@@ -93,6 +106,8 @@ class UnicodeData(ModuleFunction):
         try:
             char = unicodedata.lookup(name.value)
         except KeyError as e:
+            assert name.pos_start is not None
+            assert name.pos_end is not None
             return RTResult().failure(RTNotDefinedError(
                 name.pos_start, name.pos_end,
                 str(e).replace('"', ''),
@@ -116,9 +131,11 @@ class UnicodeData(ModuleFunction):
         # * char
         assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "name")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         default = exec_ctx.symbol_table.getf("default")
 
@@ -126,9 +143,11 @@ class UnicodeData(ModuleFunction):
             name = String(unicodedata.name(char.value))
         except ValueError as e:
             if default is None:
+                assert char.pos_start is not None
+                assert char.pos_end is not None
                 return RTResult().failure(RunTimeError(
                     char.pos_start, char.pos_end,
-                    e,
+                    str(e),
                     exec_ctx,
                     origin_file="lib_.unicodedata_.UnicodeData.execute_unicodedata_name"
                 ))
@@ -150,9 +169,11 @@ class UnicodeData(ModuleFunction):
         # * char
         assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "category")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         return RTResult().success(String(unicodedata.category(char.value)))
 
@@ -171,9 +192,11 @@ class UnicodeData(ModuleFunction):
         # * char
         assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "bidirectional")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         return RTResult().success(String(unicodedata.bidirectional(char.value)))
 
@@ -192,9 +215,11 @@ class UnicodeData(ModuleFunction):
         # * char
         assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "combining")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         return RTResult().success(Number(unicodedata.combining(char.value)))
 
@@ -213,9 +238,11 @@ class UnicodeData(ModuleFunction):
         # * char
         assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "east_asian_width")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         return RTResult().success(String(unicodedata.east_asian_width(char.value)))
 
@@ -234,9 +261,11 @@ class UnicodeData(ModuleFunction):
         # * char
         assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "mirrored")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         return RTResult().success(Number(unicodedata.mirrored(char.value)))
 
@@ -255,9 +284,11 @@ class UnicodeData(ModuleFunction):
         # * char
         assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "decomposition")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         return RTResult().success(String(unicodedata.decomposition(char.value)))
 
@@ -278,9 +309,13 @@ class UnicodeData(ModuleFunction):
         assert exec_ctx.symbol_table is not None
         form = exec_ctx.symbol_table.getf("form")
         uni_str = exec_ctx.symbol_table.getf("uni_str")
+        assert form is not None
+        assert uni_str is not None
         is_valid_form_and_uni_str = self.is_valid_form_and_uni_str(form, uni_str, exec_ctx, "normalize")
         if is_valid_form_and_uni_str is not None:
             return is_valid_form_and_uni_str
+        assert isinstance(form, String)
+        assert isinstance(uni_str, String)
 
         return RTResult().success(String(unicodedata.normalize(form.value, uni_str.value)))
 
@@ -301,9 +336,13 @@ class UnicodeData(ModuleFunction):
         assert exec_ctx.symbol_table is not None
         form = exec_ctx.symbol_table.getf("form")
         uni_str = exec_ctx.symbol_table.getf("uni_str")
+        assert form is not None
+        assert uni_str is not None
         is_valid_form_and_uni_str = self.is_valid_form_and_uni_str(form, uni_str, exec_ctx, "is_normalized")
         if is_valid_form_and_uni_str is not None:
             return is_valid_form_and_uni_str
+        assert isinstance(form, String)
+        assert isinstance(uni_str, String)
 
         return RTResult().success(Number(int(unicodedata.is_normalized(form.value, uni_str.value))))
 

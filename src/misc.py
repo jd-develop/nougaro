@@ -102,7 +102,6 @@ class RunFunction(Protocol):
 
 # ##########
 # CUSTOM BUILTIN FUNC METHODS
-# thanks to lancelote (https://github.com/lancelote) who works at JetBrains for these tricks
 # ##########
 class BuiltinFunctionDict(TypedDict):
     function: Callable[..., RTResult]
@@ -115,6 +114,7 @@ class BuiltinFunctionDict(TypedDict):
 
 # ##########
 # CUSTOM INTERPRETER VISIT METHOD
+# thanks to lancelote (https://github.com/lancelote) who works at JetBrains for these tricks
 # ##########
 class CustomInterpreterVisitMethod(Protocol):
     """The type of the methods `visit_{name}` in Interpreter"""

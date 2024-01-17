@@ -15,10 +15,12 @@ from __future__ import annotations
 from src.runtime.values.functions.builtin_function import *
 from src.runtime.values.tools.py2noug import *
 from src.errors.errors import *
-from src.misc import builtin_function_dict
+from src.misc import BuiltinFunctionDict
 # Above line : Context, RTResult, errors and values are imported in builtin_function.py
 # built-in python imports
 # no imports
+
+builtin_function_dict = BuiltinFunctionDict
 
 
 class ModuleFunction(BaseBuiltInFunction):
@@ -26,17 +28,17 @@ class ModuleFunction(BaseBuiltInFunction):
     def __init__(
             self, module_name: str, function_name: str,
             link_for_bug_report: str = "https://jd-develop.github.io/nougaro/bugreport.html",
-            functions: dict[str, builtin_function_dict] | None = None
-        ):
+            functions: dict[str, BuiltinFunctionDict] | None = None
+    ):
         super().__init__(function_name)
         self.module_name = module_name
         self.link_for_bug_report: str = link_for_bug_report
         if functions is None:
-            self.functions: dict[str, builtin_function_dict] = {}
+            self.functions: dict[str, BuiltinFunctionDict] = {}
         else:
             self.functions = functions
 
-    def add_function(self, name: str, func_dict: builtin_function_dict):
+    def add_function(self, name: str, func_dict: BuiltinFunctionDict):
         self.functions[name] = func_dict
 
     def __repr__(self):
@@ -62,7 +64,7 @@ class ModuleFunction(BaseBuiltInFunction):
 
         # get the method name and the method
         try:
-            method_dict: builtin_function_dict = self.functions[self.name]
+            method_dict: BuiltinFunctionDict = self.functions[self.name]
         except KeyError:
             print(self.functions, self.name)
             self.no_visit_method(exec_context)
@@ -115,7 +117,7 @@ class ModuleFunction(BaseBuiltInFunction):
     def no_visit_method(self, exec_ctx: Context):
         """Method called when the func name given through self.name is not defined"""
         print(exec_ctx)
-        print(f"NOUGARO INTERNAL ERROR : No execute_{self.module_name}_{self.name} method defined in "
+        print(f"NOUGARO INTERNAL ERROR: No execute_{self.module_name}_{self.name} method defined in "
               f"lib_.{self.module_name}_.\n"
               f"Please report this bug at {self.link_for_bug_report} with all informations above.")
         raise Exception(f'No execute_{self.module_name}_{self.name} method defined in lib_.{self.module_name}_.')

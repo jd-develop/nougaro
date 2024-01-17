@@ -23,7 +23,7 @@ UNICODEDATA_VERSION = unicodedata.unidata_version
 
 
 class UnicodeData(ModuleFunction):
-    functions: dict[str, builtin_function_dict] = {}
+    functions: dict[str, BuiltinFunctionDict] = {}
 
     """ unicodedata module """
     def __init__(self, name: str):

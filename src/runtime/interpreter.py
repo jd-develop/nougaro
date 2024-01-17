@@ -55,31 +55,31 @@ class Interpreter:
             "AssertNode": self.visit_AssertNode,
             "BinOpCompNode": self.visit_BinOpCompNode,
             "BinOpNode": self.visit_BinOpNode,
-            "BreakNode" : self.visit_BreakNode,
-            "CallNode" : self.visit_CallNode,
-            "ClassNode" : self.visit_ClassNode,
-            "ContinueNode" : self.visit_ContinueNode,
-            "DoWhileNode" : self.visit_DoWhileNode,
-            "DollarPrintNode" : self.visit_DollarPrintNode,
-            "ExportNode" : self.visit_ExportNode,
-            "ForNode" : self.visit_ForNode,
-            "ForNodeList" : self.visit_ForNodeList,
-            "FuncDefNode" : self.visit_FuncDefNode,
-            "IfNode" : self.visit_IfNode,
-            "ImportNode" : self.visit_ImportNode,
-            "ListNode" : self.visit_ListNode,
-            "NoNode" : self.visit_NoNode,
-            "NumberENumberNode" : self.visit_NumberENumberNode,
-            "NumberNode" : self.visit_NumberNode,
-            "ReadNode" : self.visit_ReadNode,
-            "ReturnNode" : self.visit_ReturnNode,
-            "StringNode" : self.visit_StringNode,
-            "UnaryOpNode" : self.visit_UnaryOpNode,
-            "VarAccessNode" : self.visit_VarAccessNode,
-            "VarAssignNode" : self.visit_VarAssignNode,
-            "VarDeleteNode" : self.visit_VarDeleteNode,
-            "WhileNode" : self.visit_WhileNode,
-            "WriteNode" : self.visit_WriteNode,
+            "BreakNode": self.visit_BreakNode,
+            "CallNode": self.visit_CallNode,
+            "ClassNode": self.visit_ClassNode,
+            "ContinueNode": self.visit_ContinueNode,
+            "DoWhileNode": self.visit_DoWhileNode,
+            "DollarPrintNode": self.visit_DollarPrintNode,
+            "ExportNode": self.visit_ExportNode,
+            "ForNode": self.visit_ForNode,
+            "ForNodeList": self.visit_ForNodeList,
+            "FuncDefNode": self.visit_FuncDefNode,
+            "IfNode": self.visit_IfNode,
+            "ImportNode": self.visit_ImportNode,
+            "ListNode": self.visit_ListNode,
+            "NoNode": self.visit_NoNode,
+            "NumberENumberNode": self.visit_NumberENumberNode,
+            "NumberNode": self.visit_NumberNode,
+            "ReadNode": self.visit_ReadNode,
+            "ReturnNode": self.visit_ReturnNode,
+            "StringNode": self.visit_StringNode,
+            "UnaryOpNode": self.visit_UnaryOpNode,
+            "VarAccessNode": self.visit_VarAccessNode,
+            "VarAssignNode": self.visit_VarAssignNode,
+            "VarDeleteNode": self.visit_VarDeleteNode,
+            "WhileNode": self.visit_WhileNode,
+            "WriteNode": self.visit_WriteNode,
         }
 
     @staticmethod
@@ -90,7 +90,8 @@ class Interpreter:
             del symbols_copy['__symbol_table__']
         ctx.symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
 
-    def visit(self, node: Node, ctx: Context, methods_instead_of_funcs: bool, other_ctx: Context | None = None, main_visit: bool = False) -> RTResult:
+    def visit(self, node: Node, ctx: Context, methods_instead_of_funcs: bool, other_ctx: Context | None = None,
+              main_visit: bool = False) -> RTResult:
         """Visit a node."""
         method_name = f'{type(node).__name__}'
         assert self._methods is not None
@@ -143,7 +144,7 @@ class Interpreter:
             result: RTResult,
             origin_file: str = f"{_ORIGIN_FILE}._undefined",
             edit: bool = False
-        ) -> RTResult:
+    ) -> RTResult:
         """Returns a RTNotDefinedError with a proper message."""
         assert ctx.symbol_table is not None
         close_match_in_symbol_table = ctx.symbol_table.best_match(var_name)
@@ -183,7 +184,7 @@ class Interpreter:
     def _visit_value_that_can_have_attributes(
             self, node_or_list: Node | list[Node], result: RTResult, context: Context,
             methods_instead_of_funcs: bool
-        ) -> RTResult | Value:
+    ) -> RTResult | Value:
         """If node_or_list is Node, visit is and return it. If it is a list, visit the value and its attributes."""
         if not isinstance(node_or_list, list):
             value = result.register(self.visit(node_or_list, context, methods_instead_of_funcs))
@@ -221,7 +222,7 @@ class Interpreter:
     def no_visit_method(node: Node, ctx: Context):
         """The method visit_FooNode (with FooNode given in self.visit) does not exist."""
         print(ctx)
-        print(f"NOUGARO INTERNAL ERROR : No visit_{type(node).__name__} method defined in {_ORIGIN_FILE}.\n"
+        print(f"NOUGARO INTERNAL ERROR: No visit_{type(node).__name__} method defined in {_ORIGIN_FILE}.\n"
               f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all informations "
               f"above.")
         raise Exception(f'No visit_{type(node).__name__} method defined in {_ORIGIN_FILE}.')
@@ -245,7 +246,7 @@ class Interpreter:
             return RTResult().success(Number(value).set_context(ctx).set_pos(node.pos_start, node.pos_end))
         else:
             print(ctx)
-            print(f"NOUGARO INTERNAL ERROR : in visit_NumberENumberNode method defined in {_ORIGIN_FILE},\n"
+            print(f"NOUGARO INTERNAL ERROR: in visit_NumberENumberNode method defined in {_ORIGIN_FILE},\n"
                   f"{value=}, {methods_instead_of_funcs=}\n"
                   f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all "
                   f"informations above.")
@@ -425,10 +426,10 @@ class Interpreter:
             else:
                 print(ctx)
                 print(
-                    f"NOUGARO INTERNAL ERROR : Result is not defined after executing "
+                    f"NOUGARO INTERNAL ERROR: Result is not defined after executing "
                     f"{_ORIGIN_FILE}.visit_BinOpCompNode because of an invalid token.\n"
                     f"{methods_instead_of_funcs}\n"
-                    f"Note for devs : the actual invalid token is {op_token.type}:{op_token.value}.\n"
+                    f"Note for devs: the actual invalid token is {op_token.type}:{op_token.value}.\n"
                     f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
                     f"information above")
                 raise Exception("Result is not defined after executing "
@@ -601,7 +602,8 @@ class Interpreter:
                     var_actual_value: Value | None = None
                 value: Value | None = None
             else:  # var a.b.(...).z = value
-                if isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"] and var_name[0].value in PROTECTED_VARS:
+                if isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"] \
+                        and var_name[0].value in PROTECTED_VARS:
                     assert var_name[0].pos_start is not None
                     assert var_name[0].pos_end is not None
                     return result.failure(RunTimeError(
@@ -698,7 +700,7 @@ class Interpreter:
             if equal == TT["EQ"]:  # just a regular equal, we can modify/create the variable in the symbol table
                 final_value, error = values[i], None  # we want to return the new value of the variable
             elif variable_exists:  # edit variable
-                assert isinstance(var_actual_value, Value) # a little cheesy
+                assert isinstance(var_actual_value, Value)  # a little cheesy
                 if equal == TT["PLUSEQ"]:
                     final_value, error = var_actual_value.added_to(values[i])
                 elif equal == TT["MINUSEQ"]:
@@ -1413,7 +1415,8 @@ class Interpreter:
 
     # todo: separate call methods
 
-    def _init_constructor(self, constructor: Constructor, outer_context: Context, result: RTResult, node: Node, object_to_set_this: Object | None = None) -> RTResult:
+    def _init_constructor(self, constructor: Constructor, outer_context: Context, result: RTResult, node: Node,
+                          object_to_set_this: Object | None = None) -> RTResult:
         """Initialize a constructor. Recursive method."""
         call_with_module_context: bool = constructor.call_with_module_context
 
@@ -1768,8 +1771,10 @@ class Interpreter:
         except Exception as e:  # python error
             return result.failure(
                 RunTimeError(
-                    node.pos_start, node.pos_end, f"unable to write in file '{file_name_value}'. "
-                                                  f"More info : Python{e.__class__.__name__}: {e}", ctx,
+                    node.pos_start, node.pos_end,
+                    f"unable to write in file '{file_name_value}'. "
+                    f"More info: Python{e.__class__.__name__}: {e}",
+                    ctx,
                     origin_file=f"{_ORIGIN_FILE}.visit_WriteNode"
                 )
             )
@@ -1821,7 +1826,7 @@ class Interpreter:
                 return result.failure(RunTimeError(
                     node.pos_start, node.pos_end,
                     f"unable to read file '{file_name_value}'. "
-                    f"More info : Python{e.__class__.__name__}: {e}",
+                    f"More info: Python{e.__class__.__name__}: {e}",
                     ctx, origin_file=f"{_ORIGIN_FILE}.visit_ReadNode"
                 ))
         else:

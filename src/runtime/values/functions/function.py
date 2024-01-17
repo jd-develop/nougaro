@@ -26,7 +26,8 @@ if TYPE_CHECKING:
 
 
 class Function(BaseFunction):
-    def __init__(self, name: str | None, body_node: Node, param_names: list[str], should_auto_return: bool, call_with_module_context: bool = False):
+    def __init__(self, name: str | None, body_node: Node, param_names: list[str], should_auto_return: bool,
+                 call_with_module_context: bool = False):
         super().__init__(name, call_with_module_context)
         self.body_node = body_node
         self.param_names = param_names
@@ -39,8 +40,9 @@ class Function(BaseFunction):
     def to_python_str(self):
         return self.__repr__()
 
-    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str, exec_from: str = "<invalid>",
-                use_context: Context | None = None, cli_args: list[String] | None = None, work_dir: str | None = None):
+    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
+                exec_from: str = "<invalid>", use_context: Context | None = None, cli_args: list[String] | None = None,
+                work_dir: str | None = None):
         if work_dir is None:
             work_dir = noug_dir
         # execute the function

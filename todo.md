@@ -34,7 +34,7 @@
 * [X] add possibility to read command line arguments (finished 26/10/2023)
 * [X] switch to semantic versioning (finished 16/10/23)
 * [X] return None in loops, even when there is a continue of a break (finished 24/11/2023)
-* [X] fix the fact that nougaro doesn’t crashes with an error code when there is an error
+* [X] fix the fact that nougaro doesn't crash with an error code when there is an error
 
 ## 0.17.0 beta (goal: february 2024)
 
@@ -73,7 +73,7 @@
 * [ ] if possible, implement `break (name)` and `continue (name)` where (name) is `if`, `for`, …
 * [X] completely switch to semver (finished 7/11/2023)
 
-## Future realeases
+## Future releases
 
 * [ ] add `turtle`
 * [ ] add `socket`

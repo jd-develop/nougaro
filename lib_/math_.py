@@ -28,7 +28,7 @@ E = Number(math.e)
 
 class Math(ModuleFunction):
     """ Math module """
-    functions: dict[str, builtin_function_dict] = {}
+    functions: dict[str, BuiltinFunctionDict] = {}
 
     def __init__(self, name: str):
         super().__init__("math", name, functions=self.functions)

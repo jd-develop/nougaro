@@ -22,7 +22,7 @@ import random
 
 class Random(ModuleFunction):
     """ Random module """
-    functions: dict[str, builtin_function_dict] = {}
+    functions: dict[str, BuiltinFunctionDict] = {}
 
     def __init__(self, name: str):
         super().__init__("random", name, functions=self.functions)

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -682,7 +682,8 @@ class Module(Value):
 
 
 class Constructor(Value):
-    def __init__(self, name: str | None, symbol_table: SymbolTable, attributes: dict[str, Value], parent: Constructor | None = None):
+    def __init__(self, name: str | None, symbol_table: SymbolTable, attributes: dict[str, Value],
+                 parent: Constructor | None = None):
         super().__init__()
         self.name = name if name is not None else '<class>'
         self.symbol_table = symbol_table
@@ -743,7 +744,7 @@ class Constructor(Value):
 
 
 class Object(Value):
-    def __init__(self, attributes: dict[str, Value], constructor: Constructor, inner_ctx: Context | None =None):
+    def __init__(self, attributes: dict[str, Value], constructor: Constructor, inner_ctx: Context | None = None):
         super().__init__()
         self.attributes = attributes.copy()
         self.constructor: Constructor = constructor

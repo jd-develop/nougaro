@@ -641,8 +641,8 @@ class Parser:
             is_call = False
             call_node = identifier
 
-            IS_LPAREN = self.current_token.type == TT["LPAREN"]
-            if IS_LPAREN:
+            is_lparen = self.current_token.type == TT["LPAREN"]
+            if is_lparen:
                 call_node_node = VarAccessNode([identifier], is_attr)
                 is_call = True
             else:
@@ -702,7 +702,7 @@ class Parser:
                     self.advance()
                 call_node_node = CallNode(call_node_node, arg_nodes)
 
-            if IS_LPAREN:
+            if is_lparen:
                 call_node = call_node_node
 
             if self.current_token.type == TT["DOT"]:
@@ -975,10 +975,10 @@ class Parser:
                 self.advance()
 
                 while self.current_token.type == TT["NEWLINE"]:
-                    next = self.next_token()
-                    if next is None:
+                    next_ = self.next_token()
+                    if next_ is None:
                         break
-                    if next.type not in (TT["NEWLINE"], TT["STRING"]):
+                    if next_.type not in (TT["NEWLINE"], TT["STRING"]):
                         break
                     result.register_advancement()
                     self.advance()
@@ -1767,7 +1767,7 @@ class Parser:
                     if self.current_token.type == TT["KEYWORD"]:
                         return result.failure(InvalidSyntaxError(
                             self.current_token.pos_start, self.current_token.pos_end,
-                            f"expected identifier after coma. NB : use keyword as identifier is illegal.",
+                            f"expected identifier after coma. NB: usage of keyword as identifier is illegal.",
                             "src.parser.parser.Parser.func_def"
                         ))
 

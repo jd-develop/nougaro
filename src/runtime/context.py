@@ -16,7 +16,6 @@ import pprint
 from typing import Self
 
 
-
 # ##########
 # CONTEXT
 # ##########
@@ -25,7 +24,8 @@ class Context:
     def __init__(self, display_name: str | None, parent: Self | None = None, parent_entry_pos: Position | None = None):
         self.display_name = display_name  # name of the function we are in
         self.parent: Context | None = parent  # parent context
-        self.parent_entry_pos: Position | None = parent_entry_pos  # pos_start of the parent context, used in errors tracebacks
+        # self.parent_entry_pos is the pos_start of the parent context. It is used in errors tracebacks
+        self.parent_entry_pos: Position | None = parent_entry_pos
         # ABOUT self.parent_entry_pos:
         # I actually don't know why there is a parent_entry_pos to every context, but there is no pos_start.
         # The entry pos seems to be the pos start of a context, but... Well, I don't know....

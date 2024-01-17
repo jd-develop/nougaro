@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -14,10 +14,12 @@ from src.runtime.values.basevalues.basevalues import *
 # built-in python imports
 from typing import Any
 
-# This next line should be uncommented when the project switches to python 3.12, and the type of the "value" argument in the "py2noug" function should be defined as "val"
-# type val = str | int | float | bool | list[val] | None
 
-def py2noug(value: str | int | float | bool | list[Any] | None): # eek, i hope python 3.12 will be allowed soon on the project to remove this "Any"
+# This next line should be uncommented when the project (fully) switches to python 3.12, and the type of the "value"
+# argument in the "py2noug" function should be defined as "val"
+# (todo)
+# type val = str | int | float | bool | list[val] | None
+def py2noug(value: str | int | float | bool | list[Any] | None):
     """Converts python values to nougaro ones"""
     if isinstance(value, str):
         return String(value)
@@ -36,7 +38,7 @@ def py2noug(value: str | int | float | bool | list[Any] | None): # eek, i hope p
         return Value()  # we just return a base value if there is no equivalent...
 
 
-def noug2py(value: Value, none_instead_of_raw_value: bool=True) -> Any:
+def noug2py(value: Value, none_instead_of_raw_value: bool = True) -> Any:
     """Converts nougaro values to python ones."""
     if isinstance(value, String) or isinstance(value, Number):
         return value.value

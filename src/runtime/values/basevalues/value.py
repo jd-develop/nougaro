@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     from src.runtime.values.basevalues.basevalues import String, Number, List
     from src.misc import RunFunction
 
+
 class Value:
     """The parent class to all the value classes (String, Number, List...)"""
     def __init__(self):
@@ -243,8 +244,9 @@ class Value:
         """
         return None, self.illegal_operation()
 
-    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str, exec_from: str = "<invalid>",
-                use_context: Context | None = None, cli_args: list[String] | None = None, work_dir: str | None = None):
+    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
+                exec_from: str = "<invalid>", use_context: Context | None = None, cli_args: list[String] | None = None,
+                work_dir: str | None = None):
         """Execute the function.
         Returns a result"""
         return RTResult().failure(self.illegal_operation())

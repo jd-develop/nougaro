@@ -131,7 +131,8 @@ def run(
         context = use_context  # do not .copy() here
     interpreter.update_symbol_table(context)
 
-    result = interpreter.visit(ast.node, context, False, main_visit=True)  # visit the main node of the AST with the created context
+    # visit the main node of the AST with the created context
+    result = interpreter.visit(ast.node, context, False, main_visit=True)
     if print_context:
         print(context.__str__())
     if result.error is not None:

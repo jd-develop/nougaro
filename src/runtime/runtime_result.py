@@ -21,7 +21,6 @@ if TYPE_CHECKING:
     from src.runtime.values.basevalues.value import Value
 
 
-
 # ##########
 # RUNTIME RESULT
 # ##########
@@ -77,25 +76,29 @@ class RTResult:
         self.value = value
         return self
 
-    def success_return(self, value: Value, pos_start: Position, pos_end: Position):  # same as self.success for self.function_return_value
+    def success_return(self, value: Value, pos_start: Position, pos_end: Position):
+        """same as self.success for self.function_return_value"""
         self.reset()
         self.function_return_value = value
         self.return_pos = (pos_start, pos_end)
         return self
 
-    def success_continue(self, pos_start: Position, pos_end: Position):  # same as self.success for self.loop_should_continue
+    def success_continue(self, pos_start: Position, pos_end: Position):
+        """same as self.success for self.loop_should_continue"""
         self.reset()
         self.break_or_continue_pos = (pos_start, pos_end)
         self.loop_should_continue = True
         return self
 
-    def success_break(self, pos_start: Position, pos_end: Position):  # same as self.success for self.loop_should_break
+    def success_break(self, pos_start: Position, pos_end: Position):
+        """same as self.success for self.loop_should_break"""
         self.reset()
         self.break_or_continue_pos = (pos_start, pos_end)
         self.loop_should_break = True
         return self
 
-    def failure(self, error: Error):  # same as self.success for self.error
+    def failure(self, error: Error):
+        """same as self.success for self.error"""
         self.reset()
         self.error = error
         return self

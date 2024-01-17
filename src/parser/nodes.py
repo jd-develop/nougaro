@@ -117,8 +117,8 @@ class VarDeleteNode(Node):
     """Node for variable delete, such as `del foo` where var_name_token is Token(TT_IDENTIFIER, 'foo')"""
     def __init__(self, var_name_token: Token):
         self.var_name_token = var_name_token
-        self.pos_start= self.var_name_token.pos_start
-        self.pos_end= self.var_name_token.pos_end
+        self.pos_start = self.var_name_token.pos_start
+        self.pos_end = self.var_name_token.pos_end
 
     def __repr__(self):
         return f'var_delete:{self.var_name_token}'
@@ -207,8 +207,8 @@ class IfNode(Node):
         self.pos_start = self.cases[0][0].pos_start
 
         if debug:
-            print(f"else_case : type {type(self.else_case)}, value " + str(self.else_case))
-            print(f"cases[-1][0] : type {type(self.cases[-1][0])}, value " + str(self.cases[-1][0]))
+            print(f"else_case: type {type(self.else_case)}, value " + str(self.else_case))
+            print(f"cases[-1][0]: type {type(self.cases[-1][0])}, value " + str(self.cases[-1][0]))
         self.pos_end = (self.else_case or self.cases[-1][0]).pos_end
 
     def __repr__(self):
@@ -453,12 +453,14 @@ class ImportNode(Node):
     """Node for `import` structure.
     identifier is the name of the module to import. It is a token. Example: Token(TT_IDENTIFIER, 'math')
     """
-    def __init__(self, identifiers: list[Token], pos_start: Position, pos_end: Position, as_identifier: Token | None = None):
+    def __init__(self, identifiers: list[Token], pos_start: Position, pos_end: Position,
+                 as_identifier: Token | None = None):
         self.identifiers: list[Token] = identifiers
         self.as_identifier: Token | None = as_identifier
 
         self.pos_start = pos_start
         self.pos_end = pos_end
+
     def __repr__(self):
         names = [str(identifier) for identifier in self.identifiers]
         if self.as_identifier is None:
@@ -470,7 +472,8 @@ class ExportNode(Node):
     """Node for `export` structure.
     identifier is the name of the module to import. It is a token. Example: Token(TT_IDENTIFIER, 'lorem_ipsum')
     """
-    def __init__(self, expr_or_identifier: Node | Token, as_identifier: Token | None, pos_start: Position, pos_end: Position):
+    def __init__(self, expr_or_identifier: Node | Token, as_identifier: Token | None,
+                 pos_start: Position, pos_end: Position):
         self.expr_or_identifier: Node | Token = expr_or_identifier
         self.as_identifier: Token | None = as_identifier
 
@@ -535,7 +538,8 @@ class ReadNode(Node):
               line_number is Python int 6
 
     """
-    def __init__(self, file_name_expr: Node, identifier: Token | None, line_number: int | str, pos_start: Position, pos_end: Position):
+    def __init__(self, file_name_expr: Node, identifier: Token | None, line_number: int | str,
+                 pos_start: Position, pos_end: Position):
         self.file_name_expr: Node = file_name_expr
         self.identifier: Token | None = identifier
         self.line_number: int | str = line_number

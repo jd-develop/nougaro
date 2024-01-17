@@ -25,7 +25,7 @@ TIMEZONE = Number(time.timezone)
 
 class Time(ModuleFunction):
     """ Time module """
-    functions: dict[str, builtin_function_dict] = {}
+    functions: dict[str, BuiltinFunctionDict] = {}
 
     def __init__(self, name: str):
         super().__init__('time', name, functions=self.functions)

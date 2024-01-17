@@ -24,7 +24,8 @@ try:
     ForeRED: str = Fore.RED
     ForeRESET: str = Fore.RESET
 except (ModuleNotFoundError, ImportError):
-    colorama_init = lambda: None  # this is to avoid type checking errors
+    def colorama_init():
+        return None
     ForeRED: str = ""
     ForeRESET: str = ""
 
@@ -98,17 +99,18 @@ class RunFunction(Protocol):
     ) -> tuple[Value, None] | tuple[None, Error]:
         ...
 
+
 # ##########
 # CUSTOM BUILTIN FUNC METHODS
 # thanks to lancelote (https://github.com/lancelote) who works at JetBrains for these tricks
 # ##########
-class builtin_function_dict(TypedDict):
-        function: Callable[..., RTResult]
-        param_names: list[str]
-        optional_params: list[str]
-        should_respect_args_number: bool
-        run_noug_dir_work_dir: bool
-        noug_dir: bool  # if run_noug_dir_work_dir is True then this is False
+class BuiltinFunctionDict(TypedDict):
+    function: Callable[..., RTResult]
+    param_names: list[str]
+    optional_params: list[str]
+    should_respect_args_number: bool
+    run_noug_dir_work_dir: bool
+    noug_dir: bool  # if run_noug_dir_work_dir is True then this is False
 
 
 # ##########

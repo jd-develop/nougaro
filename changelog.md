@@ -53,7 +53,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Better error messages
 * Switch to semantic versioning
 * Add `__args__` to have access to CLI args (except in Nebraska)
-* Better retrocompatibility with python 3.10 in tests
+* Better retro-compatibility with python 3.10 in tests
 * Add a reference to this changelog file in the intro text
-* Add backlines to the intro text to be more pleasant to read
+* Add back lines to the intro text to be more pleasant to read
 * Add python version to intro text in debug mode

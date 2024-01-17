@@ -112,7 +112,8 @@ def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: l
         sys.exit(1)
 
 
-def print_result_and_error(result: Value | None, error: Error | None, args: list[str], exit_on_cd: bool = False, should_print_stuff: bool = True):
+def print_result_and_error(result: Value | None, error: Error | None, args: list[str], exit_on_cd: bool = False,
+                           should_print_stuff: bool = True):
     if error is not None:  # there is an error, we print it in RED because OMG AN ERROR
         print_in_red(error.as_string())
         return
@@ -190,7 +191,6 @@ def main():
     if not endswith_slash:
         work_dir += "/"
 
-
     # We print stuff if this is an interactive shell.
     # HOWEVER, if we are in a pipe, like `echo "$" | nougaro`, we don’t want our prompt to be printed
     should_print_stuff = sys.stdin.isatty()
@@ -219,7 +219,7 @@ def main():
                 print()
                 print(f"Current working directory is {work_dir} ({type(work_dir)})")
                 print(f"Python version is {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]} "
-                    f"({list(sys.version_info)})")
+                      f"({list(sys.version_info)})")
                 print("DEBUG mode is ENABLED")
             if print_context:
                 if not debug_on:

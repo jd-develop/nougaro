@@ -22,7 +22,8 @@ import statistics
 
 class RTStatisticsError(RunTimeError):
     """StatisticsError is an error that can be triggered ONLY via functions in this module."""
-    def __init__(self, pos_start: Position, pos_end: Position, details: str, context: Context, origin_file: str = "lib_.statistics_"):
+    def __init__(self, pos_start: Position, pos_end: Position, details: str, context: Context,
+                 origin_file: str = "lib_.statistics_"):
         super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="StatisticsError",
                          origin_file=origin_file)
         self.context = context
@@ -30,7 +31,7 @@ class RTStatisticsError(RunTimeError):
 
 class Statistics(ModuleFunction):
     """ Statistics module """
-    functions: dict[str, builtin_function_dict] = {}
+    functions: dict[str, BuiltinFunctionDict] = {}
 
     def __init__(self, name: str):
         super().__init__("statistics", name, functions=self.functions)

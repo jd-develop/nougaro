@@ -35,8 +35,9 @@ class BuiltInFunction(BaseBuiltInFunction):
         super().__init__(name, call_with_module_context)
         self.cli_args = []
 
-    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str, exec_from: str = "<invalid>",
-                use_context: Context | None = None, cli_args: list[String] | None = None, work_dir: str | None = None) -> RTResult:
+    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
+                exec_from: str = "<invalid>", use_context: Context | None = None, cli_args: list[String] | None = None,
+                work_dir: str | None = None) -> RTResult:
         # execute a built-in function
         # create the result
         result = RTResult()
@@ -56,7 +57,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         # get the method name and the method
         try:
-            method_dict: builtin_function_dict = self.builtin_functions[self.name]
+            method_dict: BuiltinFunctionDict = self.builtin_functions[self.name]
         except KeyError:
             self.no_visit_method(exec_ctx)
             return result
@@ -108,7 +109,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     def no_visit_method(self, exec_ctx: Context):
         """Method called when the func name given through self.name is not defined"""
         print(exec_ctx)
-        print(f"NOUGARO INTERNAL ERROR : No execute_{self.name} method defined in "
+        print(f"NOUGARO INTERNAL ERROR: No execute_{self.name} method defined in "
               f"src.runtime.values.functions.builtin_function.BuiltInFunction.\n"
               f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with all informations "
               f"above.")
@@ -123,7 +124,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         copy.attributes = self.attributes.copy()
         return copy
 
-    builtin_functions: dict[str, builtin_function_dict] = {}
+    builtin_functions: dict[str, BuiltinFunctionDict] = {}
 
     # ==================
     # BUILT-IN FUNCTIONS
@@ -229,7 +230,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         if value is not None:  # if the value is defined
             try:
                 print_in_red(value.to_python_str())
-                if easter_egg is not None and value.to_python_str() == "Is there an easter egg in this program? That would be so cool!":
+                if easter_egg is not None and value.to_python_str() == "Is there an easter egg in this program? That " \
+                                                                       "would be so cool!":
                     if isinstance(easter_egg, String) and easter_egg.value == "thanks":
                         print("You’re welcome :)")
                     return RTResult().success(String("Here you go!"))
@@ -289,7 +291,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 number = int(text)
                 break
             except ValueError:
-                print(f"'{text}' must be an integer. Try again :")
+                print(f"'{text}' must be an integer. Try again: ")
         return RTResult().success(Number(number))
 
     builtin_functions["input_int"] = {
@@ -317,7 +319,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 number = float(text)
                 break
             except ValueError:
-                print(f"'{text}' must be a number. Try again :")
+                print(f"'{text}' must be a number. Try again: ")
         return RTResult().success(Number(number))
     
     builtin_functions["input_num"] = {
@@ -996,7 +998,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         code = exec_ctx.symbol_table.getf('code')
         if isinstance(code, Number) or isinstance(code, String):
             if isinstance(code.value, int) or isinstance(code.value, str):
-                sys.exit(code.value)  # !!!!!!!!!!!!!!! ALWAYS USE sys.exit() INSTEAD OF exit() OR quit() !!!!!!!!!!!!!!!
+                sys.exit(code.value)  # !!!!!!!!!!!!!! ALWAYS USE sys.exit() INSTEAD OF exit() OR quit() !!!!!!!!!!!!!!!
         sys.exit()
 
     builtin_functions["exit"] = {
@@ -1857,14 +1859,17 @@ class BuiltInFunction(BaseBuiltInFunction):
                 assert list_.pos_end is not None
                 return result.failure(RTTypeError(
                     list_.pos_start, list_.pos_end,
-                    str(e), exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
+                    str(e), exec_ctx,
+                    origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
                 ))
         elif mode == "stalin":  # stalin sort
-            def get_comparison(list_to_sort_: list[Value], index_: int) -> tuple[Number, None] | tuple[None, RunTimeError]:
+            def get_comparison(
+                    list_to_sort_: list[Value], index_: int
+            ) -> tuple[Number, None] | tuple[None, RunTimeError]:
                 if index_ + 1 < len(list_to_sort_):
-                    comp, error = list_to_sort_[index_].get_comparison_gt(list_to_sort_[index_ + 1])
-                    if error is not None:
-                        return None, error
+                    comp, error_ = list_to_sort_[index_].get_comparison_gt(list_to_sort_[index_ + 1])
+                    if error_ is not None:
+                        return None, error_
                     else:
                         assert isinstance(comp, Number)
                 else:

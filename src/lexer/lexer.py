@@ -98,7 +98,8 @@ class Lexer:
                         (tok.value.startswith('e') or tok.value.startswith('E'))
                 )
                 current_tok_is_positive_e_infix = (
-                        current_tok_is_maybe_e_infix and tok.value is not None and tok.value[1:].isdigit() and self.current_char != "."
+                        current_tok_is_maybe_e_infix and tok.value is not None and tok.value[1:].isdigit()
+                        and self.current_char != "."
                 )
                 next_char = self.next_char()
                 if next_char is not None:
@@ -571,7 +572,12 @@ class Lexer:
         token_type = TT["KEYWORD"] if id_str in KEYWORDS else TT["IDENTIFIER"]  # KEYWORDS is the keywords list
         return Token(token_type, id_str, pos_start, self.pos)
 
-    def make_number(self, digits: str = DIGITS + '.', _0prefixes: bool = True, mode: str = "int") -> tuple[Token, None] | tuple[None, Error]:
+    def make_number(
+            self,
+            digits: str = DIGITS + '.',
+            _0prefixes: bool = True,
+            mode: str = "int"
+    ) -> tuple[Token, None] | tuple[None, Error]:
         """Make number, int or float"""
         num_str = ''
         dot_count = 0  # we can't have more than one dot, so we count them

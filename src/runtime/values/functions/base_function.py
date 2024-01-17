@@ -24,7 +24,8 @@ class BaseFunction(Value):
     """Parent class for all the function classes (Function, BaseBuiltinFunction and its children)"""
     def __init__(self, name: str | None, call_with_module_context: bool = False):
         super().__init__()
-        self.name: str = name if name is not None else '<function>'  # if 'name' is None, we have something like `def()->foo`
+        self.name: str = name if name is not None else '<function>'
+        # (if 'name' is None, we have something like `def()->foo`)
         self.type_ = 'BaseFunction'
         self.call_with_module_context: bool = call_with_module_context
     
@@ -45,7 +46,8 @@ class BaseFunction(Value):
             new_context.symbol_table = SymbolTable(new_context.parent.symbol_table)
         return new_context
 
-    def check_args(self, param_names: list[str], args: list[Value], optional_params: list[str] | None = None, should_respect_args_number: bool = True):
+    def check_args(self, param_names: list[str], args: list[Value], optional_params: list[str] | None = None,
+                   should_respect_args_number: bool = True):
         """Check if the number of args match with the number of params/optional params"""
         # create a result
         result = RTResult()
@@ -79,8 +81,8 @@ class BaseFunction(Value):
         return result.success(NoneValue())  # if there is the right number of params
 
     @staticmethod
-    def populate_args(param_names: list[str], args: list[Value], exec_context: Context, optional_params: list[str] | None = None,
-                      should_respect_args_number: bool = True):
+    def populate_args(param_names: list[str], args: list[Value], exec_context: Context,
+                      optional_params: list[str] | None = None, should_respect_args_number: bool = True):
         """Make the args match to the param names in the symbol table"""
         # We need the context for the symbol table :)
         if optional_params is None:  # there is no optional params
@@ -122,9 +124,9 @@ class BaseFunction(Value):
                     break
 
     def check_and_populate_args(
-            self, param_names: list[str], args: list[Value], exec_context: Context, optional_params: list[str] | None = None,
-            should_respect_args_number: bool = True
-        ) -> RTResult:
+            self, param_names: list[str], args: list[Value], exec_context: Context,
+            optional_params: list[str] | None = None, should_respect_args_number: bool = True
+    ) -> RTResult:
         """self.check_args() then self.populate_args()"""
         # We still need the context for the symbol table ;)
         result = RTResult()

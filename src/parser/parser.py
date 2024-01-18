@@ -100,6 +100,8 @@ class Parser:
         if result.error is not None:  # we check for errors
             return result
         assert statement is not None
+        assert not isinstance(statement, list)
+        
         statements.append((statement, False))  # we append the statement to our list of there is no error
 
         # (NEWLINE+ statement)*
@@ -174,6 +176,8 @@ class Parser:
             if result.error is not None:
                 return result
             assert statement is not None
+            assert not isinstance(statement, list)
+            
             statements.append((statement, False))
 
         assert self.current_token.pos_end is not None
@@ -211,6 +215,8 @@ class Parser:
             if expr is None:  # there is no expr : we reverse
                 self.reverse(result.to_reverse_count)
             # assert expr is not None
+            assert not isinstance(expr, list)
+            
             return result.success(ReturnNode(expr, pos_start, self.current_token.pos_start.copy()))
 
         # KEYWORD:IMPORT IDENTIFIER
@@ -311,6 +317,7 @@ class Parser:
                 self.advance()
             else:
                 as_identifier = None
+            assert not isinstance(expr_or_identifier, list)
 
             return result.success(
                 ExportNode(expr_or_identifier, as_identifier, pos_start, self.current_token.pos_start.copy())
@@ -432,6 +439,8 @@ class Parser:
                 self.advance()
             else:
                 line_number = 'last'
+            assert not isinstance(expr_to_write, list)
+            assert not isinstance(file_name_expr, list)
 
             return result.success(WriteNode(
                 expr_to_write, file_name_expr, to_token, line_number, pos_start, self.current_token.pos_start.copy()
@@ -476,6 +485,7 @@ class Parser:
                 self.advance()
             else:
                 line_number = 'all'
+            assert not isinstance(file_name_expr, list)
 
             return result.success(ReadNode(
                 file_name_expr, identifier, line_number, pos_start, self.current_token.pos_start.copy()
@@ -503,10 +513,14 @@ class Parser:
                 errmsg = result.register(self.expr())
                 if result.error is not None:
                     return result
+                
+                assert not isinstance(assertion, list)
+                assert not isinstance(errmsg, list)
 
                 return result.success(AssertNode(
                     assertion, pos_start, self.current_token.pos_start.copy(), errmsg=errmsg
                 ))
+            assert not isinstance(assertion, list)
 
             return result.success(AssertNode(assertion, pos_start, self.current_token.pos_start.copy()))
 
@@ -609,6 +623,7 @@ class Parser:
         if result.error is not None:
             return result
         assert first_node is not None
+        assert not isinstance(first_node, list)
         expressions = [first_node]
 
         while self.current_token.type == TT["COMMA"]:  # (COMMA expr)?*
@@ -618,6 +633,7 @@ class Parser:
             if result.error is not None:
                 return result
             assert node is not None
+            assert not isinstance(node, list)
             expressions.append(node)
 
         return result.success(VarAssignNode(all_names_list, expressions, equal))
@@ -670,6 +686,8 @@ class Parser:
                     if result.error is not None:
                         return None, result.error
                     assert expr_node is not None
+                    assert not isinstance(expr_node, list)
+
                     arg_nodes.append((expr_node, mul))
                     while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
                         mul = False
@@ -689,6 +707,8 @@ class Parser:
                             # type ignore is required because type checking strict is DUMB
                             return None, result.error  # type: ignore
                         assert expr_node is not None
+                        assert not isinstance(expr_node, list)
+                        
                         arg_nodes.append((expr_node, mul))
 
                     if self.current_token.type != TT["RPAREN"]:  # there is no paren (it is expected)
@@ -817,6 +837,8 @@ class Parser:
         if result.error is not None:
             return result
         assert value is not None
+        assert not isinstance(value, list)
+        
         values_list: list[Node] = [value]
 
         assert self.current_token is not None
@@ -827,6 +849,8 @@ class Parser:
             if result.error is not None:
                 return result
             assert value is not None
+            assert not isinstance(value, list)
+            
             values_list.append(value)
 
         return self.bin_op(values_list, (TT["POW"],), self.factor)  # do not remove the comma after 'TT["POW"]' !!
@@ -872,6 +896,7 @@ class Parser:
                     if result.error is not None:
                         return result
                     assert expr_ is not None
+                    assert not isinstance(expr_, list)
                     expr_and_mul = (expr_, mul)
                     arg_nodes.append(expr_and_mul)
                     while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
@@ -891,7 +916,9 @@ class Parser:
                         if result.error is not None:
                             return result
                         assert expr_ is not None
+                        assert not isinstance(expr_, list)
                         expr_and_mul = (expr_, mul)
+                        
                         arg_nodes.append(expr_and_mul)
 
                     if self.current_token.type != TT["RPAREN"]:  # there is no paren (it is expected)
@@ -903,6 +930,8 @@ class Parser:
 
                     result.register_advancement()
                     self.advance()
+                assert not isinstance(call_node, list)
+                    
                 call_node = CallNode(call_node, arg_nodes)
 
             return result.success(call_node)
@@ -1011,6 +1040,8 @@ class Parser:
                         return result
                     assert value is not None
                     # append the token to our list
+                    assert not isinstance(value, list)
+                    
                     choices.append(value)
                     break  # the expr is the final value we want to parse
                     #        E.g.: `identifier ? identifier ? expr ? whatever` : we don't want the `? whatever`
@@ -1173,7 +1204,9 @@ class Parser:
             if result.error is not None:
                 return result
             assert expr_ is not None
+            assert not isinstance(expr_, list)
             expr_and_mul = (expr_, mul)
+            
             element_nodes.append(expr_and_mul)
 
             while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
@@ -1193,7 +1226,9 @@ class Parser:
                 if result.error is not None:
                     return result
                 assert expr_ is not None
+                assert not isinstance(expr_, list)
                 expr_and_mul = (expr_, mul)
+                
                 element_nodes.append(expr_and_mul)
 
             if self.current_token.type != TT["RSQUARE"]:  # there is no ']' to close the list
@@ -1289,6 +1324,7 @@ class Parser:
                 if result.error is not None:
                     return None, result.error
                 else_case = expr
+        assert not isinstance(else_case, list)
 
         return else_case, None
 
@@ -1361,6 +1397,9 @@ class Parser:
             if result.error is not None:
                 return None, None, result.error  # type: ignore
             assert statements is not None
+            assert not isinstance(condition, list)
+            assert not isinstance(statements, list)
+            
             cases.append((condition, statements))
 
             if self.current_token.matches(TT["KEYWORD"], 'end'):
@@ -1379,6 +1418,8 @@ class Parser:
             if result.error is not None:
                 return None, None, result.error  # type: ignore
             assert expr is not None
+            assert not isinstance(condition, list)
+            assert not isinstance(expr, list)
             cases.append((condition, expr))
 
             # (if_expr_b|if_expr_c?)*?
@@ -1478,6 +1519,8 @@ class Parser:
 
                 result.register_advancement()
                 self.advance()
+                assert not isinstance(body, list)
+                assert not isinstance(iterable_, list)
 
                 return result.success(ForNodeList(var_name, body, iterable_))
 
@@ -1486,6 +1529,8 @@ class Parser:
             if result.error is not None:
                 return result
             assert body is not None
+            assert not isinstance(body, list)
+            assert not isinstance(iterable_, list)
 
             return result.success(ForNodeList(var_name, body, iterable_))
         elif self.current_token.type != TT["EQ"]:
@@ -1573,6 +1618,10 @@ class Parser:
 
             result.register_advancement()
             self.advance()
+            assert not isinstance(start_value, list)
+            assert not isinstance(end_value, list)
+            assert not isinstance(step_value, list)
+            assert not isinstance(body, list)
 
             return result.success(ForNode(var_name, start_value, end_value, step_value, body))
 
@@ -1581,7 +1630,11 @@ class Parser:
         if result.error is not None:
             return result
         assert body is not None
-
+        assert not isinstance(start_value, list)
+        assert not isinstance(end_value, list)
+        assert not isinstance(step_value, list)
+        assert not isinstance(body, list)
+        
         return result.success(ForNode(var_name, start_value, end_value, step_value, body))
 
     def while_expr(self) -> ParseResult:
@@ -1641,6 +1694,8 @@ class Parser:
 
             result.register_advancement()
             self.advance()
+            assert not isinstance(body, list)
+            assert not isinstance(condition, list)
 
             return result.success(WhileNode(condition, body))
 
@@ -1649,6 +1704,8 @@ class Parser:
         if result.error is not None:
             return result
         assert body is not None
+        assert not isinstance(body, list)
+        assert not isinstance(condition, list)
 
         return result.success(WhileNode(condition, body))
 
@@ -1703,6 +1760,8 @@ class Parser:
         if result.error is not None:
             return result
         assert condition is not None
+        assert not isinstance(body, list)
+        assert not isinstance(condition, list)
 
         return result.success(DoWhileNode(body, condition))
 
@@ -1813,6 +1872,7 @@ class Parser:
             if result.error is not None:
                 return result
             assert body is not None
+            assert not isinstance(body, list)
 
             return result.success(FuncDefNode(
                 var_name_token,
@@ -1853,6 +1913,7 @@ class Parser:
 
         result.register_advancement()
         self.advance()
+        assert not isinstance(body, list)
 
         return result.success(FuncDefNode(
             var_name_token,
@@ -1927,6 +1988,7 @@ class Parser:
             if result.error is not None:
                 return result
             assert body is not None
+            assert not isinstance(body, list)
 
             return result.success(ClassNode(
                 var_name_token,
@@ -1967,6 +2029,7 @@ class Parser:
 
         result.register_advancement()
         self.advance()
+        assert not isinstance(body, list)
 
         return result.success(ClassNode(
             var_name_token,

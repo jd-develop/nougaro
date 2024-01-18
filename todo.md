@@ -36,7 +36,11 @@
 * [X] return None in loops, even when there is a continue of a break (finished 24/11/2023)
 * [X] fix the fact that nougaro doesn't crash with an error code when there is an error
 
-## 0.17.0 beta (goal: february 2024)
+## 0.17.0 beta (goal: no goal, this is a crash-fixing version)
+
+### Planned release date: January 21th, 2024
+
+## 0.18.0 beta (goal: february 2024)
 
 * [X] add `import ... as ...` (finished 16/10/23)
 * [ ] rewrite shell.py CLI args with `argparse`
@@ -54,14 +58,14 @@
 * [ ] add `raise`
 * [ ] add `assert ... crashes (on Error) (with message "...")`
 
-## 0.18.0 beta (goal: may 2024)
+## 0.19.0 beta (goal: may 2024)
 
 * [ ] add `tkinter`
 * [ ] add `webbrowser`
 * [X] add `unicodedata` (finished 9/10/23)
 * [ ] move config files to `~/.config` under Linux and BSD, `~/Library/Preferences` under macOS, and `%appdata%` under Windaube
 
-## 0.19.0 beta (goal: july 2024)
+## 0.20.0 beta (goal: july 2024)
 
 * [ ] add unit tests
 * [ ] add complex numbers

@@ -2,7 +2,7 @@
 
 This file is updated nearly every commit and copied to GH release changelog.
 
-## 0.16.1-beta
+## 0.17.0-beta
 
 ### Technical
 * Fix a lot of crashes and a lot of bugs

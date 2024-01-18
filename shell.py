@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,29 +17,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Works with Python 3.10 and 3.11
+# Works with python 3.11 and 3.12
 
 # IMPORTS
 # nougaro modules imports
 import src.nougaro as nougaro
 from src.misc import print_in_red
+from src.runtime.values.basevalues.value import Value
 from src.runtime.values.basevalues.basevalues import List
+from src.errors.errors import Error
 # built in python imports
 import json
 import sys
 import os
 import platform
 import pathlib
+from datetime import datetime
 if platform.system() in ["Linux", "Darwin"] or "BSD" in platform.system():
     try:
-        import readline  # browse command history
+        import readline  # browse command history # type: ignore
     except ImportError:
         pass
 
 
-def check_arguments(args, noug_dir, version):
+def check_arguments(args: list[str], noug_dir: str, version: str):
     line_to_exec = None
-    if len(args) == 0:  # there is a file to exec
+    if len(args) == 0:  # there is no file to exec
         return "<stdin>", None
 
     if args[0] == "-c" or args[0] == "-cd":
@@ -53,7 +56,7 @@ def check_arguments(args, noug_dir, version):
         # note that bash, zsh and fiSH automatically delete quotes.
         # TODO: test in windows cmd and powershell
         assert isinstance(line_to_exec, str), "please report this bug on GitHub: https://github.com/" \
-                                              "jd-develop/nougaro"
+                                              "jd-develop/nougaro/issues"
     elif args[0] == "--help" or args[0] == "-h":
         with open(os.path.abspath(noug_dir + "/config/help"), "r+", encoding="UTF-8") as help_file:
             what_to_print = help_file.readlines()[1:]
@@ -81,7 +84,7 @@ def check_arguments(args, noug_dir, version):
     return path, line_to_exec
 
 
-def execute_file(path, debug_on, noug_dir, version, args):
+def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: list[str]):
     work_dir = os.path.dirname(os.path.realpath(path))
     endswith_slash = work_dir.endswith("/") or work_dir.endswith("\\")
     if endswith_slash:
@@ -92,11 +95,11 @@ def execute_file(path, debug_on, noug_dir, version, args):
     with open(path, encoding="UTF-8") as file:
         file_content = str(file.read())
 
-    if file_content == "" or file_content is None:  # no need to run this empty file
-        result, error = None, None
+    if file_content == "":  # no need to run this empty file
+        error = None
     else:  # the file isn't empty, let's run it !
         try:
-            result, error = nougaro.run('<stdin>', file_content, noug_dir, version, args=args, work_dir=work_dir)
+            _, error = nougaro.run('<stdin>', file_content, noug_dir, version, args=args, work_dir=work_dir)
         except KeyboardInterrupt:  # if CTRL+C, just exit the Nougaro shell
             print_in_red("\nKeyboardInterrupt")
             sys.exit()
@@ -109,7 +112,8 @@ def execute_file(path, debug_on, noug_dir, version, args):
         sys.exit(1)
 
 
-def print_result_and_error(result, error, args, exit_on_cd: bool = False):
+def print_result_and_error(result: Value | None, error: Error | None, args: list[str], exit_on_cd: bool = False,
+                           should_print_stuff: bool = True):
     if error is not None:  # there is an error, we print it in RED because OMG AN ERROR
         print_in_red(error.as_string())
         return
@@ -124,6 +128,8 @@ def print_result_and_error(result, error, args, exit_on_cd: bool = False):
         print(f"The actual result is {result}, of type {type(result)}, error is {error}.")
         return
 
+    if not should_print_stuff:
+        return
     if len(result.elements) == 1:  # there is one single result, let's print it without the "[]".
         if result.elements[0].should_print:  # if the value should be printed, let's print it!
             print(result.elements[0])
@@ -185,38 +191,57 @@ def main():
     if not endswith_slash:
         work_dir += "/"
 
+    # We print stuff if this is an interactive shell.
+    # HOWEVER, if we are in a pipe, like `echo "$" | nougaro`, we don’t want our prompt to be printed
+    should_print_stuff = sys.stdin.isatty()
+
     if path == "<stdin>":  # we open the shell
-        # this text is always printed when we start the shell
-        print(f"Welcome to Nougaro {version} on {platform.system()}! "
-              f"Contribute: https://github.com/jd-develop/nougaro/")
-        print(f"Changelog: see {noug_dir}/changelog.md")
-        print()
-        print("This program is under GPL license. For more details, type __gpl__() or __gpl__(1) to stay in terminal.\n"
-              "This program comes with ABSOLUTELY NO WARRANTY; for details type `__disclaimer_of_warranty__'.")
-        print()
-        print("Found a bug? Feel free to report it at https://jd-develop.github.io/nougaro/bugreport.html")
-        if debug_on:
+        if should_print_stuff:
+            # this text is always printed when we start the shell
+            print(f"Welcome to Nougaro {version} on {platform.system()}!")
+            print(f"Contribute: https://github.com/jd-develop/nougaro/")
+            print(f"Changelog: see {noug_dir}/changelog.md")
             print()
-            print(f"Current working directory is {work_dir} ({type(work_dir)})")
-            print(f"Python version is {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]} ({list(sys.version_info)})")
-            print("DEBUG mode is ENABLED")
-        if print_context:
-            if not debug_on:
+            print("This program is under GPL license. For more details, type __gpl__()")
+            print("or __gpl__(1) to stay in terminal.")
+            print("This program comes with ABSOLUTELY NO WARRANTY; for details type")
+            print("`__disclaimer_of_warranty__'.")
+            print()
+            print("Found a bug? Feel free to report it at")
+            print("https://jd-develop.github.io/nougaro/bugreport.html")
+            # idea: cowsay?
+            now = datetime.now()
+            if now.month == 12 and 24 <= now.day <= 26:
+                print("\nMerry Christmas!")
+            elif now.month == now.day == 1:
+                print(f"\nHappy new year {now.year}!")
+            if debug_on:
                 print()
-            print("PRINT CONTEXT debug option is ENABLED")
-        print()  # blank line
+                print(f"Current working directory is {work_dir} ({type(work_dir)})")
+                print(f"Python version is {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]} "
+                      f"({list(sys.version_info)})")
+                print("DEBUG mode is ENABLED")
+            if print_context:
+                if not debug_on:
+                    print()
+                print("PRINT CONTEXT debug option is ENABLED")
+            print()  # blank line
 
         while True:  # the shell loop (like game loop in a video game but, obviously, Nougaro isn't a video game)
             try:  # we ask for an input to be interpreted
-                text = input("nougaro> ")
+                if should_print_stuff:
+                    text = input("nougaro> ")
+                else:
+                    text = input()
             except KeyboardInterrupt:  # if CTRL+C, exit the shell
                 print_in_red("\nKeyboardInterrupt")
                 break  # breaks the `while True` loop to the end of the file
             except EOFError:
-                print_in_red("\nEOF")
+                if should_print_stuff:
+                    print_in_red("\nEOF")
                 break  # breaks the `while True` loop to the end of the file
 
-            if str(text) == "" or text is None:  # nothing was entered: we don't do anything
+            if str(text) == "":  # nothing was entered: we don't do anything
                 result, error = None, None
                 continue
             try:  # we try to run it
@@ -228,7 +253,7 @@ def main():
                 print_in_red("\nEOF")
                 break  # breaks the `while True` loop to the end of the file
 
-            print_result_and_error(result, error, args)
+            print_result_and_error(result, error, args, should_print_stuff=should_print_stuff)
     elif path == "<commandline>":
         if line_to_exec == "":
             sys.exit()

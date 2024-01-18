@@ -19,6 +19,9 @@ def test_nougaro(print_OK)
     assert $test == "$test"
     var a = 1
     assert $a == 1
+    assert b?a == 1
+    assert b?c?2 == 2
+    assert b?c?d?a?e?4 == 1
 
     if print_OK then /* comment */ assert $print("OK print & comments") == None /* comment */ # comment
 
@@ -165,6 +168,7 @@ def test_nougaro(print_OK)
     assert (for i = 1 to 10 then i) == [1, 2, 3, 4, 5, 6, 7, 8, 9]
     assert (for i in [1, 2, 3, 4, 5, 6, 7, 8, 9] then if i%2 == 0 then i else continue) == [None, 2, None, 4, None, 6, None, 8, None]
     assert (for i = -1 to -10 step -1 then i%2) == [1, 0, 1, 0, 1, 0, 1, 0, 1]
+    for c in "abc" then assert c in "abc"
     var b = 1
     assert (while b<10 then; var b+=1; end) == [[2], [3], [4], [5], [6], [7], [8], [9], [10]]
     assert b == 10
@@ -187,10 +191,15 @@ def test_nougaro(print_OK)
         return "str"
     end
 
+    def this_is_a_function(x); if x then; return; elif x == None then; return 3; else; return; end; end
+
     if print_OK then print("OK func")
 
     ## call
     assert (def()->"str")() == func()
+    assert this_is_a_function(12) == None
+    assert this_is_a_function(False) == None
+    assert this_is_a_function(None) == 3
 
     if print_OK then print("OK call")
 
@@ -254,6 +263,15 @@ def test_nougaro(print_OK)
         end
     end
     assert Test4().bar() == 0
+
+    def e(a)
+        return a
+    end
+
+    var variable = Test4()
+    var variable.test = 20
+    # var e(variable).test = 20  # fixme: there is a .copy() somewhere I think
+    assert variable.test == 20
 
     # builtin funcs
     print("Please test these builtin functions after the execution of the test:")

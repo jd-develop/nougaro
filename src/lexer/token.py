@@ -2,12 +2,14 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# NO IMPORTS
+# IMPORTS
+# nougaro modules imports
+from src.lexer.position import Position
 
 """File for Token class. For token types list, please refer to ./token_types.py"""
 
@@ -18,7 +20,8 @@
 class Token:
     """Token class.
     A token have a type (keyboard, int, str, statement, ...) and sometimes a value ("foo", 123, break)"""
-    def __init__(self, type_, value=None, pos_start=None, pos_end=None):
+    def __init__(self, type_: str, value: str | int | float | None = None, pos_start: Position | None = None,
+                 pos_end: Position | None = None):
         self.type = type_  # type
         self.value = value  # value
         self.pos_start = self.pos_end = None
@@ -40,7 +43,7 @@ class Token:
     def __str__(self):
         return repr(self)
 
-    def matches(self, type_, value):
+    def matches(self, type_: str, value: str):
         """Check if the token have the given type and the given value"""
         return self.type == type_ and self.value == value
 
@@ -48,6 +51,6 @@ class Token:
         """Returns a copy of self"""
         return Token(self.type, self.value, self.pos_start, self.pos_end)
 
-    def set_value(self, value):
+    def set_value(self, value: str | int | float | None):
         self.value = value
         return self

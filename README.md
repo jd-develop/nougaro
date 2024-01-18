@@ -25,8 +25,6 @@ This is Nougaro beta 0.16.0.
 
  The code is compiled for Windows and Linux. Check it out in the [releases](https://github.com/jd-develop/nougaro/releases/) tab!
 
- Minimum : Python 3.11
-
  Supports Python 3.11 and 3.12
 
 ## French description
@@ -49,9 +47,7 @@ This is Nougaro beta 0.16.0.
  Généralement, on utilise l'extension `.noug` pour les fichiers Nougaro.
 
  Le code est compilé pour Windows et Linux. Disponible dans l'onglet [releases](https://github.com/jd-develop/nougaro/releases/)&nbsp;!
-
- Minimum : Python 3.11
-
+ 
  Prend en charge Python 3.11 et 3.12
 
 ## Documentation

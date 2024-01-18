@@ -13,7 +13,7 @@ print("  (1 + 1) * (12 + 13) will be 1 1 + 12 13 + *")
 print()
 print("Type 'help' for all the operators and constants.")
 print()
-print("Nougaro  Copyright (C) 2023  Jean Dubois")
+print("Nougaro  Copyright (C) 2023-2024  Jean Dubois")
 print("This program comes with ABSOLUTELY NO WARRANTY.")
 print("This is free software, and you are welcome to redistribute it")
 print("under certain conditions.")
@@ -49,6 +49,7 @@ while True then
         print()
         print("Here all the constants:")
         print("        pi : 3.141592653589793")
+        print("         e : " + str(math.e))
         print()
         print("Here all the variables:")
         print("       ans : result of last operation")
@@ -136,6 +137,8 @@ while True then
             replace(tokens, -1, "mod")
         elif char == "i" then
              append(tokens, char)
+        elif char == "e" then
+             append(tokens, char)
         elif char == "\t" then
             print("Error: use spaces instead of tabulations.")
             var should_continue = True
@@ -187,6 +190,8 @@ while True then
             void()
         elif token == "i" then
             append(stack, increment)
+        elif token == "e" then
+            append(stack, math.e)
         else
             if len(stack) >= 2 then
                 if token == "+" then

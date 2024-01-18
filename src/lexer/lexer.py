@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -25,22 +25,24 @@ class Lexer:
     """Transforms code into a list of tokens (lexical units)"""
     def __init__(self, file_name: str, text: str):
         self.file_name: str = file_name  # name of the file we're executing
-        self.text: str = text  # raw code we have to execute
-        self.pos: Position = Position(-1, 0, -1, file_name, text)  # actual position of the lexer
+        self.text = text  # raw code we have to execute
+        self.pos = Position(-1, 0, -1, file_name, text)  # actual position of the lexer
         self.current_char: str | None = None
         self.advance()
 
-    def get_char(self, pos):
+    def get_char(self, pos: Position):
         return self.text[pos.index] if pos.index < len(self.text) else None
 
     def advance(self):
-        """Advance of 1 char in self.text"""
+        """Advance of 1 char in self.text, and return the new char"""
         self.pos.advance(self.current_char)  # advance in position
         # set the new current char - the next one in the code or None if this is EOF (end of file)
         self.current_char = self.get_char(self.pos)
-        # USEFUL to know where tf you are in the file when it throws at you an unclear error
+        # if you want to know where tf you are in the file when it throws at you an unclear error,
+        # uncomment these lines and change the right values:
         # if self.pos.index in [7583, 5547]:
         #     print(self.pos.index, self.pos.line_number, self.current_char, self.next_char())
+        return self.current_char
 
     def next_char(self):
         """Returns the next char without advancing"""
@@ -54,15 +56,15 @@ class Lexer:
         tokens: list[Token] = []
 
         there_is_a_space_or_a_tab_or_a_comment = False
-
         while self.current_char is not None:  # None is EOF
+            next_char = self.next_char()
             if self.current_char in ' \t':  # tab and space
                 there_is_a_space_or_a_tab_or_a_comment = True
                 self.advance()
             elif self.current_char == '#':  # for comments
                 there_is_a_space_or_a_tab_or_a_comment = True
                 self.skip_comment()
-            elif self.current_char == '\\' and self.next_char() is not None and self.next_char() in ';\n':
+            elif self.current_char == '\\' and next_char is not None and next_char in ';\n':
                 self.advance()
                 self.advance()
             elif self.current_char == "\\":  # and next char is invalid
@@ -78,28 +80,31 @@ class Lexer:
 
             elif self.current_char in DIGITS + '.':  # the char is a digit: we generate a number
                 there_is_a_space_or_a_tab_or_a_comment = False
-                number, error = self.make_number()
-                if error is None:  # there is no error
-                    tokens.append(number)
+                number_with_error = self.make_number()
+                if number_with_error[1] is None:  # there is no error
+                    tokens.append(number_with_error[0])
                 else:  # there is an error, we return it
-                    return [], error
+                    return [], number_with_error[1]
             elif self.current_char in IDENTIFIERS_LEGAL_CHARS:  # the char is legal: identifier or keyword
                 tok = self.make_identifier()
+                assert tok.value is None or isinstance(tok.value, str)
                 try:
                     last_tok_is_number = tokens[-1].type in (TT['INT'], TT['FLOAT'])
                 except IndexError:
                     last_tok_is_number = False
                 current_tok_is_identifier = tok.type == TT['IDENTIFIER']
-                current_tok_is_maybe_e_infix = (
-                        last_tok_is_number and current_tok_is_identifier and
+                current_tok_is_maybe_e_infix: bool = (
+                        tok.value is not None and last_tok_is_number and current_tok_is_identifier and
                         (tok.value.startswith('e') or tok.value.startswith('E'))
                 )
                 current_tok_is_positive_e_infix = (
-                        current_tok_is_maybe_e_infix and tok.value[1:].isdigit() and self.current_char != "."
+                        current_tok_is_maybe_e_infix and tok.value is not None and tok.value[1:].isdigit()
+                        and self.current_char != "."
                 )
-                if self.next_char() is not None:
+                next_char = self.next_char()
+                if next_char is not None:
                     current_tok_is_negative_e_infix = (
-                        current_tok_is_maybe_e_infix and self.current_char == "-" and self.next_char() in DIGITS
+                        current_tok_is_maybe_e_infix and self.current_char == "-" and next_char in DIGITS
                     )
                 else:
                     current_tok_is_negative_e_infix = False
@@ -108,7 +113,7 @@ class Lexer:
                     tokens.append(tok)
                 elif there_is_a_space_or_a_tab_or_a_comment:
                     tokens.append(tok)
-                elif current_tok_is_positive_e_infix:
+                elif current_tok_is_positive_e_infix and tok.pos_start is not None and tok.value is not None:
                     tokens.append(Token(
                         TT['E_INFIX'],
                         pos_start=tok.pos_start,
@@ -124,10 +129,10 @@ class Lexer:
                     self.advance()
 
                     num, error = self.make_number(_0prefixes=False)
-                    if error is not None:
+                    if error is not None or num is None:
                         return [], error
 
-                    num: Token
+                    assert isinstance(num.value, int) or isinstance(num.value, float)
                     if num.type == TT["FLOAT"]:
                         return [], InvalidSyntaxError(
                             num.pos_start, num.pos_end,
@@ -138,7 +143,7 @@ class Lexer:
                         tokens.append(Token(
                             TT['E_INFIX'],
                             pos_start=tok.pos_start,
-                            pos_end=tok.pos_start.copy().advance()
+                            pos_end=tok.pos_start.copy().advance() if tok.pos_start is not None else None
                         ))
                         tokens.append(num.set_value(-1*num.value))
                 else:
@@ -147,7 +152,7 @@ class Lexer:
             elif self.current_char == '"' or self.current_char == "'":  # the char is a quote: str
                 there_is_a_space_or_a_tab_or_a_comment = False
                 string_, error = self.make_string(self.current_char)
-                if error is None:  # there is no error
+                if error is None and string_ is not None:  # there is no error
                     tokens.append(string_)
                 else:  # there is an error: we return it
                     return [], error
@@ -172,7 +177,7 @@ class Lexer:
             elif self.current_char == '^':
                 there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_pow()
-                if error is not None:
+                if error is not None or token is None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == '%':
@@ -183,13 +188,13 @@ class Lexer:
             elif self.current_char == "|":
                 there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_or()
-                if error is not None:
+                if error is not None or token is None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == "&":
                 there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_and()
-                if error is not None:
+                if error is not None or token is None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == "~":
@@ -219,7 +224,7 @@ class Lexer:
             elif self.current_char == '!':
                 there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_not_equals()
-                if error is not None:
+                if error is not None or token is None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == '=':
@@ -228,7 +233,7 @@ class Lexer:
             elif self.current_char == '<':
                 there_is_a_space_or_a_tab_or_a_comment = False
                 token, error = self.make_less_than()
-                if error is not None:
+                if error is not None or token is None:
                     return [], error
                 tokens.append(token)
             elif self.current_char == '>':
@@ -236,6 +241,7 @@ class Lexer:
                 token, error = self.make_greater_than()
                 if error is not None:
                     return [], error
+                assert token is not None
                 tokens.append(token)
 
             # syntax 'var a = b ? c ? d ? e ? f'
@@ -308,7 +314,7 @@ class Lexer:
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_mul(self):
-        """Make * or *= or ** """
+        """Make * or *= """
         token_type = TT["MUL"]
         pos_start = self.pos.copy()
         self.advance()
@@ -316,9 +322,6 @@ class Lexer:
         if self.current_char == '=':  # *=
             self.advance()
             token_type = TT["MULTEQ"]
-        elif self.current_char == "*":  # **
-            self.advance()
-            token_type = TT["SQUARE"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
@@ -329,9 +332,9 @@ class Lexer:
         self.advance()
 
         if self.current_char == '/':  # //
-            self.advance()
             token_type = TT["FLOORDIV"]
-            if self.current_char == '=':  # //=
+            new_char = self.advance()
+            if new_char == '=':  # //=
                 self.advance()
                 token_type = TT["FLOORDIVEQ"]
         elif self.current_char == '=':  # /=
@@ -354,14 +357,14 @@ class Lexer:
             self.advance()
             token_type = TT["POWEQ"]
         elif self.current_char == '^':  # ^^
-            self.advance()
             token_type = TT["BITWISEXOR"]
-            if self.current_char == '=':  # ^^=
+            new_char = self.advance()
+            if new_char == '=':  # ^^=
                 self.advance()
                 token_type = TT["BITWISEXOREQ"]
             elif self.current_char == '^':  # ^^^
-                self.advance()
-                if self.current_char != "=":
+                newest_char = self.advance()
+                if newest_char != "=":
                     return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '^^^'.",
                                                     "src.lexer.lexer.Lexer.make_pow")
                 token_type = TT["XOREQ"]  # ^^^=
@@ -394,8 +397,8 @@ class Lexer:
             token_type = TT["BITWISEOREQ"]
             self.advance()
         elif self.current_char == '|':  # ||
-            self.advance()
-            if self.current_char != "=":
+            new_char = self.advance()
+            if new_char != "=":
                 return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '||'.",
                                                 "src.lexer.lexer.Lexer.make_or")
             token_type = TT["OREQ"]  # ||=
@@ -416,8 +419,8 @@ class Lexer:
             token_type = TT["BITWISEANDEQ"]
             self.advance()
         elif self.current_char == '&':  # &&
-            self.advance()
-            if self.current_char != "=":
+            new_char = self.advance()
+            if new_char != "=":
                 return None, InvalidSyntaxError(pos_start, self.pos, "expected '=' after '&&'.",
                                                 "src.lexer.lexer.Lexer.make_and")
             token_type = TT["ANDEQ"]  # &&=
@@ -425,7 +428,7 @@ class Lexer:
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 
-    def make_string(self, quote='"'):
+    def make_string(self, quote: str = '"'):
         """Make string. We need quote to know where to stop"""
         string_ = ''
         if quote == '"':
@@ -569,7 +572,12 @@ class Lexer:
         token_type = TT["KEYWORD"] if id_str in KEYWORDS else TT["IDENTIFIER"]  # KEYWORDS is the keywords list
         return Token(token_type, id_str, pos_start, self.pos)
 
-    def make_number(self, digits=DIGITS + '.', _0prefixes=True, mode="int"):
+    def make_number(
+            self,
+            digits: str = DIGITS + '.',
+            _0prefixes: bool = True,
+            mode: str = "int"
+    ) -> tuple[Token, None] | tuple[None, Error]:
         """Make number, int or float"""
         num_str = ''
         dot_count = 0  # we can't have more than one dot, so we count them
@@ -636,13 +644,13 @@ class Lexer:
                 "b": ("01", "bin"),
                 "B": ("01", "bin"),
             }
-            if self.current_char in prefixes.keys():
+            if self.current_char in prefixes.keys() and self.current_char is not None:
                 prefix = prefixes[self.current_char]
                 self.advance()
-                num, error = self.make_number(prefix[0], False, prefix[1])
-                if error is not None:
-                    return None, error
-                return num, None
+                number_with_error = self.make_number(prefix[0], False, prefix[1])
+                if number_with_error[1] is not None:
+                    return None, number_with_error[1]
+                return number_with_error[0], None
 
         if mode == 'int':
             if dot_count == 0:  # if there is no dots, this is an INT, else this is a FLOAT
@@ -712,8 +720,8 @@ class Lexer:
                 self.advance()
                 token_type = TT["LTEEQ"]
         elif self.current_char == '<':  # <<
-            self.advance()
-            if self.current_char == '=':  # <<=
+            new_char = self.advance()
+            if new_char == '=':  # <<=
                 self.advance()
                 token_type = TT["LTEQ"]
             else:
@@ -726,7 +734,7 @@ class Lexer:
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 
-    def make_greater_than(self):
+    def make_greater_than(self) -> tuple[Token, None] | tuple[None, Error]:
         """Make > , >= , >== , >> , >>= """
         token_type = TT["GT"]
         pos_start = self.pos.copy()
@@ -739,9 +747,9 @@ class Lexer:
                 self.advance()
                 token_type = TT["GTEEQ"]
         elif self.current_char == '>':
-            self.advance()
+            new_char = self.advance()
             token_type = TT["TO"]
-            if self.current_char == '=':
+            if new_char == '=':
                 self.advance()
                 token_type = TT["GTEQ"]
 
@@ -786,6 +794,6 @@ class Lexer:
         while self.current_char is not None and not (self.current_char == "*" and self.next_char() == "/"):
             self.advance()
         if self.current_char == "*":
-            self.advance()
-            if self.current_char == "/":
+            new_char = self.advance()
+            if new_char == "/":
                 self.advance()

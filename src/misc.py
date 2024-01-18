@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
+from __future__ import annotations
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -11,36 +12,43 @@
 # nougaro modules imports
 from src.runtime.context import Context
 from src.parser.nodes import Node
+from src.errors.errors import Error
 from src.runtime.values.basevalues.basevalues import String
+from src.runtime.values.basevalues.value import Value
+from src.runtime.runtime_result import RTResult
 # built-in python imports
-from typing import Protocol, Any
+from typing import Protocol, Any, TypedDict, Sequence, Callable
 import os
 try:
     from colorama import init as colorama_init, Fore
-    colorama_installed = True
-except ModuleNotFoundError:
-    colorama_installed = False
+    ForeRED: str = Fore.RED
+    ForeRESET: str = Fore.RESET
+except (ModuleNotFoundError, ImportError):
+    def colorama_init():
+        return None
+    ForeRED: str = ""
+    ForeRESET: str = ""
 
-if colorama_installed:
-    colorama_init()
+colorama_init()
 
 
 # ##########
 # COLORS
 # ##########
 # prints text in red.
-if colorama_installed:
-    def print_in_red(txt: str = ""): print(Fore.RED + txt + Fore.RESET)
-else:
-    print_in_red = print
+def print_in_red(txt: str = ""): print(ForeRED + txt + ForeRESET)
 
 
 # ##########
 # TOOLS
 # ##########
-def is_num(value: Any):
+def is_num(value: Any) -> bool:
     """Return True if `value` is a python `int` or `float`. Return False in the other cases, including `bool`"""
-    return (isinstance(value, int) or isinstance(value, float)) and not isinstance(value, bool)
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, int) or isinstance(value, float):
+        return True
+    return False
 
 
 def does_tok_type_exist(tok_type: str):
@@ -63,7 +71,7 @@ def clear_screen():
     os.system('cls' if (os.name.lower() == "nt" or os.name.lower().startswith("windows")) else 'clear')
 
 
-def nice_str_from_idk(idk):
+def nice_str_from_idk(idk: Any) -> String:
     """Returns a NOUGARO string from either a PYTHON value either a NOUGARO string"""
     if isinstance(idk, String):
         return idk
@@ -73,43 +81,44 @@ def nice_str_from_idk(idk):
         return String(str(idk))
 
 
+class RunFunction(Protocol):
+    """The type of the run function found in nougaro.py"""
+
+    def __call__(
+        self,
+        file_name: str,
+        text: str | None,
+        noug_dir: str,
+        version: str | None = None,
+        exec_from: str | None = "(shell)",
+        actual_context: str = "<program>",
+        use_default_symbol_table: bool = False,
+        use_context: Context | None = None,
+        args: Sequence[str | String] | None = None,
+        work_dir: str | None = None
+    ) -> tuple[Value, None] | tuple[None, Error]:
+        ...
+
+
 # ##########
 # CUSTOM BUILTIN FUNC METHODS
-# thanks to lancelote (https://github.com/lancelote) that works at JetBrains for these tricks
 # ##########
-class CustomBuiltInFuncMethod(Protocol):
-    """The type of the methods `execute_{name}` in BuiltInFunction"""
-    # This class was made to bypass a pycharm bug.
+class BuiltinFunctionDict(TypedDict):
+    function: Callable[..., RTResult]
     param_names: list[str]
     optional_params: list[str]
     should_respect_args_number: bool
-
-    def __call__(self, exec_context: Context = None) -> Any:
-        ...
-
-
-class CustomBuiltInFuncMethodWithRunParam(CustomBuiltInFuncMethod):
-    """The type of the methods `execute_{name}` with `run` parameter in BuiltInFunction"""
-    # This class was made to bypass a pycharm bug.
-
-    def __call__(self, exec_context: Context = None, run=None, noug_dir: str = None, work_dir: str = None) -> Any:
-        ...
-
-
-class CustomBuiltInFuncMethodWithNougDirButNotRun(CustomBuiltInFuncMethod):
-    """The type of the methods `execute_{name}` with `run` parameter in BuiltInFunction"""
-    # This class was made to bypass a pycharm bug.
-
-    def __call__(self, exec_context: Context = None, noug_dir: str = None) -> Any:
-        ...
+    run_noug_dir_work_dir: bool
+    noug_dir: bool  # if run_noug_dir_work_dir is True then this is False
 
 
 # ##########
 # CUSTOM INTERPRETER VISIT METHOD
+# thanks to lancelote (https://github.com/lancelote) who works at JetBrains for these tricks
 # ##########
 class CustomInterpreterVisitMethod(Protocol):
     """The type of the methods `visit_{name}` in Interpreter"""
     # This class was made to bypass a pycharm bug.
-    def __call__(self, node: Node = None, exec_context: Context = None,
-                 other_context: Context = None, methods_instead_of_funcs: bool = False) -> Any:
+    def __call__(self, node: Node | None = None, exec_context: Context | None = None,
+                 other_context: Context | None = None, methods_instead_of_funcs: bool = False) -> RTResult:
         ...

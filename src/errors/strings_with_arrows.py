@@ -9,7 +9,7 @@
 from src.lexer.position import Position
 
 
-def string_with_arrows(text: str, pos_start, pos_end) -> str:
+def string_with_arrows(text: str, pos_start: Position, pos_end: Position) -> str:
     """Generate a string with arrows under it.
         In this example, text will be 'var 1a = 123'
         If you execute this line with nougaro, it crashes with an :

@@ -1,25 +1,33 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
+from __future__ import annotations
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # IMPORTS
 # nougaro modules imports
+from src.parser.nodes import Node
 from src.runtime.values.functions.base_function import BaseFunction
+from src.runtime.values.basevalues.value import Value
 from src.runtime.values.basevalues.basevalues import NoneValue, String, List
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
-from src.misc import nice_str_from_idk
+from src.misc import nice_str_from_idk, RunFunction
 # built-in python imports
 # no imports
+# special typing imports
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.runtime.interpreter import Interpreter
 
 
 class Function(BaseFunction):
-    def __init__(self, name, body_node, param_names, should_auto_return, call_with_module_context=False):
+    def __init__(self, name: str | None, body_node: Node, param_names: list[str], should_auto_return: bool,
+                 call_with_module_context: bool = False):
         super().__init__(name, call_with_module_context)
         self.body_node = body_node
         self.param_names = param_names
@@ -28,14 +36,20 @@ class Function(BaseFunction):
 
     def __repr__(self):
         return f'<function {self.name}>'
+    
+    def to_python_str(self):
+        return self.__repr__()
 
-    def execute(self, args, interpreter_, run, noug_dir, exec_from: str = "<invalid>",
-                use_context: Context | None = None, cli_args=None, work_dir: str = None):
+    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
+                exec_from: str = "<invalid>", use_context: Context | None = None, cli_args: list[String] | None = None,
+                work_dir: str | None = None):
         if work_dir is None:
             work_dir = noug_dir
         # execute the function
         # create the result
         result = RTResult()
+        if cli_args is None:
+            cli_args = []
 
         # create an interpreter to run the code inside the function
         interpreter = interpreter_(run, noug_dir, cli_args, work_dir)
@@ -44,13 +58,12 @@ class Function(BaseFunction):
             self.context = use_context
         # generate the context and update symbol table
         exec_context = self.generate_new_context(True)
+        assert exec_context.symbol_table is not None
         exec_context.symbol_table.set("__exec_from__", String(exec_from))
         exec_context.symbol_table.set("__actual_context__", String(self.name))
-        if cli_args is None:
-            exec_context.symbol_table.set("__args__", List([]))
-        else:
-            cli_args = list(map(nice_str_from_idk, cli_args))
-            exec_context.symbol_table.set("__args__", List(cli_args))
+
+        cli_args_value: list[Value] = list(map(nice_str_from_idk, cli_args))
+        exec_context.symbol_table.set("__args__", List(cli_args_value))
         # print(self.context)
 
         # populate argument and check for errors
@@ -88,11 +101,11 @@ class Function(BaseFunction):
 
 class Method(Function):
     """Parent class for methods (functions in classes)"""
-    def __init__(self, name, body_node, param_names, should_auto_return,
+    def __init__(self, name: str | None, body_node: Node, param_names: list[str], should_auto_return: bool,
                  call_with_module_context: bool = False):
         super().__init__(name, body_node, param_names, should_auto_return, call_with_module_context)
         self.type_ = "method"
-        self.object_ = None
+        self.object_: Value | None = None
 
     def __repr__(self):
         return f'<method {self.name}>'

@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -23,9 +23,11 @@ UNICODEDATA_VERSION = unicodedata.unidata_version
 
 
 class UnicodeData(ModuleFunction):
+    functions: dict[str, BuiltinFunctionDict] = {}
+
     """ unicodedata module """
-    def __init__(self, name):
-        super().__init__('unicodedata', name)
+    def __init__(self, name: str):
+        super().__init__('unicodedata', name, functions=self.functions)
 
     def copy(self):
         """Return a copy of self"""
@@ -35,12 +37,16 @@ class UnicodeData(ModuleFunction):
     @staticmethod
     def is_unicode_char(char: Value, exec_ctx: Context, function: str) -> RTResult | None:
         if not isinstance(char, String):
+            assert char.pos_start is not None
+            assert char.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 char.pos_start, char.pos_end,
                 "first", f"unicodedata.{function}", "str", char, exec_ctx,
                 origin_file=f"lib_.unicodedata_.UnicodeData.is_unicode_char"
             ))
         if len(char) != 1:
+            assert char.pos_start is not None
+            assert char.pos_end is not None
             return RTResult().failure(RunTimeError(
                 char.pos_start, char.pos_end,
                 f"first argument of function unicodedata.{function} should be only one unicode character, not "
@@ -53,12 +59,16 @@ class UnicodeData(ModuleFunction):
     @staticmethod
     def is_valid_form_and_uni_str(form: Value, uni_str: Value, exec_ctx: Context, function: str) -> RTResult | None:
         if not isinstance(form, String):
+            assert form.pos_start is not None
+            assert form.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 form.pos_start, form.pos_end,
                 "first", f"unicodedata.{function}", "str", form, exec_ctx,
                 origin_file="lib_.unicodedata_.UnicodeData.is_valid_form_and_uni_str"
             ))
         if form.value not in ["NFC", "NFKC", "NFD", "NFKD"]:
+            assert form.pos_start is not None
+            assert form.pos_end is not None
             return RTResult().failure(RunTimeError(
                 form.pos_start, form.pos_end,
                 f"first argument of builtin function unicodedata.{function} should be 'NFC', 'NFKC', 'NFD' or 'NFKD', "
@@ -66,6 +76,8 @@ class UnicodeData(ModuleFunction):
                 exec_ctx, origin_file="lib_.unicodedata_.UnicodeData.is_valid_form_and_uni_str"
             ))
         if not isinstance(uni_str, String):
+            assert uni_str.pos_start is not None
+            assert uni_str.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 uni_str.pos_start, uni_str.pos_end,
                 "second", f"unicodedata.{function}", "str", uni_str, exec_ctx,
@@ -80,8 +92,12 @@ class UnicodeData(ModuleFunction):
         """ Like python unicodedata.lookup """
         # Params:
         # * name
+        assert exec_ctx.symbol_table is not None
         name = exec_ctx.symbol_table.getf("name")
         if not isinstance(name, String):
+            assert name is not None
+            assert name.pos_start is not None
+            assert name.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 name.pos_start, name.pos_end,
                 "first", "unicodedata.lookup", "str", name, exec_ctx,
@@ -90,6 +106,8 @@ class UnicodeData(ModuleFunction):
         try:
             char = unicodedata.lookup(name.value)
         except KeyError as e:
+            assert name.pos_start is not None
+            assert name.pos_end is not None
             return RTResult().failure(RTNotDefinedError(
                 name.pos_start, name.pos_end,
                 str(e).replace('"', ''),
@@ -98,18 +116,26 @@ class UnicodeData(ModuleFunction):
             ))
         return RTResult().success(String(char))
 
-    execute_unicodedata_lookup.param_names = ['name']
-    execute_unicodedata_lookup.optional_params = []
-    execute_unicodedata_lookup.should_respect_args_number = True
+    functions["lookup"] = {
+        "function": execute_unicodedata_lookup,
+        "param_names": ["name"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_unicodedata_name(self, exec_ctx: Context):
         """ Like python unicodedata.name """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "name")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         default = exec_ctx.symbol_table.getf("default")
 
@@ -117,142 +143,217 @@ class UnicodeData(ModuleFunction):
             name = String(unicodedata.name(char.value))
         except ValueError as e:
             if default is None:
+                assert char.pos_start is not None
+                assert char.pos_end is not None
                 return RTResult().failure(RunTimeError(
                     char.pos_start, char.pos_end,
-                    e,
+                    str(e),
                     exec_ctx,
                     origin_file="lib_.unicodedata_.UnicodeData.execute_unicodedata_name"
                 ))
             name = default
         return RTResult().success(name)
 
-    execute_unicodedata_name.param_names = ['char']
-    execute_unicodedata_name.optional_params = ['default']
-    execute_unicodedata_name.should_respect_args_number = True
+    functions["name"] = {
+        "function": execute_unicodedata_name,
+        "param_names": ["char"],
+        "optional_params": ["default"],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_unicodedata_category(self, exec_ctx: Context):
         """ Like python unicodedata.category """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "category")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         return RTResult().success(String(unicodedata.category(char.value)))
 
-    execute_unicodedata_category.param_names = ['char']
-    execute_unicodedata_category.optional_params = []
-    execute_unicodedata_category.should_respect_args_number = True
+    functions["category"] = {
+        "function": execute_unicodedata_category,
+        "param_names": ["char"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_unicodedata_bidirectional(self, exec_ctx: Context):
         """ Like python unicodedata.bidirectional """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "bidirectional")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         return RTResult().success(String(unicodedata.bidirectional(char.value)))
 
-    execute_unicodedata_bidirectional.param_names = ['char']
-    execute_unicodedata_bidirectional.optional_params = []
-    execute_unicodedata_bidirectional.should_respect_args_number = True
+    functions["bidirectional"] = {
+        "function": execute_unicodedata_bidirectional,
+        "param_names": ["char"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_unicodedata_combining(self, exec_ctx: Context):
         """ Like python unicodedata.combining """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "combining")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         return RTResult().success(Number(unicodedata.combining(char.value)))
 
-    execute_unicodedata_combining.param_names = ['char']
-    execute_unicodedata_combining.optional_params = []
-    execute_unicodedata_combining.should_respect_args_number = True
+    functions["combining"] = {
+        "function": execute_unicodedata_combining,
+        "param_names": ["char"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_unicodedata_east_asian_width(self, exec_ctx: Context):
         """ Like python unicodedata.east_asian_width """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "east_asian_width")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         return RTResult().success(String(unicodedata.east_asian_width(char.value)))
 
-    execute_unicodedata_east_asian_width.param_names = ['char']
-    execute_unicodedata_east_asian_width.optional_params = []
-    execute_unicodedata_east_asian_width.should_respect_args_number = True
+    functions["east_asian_width"] = {
+        "function": execute_unicodedata_east_asian_width,
+        "param_names": ["char"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_unicodedata_mirrored(self, exec_ctx: Context):
         """ Like python unicodedata.mirrored """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "mirrored")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         return RTResult().success(Number(unicodedata.mirrored(char.value)))
 
-    execute_unicodedata_mirrored.param_names = ['char']
-    execute_unicodedata_mirrored.optional_params = []
-    execute_unicodedata_mirrored.should_respect_args_number = True
+    functions["mirrored"] = {
+        "function": execute_unicodedata_mirrored,
+        "param_names": ["char"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_unicodedata_decomposition(self, exec_ctx: Context):
         """ Like python unicodedata.decomposition """
         # Params:
         # * char
+        assert exec_ctx.symbol_table is not None
         char = exec_ctx.symbol_table.getf("char")
+        assert char is not None
         is_unicode_char = self.is_unicode_char(char, exec_ctx, "decomposition")
         if is_unicode_char is not None:
             return is_unicode_char
+        assert isinstance(char, String)
 
         return RTResult().success(String(unicodedata.decomposition(char.value)))
 
-    execute_unicodedata_decomposition.param_names = ['char']
-    execute_unicodedata_decomposition.optional_params = []
-    execute_unicodedata_decomposition.should_respect_args_number = True
+    functions["decomposition"] = {
+        "function": execute_unicodedata_decomposition,
+        "param_names": ["char"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_unicodedata_normalize(self, exec_ctx: Context):
         """ Like python unicodedata.normalize """
         # Params:
         # * form
         # * uni_str
+        assert exec_ctx.symbol_table is not None
         form = exec_ctx.symbol_table.getf("form")
         uni_str = exec_ctx.symbol_table.getf("uni_str")
+        assert form is not None
+        assert uni_str is not None
         is_valid_form_and_uni_str = self.is_valid_form_and_uni_str(form, uni_str, exec_ctx, "normalize")
         if is_valid_form_and_uni_str is not None:
             return is_valid_form_and_uni_str
+        assert isinstance(form, String)
+        assert isinstance(uni_str, String)
 
         return RTResult().success(String(unicodedata.normalize(form.value, uni_str.value)))
 
-    execute_unicodedata_normalize.param_names = ['form', 'uni_str']
-    execute_unicodedata_normalize.optional_params = []
-    execute_unicodedata_normalize.should_respect_args_number = True
+    functions["normalize"] = {
+        "function": execute_unicodedata_normalize,
+        "param_names": ["form", "uni_str"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_unicodedata_is_normalized(self, exec_ctx: Context):
         """ Like python unicodedata.is_normalized """
         # Params:
         # * form
         # * uni_str
+        assert exec_ctx.symbol_table is not None
         form = exec_ctx.symbol_table.getf("form")
         uni_str = exec_ctx.symbol_table.getf("uni_str")
+        assert form is not None
+        assert uni_str is not None
         is_valid_form_and_uni_str = self.is_valid_form_and_uni_str(form, uni_str, exec_ctx, "is_normalized")
         if is_valid_form_and_uni_str is not None:
             return is_valid_form_and_uni_str
+        assert isinstance(form, String)
+        assert isinstance(uni_str, String)
 
         return RTResult().success(Number(int(unicodedata.is_normalized(form.value, uni_str.value))))
 
-    execute_unicodedata_is_normalized.param_names = ['form', 'uni_str']
-    execute_unicodedata_is_normalized.optional_params = []
-    execute_unicodedata_is_normalized.should_respect_args_number = True
+    functions["is_normalized"] = {
+        "function": execute_unicodedata_is_normalized,
+        "param_names": ["form", "uni_str"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
 
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported

@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -28,8 +28,10 @@ E = Number(math.e)
 
 class Math(ModuleFunction):
     """ Math module """
-    def __init__(self, name):
-        super().__init__("math", name)
+    functions: dict[str, BuiltinFunctionDict] = {}
+
+    def __init__(self, name: str):
+        super().__init__("math", name, functions=self.functions)
 
     def copy(self):
         """Return a copy of self"""
@@ -44,14 +46,20 @@ class Math(ModuleFunction):
         It returns the same as math.root(value, 2)"""
         # Params:
         # * value
+        assert exec_context.symbol_table is not None
         value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.sqrt", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_sqrt"
             ))
 
         if value.value < 0:  # we check if the value is greater than (or equal to) 0
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
                 "first argument of the built-in function 'math.sqrt' must be greater than (or equal to) 0.",
@@ -61,35 +69,51 @@ class Math(ModuleFunction):
         sqrt_ = math.sqrt(value.value)  # we calculate the square root
         return RTResult().success(Number(sqrt_))
 
-    execute_math_sqrt.param_names = ['value']
-    execute_math_sqrt.optional_params = []
-    execute_math_sqrt.should_respect_args_number = True
+    functions["sqrt"] = {
+        "function": execute_math_sqrt,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_isqrt(self, exec_context: Context):
         """Calculates the integer part of the square root of 'value'
         It returns the same as math.iroot(value, 2)"""
         # Params:
         # * value
+        assert exec_context.symbol_table is not None
         value = exec_context.symbol_table.getf('value')  # we get the value
-        if not (isinstance(value, Number) and value.is_int()):  # we check if the value is a number
+        if not (isinstance(value, Number) and isinstance(value.value, int)):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
-                value.pos_start, value.pos_end, "first", "math.sqrt", "int", value,
-                exec_context, "lib_.math_.Math.execute_math_sqrt"
+                value.pos_start, value.pos_end, "first", "math.isqrt", "int", value,
+                exec_context, "lib_.math_.Math.execute_math_isqrt"
             ))
 
         if value.value < 0:  # we check if the value is greater than (or equal to) 0
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
                 "first argument of the built-in function 'math.isqrt' must be greater than (or equal to) 0.",
-                exec_context, "lib_.math_.Math.execute_math_sqrt"
+                exec_context, "lib_.math_.Math.execute_math_isqrt"
             ))
 
         sqrt_ = math.isqrt(value.value)  # we calculate the square root
         return RTResult().success(Number(sqrt_))
 
-    execute_math_isqrt.param_names = ['value']
-    execute_math_isqrt.optional_params = []
-    execute_math_isqrt.should_respect_args_number = True
+    functions["isqrt"] = {
+        "function": execute_math_isqrt,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_root(self, exec_context: Context):
         """Calculates the n-root of 'value' (ⁿ√value)
@@ -98,14 +122,20 @@ class Math(ModuleFunction):
         # * value
         # Optional params:
         # * n
+        assert exec_context.symbol_table is not None
         value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.root", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_root"
             ))
 
         if value.value < 0:  # we check if the value is greater than (or equal to) 0
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
                 "first argument of the built-in function ‘math.root’ must be greater than (or equal to) 0.",
@@ -117,6 +147,8 @@ class Math(ModuleFunction):
             n = Number(2).set_pos(value.pos_end, self.pos_end)
 
         if not isinstance(n, Number):  # we check if 'n' is a number
+            assert n.pos_start is not None
+            assert n.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 n.pos_start, n.pos_end, "second", "math.root", "number", n,
                 exec_context, "lib_.math_.Math.execute_math_root"
@@ -126,9 +158,14 @@ class Math(ModuleFunction):
 
         return RTResult().success(value_to_return)
 
-    execute_math_root.param_names = ['value']
-    execute_math_root.optional_params = ['n']
-    execute_math_root.should_respect_args_number = True
+    functions["root"] = {
+        "function": execute_math_root,
+        "param_names": ["value"],
+        "optional_params": ["n"],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_iroot(self, exec_context: Context):
         """Calculates the integer part of the n-root of 'value' (ⁿ√value)
@@ -137,14 +174,20 @@ class Math(ModuleFunction):
         # * value
         # Optional params:
         # * n
+        assert exec_context.symbol_table is not None
         value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.iroot", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_root"
             ))
 
         if value.value < 0:  # we check if the value is greater than (or equal to) 0
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
                 "first argument of the built-in function ‘math.iroot’ must be greater than (or equal to) 0.",
@@ -156,6 +199,8 @@ class Math(ModuleFunction):
             n = Number(2).set_pos(value.pos_end, self.pos_end)
 
         if not isinstance(n, Number):  # we check if 'n' is a number
+            assert n.pos_start is not None
+            assert n.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 n.pos_start, n.pos_end, "second", "math.iroot", "number", n,
                 exec_context, "lib_.math_.Math.execute_math_root"
@@ -165,16 +210,25 @@ class Math(ModuleFunction):
 
         return RTResult().success(value_to_return)
 
-    execute_math_iroot.param_names = ['value']
-    execute_math_iroot.optional_params = ['n']
-    execute_math_iroot.should_respect_args_number = True
+    functions["iroot"] = {
+        "function": execute_math_iroot,
+        "param_names": ["value"],
+        "optional_params": ["n"],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_degrees(self, exec_context: Context):
         """Converts 'value' (radians) to degrees"""
         # Params:
         # * value
+        assert exec_context.symbol_table is not None
         value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.degrees", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_degrees"
@@ -182,16 +236,25 @@ class Math(ModuleFunction):
         degrees = math.degrees(value.value)
         return RTResult().success(Number(degrees))
 
-    execute_math_degrees.param_names = ['value']
-    execute_math_degrees.optional_params = []
-    execute_math_degrees.should_respect_args_number = True
+    functions["degrees"] = {
+        "function": execute_math_degrees,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_radians(self, exec_context: Context):
         """Converts 'value' (degrees) to radians"""
         # Params:
         # * value
+        assert exec_context.symbol_table is not None
         value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.radians", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_radians"
@@ -199,16 +262,25 @@ class Math(ModuleFunction):
         radians = math.radians(value.value)
         return RTResult().success(Number(radians))
 
-    execute_math_radians.param_names = ['value']
-    execute_math_radians.optional_params = []
-    execute_math_radians.should_respect_args_number = True
+    functions["radians"] = {
+        "function": execute_math_radians,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_sin(self, exec_context: Context):
         """Calculates sin('value')"""
         # Params:
         # * value
+        assert exec_context.symbol_table is not None
         value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.sin", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_sin"
@@ -216,16 +288,25 @@ class Math(ModuleFunction):
         sin = math.sin(value.value)
         return RTResult().success(Number(sin))
 
-    execute_math_sin.param_names = ['value']
-    execute_math_sin.optional_params = []
-    execute_math_sin.should_respect_args_number = True
+    functions["sin"] = {
+        "function": execute_math_sin,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_cos(self, exec_context: Context):
         """Calculates cos('value')"""
         # Params:
         # * value
+        assert exec_context.symbol_table is not None
         value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.cos", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_cos"
@@ -233,16 +314,25 @@ class Math(ModuleFunction):
         cos = math.cos(value.value)
         return RTResult().success(Number(cos))
 
-    execute_math_cos.param_names = ['value']
-    execute_math_cos.optional_params = []
-    execute_math_cos.should_respect_args_number = True
+    functions["cos"] = {
+        "function": execute_math_cos,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_tan(self, exec_context: Context):
         """Calculates tan('value')"""
         # Params:
         # * value
+        assert exec_context.symbol_table is not None
         value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.tan", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_tan"
@@ -250,16 +340,25 @@ class Math(ModuleFunction):
         tan = math.tan(value.value)
         return RTResult().success(Number(tan))
 
-    execute_math_tan.param_names = ['value']
-    execute_math_tan.optional_params = []
-    execute_math_tan.should_respect_args_number = True
+    functions["tan"] = {
+        "function": execute_math_tan,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_asin(self, exec_context: Context):
         """Calculates asin('value')"""
         # Params:
         # * value
+        assert exec_context.symbol_table is not None
         value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.asin", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_asin"
@@ -267,6 +366,8 @@ class Math(ModuleFunction):
         try:
             asin = math.asin(value.value)
         except ValueError:
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
                 "first argument of the built-in function ‘math.asin’ must be a number between -1 and 1.",
@@ -274,16 +375,25 @@ class Math(ModuleFunction):
             ))
         return RTResult().success(Number(asin))
 
-    execute_math_asin.param_names = ['value']
-    execute_math_asin.optional_params = []
-    execute_math_asin.should_respect_args_number = True
+    functions["asin"] = {
+        "function": execute_math_asin,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_acos(self, exec_context: Context):
         """Calculates acos('value')"""
         # Params:
         # * value
+        assert exec_context.symbol_table is not None
         value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.acos", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_acos"
@@ -291,6 +401,8 @@ class Math(ModuleFunction):
         try:
             acos = math.acos(value.value)
         except ValueError:  # 1 < value or value < -1
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTArithmeticError(
                 value.pos_start, value.pos_end,
                 "first argument of the built-in function ‘math.acos’ must be a number between -1 and 1.",
@@ -298,16 +410,25 @@ class Math(ModuleFunction):
             ))
         return RTResult().success(Number(acos))
 
-    execute_math_acos.param_names = ['value']
-    execute_math_acos.optional_params = []
-    execute_math_acos.should_respect_args_number = True
+    functions["acos"] = {
+        "function": execute_math_acos,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_atan(self, exec_context: Context):
         """Calculates atan('value')"""
         # Params:
         # * value
+        assert exec_context.symbol_table is not None
         value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.atan", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_atan"
@@ -315,28 +436,44 @@ class Math(ModuleFunction):
         atan = math.atan(value.value)
         return RTResult().success(Number(atan))
 
-    execute_math_atan.param_names = ['value']
-    execute_math_atan.optional_params = []
-    execute_math_atan.should_respect_args_number = True
+    functions["atan"] = {
+        "function": execute_math_atan,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_abs(self, exec_context: Context):
         """Exactly like python `abs()` (absolute value)"""
         # Params:
         # * value
-        value: Value = exec_context.symbol_table.getf('value')  # we get the value
+        assert exec_context.symbol_table is not None
+        value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.abs", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_abs"
             ))
 
-        value_to_return = value.abs_()
+        value_to_return, error = value.abs_()
+        if error is not None:
+            return RTResult().failure(error)
 
         return RTResult().success(value_to_return)
 
-    execute_math_abs.param_names = ['value']
-    execute_math_abs.optional_params = []
-    execute_math_abs.should_respect_args_number = True
+    functions["abs"] = {
+        "function": execute_math_abs,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_log(self, exec_context: Context):
         """Exactly like python 'log()'. Default base is 'e' (math_e)."""
@@ -344,18 +481,24 @@ class Math(ModuleFunction):
         # * value
         # Optional params:
         # * base
-        value: Value = exec_context.symbol_table.getf('value')  # we get the value
+        assert exec_context.symbol_table is not None
+        value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.log", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_log"
             ))
 
-        base: Value = exec_context.symbol_table.getf('base')  # we get the base
+        base = exec_context.symbol_table.getf('base')  # we get the base
         if base is None:
             value_to_return = Number(math.log(value.value))
         else:
             if not isinstance(base, Number):  # we check if the base is a number
+                assert base.pos_start is not None
+                assert base.pos_end is not None
                 return RTResult().failure(RTTypeErrorF(
                     base.pos_start, base.pos_end, "second", "math.log", "number", base,
                     exec_context, "lib_.math_.Math.execute_math_log"
@@ -364,16 +507,25 @@ class Math(ModuleFunction):
 
         return RTResult().success(value_to_return)
 
-    execute_math_log.param_names = ['value']
-    execute_math_log.optional_params = ['base']
-    execute_math_log.should_respect_args_number = True
+    functions["log"] = {
+        "function": execute_math_log,
+        "param_names": ["value"],
+        "optional_params": ["base"],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
     def execute_math_log2(self, exec_context: Context):
         """Exactly like python 'log2()', is log(n, 2)"""
         # Params:
         # * value
-        value: Value = exec_context.symbol_table.getf('value')  # we get the value
+        assert exec_context.symbol_table is not None
+        value = exec_context.symbol_table.getf('value')  # we get the value
         if not isinstance(value, Number):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "math.log2", "number", value,
                 exec_context, "lib_.math_.Math.execute_math_log2"
@@ -383,9 +535,14 @@ class Math(ModuleFunction):
 
         return RTResult().success(value_to_return)
 
-    execute_math_log2.param_names = ['value']
-    execute_math_log2.optional_params = []
-    execute_math_log2.should_respect_args_number = True
+    functions["log2"] = {
+        "function": execute_math_log2,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
 
 
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported

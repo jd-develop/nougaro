@@ -13,7 +13,9 @@
 * [X] add an error when things like `math.(assert 1)` (finished 3/10/23)
 * [X] add `time.time()` (finished 3/10/23)
 
-## 0.16.0 beta (goal: november 26th, 2023)
+## ✅ 0.16.0 beta (goal: november 26th, 2023)
+
+### Release date: november 27th, 2023
 
 * [X] add '\xXX' and '\uXXXX' support (finished 6/10/23)
 * [X] add '\UXXXXXXXX' (finished 8/10/23)
@@ -32,11 +34,12 @@
 * [X] add possibility to read command line arguments (finished 26/10/2023)
 * [X] switch to semantic versioning (finished 16/10/23)
 * [X] return None in loops, even when there is a continue of a break (finished 24/11/2023)
-* [X] fix the fact that nougaro doesn’t crashes with an error code when there is an error
+* [X] fix the fact that nougaro doesn't crash with an error code when there is an error
 
 ## 0.17.0 beta (goal: february 2024)
 
 * [X] add `import ... as ...` (finished 16/10/23)
+* [ ] rewrite shell.py CLI args with `argparse`
 * [ ] add optional arguments in functions
   * [ ] Parser:
     * [ ] Allow optional parameters, do not allow positional parameters after them
@@ -56,6 +59,7 @@
 * [ ] add `tkinter`
 * [ ] add `webbrowser`
 * [X] add `unicodedata` (finished 9/10/23)
+* [ ] move config files to `~/.config` under Linux and BSD, `~/Library/Preferences` under macOS, and `%appdata%` under Windaube
 
 ## 0.19.0 beta (goal: july 2024)
 
@@ -69,8 +73,9 @@
 * [ ] if possible, implement `break (name)` and `continue (name)` where (name) is `if`, `for`, …
 * [X] completely switch to semver (finished 7/11/2023)
 
-## Future realeases
+## Future releases
 
 * [ ] add `turtle`
 * [ ] add `socket`
 * [ ] add `requests`
+* [ ] eventually remove protected variables

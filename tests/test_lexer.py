@@ -30,6 +30,7 @@ class TestLexer(unittest.TestCase):
         )
 
         self.assertEqual(tokens, [])
+        assert error is not None
         self.assertEqual(error.as_string(), expected_error.as_string())
 
     def test_identifiers_and_keywords(self):

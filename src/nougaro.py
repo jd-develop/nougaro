@@ -132,6 +132,7 @@ def run(
     interpreter.update_symbol_table(context)
 
     # visit the main node of the AST with the created context
+    assert not isinstance(ast.node, list)
     result = interpreter.visit(ast.node, context, False, main_visit=True)
     if print_context:
         print(context.__str__())

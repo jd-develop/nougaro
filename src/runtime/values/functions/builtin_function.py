@@ -340,7 +340,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     builtin_functions["clear"] = {
         "function": execute_clear,
         "param_names": [],
-        "optional_params": [""],
+        "optional_params": [],
         "should_respect_args_number": False,
         "run_noug_dir_work_dir": False,
         "noug_dir": False

@@ -29,14 +29,32 @@ fi
 if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
     python3 -m pip install --upgrade pip wheel colorama nuitka --break-system-packages
 
+    return_code=$?
+    if [ $return_code != 0 ]; then
+        echo pip returned with error
+        exit $return_code
+    fi
+
     read -p "Nougaro version: " -r nougversion
     read -p "Phase (beta for example): " -r nougphase
 
     python3 -m nuitka --standalone --include-package=lib_ --no-deployment-flag=self-execution shell.py
+
+    return_code=$?
+    if [ $return_code != 0 ]; then
+        echo nuitka returned with error
+        exit $return_code
+    fi
 
     cp -r example.noug LICENSE README.md shell.py CODE_OF_CONDUCT.md CONTRIBUTING.md how_it_works.md tests/ examples lib_ src config repo-image.png shell.dist/
 
     echo "Renaming and compressing…"
     mv shell.dist nougaro-"$nougversion"-"$nougphase"-linux-bin
     tar -czf nougaro-"$nougversion"-"$nougphase"-linux-bin.tar.gz nougaro-"$nougversion"-"$nougphase"-linux-bin/
+
+    return_code=$?
+    if [ $return_code != 0 ]; then
+        echo tar returned with error
+        exit $return_code
+    fi
 fi

@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) jd-dev@laposte.net
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) jd-dev@laposte.net
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see https://www.gnu.org/licenses/.
@@ -16,6 +16,7 @@ read -p "Continue? [y/N] " -r c
 if [[ $c == [Yy] ]]; then
     echo "WARNING: a pip command will be executed (see below) and may (in edge cases) break your python installation or your OS (it won't)"
     echo "WARNING: this is the command : 'python3 -m pip install --upgrade pip wheel colorama nuitka --break-system-packages'"
+    echo "WARNING: For information, the python version that will be used is $(python3 --version)."
     read -p "Continue? [y/N] " -r d
 fi
 

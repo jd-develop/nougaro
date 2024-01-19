@@ -1,6 +1,6 @@
 @echo off
 rem Nougaro : a python-interpreted high-level programming language
-rem Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) jd-dev@laposte.net
+rem Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) jd-dev@laposte.net
 
 rem You should have received a copy of the GNU General Public License
 rem along with this program.  If not, see https://www.gnu.org/licenses/.
@@ -10,6 +10,11 @@ rem This file is used to build Nougaro for Windows using Nuitka (requires pip an
 echo WARNING: please execute this script ONLY in a safe environnement, like in a sandbox directory.
 echo WARNING: this script may use Internet connection, and having an Internet connection is recommended. However, you can execute the script without any Internet connection.
 echo You can exit this script safely without building anything by pressing CTRL+C or by closing this window :)
+pause
+
+echo The following Python version will be used:
+python --version
+echo You can stop this script now if this is not correct.
 pause
 
 rem We update pip and nuitka

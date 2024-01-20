@@ -1,11 +1,13 @@
 /* Nougaro : a python-interpreted high-level programming language
-   Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+   Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+import time
 
 
 def test_nougaro(print_OK)
+    var start_time = time.time()
     assert __noug_version__ == "0.17.0-beta"
     print("Hello Toulouse!")  # the entire world is actually Toulouse, trust me. If you say 'pain au chocolat', you're not in the world.
     # comment
@@ -148,6 +150,7 @@ def test_nougaro(print_OK)
     import debug
     assert not 10 == debug and 10 != debug and not debug == 10 and debug != 10
     assert not (False and 1/0)
+    assert True or 1/0
     var a = 1
     assert (is_int(a) and round(a)) == True
     var a = "str"
@@ -466,7 +469,7 @@ def test_nougaro(print_OK)
     if print_OK then print("OK loops 2")
 
     # files
-    assert (read __noug_dir__ + "/tests/test_file.noug" 8) == "def test_nougaro(print_OK)\n"
+    assert (read __noug_dir__ + "/tests/test_file.noug" 9) == "def test_nougaro(print_OK)\n"
     assert (write "hey" !>> __noug_dir__ + "/example_file" 2) == "hey"
     assert (read __noug_dir__ + "/example_file" 2) in ["hey\n", "hey"]
     assert (write "Hello world!" !>> __noug_dir__ + "/example_file" 2) == "Hello world!"
@@ -524,8 +527,8 @@ def test_nougaro(print_OK)
 
     if print_OK then print("OK statistics lib")
 
-    import time
     assert time.time() > 0  # don’t test after changing your computer clock before 1970-01-01 00:00:00 x)
+    assert is_num(time.time())
 
     print("Please test 'time' module (tested when 'example()' is executed)")
     print("Please test 'lorem' module")
@@ -564,24 +567,30 @@ def test_nougaro(print_OK)
     assert noug_version.major == int(split(__noug_version__, ".")(0))
     assert noug_version.minor == int(split(__noug_version__, ".")(1))
 
-    if print_OK then print("OK unicodedata")
+    if print_OK then print("OK noug_version")
+
+    print("Please also test importing in current directory.")
 
     # export ... as ...
     import debug
     assert is_func(debug.disable)
     assert debug.test_pi == 3.14
 
-    if print_OK then print("export as")
+    if print_OK then print("OK export as")
 
     # system_call
-    print("Here it should print “hello”:")
+    assert print_in_red_ret("Here it should print “hello”:") == "Here it should print “hello”:"
     system_call("echo hello")
-    print("If it didn't work, please open an issue on GitHub.")
+    print_in_red("If it didn't work, please open an issue on GitHub.")
     print()
+
+    if print_OK then print("OK system_call (or maybe, please check)")
 
     # everything is fine in this file
     if print_OK then print("OK everything")
     print("Everything seems fine!")
+    var delta_time = time.time() - start_time
+    print("Ran Nougaro test file in " + str(round(delta_time, 5)) + " seconds.")
 end
 
 

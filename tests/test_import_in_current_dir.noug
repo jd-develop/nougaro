@@ -1,0 +1,19 @@
+/* Nougaro : a python-interpreted high-level programming language
+   Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+
+# import file in current directory and subdirectories
+
+def test_import_in_current_dir()
+    print("Testing to import non-builtin files…")
+    import lib_test
+    assert lib_test.this_is_a_test == 3
+    import lib_tests.lib_test2
+    assert lib_test2.this_is_a_test == 5
+    print("Done.")
+end
+
+
+test_import_in_current_dir()

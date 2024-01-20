@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -13,7 +13,6 @@ from src.runtime.symbol_table import SymbolTable
 from src.runtime.values.number_constants import *
 from src.runtime.values.basevalues.basevalues import String, Value, NoneValue
 from src.runtime.values.functions.builtin_function import BuiltInFunction
-from src.constants import PROTECTED_VARS
 # built-in python imports
 import platform
 import sys
@@ -129,22 +128,3 @@ def set_symbol_table(symbol_table: SymbolTable):
     if '__symbol_table__' in symbols_copy.keys():
         del symbols_copy['__symbol_table__']
     symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
-
-    # test_protected_vars(symbol_table)
-
-
-def test_protected_vars(symbol_table: SymbolTable):
-    """Test if all the variables in the symbol table are protected in writing or not. Used while coding."""
-    error_count = 0
-    for symbol in symbol_table.symbols:
-        if symbol not in PROTECTED_VARS:
-            if symbol not in [
-                "numberOfHornsOnAnUnicorn",
-                "theLoneliestNumber",
-                "rickroll",
-                "__how_many_lines_of_code__"
-            ]:
-                print(f"missing {symbol} in PROTECTED_VARS")
-                error_count += 1
-    if error_count == 0:
-        print("Good job! Basic SymbolTable does not contain unprotected vars! :)")

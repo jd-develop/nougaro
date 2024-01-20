@@ -82,4 +82,4 @@
 * [ ] add `turtle`
 * [ ] add `socket`
 * [ ] add `requests`
-* [ ] eventually remove protected variables
+* [X] eventually remove protected variables (finished 20/01/2024)

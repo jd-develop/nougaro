@@ -591,6 +591,11 @@ def test_nougaro(print_OK)
 
     if print_OK then print("OK system_call (or maybe, please check)")
 
+    # variable that shadows builtin name
+    var reverse = answerToTheLifeTheUniverseAndEverything
+    assert reverse == 42
+    if print_OK then print("OK variable that shadows builtin name")
+
     # everything is fine in this file
     if print_OK then print("OK everything")
     print("Everything seems fine!")

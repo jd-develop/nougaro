@@ -13,7 +13,6 @@ from src.runtime.values.basevalues.basevalues import Number, String, List, NoneV
 from src.runtime.values.number_constants import FALSE, TRUE
 from src.runtime.values.functions.function import Function, Method
 from src.runtime.values.functions.base_function import BaseFunction
-from src.constants import PROTECTED_VARS
 from src.parser.nodes import *
 from src.errors.errors import *
 from src.lexer.token_types import TT, TOKENS_NOT_TO_QUOTE
@@ -585,16 +584,6 @@ class Interpreter:
                 assert isinstance(var_name[0].value, str)
                 final_var_name: str = var_name[0].value
 
-                VARIABLE_IS_PROTECTED = final_var_name in PROTECTED_VARS
-                if VARIABLE_IS_PROTECTED:
-                    assert node.pos_start is not None
-                    assert node.pos_end is not None
-                    return result.failure(RunTimeError(
-                        node.pos_start, node.pos_end,
-                        f"can not create or edit a variable with builtin name '{final_var_name}'.",
-                        ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
-                    ))
-
                 variable_exists = final_var_name in ctx.symbol_table.symbols
                 if variable_exists:
                     var_actual_value: Value | None = ctx.symbol_table.get(final_var_name)
@@ -602,16 +591,6 @@ class Interpreter:
                     var_actual_value: Value | None = None
                 value: Value | None = None
             else:  # var a.b.(...).z = value
-                if isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"] \
-                        and var_name[0].value in PROTECTED_VARS:
-                    assert var_name[0].pos_start is not None
-                    assert var_name[0].pos_end is not None
-                    return result.failure(RunTimeError(
-                        var_name[0].pos_start, var_name[0].pos_end,
-                        f"can not edit a variable with builtin name '{var_name[0].value}'.",
-                        ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
-                    ))
-
                 if isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"]:
                     assert isinstance(var_name[0].value, str)
                     value = ctx.symbol_table.get(var_name[0].value)
@@ -789,16 +768,6 @@ class Interpreter:
             assert node.pos_end is not None
             return self._undefined(node.pos_start, node.pos_end, var_name, ctx, result,
                                    f"{_ORIGIN_FILE}.visit_varDeleteNode")
-
-        IS_VAR_NAME_PROTECTED = var_name in PROTECTED_VARS
-        if IS_VAR_NAME_PROTECTED:
-            assert node.pos_start is not None
-            assert node.pos_end is not None
-            return result.failure(RunTimeError(
-                node.pos_start, node.pos_end,
-                f"can not delete builtin name '{var_name}'.",
-                ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarDeleteNode"
-            ))
 
         ctx.symbol_table.remove(var_name)
 
@@ -1083,14 +1052,6 @@ class Interpreter:
         func_name = None
         if node.var_name_token is not None:
             func_name = node.var_name_token.value
-            if func_name in PROTECTED_VARS:
-                assert node.pos_start is not None
-                assert node.pos_end is not None
-                return result.failure(RunTimeError(
-                    node.pos_start, node.pos_end,
-                    f"can not create a function with builtin name '{func_name}'.",
-                    ctx, origin_file=f"{_ORIGIN_FILE}.visit_FuncDefNode"
-                ))
             assert isinstance(func_name, str)
 
         body_node = node.body_node
@@ -1122,14 +1083,6 @@ class Interpreter:
         class_name = None
         if node.var_name_token is not None:
             class_name = node.var_name_token.value
-            if class_name in PROTECTED_VARS:
-                assert node.pos_start is not None
-                assert node.pos_end is not None
-                return result.failure(RunTimeError(
-                    node.pos_start, node.pos_end,
-                    f"can not create a class with builtin name '{class_name}'.",
-                    ctx, origin_file=f"{_ORIGIN_FILE}.visit_ClassNode"
-                ))
             assert isinstance(class_name, str)
 
         body_node = node.body_node
@@ -1833,17 +1786,10 @@ class Interpreter:
             file_str = input()
 
         if identifier is not None:  # an identifier is given
-            if identifier.value not in PROTECTED_VARS:  # the identifier is not protected
-                assert ctx.symbol_table is not None
-                assert isinstance(identifier.value, str)
-                ctx.symbol_table.set(identifier.value, String(file_str))
-                self.update_symbol_table(ctx)
-            else:
-                return result.failure(RunTimeError(
-                    node.pos_start, node.pos_end,
-                    f"unable to create a variable with builtin name '{identifier.value}'.",
-                    ctx, origin_file=f"{_ORIGIN_FILE}.visit_ReadNode"
-                ))
+            assert ctx.symbol_table is not None
+            assert isinstance(identifier.value, str)
+            ctx.symbol_table.set(identifier.value, String(file_str))
+            self.update_symbol_table(ctx)
 
         return result.success(String(file_str))
 

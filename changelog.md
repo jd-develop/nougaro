@@ -2,6 +2,11 @@
 
 This file is updated nearly every commit and copied to GH release changelog.
 
+## 0.18.0-beta
+* Remove `PROTECTED_VARS`, which means that variables can now use builtin names as identifiers.
+* Add `path_exists(path)` builtin function
+* Add more tests
+
 ## 0.17.0-beta
 
 ### Technical

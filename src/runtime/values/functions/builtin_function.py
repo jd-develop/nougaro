@@ -1847,6 +1847,29 @@ class BuiltInFunction(BaseBuiltInFunction):
                 mode.pos_start, mode.pos_end, "second", "sort", "str", mode,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
             ))
+        
+        def get_comparison_gt(list_to_sort_: list[Value], index_: int) -> tuple[Number, None] | tuple[None, RunTimeError]:
+            if index_ + 1 < len(list_to_sort_):
+                comp, error_ = list_to_sort_[index_].get_comparison_gt(list_to_sort_[index_ + 1])
+                if error_ is not None:
+                    return None, error_
+                else:
+                    assert isinstance(comp, Number)
+            else:
+                comp = FALSE.copy()
+            return comp, None
+        
+        def is_sorted(list_to_sort: list[Value]) -> tuple[bool, None] | tuple[None, RunTimeError]:
+            for i in range(len(list_to_sort)):
+                if i+1 == len(list_to_sort):
+                    continue
+                comp, error = get_comparison_gt(list_to_sort, i)
+                if error is not None:
+                    return None, error
+                assert comp is not None
+                if comp.is_true():
+                    return False, None
+            return True, None
 
         mode_noug = mode
         mode = mode_noug.value
@@ -1863,24 +1886,11 @@ class BuiltInFunction(BaseBuiltInFunction):
                     origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
                 ))
         elif mode == "stalin":  # stalin sort
-            def get_comparison(
-                    list_to_sort_: list[Value], index_: int
-            ) -> tuple[Number, None] | tuple[None, RunTimeError]:
-                if index_ + 1 < len(list_to_sort_):
-                    comp, error_ = list_to_sort_[index_].get_comparison_gt(list_to_sort_[index_ + 1])
-                    if error_ is not None:
-                        return None, error_
-                    else:
-                        assert isinstance(comp, Number)
-                else:
-                    comp = FALSE.copy()
-                return comp, None
-
             for i in range(len(list_to_sort)):
                 if i == len(list_to_sort):
                     break
 
-                comparison, error = get_comparison(list_to_sort, i)
+                comparison, error = get_comparison_gt(list_to_sort, i)
                 if error is not None:
                     return result.failure(error)
                 
@@ -1888,7 +1898,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
                 while i + 1 < len(list_to_sort) and comparison.is_true():
                     list_to_sort.pop(i + 1)
-                    comparison, error = get_comparison(list_to_sort, i)
+                    comparison, error = get_comparison_gt(list_to_sort, i)
                     if error is not None:
                         return result.failure(error)
                     assert comparison is not None
@@ -1934,6 +1944,15 @@ class BuiltInFunction(BaseBuiltInFunction):
 
             list_of_coroutines = [wait_and_append(i) for i in list_to_sort_only_nums]
             asyncio.run(execute_coroutine_list(list_of_coroutines))
+        elif mode == "miracle":
+            sorted_ = list_to_sort
+            is_sorted_, error = is_sorted(sorted_)
+            if error is not None:
+                return result.failure(error)
+            while not is_sorted_:
+                is_sorted_, error = is_sorted(sorted_)
+                if error is not None:
+                    return result.failure(error)
         else:  # mode is none of the above
             assert mode_noug.pos_start is not None
             assert mode_noug.pos_end is not None
@@ -1941,8 +1960,9 @@ class BuiltInFunction(BaseBuiltInFunction):
                 mode_noug.pos_start, mode_noug.pos_end,
                 "this mode does not exist. Available modes:\n"
                 "\t* 'timsort' (default),\n"
-                "\t* 'stalin',"
-                "\t* 'sleep'.",
+                "\t* 'stalin',\n"
+                "\t* 'sleep',\n"
+                "\t* 'miracle'.",
                 exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
             ))
         

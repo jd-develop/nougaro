@@ -422,6 +422,11 @@ def test_nougaro(print_OK)
 
     if print_OK then print("OK builtin funcs 12")
 
+    assert path_exists(__noug_dir__)
+    assert path_exists(__noug_dir__ + "/tests/test_file.noug")
+
+    if print_OK then print("OK builtin funcs 13")
+
     # builtin variables
     assert __os_name__ in [\
         "Windows",\

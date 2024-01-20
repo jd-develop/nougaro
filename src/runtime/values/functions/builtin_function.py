@@ -1896,7 +1896,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             sorted_ = list_to_sort  
         elif mode == "sleep" or mode == "sleep-verbose":  # sleep sort
             # sleep sort was implemented by Mistera. Please refer to him if you have any questions about it, as I
-            # completely don’t have any ideas of how tf asyncio works
+            # completely don’t have any ideas on how tf asyncio works
             import asyncio
 
             sorted_: list[Value] = []
@@ -2096,6 +2096,33 @@ class BuiltInFunction(BaseBuiltInFunction):
     builtin_functions["__python__"] = {
         "function": execute___python__,
         "param_names": ["source"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
+
+    def execute_path_exists(self, exec_ctx: Context) -> RTResult:
+        """Return TRUE if the path exists"""
+        assert exec_ctx.symbol_table is not None
+        path = exec_ctx.symbol_table.getf("path")
+        if not isinstance(path, String):
+            assert path is not None
+            assert path.pos_start is not None
+            assert path.pos_end is not None
+            return RTResult().failure(RTTypeErrorF(
+                path.pos_start, path.pos_end,
+                "first", "path_exists", "str", path,
+                exec_ctx,
+                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_path_exists"
+            ))
+        
+        path_exists = os.path.exists(path.value)
+        return RTResult().success(Number(int(path_exists)))
+
+    builtin_functions["path_exists"] = {
+        "function": execute_path_exists,
+        "param_names": ["path"],
         "optional_params": [],
         "should_respect_args_number": True,
         "run_noug_dir_work_dir": False,

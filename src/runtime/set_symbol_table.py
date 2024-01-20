@@ -82,6 +82,8 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("startswith", BuiltInFunction('startswith'))
     symbol_table.set("endswith", BuiltInFunction('endswith'))
 
+    symbol_table.set("path_exists", BuiltInFunction('path_exists'))
+
     # Hum...
     symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))
     symbol_table.set("numberOfHornsOnAnUnicorn", Number(1))

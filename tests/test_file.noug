@@ -416,7 +416,7 @@ def test_nougaro(print_OK)
     assert reverse(sort([3, 1, 5, 6, 12, -4, 0, 9999999, 45])) == [9999999, 45, 12, 6, 5, 3, 1, 0, -4]
     assert reverse("bépo") == "opéb" != "azerty"
     print("Executing sleep sort, this should take 4 seconds...")
-    assert sort([1, 2, 3, 4, 3, 2, 1, 0, 4, 2, 4, 1, 2, 4, 3], "sleep") == [0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4]
+    assert sort([1, 2, 3, 4, 3, 2, 1, 0, 4, 2, 4, 1, 2, 4, 3], "sleep-verbose") == [0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4]
     assert sort([0], "sleep") == [0]
     assert sort([], "sleep") == []
 

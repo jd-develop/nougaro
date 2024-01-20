@@ -1894,7 +1894,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                     assert comparison is not None
 
             sorted_ = list_to_sort  
-        elif mode == "sleep":  # sleep sort
+        elif mode == "sleep" or mode == "sleep-verbose":  # sleep sort
             # sleep sort was implemented by Mistera. Please refer to him if you have any questions about it, as I
             # completely don’t have any ideas of how tf asyncio works
             import asyncio
@@ -1928,6 +1928,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             async def wait_and_append(i_: int):
                 nonlocal sorted_
                 await asyncio.sleep(i_)
+                if mode == "sleep-verbose":
+                    print(f"(sleep sort) Currently appending {i_} to the final list.")
                 sorted_.append(Number(i_))
 
             list_of_coroutines = [wait_and_append(i) for i in list_to_sort_only_nums]

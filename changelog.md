@@ -7,6 +7,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Add `path_exists(path)` builtin function
 * Add miracle sort
 * Add more tests
+* Better error messages
 
 ## 0.17.0-beta
 

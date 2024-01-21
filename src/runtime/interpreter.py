@@ -144,7 +144,8 @@ class Interpreter:
             origin_file: str = f"{_ORIGIN_FILE}._undefined",
             edit: bool = False
     ) -> RTResult:
-        """Returns a RTNotDefinedError with a proper message."""
+        """Returns a RTNotDefinedError with a proper message.
+        Note: `edit` parameter is used when the user wants to edit an undefined variable"""
         assert ctx.symbol_table is not None
         close_match_in_symbol_table = ctx.symbol_table.best_match(var_name)
         IS_NOUGARO_LIB = os.path.exists(os.path.abspath(self.noug_dir + f"/lib_/{var_name}.noug"))
@@ -162,6 +163,12 @@ class Interpreter:
                 ctx, origin_file
             ))
         elif IS_NOUGARO_LIB or IS_PYTHON_LIB:
+            if close_match_in_symbol_table is not None:
+                return result.failure(RTNotDefinedError(
+                    pos_start, pos_end,
+                    f"{err_msg} Maybe you forgot to import it? Or maybe you did mean '{close_match_in_symbol_table}'?",
+                    ctx, origin_file
+                ))
             return result.failure(RTNotDefinedError(
                 pos_start, pos_end,
                 f"{err_msg} Maybe you forgot to import it?",

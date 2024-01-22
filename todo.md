@@ -43,7 +43,7 @@
 ## 0.18.0 beta (goal: february 2024)
 
 * [X] add `import ... as ...` (finished 16/10/23)
-* [ ] rewrite shell.py CLI args with `argparse`
+* [X] rewrite shell.py CLI args with `argparse`
 * [ ] add optional arguments in functions
   * [ ] Parser:
     * [ ] Allow optional parameters, do not allow positional parameters after them

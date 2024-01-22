@@ -8,6 +8,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Add miracle sort
 * Add more tests
 * Better error messages
+* Rewrite argument handling in `shell.py` using `argparse` (arguments have changed, use `(nougaro) -h` to view the new arguments)
 
 ## 0.17.0-beta
 

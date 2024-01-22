@@ -40,3 +40,9 @@ Voici Nougaro bêta 0.17.0.
 ## Comment ça marche&nbsp;?
 
  Tout est expliqué [ici](how_it_works.md) (en anglais…)
+
+## Remerciements
+
+ Merci à [Mistera](https://github.com/mistera91) qui contribue épisodiquement.
+
+ Merci à [3fxcf9](https://github.com/3fxcf9) pour la [bannière du dépôt](repo-image.png).

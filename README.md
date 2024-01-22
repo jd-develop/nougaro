@@ -40,3 +40,9 @@ Nougaro is a programming language interpreted in Python.
 ## How it works?
 
  Everything is explained [here](how_it_works.md) :)
+
+## Acknowledgements
+
+ Thanks to [Mistera](https://github.com/mistera91) who episodically contributes.
+
+ Thanks to [3fxcf9](https://github.com/3fxcf9) for the [repository banner](repo-image.png).

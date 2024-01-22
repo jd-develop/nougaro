@@ -9,6 +9,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Add more tests
 * Better error messages
 * Rewrite argument handling in `shell.py` using `argparse` (arguments have changed, use `(nougaro) -h` to view the new arguments)
+* Change repo image
 
 ## 0.17.0-beta
 

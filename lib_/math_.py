@@ -503,7 +503,17 @@ class Math(ModuleFunction):
                     base.pos_start, base.pos_end, "second", "math.log", "number", base,
                     exec_context, "lib_.math_.Math.execute_math_log"
                 ))
-            value_to_return = Number(math.log(value.value, base.value))
+            try:
+                value_to_return = Number(math.log(value.value, base.value))
+            except ValueError as e:
+                assert self.pos_start is not None
+                assert self.pos_end is not None
+                return RTResult().failure(RunTimeError(
+                    self.pos_start, self.pos_end,
+                    f"Python ValueError: {e}",
+                    exec_context,
+                    origin_file="lib_.math_.Math.execute_math_log"
+                ))
 
         return RTResult().success(value_to_return)
 

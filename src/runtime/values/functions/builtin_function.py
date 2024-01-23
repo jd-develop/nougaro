@@ -1121,6 +1121,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         value = exec_ctx.symbol_table.getf('value')  # we get the value
         assert value is not None
+        if isinstance(value, List):
+            return RTResult().success(value.true_copy())
         list_value, error = value.to_list_()  # we convert
         if error is not None:
             return error  # error is already an RTResult in convert methods in all Value classes

@@ -24,14 +24,29 @@ print()
 var answer = 0
 var increment = 0
 
+var stack = []
 while True then
     var calcul = input("calc> ")
     var should_continue = False
     
-    if calcul in ["exit", "done"] then break
+    if calcul in ["exit", "done", "quit", "q"] then break
     if calcul == "" then continue
     if calcul in ["clear", "cls"] then; clear(); continue; end
     if calcul in ["reseti", "ri"] then; var increment = 0; continue; end
+    if calcul in ["printi", "pi"] then; print(increment); continue; end
+    if calcul in ["rics", "csri", "rsi", "ris"] then
+        var increment = 0
+        var stack = []
+        print("Stack cleared and i set to 0.")
+        continue
+    end
+    if calcul in ["resetstack", "rstack", "resets", "rs", "clearstack", "cstack", "clears", "cs"] then
+        var stack = []
+        print("Stack cleared.")
+        continue
+    end
+    if calcul in ["printstack", "pstack", "prints", "ps", "s"] then; print(stack); continue; end
+    if calcul in ["psi", "pis", "spi"] then; print(stack); print(increment); continue; end
     if calcul == "help" then
         print("Welcome to the nougaro calculator help.")
         print("Here all the binary operators with their syntax:")
@@ -53,7 +68,13 @@ while True then
         print()
         print("Here all the variables:")
         print("       ans : result of last operation")
-        print("         i : value that increments at each operation. Reset it with reseti or ri.") 
+        print("         i : value that gets incremented at each operation. Reset it with 'reseti' or 'ri'.")
+        print("             Print current value without incrementing with 'printi' or 'pi'.")
+        print()
+        print("You can exit the calculator using 'exit', 'done' or 'quit'.")
+        print("You can clear the screen using 'clear' or 'cls'.")
+        print("You can view the stack using 'printstack', 'prints', 'pstack', 'ps' or 's'.")
+        print("You can clear the stack using 'clearstack', 'clears', 'cstack', 'cs', 'resetstack', 'resets', 'rstack' or 'rs'.")
         print()
         continue
     end
@@ -154,7 +175,6 @@ while True then
     if should_continue then continue
     
     # parse
-    var stack = []
     var i = -1
     var last_token = ""
     for token in tokens then
@@ -226,7 +246,7 @@ while True then
                 var should_continue = True
                 break
             else
-                print("Error")
+                print("Error: maybe there is not enough values in stack")
                 var should_continue = True
                 break
             end
@@ -236,12 +256,9 @@ while True then
     
     if should_continue then continue
     
-    if len(stack) != 1 then
-        print("Error: more than one result after execution, consider check your input.")
-        continue
+    if len(stack) >= 1 then
+        print(stack(-1))
+        var answer = stack(-1)
+        var increment += 1
     end
-    
-    print(stack(0))
-    var answer = stack(0)
-    var increment += 1
 end

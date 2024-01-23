@@ -70,7 +70,7 @@ class SymbolTable:
         """Return the name in the symbol table that is the closest to 'name'. Return None if there is no close match."""
         if len(self.symbols) == 0 or name == "":
             return None
-        min_best_match = 0.5
+        min_best_match = 0.5  # the original value was 0.3. Tweaked in commit 568156d
         best_match = min_best_match
         best_match_name = ""
         list_to_check = list(self.symbols.keys())

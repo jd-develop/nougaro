@@ -11,6 +11,10 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Rewrite argument handling in `shell.py` using `argparse` (arguments have changed, use `(nougaro) -h` to view the new arguments)
 * Change repo image
 
+### Calculator
+* Now, the stack is kept at the end of a command. You can make computations using multiple commands, like in Unix’ `dc`.
+* Add a bunch of debugging command (such as `printi`, `prints`, `resets`, `rsi`, …) and aliases for existing commands (such as `quit`).
+
 ## 0.17.0-beta
 
 ### Technical

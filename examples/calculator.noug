@@ -50,26 +50,28 @@ while True then
     if calcul == "help" then
         print("Welcome to the nougaro calculator help.")
         print("Here all the binary operators with their syntax:")
-        print("   -number : negative number")
-        print("     a b + : addition")
-        print("     a b - : subtraction")
-        print("     a b * : multiplication")
-        print("     a b / : float division")
-        print("    a b // : quotient of integer division")
-        print("   a b mod : remainder of integer division")
-        print("     a b ^ : power")
+        print("      -number : negative number")
+        print("        a b + : addition")
+        print("        a b - : subtraction")
+        print("        a b * : multiplication")
+        print("        a b / : float division")
+        print("       a b // : quotient of integer division")
+        print("      a b mod : remainder of integer division")
+        print("        a b ^ : power")
+        print("   a base log : logarithm of base `base`")
         print()
         print("Here all the unary operators with their syntax:")
-        print("  num sqrt : square root")
+        print("     num sqrt : square root")
+        print("         a ln : logarithm of base e")
         print()
         print("Here all the constants:")
-        print("        pi : 3.141592653589793")
-        print("         e : " + str(math.e))
+        print("           pi : 3.141592653589793")
+        print("            e : " + str(math.e))
         print()
         print("Here all the variables:")
-        print("       ans : result of last operation")
-        print("         i : value that gets incremented at each operation. Reset it with 'reseti' or 'ri'.")
-        print("             Print current value without incrementing with 'printi' or 'pi'.")
+        print("          ans : result of last operation")
+        print("            i : value that gets incremented at each operation. Reset it with 'reseti' or 'ri'.")
+        print("                Print current value without incrementing with 'printi' or 'pi'.")
         print()
         print("You can exit the calculator using 'exit', 'done' or 'quit'.")
         print("You can clear the screen using 'clear' or 'cls'.")
@@ -156,16 +158,24 @@ while True then
             replace(tokens, -1, "mo")
         elif char == "d" and len(tokens) > 0 and tokens(-1) == "mo" then
             replace(tokens, -1, "mod")
+        elif char == "l" then
+            append(tokens, char)
+        elif char == "o" and len(tokens) > 0 and tokens(-1) == "l" then
+            replace(tokens, -1, "lo")
+        elif char == "g" and len(tokens) > 0 and tokens(-1) == "lo" then
+            replace(tokens, -1, "log")
+        elif char == "n" and len(tokens) > 0 and tokens(-1) == "l" then
+            replace(tokens, -1, "ln")
         elif char == "i" then
              append(tokens, char)
         elif char == "e" then
              append(tokens, char)
         elif char == "\t" then
-            print("Error: use spaces instead of tabulations.")
+            print_in_red("Error: use spaces instead of tabulations.")
             var should_continue = True
             break
         else
-            print("Error: illegal char: " + char)
+            print_in_red("Error: illegal char: " + char)
             var should_continue = True
             break
         end
@@ -177,6 +187,7 @@ while True then
     # parse
     var i = -1
     var last_token = ""
+    var old_stack = list(stack)
     for token in tokens then
         var i += 1
         if last_token == "/" and token == "/" then continue
@@ -186,7 +197,7 @@ while True then
             if stack(-1) >= 0 then
                 replace(stack, -1, math.sqrt(stack(-1)))
             else
-                print("Error: a negative number (" + str(stack(-1)) + ") doesn't have a square root (this calculator does not support complex numbers).")
+                print_in_red("Error: a negative number (" + str(stack(-1)) + ") doesn't have a square root (this calculator does not support complex numbers).")
                 var should_continue = True
                 break
            end
@@ -198,7 +209,7 @@ while True then
             var num1 = stack(-2)
             var num2 = stack(-1)
             if num2 == 0 then
-                print("Error: can not divide by 0")
+                print_in_red("Error: can not divide by 0")
                 var should_continue = True
                 break
             end
@@ -206,6 +217,28 @@ while True then
             pop(stack, -1)
             pop(stack, -1)
             append(stack, mod)
+        elif token == "log" and len(stack) > 1 and is_num(stack(-1)) and is_num(stack(-2)) then
+            var number = stack(-2)
+            var base = stack(-1)
+            if number < 0 or base < 0 then
+                print_in_red("Error: math domain error with logarithm")
+                var should_continue = True
+                break
+            end
+            var logbase = math.log(number, base)
+            pop(stack, -1)
+            pop(stack, -1)
+            append(stack, logbase)
+        elif token == "ln" and len(stack) > 0 and is_num(stack(-1)) then
+            var number = stack(-1)
+            if number < 0 then
+                print_in_red("Error: math domain error with logarithm")
+                var should_continue = True
+                break
+            end
+            var natural_log = math.log(number)
+            pop(stack, -1)
+            append(stack, natural_log)
         elif token == "space" then
             void()
         elif token == "i" then
@@ -220,7 +253,7 @@ while True then
                     var result = stack(-2) - stack(-1)
                 elif token == '/' then
                     if len(stack) != 0 and stack(-1) == 0 then
-                        print("Error: can not divide by 0")
+                        print_in_red("Error: can not divide by 0")
                         var should_continue = True
                         break
                     end
@@ -234,19 +267,15 @@ while True then
                 elif token == "^" then
                     var result = stack(-2) ^ stack(-1)
                 else
-                    print("Error: invalid token: " + str(token))
+                    print_in_red("Error: invalid token: " + str(token))
                     var should_continue = True
                     break
                 end
                 pop(stack, -1)
                 pop(stack, -1)
                 append(stack, result)
-            elif token == "a" or token == "s" or token == "p" then
-                print("Error: illegal char: " + token)
-                var should_continue = True
-                break
             else
-                print("Error: maybe there is not enough values in stack")
+                print_in_red("Error: maybe there is not enough values in stack, or maybe you just typed the beginning of a command.")
                 var should_continue = True
                 break
             end
@@ -254,7 +283,11 @@ while True then
         var last_token = token
     end
     
-    if should_continue then continue
+    if should_continue then
+        var stack = list(old_stack)
+        print("Stack is unchanged.")
+        continue
+    end
     
     if len(stack) >= 1 then
         print(stack(-1))

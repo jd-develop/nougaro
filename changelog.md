@@ -15,7 +15,10 @@ This file is updated nearly every commit and copied to GH release changelog.
 
 ### Calculator
 * Now, the stack is kept at the end of a command. You can make computations using multiple commands, like in Unix’ `dc`.
-* Add a bunch of debugging command (such as `printi`, `prints`, `resets`, `rsi`, …) and aliases for existing commands (such as `quit`).
+  Note that if there is an error, the stack is left unchanged.
+* Add a bunch of debugging commands (such as `printi`, `prints`, `resets`, `rsi`, …) and aliases for existing commands (such as `quit`).
+* Add logarithm
+* Better error messages
 
 ## 0.17.0-beta
 

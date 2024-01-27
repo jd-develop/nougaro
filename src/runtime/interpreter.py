@@ -687,6 +687,7 @@ class Interpreter:
                 final_value, error = values[i], None  # we want to return the new value of the variable
             elif variable_exists:  # edit variable
                 assert isinstance(var_actual_value, Value)  # a little cheesy
+                var_actual_value.set_pos(var_name[0].pos_start, var_name[-1].pos_end)
                 if equal == TT["PLUSEQ"]:
                     final_value, error = var_actual_value.added_to(values[i])
                 elif equal == TT["MINUSEQ"]:

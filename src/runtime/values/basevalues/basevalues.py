@@ -49,7 +49,17 @@ class String(Value):
 
     def multiplied_by(self, other: Value):
         if isinstance(other, Number) and isinstance(other.value, int):
-            return String(self.value * other.value).set_context(self.context), None
+            try:
+                return String(self.value * other.value).set_context(self.context), None
+            except OverflowError as e:
+                assert self.context is not None
+                assert self.pos_start is not None
+                assert other.pos_end is not None
+                return None, RTOverflowError(
+                    self.pos_start, other.pos_end,
+                    str(e), self.context,
+                    "src.runtime.values.basevalues.basevalues.String.multiplied_by"
+                )
         else:
             return None, self.illegal_operation(other)
 
@@ -177,7 +187,7 @@ class Number(Value):
         try:
             return str(self.value)
         except ValueError:
-            return "This number can not be displayed. However, Nougaro can deal with it."
+            return "(this number can not be displayed)"
     
     def to_python_str(self) -> str:
         """Returns self.value, as a python str"""
@@ -203,21 +213,45 @@ class Number(Value):
 
     def subbed_by(self, other: Value):  # SUBTRACTION
         if isinstance(other, Number):
-            return Number(self.value - other.value).set_context(self.context), None
+            try:
+                return Number(self.value - other.value).set_context(self.context), None
+            except OverflowError as e:
+                errmsg = str(e)
+                assert self.pos_start is not None
+                assert self.pos_end is not None
+                assert self.context is not None
+                return None, RTOverflowError(
+                    self.pos_start, self.pos_end,
+                    errmsg,
+                    self.context,
+                    origin_file="src.values.basevalues.Number.subbed_by"
+                )
         else:
             return None, self.illegal_operation(other)
 
     def multiplied_by(self, other: Value):  # MULTIPLICATION
-        if isinstance(other, Number):
-            return Number(self.value * other.value).set_context(self.context), None
-        elif isinstance(other, String) and isinstance(self.value, int):
-            return String(other.value * self.value).set_context(self.context), None
-        elif isinstance(other, List) and isinstance(self.value, int):
-            new_list = other.copy()
-            new_list.elements = new_list.elements * self.value
-            return new_list, None
-        else:
-            return None, self.illegal_operation(other)
+        try:
+            if isinstance(other, Number):
+                return Number(self.value * other.value).set_context(self.context), None
+            elif isinstance(other, String) and isinstance(self.value, int):
+                return String(other.value * self.value).set_context(self.context), None
+            elif isinstance(other, List) and isinstance(self.value, int):
+                new_list = other.copy()
+                new_list.elements = new_list.elements * self.value
+                return new_list, None
+            else:
+                return None, self.illegal_operation(other)
+        except OverflowError as e:
+            errmsg = str(e)
+            assert self.pos_start is not None
+            assert other.pos_end is not None
+            assert self.context is not None
+            return None, RTOverflowError(
+                self.pos_start, other.pos_end,
+                errmsg,
+                self.context,
+                origin_file="src.values.basevalues.Number.multiplied_by"
+            )
 
     def dived_by(self, other: Value):  # DIVISION
         if isinstance(other, Number):
@@ -260,7 +294,19 @@ class Number(Value):
                     self.context,
                     "src.values.basevalues.Number.modded_by"
                 )
-            return Number(self.value % other.value).set_context(self.context), None
+            try:
+                return Number(self.value % other.value).set_context(self.context), None
+            except OverflowError as e:
+                errmsg = str(e)
+                assert self.pos_start is not None
+                assert other.pos_end is not None
+                assert self.context is not None
+                return None, RTOverflowError(
+                    self.pos_start, other.pos_end,
+                    errmsg,
+                    self.context,
+                    "src.values.basevalues.Number.modded_by"
+                )
         else:
             return None, self.illegal_operation(other)
 
@@ -276,13 +322,35 @@ class Number(Value):
                     self.context,
                     "src.values.basevalues.Number.floor_dived_by"
                 )
-            return Number(self.value // other.value).set_context(self.context), None
+            try:
+                return Number(self.value // other.value).set_context(self.context), None
+            except OverflowError as e:
+                errmsg = str(e)
+                assert self.pos_start is not None
+                assert other.pos_end is not None
+                assert self.context is not None
+                return None, RTOverflowError(
+                    self.pos_start, other.pos_end,
+                    errmsg,
+                    self.context,
+                    "src.values.basevalues.Number.floor_dived_by"
+                )
         else:
             return None, self.illegal_operation(other)
 
     def powered_by(self, other: Value):  # POWER
         if isinstance(other, Number):
-            return Number(self.value ** other.value).set_context(self.context), None
+            try:
+                return Number(self.value ** other.value).set_context(self.context), None
+            except OverflowError as e:
+                assert self.context is not None
+                assert self.pos_start is not None, str(self)
+                assert other.pos_end is not None
+                return None, RTOverflowError(
+                    self.pos_start, other.pos_end,
+                    str(e), self.context,
+                    "src.values.basevalues.Number.powered_by"
+                )
         else:
             return None, self.illegal_operation(other)
 
@@ -459,6 +527,7 @@ class List(Value):
     def added_to(self, other: Value):
         new_list = self.copy()
         new_list.elements.append(other)
+        new_list.update_should_print()
         return new_list, None
 
     def subbed_by(self, other: Value):
@@ -466,6 +535,7 @@ class List(Value):
             new_list = self.copy()
             try:
                 new_list.elements.pop(other.value)
+                new_list.update_should_print()
                 return new_list, None
             except IndexError:
                 assert other.pos_start is not None
@@ -483,11 +553,13 @@ class List(Value):
         if isinstance(other, List):
             new_list = self.copy()
             new_list.elements.extend(other.elements)
+            new_list.update_should_print
             return new_list, None
         elif isinstance(other, Number) and isinstance(other.value, int):
             if other.is_int():
                 new_list = self.copy()
                 new_list.elements = new_list.elements * other.value
+                new_list.update_should_print()
                 return new_list, None
             else:
                 return None, self.illegal_operation(other)
@@ -524,7 +596,11 @@ class List(Value):
                 return False
             else:
                 for index, element in enumerate(self.elements):
-                    if element.get_comparison_eq(other.elements[index]):
+                    comparison, error = element.get_comparison_eq(other.elements[index])
+                    if error is not None:
+                        return None
+                    assert comparison is not None
+                    if comparison.is_true():
                         continue
                     else:
                         return False

@@ -760,9 +760,15 @@ class Interpreter:
             final_values.append(final_value)
 
         self.update_symbol_table(ctx)
-        return result.success(
-            List(final_values).set_pos(node.pos_start, node.pos_end) if len(final_values) != 1 else final_values[0]
-        )  # we return the (new) value(s) of the variable(s).
+        # we return the (new) value(s) of the variable(s).
+        if len(final_values) != 1:
+            return result.success(
+                List(final_values).set_pos(node.pos_start, node.pos_end)
+            )
+        else:
+            return result.success(
+                final_values[0].set_pos(node.pos_start, node.pos_end)
+            )
 
     def visit_VarDeleteNode(self, node: VarDeleteNode, ctx: Context) -> RTResult:
         """Visit VarDeleteNode"""

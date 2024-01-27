@@ -12,6 +12,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Change repo image
 * Fix a crash in `math.log`
 * Fix several overflow crashes
+* Fix other crashes
 * `list(list_value)` now returns an unlinked copy of the original list
 
 ### Calculator

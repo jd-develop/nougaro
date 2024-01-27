@@ -176,6 +176,9 @@ def test_nougaro(print_OK)
     assert (while b<10 then; var b+=1; end) == [[2], [3], [4], [5], [6], [7], [8], [9], [10]]
     assert b == 10
 
+    assert (for i = (var forloop = 1) to 20 step 3 then i) == (for j = 1 to 20 step 3 then j)
+    assert (for i = (var forloop += 1) to 20 step 3 then i) == (for j = 2 to 20 step 3 then j)
+
     var b = 1
     assert (do var b += 1 then loop while b < 10) == [2, 3, 4, 5, 6, 7, 8, 9, 10]
     assert b == 10
@@ -406,6 +409,7 @@ def test_nougaro(print_OK)
     if print_OK then print("OK builtin funcs 11")
 
     ## sorting algorithms
+    assert sort(list("bepo")) == list("beop")
     assert sort([1, 2, 3, 4, 3, 2, 1, 5, 2, 6, 1, 2, 4, 3, 7]) == [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 5, 6, 7]
     assert sort([]) == []
     assert sort([0, -1]) == [-1, 0]
@@ -419,6 +423,9 @@ def test_nougaro(print_OK)
     assert sort([1, 2, 3, 4, 3, 2, 1, 0, 4, 2, 4, 1, 2, 4, 3], "sleep-verbose") == [0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4]
     assert sort([0], "sleep") == [0]
     assert sort([], "sleep") == []
+    assert sort([], "miracle") == []
+    assert sort([1], "miracle") == [1]
+    assert sort([-1, 1, 2, 3, 4], "miracle") == [-1, 1, 2, 3, 4]
 
     if print_OK then print("OK builtin funcs 12")
 

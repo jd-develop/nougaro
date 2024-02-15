@@ -155,36 +155,43 @@ class Interpreter:
         else:
             err_msg = f"name '{var_name}' is not defined."
 
-        if ctx.symbol_table.exists(f'__{var_name}__'):
-            # e.g. user entered `var foo += 1` instead of `var __foo__ += 1`
-            return result.failure(RTNotDefinedError(
-                pos_start, pos_end,
-                f"{err_msg} Did you mean '__{var_name}__'?",
-                ctx, origin_file
-            ))
-        elif IS_NOUGARO_LIB or IS_PYTHON_LIB:
-            if close_match_in_symbol_table is not None:
+        if IS_NOUGARO_LIB or IS_PYTHON_LIB:
+            if ctx.symbol_table.exists(f'__{var_name}__'):
+                # e.g. user entered `var foo += 1` instead of `var __foo__ += 1`
+                return result.failure(RTNotDefinedError(
+                    pos_start, pos_end,
+                    f"{err_msg} Maybe you forgot to import it? Or maybe you did mean '__{var_name}__'?",
+                    ctx, origin_file + " (is lib and __var_name__ exists)"
+                ))
+            elif close_match_in_symbol_table is not None:
                 return result.failure(RTNotDefinedError(
                     pos_start, pos_end,
                     f"{err_msg} Maybe you forgot to import it? Or maybe you did mean '{close_match_in_symbol_table}'?",
-                    ctx, origin_file
+                    ctx, origin_file + " (is lib and close match in symbol table)"
                 ))
             return result.failure(RTNotDefinedError(
                 pos_start, pos_end,
                 f"{err_msg} Maybe you forgot to import it?",
-                ctx, origin_file
+                ctx, origin_file + " (is lib and no other match)"
+            ))
+        elif ctx.symbol_table.exists(f'__{var_name}__'):
+            # e.g. user entered `var foo += 1` instead of `var __foo__ += 1`
+            return result.failure(RTNotDefinedError(
+                pos_start, pos_end,
+                f"{err_msg} Did you mean '__{var_name}__'?",
+                ctx, origin_file + " (is NOT lib and __var_name__ exists)"
             ))
         elif close_match_in_symbol_table is not None:
             return result.failure(RTNotDefinedError(
                 pos_start, pos_end,
                 f"{err_msg} Did you mean '{close_match_in_symbol_table}'?",
-                ctx, origin_file
+                ctx, origin_file + " (is NOT lib and close match in symbol table)"
             ))
         else:
             return result.failure(RTNotDefinedError(
                 pos_start, pos_end,
                 err_msg,
-                ctx, origin_file
+                ctx, origin_file + " (is NOT lib and no other match)"
             ))
 
     def _visit_value_that_can_have_attributes(

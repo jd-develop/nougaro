@@ -4,7 +4,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Noug Version: access more details about nougaro version
+# Noug Version: access more details about the current Nougaro version
 
 var _noug_version_split = split(__noug_version__, ".")
 var _patch_and_phase_split = split(_noug_version_split(2), "-")
@@ -16,8 +16,11 @@ var phase = _patch_and_phase_split(1)
 
 var phase_minor = if len(_noug_version_split) == 4 then int(_noug_version_split(3)) else 0
 
+var version_list = [major, minor, patch, phase, phase_minor]
+
 export major
 export minor
 export patch
 export phase
 export phase_minor
+export version_list

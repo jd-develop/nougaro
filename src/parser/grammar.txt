@@ -1,4 +1,4 @@
-This is the AST of the Nougaro language. This AST is computed by the Parser (src.parser.Parser).
+This is the syntax of the Nougaro language. This file is not actually parsed by Nougaro, but is rather a way to explain the syntax.
 
 statements    : NEWLINE* statement (NEWLINE+ statement)* NEWLINE*
 
@@ -75,7 +75,7 @@ for_expr      : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr (KEYWORD:STEP exp
 while_expr    : KEYWORD:WHILE expr KEYWORD:THEN
                 statement | (NEWLINE statements KEYWORD:END)
 
-do_expr       : KEYWORD:DO (statement | (NEWLINE statements NEWLINE)) KEYWORD:THEN KEYWORD:LOOP KEYWORD:WHILE expr
+do_expr       : KEYWORD:DO (statement | (NEWLINE statements)) KEYWORD:THEN KEYWORD:LOOP KEYWORD:WHILE expr
 
 func_def      : KEYWORD:DEF IDENTIFIER? fund_def_args
                 (ARROW expr)|(NEWLINE statements KEYWORD:END)

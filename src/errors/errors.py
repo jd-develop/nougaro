@@ -8,7 +8,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # IMPORTS
-# __future__ imports (must be first)
+# __future__ import (must be first)
 from __future__ import annotations
 # nougaro modules imports
 from src.errors.strings_with_arrows import string_with_arrows

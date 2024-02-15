@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
-from __future__ import annotations
 
 # Nougaro : a python-interpreted high-level programming language
 # Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
@@ -11,11 +10,13 @@ from __future__ import annotations
 # THIS FILE CAN NOT BE IMPORTED FROM NOUGARO
 
 # IMPORTS
+# __future__ import (must be first)
+from __future__ import annotations
 # nougaro modules imports
 from src.runtime.values.functions.builtin_function import *
 from src.runtime.values.tools.py2noug import *
 from src.errors.errors import *
-# Above line : Context, RTResult, errors and values are imported in builtin_function.py
+# Note: Context, RTResult, errors and values are imported in builtin_function.py
 # built-in python imports
 # no imports
 

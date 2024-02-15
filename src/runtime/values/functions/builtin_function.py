@@ -8,7 +8,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # IMPORTS
-# Future import
+# __future__ import (must be first)
 from __future__ import annotations
 # nougaro modules imports
 from src.runtime.values.functions.base_builtin_func import BaseBuiltInFunction

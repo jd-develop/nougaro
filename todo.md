@@ -53,7 +53,7 @@
     * [ ] Update Interpreter visit methods
 * [ ] rewrite parser to make it faster and easier to read
 * [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
-* [ ] add builtin classes
+* [ ] add builtin classes, or find a way to have builtin-methods in Values.
 * [ ] add `try catch`
 * [ ] add `raise`
 * [ ] add `assert ... crashes (on Error) (with message "...")`

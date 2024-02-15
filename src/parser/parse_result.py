@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
-from __future__ import annotations
 
 # Nougaro : a python-interpreted high-level programming language
 # Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
@@ -8,6 +7,9 @@ from __future__ import annotations
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# IMPORTS
+# __future__ import (must be first)
+from __future__ import annotations
 # nougaro modules imports
 from src.parser.nodes import Node
 from src.errors.errors import Error

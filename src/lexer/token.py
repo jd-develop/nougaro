@@ -11,15 +11,17 @@
 # nougaro modules imports
 from src.lexer.position import Position
 
-"""File for Token class. For token types list, please refer to ./token_types.py"""
+"""File for Token class. For token types list, please refer to src.lexer.token_types.py"""
 
 
 # ##########
 # TOKENS
 # ##########
 class Token:
-    """Token class.
-    A token have a type (keyboard, int, str, statement, ...) and sometimes a value ("foo", 123, break)"""
+    """The token class.
+    A token have a type (keyword, int, str, identifier...) and sometimes a value ("foo", 123, break)
+    Types are listed in src.lexer.token_types
+    """
     def __init__(self, type_: str, value: str | int | float | None = None, pos_start: Position | None = None,
                  pos_end: Position | None = None):
         self.type = type_  # type

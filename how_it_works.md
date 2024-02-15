@@ -1,7 +1,5 @@
 # How Nougaro works internally ?
 
- Wow, what a question. We are going to explain you. Keep calm and read ;)
-
 ## The simple explanation
 
 ### Lexer, parser, interpreter

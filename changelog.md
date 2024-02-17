@@ -14,6 +14,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Fix several overflow crashes
 * Fix other crashes
 * `list(list_value)` now returns an unlinked copy of the original list
+* Add `noug_version.version_list`
 
 ### Calculator
 * Now, the stack is kept at the end of a command. You can make computations using multiple commands, like in Unix’ `dc`.

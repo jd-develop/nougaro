@@ -70,6 +70,55 @@ class Parser:
         if 0 <= self.token_index < len(self.tokens):  # if the index is correct
             self.current_token = self.tokens[self.token_index]  # we update
 
+    def advance_and_check_for(
+            self,
+            result: ParseResult,
+            errmsg: str,
+            tok_type: str,
+            tok_value: str | None = None,
+            origin_file: str = "advance_and_check_for",
+            pos_start: Position | None = None,
+            pos_end: Position | None = None
+    ):
+        result.register_advancement()
+        self.advance()
+
+        self.check_for(result, errmsg, tok_type, tok_value, origin_file)
+
+    def check_for(
+            self,
+            result: ParseResult,
+            errmsg: str,
+            tok_type: str,
+            tok_value: str | None = None,
+            origin_file: str = "check_for",
+            pos_start: Position | None = None,
+            pos_end: Position | None = None
+    ):
+        """Check for a token of type tok_type, eventually with value tok_value. Returns the result.
+        By default, pos_start and pos_end are those of the current token"""
+        assert self.current_token is not None
+        if pos_start is None:
+            pos_start = self.current_token.pos_start
+        if pos_end is None:
+            pos_end = self.current_token.pos_end
+        if tok_value is None:
+            if self.current_token.type != TT[tok_type]:
+                return result.failure(InvalidSyntaxError(
+                    pos_start, pos_end,
+                    errmsg,
+                    f"src.parser.parser.Parser.{origin_file}"
+                ))
+        else:
+            if not self.current_token.matches(TT[tok_type], tok_value):
+                return result.failure(InvalidSyntaxError(
+                    pos_start, pos_end,
+                    errmsg,
+                    f"src.parser.parser.Parser.{origin_file}"
+                ))
+        return result
+
+
     # GRAMMARS ATOMS (AST) :
 
     def statements(self, stop: list[tuple[Any, str] | str] | None = None) -> ParseResult:

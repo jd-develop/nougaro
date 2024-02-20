@@ -1,4 +1,4 @@
-# How Nougaro works internally ?
+# How does Nougaro work internally ?
 
 ## The simple explanation
 

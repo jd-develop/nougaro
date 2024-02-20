@@ -75,7 +75,7 @@
 
 * [ ] create highlight extension for VSCode
 * [ ] if possible, implement `break (name)` and `continue (name)` where (name) is `if`, `for`, …
-* [X] completely switch to semver (finished 7/11/2023)
+* [X] completely switch to [semver](https://semver.org) (finished 7/11/2023)
 
 ## Future releases
 

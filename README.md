@@ -2,7 +2,7 @@
 
 [Français](README.fr.md)
 
-![Nougaro. A programming Language.](repo-image.svg)
+![Nougaro. A programming Language.](repo-image.png)
 
 This is Nougaro beta 0.17.0.
 

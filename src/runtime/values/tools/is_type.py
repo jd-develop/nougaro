@@ -7,15 +7,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# IMPORTS
+# nougaro modules imports
+from src.runtime.values.basevalues.value import Value
 # built-in python imports
-from typing import Any  # context: it's 2AM and i'm mad
+# no imports
 
 
-def is_type(value: Any, type_: str):
+def is_type(value: Value, type_: str):
     """Types are 'BaseValue', 'str', 'int', 'float', 'list', 'module', 'constructor', 'object', 'NoneValue',
        'BaseFunction', 'func', 'built-in func'"""
     return value.type_ == type_
 
 
-def is_n_num(value: Any):
+def is_noug_num(value: Value):
     return is_type(value, "int") or is_type(value, "float")
+
+
+is_n_num = is_noug_num  # The function’s original name was is_n_num, so an alias is kept to ensure retro-compatibility

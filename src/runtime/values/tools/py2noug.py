@@ -18,10 +18,12 @@ from typing import Any
 # This next line should be uncommented when the project (fully) switches to python 3.12, and the type of the "value"
 # argument in the "py2noug" function should be defined as "val"
 # (todo)
-# type val = str | int | float | bool | list[val] | None
-def py2noug(value: str | int | float | bool | list[Any] | None):
+# type val = Value | str | int | float | bool | list[val] | dict[val, val] | None
+def py2noug(value: Value | str | int | float | bool | list[Any] | dict[Any, Any] | None) -> Value:
     """Converts python values to nougaro ones"""
-    if isinstance(value, str):
+    if isinstance(value, Value):
+        return value
+    elif isinstance(value, str):
         return String(value)
     elif is_num(value):
         # sometimes, type checking strict is very dumb
@@ -31,11 +33,28 @@ def py2noug(value: str | int | float | bool | list[Any] | None):
         return Number(int(value))
     elif isinstance(value, list) or isinstance(value, tuple):
         list_ = list(value)  # we want a list instead of a tuple
+        list_ = list(map(py2noug, list_))  # todo: when project fully switches to 3.12 remove this: # type: ignore
+        return List(list_)
+    elif isinstance(value, dict):
+        list_ = list(value.items())
+        list_ = list(map(py2noug, list_))  # todo: when project fully switches to 3.12 remove this: # type: ignore
         return List(list_)
     elif value is None:
         return NoneValue()
     else:
         return Value()  # we just return a base value if there is no equivalent...
+
+
+# todo: move this to unittests
+test_, err = py2noug(
+    {"a": ["b", 12], 13: "c"}
+).get_comparison_eq(
+    List([
+        List([String("a"), List([String("b"), Number(12)])]),
+        List([Number(13), String("c")])
+    ]))
+assert test_ is not None
+assert test_.is_true()
 
 
 def noug2py(value: Value, none_instead_of_raw_value: bool = True) -> Any:

@@ -5,13 +5,7 @@ print()
 print("Welcome to the Nougaro calculator!")
 print("Enter 'exit' to exit, 'cls' or 'clear' to clear the screen.")
 print("This calculator uses the Reverse Polish Notation.")
-print("Examples:")
-print()
-print("  1 + 1 will be 1 1 +")
-print("  1 ^ 3 will be 1 3 ^")
-print("  (1 + 1) * (12 + 13) will be 1 1 + 12 13 + *")
-print()
-print("Type 'help' for all the operators and constants.")
+print("Type 'help' for more info and for all the operators and constants.")
 print()
 print("Nougaro  Copyright (C) 2023-2024  Jean Dubois")
 print("This program comes with ABSOLUTELY NO WARRANTY.")
@@ -47,8 +41,20 @@ while True then
     end
     if calcul in ["printstack", "pstack", "prints", "ps", "s"] then; print(stack); continue; end
     if calcul in ["psi", "pis", "spi"] then; print(stack); print(increment); continue; end
-    if calcul == "help" then
+    if calcul in ["help", "h"] then
         print("Welcome to the nougaro calculator help.")
+        print("This calculator uses the Reverse Polish Notation (RPN)")
+        print("Find out more about RPN on https://en.wikipedia.org/wiki/Reverse_Polish_notation")
+        print("RPN examples:")
+        # the box-drawing characters may look bizarre if you’re on VSCode, but trust me, there is the right amount of
+        # it!
+        print("                   infix  │  postfix (RPN)")
+        print("  ────────────────────────┼────────────────────────")
+        print("                   1 + 1  │  1 1 +")
+        print("                   1 ^ 3  │  1 3 ^")
+        print("     (1 + 1) * (12 + 13)  │  1 1 + 12 13 + *")
+        print("  sqrt(ln(2)) + 63 mod 5  │  2 ln sqrt 63 5 mod +")
+        print()
         print("Here all the binary operators with their syntax:")
         print("      -number : negative number")
         print("        a b + : addition")

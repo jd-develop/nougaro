@@ -25,6 +25,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Add a bunch of debugging commands (such as `printi`, `prints`, `resets`, `rsi`, …) and aliases for existing commands (such as `quit`).
 * Add logarithm
 * Better error messages
+* Move the RPN examples from the greeter to the help, and add an example
 
 ## 0.17.0-beta
 

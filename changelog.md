@@ -5,6 +5,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 ## 0.18.0-beta
 * Remove `PROTECTED_VARS`, which means that variables can now use builtin names as identifiers.
 * Add `path_exists(path)` builtin function
+* Add `print_in_green(value)` and `print_in_green_ret(value)` builtins functions
 * Add miracle sort
 * Add more tests
 * Better error messages

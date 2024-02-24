@@ -37,8 +37,10 @@ def set_symbol_table(symbol_table: SymbolTable):
 
     symbol_table.set("print", BuiltInFunction('print'))
     symbol_table.set("print_in_red", BuiltInFunction('print_in_red'))
+    symbol_table.set("print_in_green", BuiltInFunction('print_in_green'))
     symbol_table.set("print_ret", BuiltInFunction('print_ret'))
     symbol_table.set("print_in_red_ret", BuiltInFunction('print_in_red_ret'))
+    symbol_table.set("print_in_green_ret", BuiltInFunction('print_in_green_ret'))
     symbol_table.set("input", BuiltInFunction('input'))
     symbol_table.set("input_int", BuiltInFunction('input_int'))
     symbol_table.set("input_num", BuiltInFunction('input_num'))

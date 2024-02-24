@@ -192,6 +192,30 @@ class BuiltInFunction(BaseBuiltInFunction):
         "noug_dir": False
     }
 
+    def execute_print_in_green(self, exec_ctx: Context):
+        """Print 'value' in green"""
+        # Optional params:
+        # * value
+        assert exec_ctx.symbol_table is not None
+        value = exec_ctx.symbol_table.getf('value')
+        if value is not None:  # if the value is defined
+            try:
+                print_in_green(value.to_python_str())
+            except AttributeError:
+                print_in_green(str(value))
+        else:  # the value is not defined, we just print a new line like in regular print() python builtin func
+            print_in_green()
+        return RTResult().success(NoneValue(False))
+
+    builtin_functions["print_in_green"] = {
+        "function": execute_print_in_green,
+        "param_names": [],
+        "optional_params": ["value"],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
+
     def execute_print_ret(self, exec_ctx: Context):
         """Print 'value' and returns 'value'"""
         # Optional params:
@@ -221,7 +245,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     }
 
     def execute_print_in_red_ret(self, exec_ctx: Context):
-        """Print 'value' and returns 'value'"""
+        """Print 'value' in red and returns 'value'"""
         # Optional params:
         # * value
         assert exec_ctx.symbol_table is not None
@@ -249,6 +273,34 @@ class BuiltInFunction(BaseBuiltInFunction):
         "function": execute_print_in_red_ret,
         "param_names": [],
         "optional_params": ["value", "easteregg?"],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
+
+    def execute_print_in_green_ret(self, exec_ctx: Context):
+        """Print 'value' in green and returns 'value'"""
+        # Optional params:
+        # * value
+        assert exec_ctx.symbol_table is not None
+        value = exec_ctx.symbol_table.getf('value')
+        if value is not None:  # if the value is defined
+            try:
+                print_in_green(value.to_python_str())
+                return RTResult().success(String(value.to_python_str()))
+            except AttributeError:
+                print_in_green(str(value))
+                return RTResult().success(String(str(value)))
+        else:
+            # the value is not defined, we just print a new line like in regular print() python builtin func and return
+            # an empty str
+            print_in_green()
+            return RTResult().success(String(''))
+
+    builtin_functions["print_in_green_ret"] = {
+        "function": execute_print_in_green_ret,
+        "param_names": [],
+        "optional_params": ["value"],
         "should_respect_args_number": True,
         "run_noug_dir_work_dir": False,
         "noug_dir": False

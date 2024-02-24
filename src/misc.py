@@ -22,13 +22,15 @@ from typing import Protocol, Any, TypedDict, Sequence, Callable
 import os
 try:
     from colorama import init as colorama_init, Fore
-    ForeRED: str = Fore.RED
-    ForeRESET: str = Fore.RESET
+    foreRED: str = Fore.RED
+    foreGREEN: str = Fore.GREEN
+    foreRESET: str = Fore.RESET
 except (ModuleNotFoundError, ImportError):
     def colorama_init():
         return None
-    ForeRED: str = ""
-    ForeRESET: str = ""
+    foreRED: str = ""
+    foreGREEN: str = ""
+    foreRESET: str = ""
 
 colorama_init()
 
@@ -37,7 +39,9 @@ colorama_init()
 # COLORS
 # ##########
 # prints text in red.
-def print_in_red(txt: str = ""): print(ForeRED + txt + ForeRESET)
+def print_in_red(txt: str = ""): print(foreRED + txt + foreRESET)
+# prints text in green.
+def print_in_green(txt: str = ""): print(foreGREEN + txt + foreRESET)
 
 
 # ##########

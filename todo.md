@@ -46,8 +46,8 @@
 * [X] rewrite shell.py CLI args with `argparse` (finished 22/01/2024)
 * [ ] add optional arguments in functions
   * [ ] Parser:
-    * [ ] Allow optional parameters, do not allow positional parameters after them
-    * [ ] Update node
+    * [ ] Allow optional parameters, do not allow positional parameters after them (call + def)
+    * [X] Update nodes (call + def) (finished 24/02/2024)
   * [ ] Runtime:
     * [ ] Update Function value and methods
     * [ ] Update Interpreter visit methods

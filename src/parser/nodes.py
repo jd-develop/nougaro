@@ -359,11 +359,14 @@ class FuncDefNode(Node):
               body_node is CallNode (identifier: foo, args: bar)
     should_auto_return is bool (it happens in one-line functions)
     If, in the function definition, the name is not defined (like in `def()->void()`), var_name_token is None
+
+    Optional params are under the form (name, default value)
     """
     def __init__(self, var_name_token: Token | None, param_names_tokens: list[Token], body_node: Node,
-                 should_auto_return: bool):
+                 should_auto_return: bool, optional_params: list[tuple[Token, Node]] = []):
         self.var_name_token = var_name_token
         self.param_names_tokens = param_names_tokens
+        self.optional_params = optional_params
         self.body_node = body_node
         self.should_auto_return = should_auto_return
 
@@ -378,7 +381,7 @@ class FuncDefNode(Node):
         self.pos_end = self.body_node.pos_end
 
     def __repr__(self):
-        return f'def:{self.var_name_token}({self.param_names_tokens})->{self.body_node}'
+        return f'def:{self.var_name_token}({self.param_names_tokens}, {self.optional_params})->{self.body_node}'
 
 
 class ClassNode(Node):
@@ -419,19 +422,22 @@ class CallNode(Node):
           arg_nodes is [VarAccessNode (identifier: bar), NumberNode (num: 1)]
     If there is no arguments given, arg_nodes is empty.
     """
-    def __init__(self, node_to_call: Node, arg_nodes: list[tuple[Node, bool]]):
-        self.node_to_call: Node = node_to_call
-        self.arg_nodes: list[tuple[Node, bool]] = arg_nodes
+    def __init__(self, node_to_call: Node, arg_nodes: list[tuple[Node, bool]], keyword_arg_nodes: list[tuple[Token, Node, bool]] = []):
+        self.node_to_call = node_to_call
+        self.arg_nodes = arg_nodes
+        self.keyword_arg_nodes = keyword_arg_nodes
 
         self.pos_start = self.node_to_call.pos_start
 
-        if len(self.arg_nodes) > 0:  # if there are arguments, we take the last one's pos_end as our pos_end.
+        if len(keyword_arg_nodes) > 0:
+            self.pos_end = self.keyword_arg_nodes[-1][1].pos_end
+        elif len(self.arg_nodes) > 0:  # if there are arguments, we take the last one's pos_end as our pos_end.
             self.pos_end = self.arg_nodes[-1][0].pos_end
         else:  # if there is no parameter, we take the node_to_call's pos_end as our pos_end.
             self.pos_end = self.node_to_call.pos_end
 
     def __repr__(self):
-        return f'call:{self.node_to_call}({self.arg_nodes})'
+        return f'call:{self.node_to_call}({self.arg_nodes}, {self.keyword_arg_nodes})'
 
 
 class ReturnNode(Node):

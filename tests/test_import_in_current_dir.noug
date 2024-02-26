@@ -10,8 +10,8 @@ def test_import_in_current_dir()
     print("Testing to import non-builtin files…")
     import lib_test
     assert lib_test.this_is_a_test == 3
-    import lib_tests.lib_test2
-    assert lib_test2.this_is_a_test == 5
+    import lib_tests.lib_test2 as lib_test2alias
+    assert lib_test2alias.this_is_a_test == 5
     print("Done.")
 end
 

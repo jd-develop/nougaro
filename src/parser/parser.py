@@ -83,7 +83,42 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        self.check_for(result, errmsg, tok_type, tok_value, origin_file)
+        return self.check_for(result, errmsg, tok_type, tok_value, origin_file, pos_start, pos_end)
+
+    def check_for_and_advance(
+            self,
+            result: ParseResult,
+            errmsg: str,
+            tok_type: str,
+            tok_value: str | None = None,
+            origin_file: str = "advance_and_check_for",
+            pos_start: Position | None = None,
+            pos_end: Position | None = None
+    ):
+        result = self.check_for(result, errmsg, tok_type, tok_value, origin_file, pos_start, pos_end)
+
+        result.register_advancement()
+        self.advance()
+
+        return result
+
+    def advance_check_for_and_advance(
+            self,
+            result: ParseResult,
+            errmsg: str,
+            tok_type: str,
+            tok_value: str | None = None,
+            origin_file: str = "advance_and_check_for",
+            pos_start: Position | None = None,
+            pos_end: Position | None = None
+    ):
+        result.register_advancement()
+        self.advance()
+
+        result = self.check_for(result, errmsg, tok_type, tok_value, origin_file, pos_start, pos_end)
+
+        result.register_advancement()
+        self.advance()
 
     def check_for(
             self,
@@ -270,32 +305,20 @@ class Parser:
 
         # KEYWORD:IMPORT IDENTIFIER
         if self.current_token.matches(TT["KEYWORD"], 'import'):
-            # we advance
-            result.register_advancement()
-            self.advance()
-
-            # we check for identifier
-            if self.current_token.type != TT["IDENTIFIER"]:
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected identifier after 'import'.",
-                    "src.parser.parser.Parser.statement"
-                ))
+            result = self.advance_and_check_for(result, "expected identifier after 'import'.",
+                                                "IDENTIFIER", origin_file="statement")
+            if result.error is not None:
+                return result
 
             identifiers = [self.current_token]
             result.register_advancement()
             self.advance()
 
             while self.current_token.type == TT["DOT"]:
-                result.register_advancement()
-                self.advance()
-
-                if self.current_token.type != TT["IDENTIFIER"]:
-                    return result.failure(InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected identifier after 'import'.",
-                        "src.parser.parser.Parser.statement"
-                    ))
+                result = self.advance_and_check_for(result, "expected identifier after 'import'.",
+                                                    "IDENTIFIER", origin_file="statement")
+                if result.error is not None:
+                    return result
 
                 identifiers.append(self.current_token)
                 result.register_advancement()
@@ -303,15 +326,10 @@ class Parser:
 
             as_identifier = None
             if self.current_token.matches(TT["KEYWORD"], "as"):
-                result.register_advancement()
-                self.advance()
-
-                if self.current_token.type != TT["IDENTIFIER"]:
-                    return result.failure(InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected identifier after 'as'.",
-                        "src.parser.parser.Parser.statement"
-                    ))
+                result = self.advance_and_check_for(result, "expected identifier after 'as'.",
+                                                    "IDENTIFIER", origin_file="statement")
+                if result.error is not None:
+                    return result
 
                 as_identifier = self.current_token
                 result.register_advancement()
@@ -351,15 +369,10 @@ class Parser:
                     "src.parser.parser.Parser.statement"
                 ))
             if current_tok_is_as:
-                result.register_advancement()
-                self.advance()
-
-                if self.current_token.type != TT["IDENTIFIER"]:
-                    return result.failure(InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected identifier after 'as'.",
-                        "src.parser.parser.Parser.statement"
-                    ))
+                result = self.advance_and_check_for(result, "expected identifier after 'as'.",
+                                                    "IDENTIFIER", origin_file="statement")
+                if result.error is not None:
+                    return result
 
                 as_identifier = self.current_token
                 result.register_advancement()

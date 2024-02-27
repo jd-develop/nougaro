@@ -124,7 +124,7 @@ class Parser:
             self,
             result: ParseResult,
             errmsg: str,
-            tok_type: str,
+            tok_type: str | list[str],
             tok_value: str | None = None,
             origin_file: str = "check_for",
             pos_start: Position | None = None,
@@ -138,13 +138,19 @@ class Parser:
         if pos_end is None:
             pos_end = self.current_token.pos_end
         if tok_value is None:
-            if self.current_token.type != TT[tok_type]:
+            if isinstance(tok_type, str):
+                condition = self.current_token.type != TT[tok_type]
+            else:
+                condition = self.current_token.type not in tok_type
+            if condition:
                 return result.failure(InvalidSyntaxError(
                     pos_start, pos_end,
                     errmsg,
                     f"src.parser.parser.Parser.{origin_file}"
                 ))
         else:
+            if isinstance(tok_type, list):
+                raise ValueError("please don’t use tok type lists AND tok values.")
             if not self.current_token.matches(TT[tok_type], tok_value):
                 return result.failure(InvalidSyntaxError(
                     pos_start, pos_end,
@@ -475,12 +481,12 @@ class Parser:
             assert expr_to_write is not None
 
             # (TO|TO_AND_OVERWRITE)
-            if self.current_token.type not in [TT["TO"], TT["TO_AND_OVERWRITE"]]:
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "'>>' or '!>>' is missing. The correct syntax is 'write () (!)>> ()'.",
-                    "src.parser.parser.Parser.expr"
-                ))
+            result = self.check_for(
+                result,"'>>' or '!>>' is missing. The correct syntax is 'write () (!)>> ()'.",
+                [TT["TO"], TT["TO_AND_OVERWRITE"]], None, "expr"
+            )
+            if result.error is not None:
+                return result
             to_token = self.current_token
 
             result.register_advancement()
@@ -523,15 +529,10 @@ class Parser:
 
             # (TO IDENTIFIER)?
             if self.current_token.type == TT["TO"]:
-                result.register_advancement()
-                self.advance()
-
-                # we check for an identifier
-                if self.current_token.type != TT["IDENTIFIER"]:
-                    return result.failure(InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        f"expected identifier, got {self.current_token.type}.", "src.parser.parser.Parser.expr"
-                    ))
+                result = self.advance_and_check_for(result, f"expected identifier, got {self.current_token.type}.",
+                                                    "IDENTIFIER", None, "expr")
+                if result.error is not None:
+                    return result
 
                 identifier = self.current_token
 
@@ -623,23 +624,19 @@ class Parser:
         assert self.current_token is not None
         assert self.current_token.pos_start is not None
         pos_start = self.current_token.pos_start.copy()
-        if not self.current_token.matches(TT["KEYWORD"], "var"):
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'var' keyboard.",
-                origin_file="src.parser.parser.Parser.var_assign"
-            ))
-        result.register_advancement()
-        self.advance()
+
+        result = self.check_for_and_advance(result, "expected 'var' keyboard.",
+                                            "KEYWORD", "var", "var_assign")
+        
+        if result.error is not None:
+            return result
         all_names_list: list[list[Node | Token]] = []
 
         while self.current_token.type not in EQUALS:
             # if current token is not identifier we have to register expr
-            if self.current_token.type != TT["IDENTIFIER"]:
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected identifier.", origin_file="src.parser.parser.Parser.var_assign"
-                ))
+            result = self.check_for(result, "expected identifier.", "IDENTIFIER", None, "var_assign")
+            if result.error is not None:
+                return result
 
             current_name_nodes_and_tokens_list, error = self.assign_identifier()
             if error is not None:
@@ -773,15 +770,10 @@ class Parser:
                         
                         arg_nodes.append((expr_node, mul))
 
-                    if self.current_token.type != TT["RPAREN"]:  # there is no paren (it is expected)
-                        return None, InvalidSyntaxError(
-                            self.current_token.pos_start, self.current_token.pos_end,
-                            "expected ',' or ')'." if comma_expected else "expected ')'.",
-                            "src.parser.parser.Parser.call"
-                        )
-
-                    result.register_advancement()
-                    self.advance()
+                    result = self.check_for_and_advance(result, "expected ',' or ')'." if comma_expected else "expected ')'.",
+                                                        "RPAREN", None, "assign_identifier")
+                    if result.error is not None:
+                        return None, result.error
                 call_node_node = CallNode(call_node_node, arg_nodes)
 
             if is_lparen:
@@ -798,7 +790,7 @@ class Parser:
                     return None, InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
                         "expected dot.",
-                        origin_file="src.parser.parser.Parser.var_assign"
+                        origin_file="src.parser.parser.Parser.assign_identifier"
                     )
                 else:
                     current_name_nodes_and_tokens_list.append(call_node)
@@ -808,7 +800,7 @@ class Parser:
             return None, InvalidSyntaxError(
                 self.current_token.pos_start, self.current_token.pos_end,
                 "expected identifier after dot.",
-                origin_file="src.parser.parser.Parser.var_assign"
+                origin_file="src.parser.parser.Parser.assign_identifier"
             )
         return current_name_nodes_and_tokens_list, None
 

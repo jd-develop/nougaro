@@ -78,12 +78,13 @@ class Parser:
             tok_value: str | None = None,
             origin_file: str = "advance_and_check_for",
             pos_start: Position | None = None,
-            pos_end: Position | None = None
+            pos_end: Position | None = None,
+            del_a_then: bool = False
     ):
         result.register_advancement()
         self.advance()
 
-        return self.check_for(result, errmsg, tok_type, tok_value, origin_file, pos_start, pos_end)
+        return self.check_for(result, errmsg, tok_type, tok_value, origin_file, pos_start, pos_end, del_a_then)
 
     def check_for_and_advance(
             self,
@@ -93,9 +94,10 @@ class Parser:
             tok_value: str | None = None,
             origin_file: str = "advance_and_check_for",
             pos_start: Position | None = None,
-            pos_end: Position | None = None
+            pos_end: Position | None = None,
+            del_a_then: bool = False
     ):
-        result = self.check_for(result, errmsg, tok_type, tok_value, origin_file, pos_start, pos_end)
+        result = self.check_for(result, errmsg, tok_type, tok_value, origin_file, pos_start, pos_end, del_a_then)
 
         result.register_advancement()
         self.advance()
@@ -110,12 +112,13 @@ class Parser:
             tok_value: str | None = None,
             origin_file: str = "advance_and_check_for",
             pos_start: Position | None = None,
-            pos_end: Position | None = None
+            pos_end: Position | None = None,
+            del_a_then: bool = False
     ):
         result.register_advancement()
         self.advance()
 
-        result = self.check_for(result, errmsg, tok_type, tok_value, origin_file, pos_start, pos_end)
+        result = self.check_for(result, errmsg, tok_type, tok_value, origin_file, pos_start, pos_end, del_a_then)
 
         result.register_advancement()
         self.advance()
@@ -128,7 +131,8 @@ class Parser:
             tok_value: str | None = None,
             origin_file: str = "check_for",
             pos_start: Position | None = None,
-            pos_end: Position | None = None
+            pos_end: Position | None = None,
+            del_a_then: bool = False
     ):
         """Check for a token of type tok_type, eventually with value tok_value. Returns the result.
         By default, pos_start and pos_end are those of the current token"""
@@ -145,7 +149,7 @@ class Parser:
             if condition:
                 return result.failure(InvalidSyntaxError(
                     pos_start, pos_end,
-                    errmsg,
+                    errmsg.replace("%toktype%", self.current_token.type),
                     f"src.parser.parser.Parser.{origin_file}"
                 ))
         else:
@@ -154,9 +158,11 @@ class Parser:
             if not self.current_token.matches(TT[tok_type], tok_value):
                 return result.failure(InvalidSyntaxError(
                     pos_start, pos_end,
-                    errmsg,
+                    errmsg.replace("%toktype%", self.current_token.type),
                     f"src.parser.parser.Parser.{origin_file}"
                 ))
+        if del_a_then:
+            del self.then_s[-1]
         return result
 
 
@@ -457,7 +463,7 @@ class Parser:
                 else:
                     return result.failure(InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
-                        "use keyword as identifier is illegal.", "src.parser.parser.Parser.expr"
+                        "using a keyword as idendifier is illegal.", "src.parser.parser.Parser.expr"
                     ))
 
             # we assign the identifier to a variable then we advance
@@ -975,15 +981,10 @@ class Parser:
                         
                         arg_nodes.append(expr_and_mul)
 
-                    if self.current_token.type != TT["RPAREN"]:  # there is no paren (it is expected)
-                        return result.failure(InvalidSyntaxError(
-                            self.current_token.pos_start, self.current_token.pos_end,
-                            "expected ',' or ')'." if comma_expected else "expected ')'.",
-                            "src.parser.parser.Parser.call"
-                        ))
-
-                    result.register_advancement()
-                    self.advance()
+                    result = self.check_for_and_advance(result, "expected ',' or ')'." if comma_expected else "expected ')'.",
+                                                        "RPAREN", None, "call")
+                    if result.error is not None:
+                        return result
                 assert not isinstance(call_node, list)
                     
                 call_node = CallNode(call_node, arg_nodes)
@@ -1017,17 +1018,11 @@ class Parser:
 
             # (E_INFIX INT)?
             if self.current_token.type == TT["E_INFIX"]:
-                # we advance
-                result.register_advancement()
-                self.advance()
-
                 # INT
-                if self.current_token.type != TT["INT"]:
-                    return result.failure(InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        f"expected an int here, but got {self.current_token.type}.",
-                        "src.parser.parser.Parser.atom"
-                    ))
+                self.advance_and_check_for(result, f"expected integer, got %toktype%.",
+                                           "INT", None, "atom")
+                if result.error is not None:
+                    return result
                 exp_token = self.current_token
 
                 # we advance
@@ -1119,29 +1114,16 @@ class Parser:
                 return result
             assert expr is not None
             # we check for right parenthesis
-            if self.current_token.type == TT["RPAREN"]:
-                # we advance and then return our expr
-                result.register_advancement()
-                self.advance()
-
-                return result.success(expr)
-            else:  # we return an error message
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected ')'.",
-                    "src.parser.parser.Parser.atom"
-                ))
+            result = self.check_for_and_advance(result, "expected ')'.", "RPAREN", None, "atom")
+            if result.error is not None:
+                return result
+            return result.success(expr)
 
         elif token.type == TT["DOLLAR"]:
-            result.register_advancement()
-            self.advance()
-
-            if self.current_token.type != TT["IDENTIFIER"]:
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected identifier or nothing.",
-                    origin_file="src.parser.parser.Parser.atom"
-                ))
+            result = self.advance_and_check_for(result, "expected identifier or nothing after '$'",
+                                                "IDENTIFIER", None, "atom")
+            if result.error is not None:
+                return result
 
             identifier = self.current_token
             result.register_advancement()
@@ -1231,15 +1213,9 @@ class Parser:
 
         mul = False
 
-        if self.current_token.type != TT["LSQUARE"]:
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "expected '['.", "src.parser.parser.Parser.list_expr"
-            ))
-
-        # we advance
-        result.register_advancement()
-        self.advance()
+        result = self.check_for_and_advance(result, "expected '['.", "LSQUARE", None, "list_expr")
+        if result.error is not None:
+            return result
 
         if self.current_token.type == TT["RSQUARE"]:  # ] : we close the list
             pos_end = self.current_token.pos_end.copy()
@@ -1285,18 +1261,12 @@ class Parser:
                 
                 element_nodes.append(expr_and_mul)
 
-            if self.current_token.type != TT["RSQUARE"]:  # there is no ']' to close the list
-                return result.failure(InvalidSyntaxError(
-                    pos_start, first_tok_pos_end,
-                    "'[' was never closed.",
-                    "src.parser.parser.Parser.list_expr"
-                ))
-            
             pos_end = self.current_token.pos_end.copy()
 
-            # we advance
-            result.register_advancement()
-            self.advance()
+            result = self.check_for_and_advance(result, "'[' was never closed.", "RSQUARE",
+                                                None, "list_expr", pos_start, first_tok_pos_end)
+            if result.error is not None:
+                return result
 
         return result.success(ListNode(
             element_nodes, pos_start, pos_end
@@ -1357,22 +1327,11 @@ class Parser:
                 assert statements is not None
                 else_case = statements
 
-                if self.current_token.matches(TT["KEYWORD"], 'end'):
-                    del self.then_s[-1]
-                    # we advance
-                    result.register_advancement()
-                    self.advance()
-                else:
-                    # it happens only in one case:
-                    # if condition then
-                    #   expr
-                    # else
-                    # (EOF)
-                    return None, InvalidSyntaxError(
-                        *else_tok_pos,
-                        "expected 'end' to close this 'else'.",
-                        "src.parser.parser.Parser.if_expr_c"
-                    )
+                # this happen when EOF after 'else'
+                result = self.check_for_and_advance(result, "expected 'end' to close this 'else'.", "KEYWORD",
+                                                    "end", "if_expr_c", *else_tok_pos, True)
+                if result.error is not None:
+                    return None, result.error
             else:  # there is no newline: statement
                 expr = result.register(self.statement())
                 if result.error is not None:
@@ -1409,28 +1368,21 @@ class Parser:
         else_case = None
         assert self.current_token is not None
 
-        if not self.current_token.matches(TT["KEYWORD"], case_keyword):  # there is no 'elif' nor 'else'
-            return None, None, InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                f"expected '{case_keyword}'.",
-                "src.parser.parser.Parser.if_expr_cases"
-            )
-
-        result.register_advancement()
-        self.advance()
+        result = self.check_for_and_advance(result, f"expected '{case_keyword}'.", "KEYWORD",
+                                            case_keyword, "if_expr_cases")
+        if result.error is not None:
+            return None, None, result.error
 
         # condition expr
         condition = result.register(self.expr())
         if result.error is not None:
-            return None, None, result.error
+            return None, None, result.error  # type: ignore
         assert condition is not None
 
         # then keyword
-        if not self.current_token.matches(TT["KEYWORD"], 'then'):
-            return None, None, InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end, "expected 'then'.",
-                "src.parser.parser.Parser.if_expr_cases"
-            )
+        result = self.check_for(result, "expected 'then'.", "KEYWORD", "then", "if_expr_cases")
+        if result.error is not None:
+            return None, None, result.error
         then_tok = self.current_token.copy()
 
         result.register_advancement()
@@ -1493,12 +1445,9 @@ class Parser:
         """
         result = ParseResult()
         assert self.current_token is not None
-        if not self.current_token.matches(TT["KEYWORD"], 'for'):
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'for'.",
-                "src.parser.parser.Parser.for_expr"
-            ))
+        result = self.check_for(result, "expected 'for'.", "KEYWORD", "for", "for_expr")
+        if result.error is not None:
+            return result
         for_tok = self.current_token.copy()
 
         result.register_advancement()
@@ -1517,7 +1466,7 @@ class Parser:
             else:
                 return result.failure(InvalidSyntaxError(
                     self.current_token.pos_start, self.current_token.pos_end,
-                    f"use keyword as identifier is illegal.",
+                    f"using keyword as identifier is illegal.",
                     "src.parser.parser.Parser.for_expr"
                 ))
 

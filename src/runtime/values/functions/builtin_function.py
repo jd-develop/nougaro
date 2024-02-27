@@ -2007,6 +2007,18 @@ class BuiltInFunction(BaseBuiltInFunction):
                 is_sorted_, error = is_sorted(sorted_)
                 if error is not None:
                     return result.failure(error)
+        elif mode == "panic":
+            sorted_ = list_to_sort
+            is_sorted_, error = is_sorted(sorted_)
+            if error is not None:
+                return result.failure(error)
+            if not is_sorted_:
+                # this causes a segfault
+                a = map(str, sorted_)
+                for i in range(1000000):
+                    a = map(str, a)
+                
+                a = list(a)
         else:  # mode is none of the above
             assert mode_noug.pos_start is not None
             assert mode_noug.pos_end is not None
@@ -2016,7 +2028,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                 "\t* 'timsort' (default),\n"
                 "\t* 'stalin',\n"
                 "\t* 'sleep',\n"
-                "\t* 'miracle'.",
+                "\t* 'miracle',\n"
+                "\t* 'panic'.",
                 exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
             ))
         

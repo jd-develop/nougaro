@@ -2017,7 +2017,6 @@ class BuiltInFunction(BaseBuiltInFunction):
                 a = map(str, sorted_)
                 for i in range(1000000):
                     a = map(str, a)
-                
                 a = list(a)
         else:  # mode is none of the above
             assert mode_noug.pos_start is not None

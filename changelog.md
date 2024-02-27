@@ -6,7 +6,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Remove `PROTECTED_VARS`, which means that variables can now use builtin names as identifiers.
 * Add `path_exists(path)` builtin function
 * Add `print_in_green(value)` and `print_in_green_ret(value)` builtins functions
-* Add miracle sort
+* Add miracle sort and panic sort
 * Add more tests
 * Better error messages
 * Rewrite argument handling in `shell.py` using `argparse` (arguments have changed, use `(nougaro) -h` to view the new arguments)

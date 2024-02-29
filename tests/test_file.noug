@@ -107,13 +107,14 @@ def test_nougaro(print_OK)
     if print_OK then print("OK var del")
 
     # strings
-    "a"
+    assert "a" == 'a' == «a»
     'b'
     "a\""
     'b\''
     "a\nb"
     "a\tb"
     "a\\b"
+    assert «a«\»"'» == "a«»\"'" == 'a«»"\''
     assert "\xD9" == chr(0xD9) == "\N{Latin capital letter u with grave}" == "Ù"
     assert "\u0D9e" == chr(0xD9E) == "\N{sinhala LETTER Kantaja nAAsIkyaya}" == "ඞ"
     assert "\xBb\u09Df" == chr(0xbB) + chr(0x9dF) == "»য়"

@@ -149,7 +149,7 @@ class Lexer:
                 else:
                     tokens.append(tok)
                 there_is_a_space_or_a_tab_or_a_comment = False
-            elif self.current_char == '"' or self.current_char == "'":  # the char is a quote: str
+            elif self.current_char in "'\"«":  # the char is a quote: str
                 there_is_a_space_or_a_tab_or_a_comment = False
                 string_, error = self.make_string(self.current_char)
                 if error is None and string_ is not None:  # there is no error
@@ -266,6 +266,14 @@ class Lexer:
                 # illegal char
                 pos_start = self.pos.copy()
                 char = self.current_char
+
+                if char == "»":
+                    return [], InvalidSyntaxError(
+                        pos_start, self.pos.advance(),
+                        f'"«" was never opened.',
+                        origin_file="src.lexer.lexer.Lexer.make_tokens"
+                    )
+
                 try:
                     char_name = unicodedata.name(char)
                 except ValueError:
@@ -433,8 +441,13 @@ class Lexer:
         string_ = ''
         if quote == '"':
             other_quote = "'"
+            closing_quote = '"'
+        elif quote == "'":
+            other_quote = '"'
+            closing_quote = "'"
         else:
             other_quote = '"'
+            closing_quote = "»"
         pos_start = self.pos.copy()
 
         escape_character = False
@@ -458,11 +471,11 @@ class Lexer:
             'N': 'UNICODE_CHAR_NAME'
         }
 
-        # if self.current_char == quote, we have to stop looping because the str is closed
+        # if self.current_char == closing_quote, we have to stop looping because the str is closed
         # if escape_character, the last char is a \, so there is an escape sequence
-        # if escape_character but self.current_char != quote, we SHOULD continue looping because \" doesn't close the
-        # str
-        while self.current_char != quote or escape_character:
+        # if escape_character but self.current_char != closing_quote, we SHOULD continue looping because \" doesn't
+        # close the str
+        while self.current_char != closing_quote or escape_character:
             if self.current_char is None:  # EOF: the string was not closed.
                 return None, InvalidSyntaxError(
                     pos_start, pos_start.copy().advance(),

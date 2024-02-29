@@ -19,6 +19,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * (internal API) py2noug can now properly convert lists and tuples containing python values
 * (internal API) py2noug can now properly convert dicts, under a list of [key, value] lists
 * (internal API) add an alias `is_noug_num` to `is_n_num` function
+* `«` and `»` are now valid string delimiters
 
 ### Calculator
 * Now, the stack is kept at the end of a command. You can make computations using multiple commands, like in Unix’ `dc`.

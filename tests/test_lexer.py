@@ -21,12 +21,12 @@ import unittest
 
 class TestLexer(unittest.TestCase):
     def test_invalid_char(self):
-        lx = src.lexer.lexer.Lexer("", "«")
+        lx = src.lexer.lexer.Lexer("", "ç")
         tokens, error = lx.make_tokens()
-        pos = src.lexer.position.Position(0, 0, 0, "", "«")
+        pos = src.lexer.position.Position(0, 0, 0, "", "ç")
         expected_error = src.errors.errors.IllegalCharError(
             pos, pos.copy().advance(),
-            "'«' is an illegal character (U+AB, LEFT-POINTING DOUBLE ANGLE QUOTATION MARK)"
+            "'ç' is an illegal character (U+E7, LATIN SMALL LETTER C WITH CEDILLA)"
         )
 
         self.assertEqual(tokens, [])

@@ -36,13 +36,6 @@ class Parser:
     def parse(self):
         """Parse tokens and return a result that contain a main node"""
         result = self.statements()
-        assert self.current_token is not None
-        if result.error is not None and self.current_token.type != TT["EOF"]:
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "invalid syntax.",
-                "src.parser.parser.Parser.parse"
-            ))
         return result
 
     def advance(self):
@@ -81,6 +74,7 @@ class Parser:
             pos_end: Position | None = None,
             del_a_then: bool = False
     ):
+        """Advance, then run `self.check_for`."""
         result.register_advancement()
         self.advance()
 
@@ -97,6 +91,7 @@ class Parser:
             pos_end: Position | None = None,
             del_a_then: bool = False
     ):
+        """Run `self.check_for`, then advance."""
         result = self.check_for(result, errmsg, tok_type, tok_value, origin_file, pos_start, pos_end, del_a_then)
 
         result.register_advancement()
@@ -115,6 +110,7 @@ class Parser:
             pos_end: Position | None = None,
             del_a_then: bool = False
     ):
+        """Advance, then run `self.check_for`, and then advance."""
         result.register_advancement()
         self.advance()
 
@@ -135,7 +131,18 @@ class Parser:
             del_a_then: bool = False
     ):
         """Check for a token of type tok_type, eventually with value tok_value. Returns the result.
-        By default, pos_start and pos_end are those of the current token"""
+
+        * `errmsg` is the error message that should be used if the token is not found. Note that the returned error
+          is InvalidSyntaxError. Any occurence of the substring "%toktype% is replaced by tok_type.
+        * if `tok_type` is a str, it checks for TT[tok_type]. If it is a list, it checks if the type of the current
+          token is in the list. Note that the values in the list need to be values of the TT dict, not the keys.
+        * `tok_value`, if given, is used in the .matches() method. It can not be a list.
+        * `origin_file` is used in the debug `origin_file` argument of the error. It is the name of the parser’s
+          method. For instance, "atom" (converted to "src.parser.parser.Parser.atom")
+        * `pos_start` and `pos_end` are the positions for the InvalidSyntaxError. By default (if not given or None),
+          pos_start and pos_end are those of the current token.
+        * `del_a_then`, if set to True, deletes the last element of the self.thens list.
+        """
         assert self.current_token is not None
         if pos_start is None:
             pos_start = self.current_token.pos_start
@@ -172,7 +179,8 @@ class Parser:
         """
         statements : NEWLINE* statement (NEWLINE+ statement)* NEWLINE
 
-        The returned node in the parse result is ALWAYS a ListNode here."""
+        The returned node in the parse result is ALWAYS a ListNode here.
+        If stop is not specified or None, stop is [TT["EOF"]]"""
         assert self.current_token is not None
         assert self.current_token.pos_start is not None
         if stop is None:
@@ -223,7 +231,7 @@ class Parser:
                     # there was no new line but there is 'id =' (need 'var')
                     return result.failure(InvalidSyntaxError(
                         self.current_token.pos_start, self.current_token.pos_end,
-                        f"unexpected token: {quote}{self.current_token}{quote}."
+                        f"unexpected token: {quote}{self.current_token}{quote}. "
                         f"To declare a variable, use 'var' keyword.",
                         "src.parser.parser.Parser.statements"
                     ))
@@ -236,7 +244,7 @@ class Parser:
                         self.advance()
                         if self.current_token.type in EQUALS:
                             break  # missing_var is already True
-                        if self.current_token.type != TT["COMMA"] and self.current_token.type not in EQUALS:
+                        if not (self.current_token.type == TT["COMMA"] or self.current_token.type in EQUALS):
                             missing_var = False
                             break
                         result.register_advancement()
@@ -245,7 +253,7 @@ class Parser:
                         # there was no new line but there is 'id1, id2, ... =' (need 'var')
                         return result.failure(InvalidSyntaxError(
                             self.current_token.pos_start, self.current_token.pos_end,
-                            f"unexpected token: {quote}{self.current_token}{quote}."
+                            f"unexpected token: {quote}{self.current_token}{quote}. "
                             f"To declare a variable, use 'var' keyword.",
                             "src.parser.parser.Parser.statements"
                         ))
@@ -259,7 +267,7 @@ class Parser:
                 if len(self.then_s) != 0:
                     return result.failure(InvalidSyntaxError(
                         self.then_s[-1][0], self.then_s[-1][1],
-                        "'end' expected to close a statement, surely this one.",
+                        "expected 'end' to close a statement, surely this one.",
                         "src.parser.parser.Parser.statements"
                     ))
 

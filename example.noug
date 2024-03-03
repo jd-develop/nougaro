@@ -1,10 +1,10 @@
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# This file was made in Nougaro beta 0.15 version.
+# This file was made in Nougaro beta 0.18.0 version.
 import math
 import statistics
 import time
@@ -32,6 +32,11 @@ var a = var b = 3  # you can use variable definitions in other expressions
 
 print(some_text); print(a * b)  # the ';' is like a back line
 
+var a ++
+var b --
+print(str(a)+str(b))  # 42
+print(reverse(str(a)+str(b)))  # 24
+
 # the following two lines are an example in the doc (Built-in variables)
 print("You use nougaro version " + __noug_version__ + ", interpreted with Python " + __python_version__)
 print("You use " + __os_name__ + " " + __os_release__ + " " + __os_version__)
@@ -53,6 +58,7 @@ print("You can put\nbacklines and\n\ttabs.")
 print("You can add \\ backslashes and \" \' quotes")
 print("\u0D9E and \xD9 are unicode chars U+D9E and U+D9")
 print("\N{sinhala letter kantaja naasikyaya} is sus")  # sus
+print(«Wait, French guillemets are valid string delimiters?»)
 
 print("You can add up and multiply strings: " + 3*some_text)
 print()

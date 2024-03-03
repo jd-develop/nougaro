@@ -125,7 +125,7 @@ def run(
             context.symbol_table.set("__exec_from__", String(str(exec_from)))
             context.symbol_table.set("__actual_context__", String(actual_context))
             context.symbol_table.set("__noug_dir__", String(noug_dir))
-        else:
+        else:  # this is how the shell “remember” the values
             context.symbol_table = global_symbol_table
     else:
         context = use_context  # do not .copy() here

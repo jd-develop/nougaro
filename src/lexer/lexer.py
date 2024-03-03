@@ -12,7 +12,7 @@
 from src.lexer.position import Position
 from src.lexer.token import Token
 from src.lexer.token_types import *
-from src.constants import DIGITS, IDENTIFIERS_LEGAL_CHARS, LETTERS_DIGITS
+from src.constants import *
 from src.errors.errors import *
 # built-in python imports
 import unicodedata
@@ -28,6 +28,7 @@ class Lexer:
         self.text = text  # raw code we have to execute
         self.pos = Position(-1, 0, -1, file_name, text)  # actual position of the lexer
         self.current_char: str | None = None
+        self.metas: dict[str, str] = {}
         self.advance()
 
     def get_char(self, pos: Position):
@@ -50,6 +51,14 @@ class Lexer:
         # get the next char in the code (or None if this is EOF (end of file))
         next_char = self.get_char(new_pos)
         return next_char
+    
+    def is_empty_file(self, tokens: list[Token]):
+        """Returns if the given list of tokens corresponds to an empty file or not."""
+        if len(tokens) == 0:
+            return True
+        if all([token.type == TT["NEWLINE"] for token in tokens]):
+            return True
+        return False
 
     def make_tokens(self) -> tuple[list[Token], None | Error]:
         """Returns a token list with self.text. Return tok_list, None or [], error."""
@@ -77,6 +86,45 @@ class Lexer:
                 there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(Token(TT["NEWLINE"], pos_start=self.pos))
                 self.advance()
+
+            elif self.current_char == "@":  # metas
+                if not self.is_empty_file(tokens):
+                    return [], InvalidSyntaxError(
+                        self.pos.copy(), self.pos.advance(),
+                        "expected metas to be at the beginning of a file.",
+                        "src.lexer.lexer.Lexer.make_tokens"
+                    )
+                self.advance()
+                for c in "meta ":
+                    if not self.current_char == c:
+                        return [], InvalidSyntaxError(
+                            self.pos.copy(), self.pos.advance(),
+                            "expected keyword `meta`.",
+                            "src.lexer.lexer.Lexer.make_tokens"
+                        )
+                    self.advance()
+                
+                meta_name = ""
+                while self.current_char is not None and self.current_char in LETTERS:  # type:ignore
+                    meta_name += self.current_char
+                    self.advance()
+
+                meta_argument = ""
+                if self.current_char is not None and self.current_char in " ":  # type:ignore
+                    self.advance()
+                    while self.current_char is not None and self.current_char in LETTERS:  # type:ignore
+                        meta_argument += self.current_char
+                        self.advance()
+
+                if self.current_char is not None and self.current_char not in ";\n":  # type:ignore
+                    return [], InvalidSyntaxError(
+                        self.pos.copy(), self.pos.advance(),
+                        "expected newline.",
+                        "src.lexer.lexer.Lexer.make_tokens"
+                    )
+                self.advance()
+
+                print(f"[META] (indev feature) {meta_name=} {meta_argument=}")
 
             elif self.current_char in DIGITS + '.':  # the char is a digit: we generate a number
                 there_is_a_space_or_a_tab_or_a_comment = False

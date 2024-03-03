@@ -136,7 +136,7 @@ class Lexer:
                     if num.type == TT["FLOAT"]:
                         return [], InvalidSyntaxError(
                             num.pos_start, num.pos_end,
-                            "expected int, get float.",
+                            "expected int, got float.",
                             origin_file="src.lexer.lexer.Lexer.make_tokens"
                         )
                     else:
@@ -578,7 +578,7 @@ class Lexer:
         pos_start = self.pos.copy()
 
         # while not EOF and current char still in authorized chars in identifier and keywords
-        while self.current_char is not None and self.current_char in LETTERS_DIGITS + '_':
+        while self.current_char is not None and self.current_char in IDENTIFIERS_LEGAL_CHARS + DIGITS:
             id_str += self.current_char
             self.advance()
 

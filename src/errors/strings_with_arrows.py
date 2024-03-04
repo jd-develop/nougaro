@@ -48,9 +48,35 @@ def string_with_arrows(text: str, pos_start: Position, pos_end: Position) -> str
         col_start = pos_start.colon if i == 0 else 0
         col_end = pos_end.colon if i == line_count - 1 else len(line) - 1
 
+        # the following code cleans up the tabs
+        new_line = ""
+        new_col_start = 0
+        new_col_end = 0
+        for j in range(0, col_start):
+            if line[j] == "\t":
+                new_line += "    "
+                new_col_start += 4
+                new_col_end += 4
+            else:
+                new_line += line[j]
+                new_col_start += 1
+                new_col_end += 1
+        for j in range(col_start, col_end):
+            if j == len(line):
+                new_col_end += 1
+                continue
+            if line[j] == "\t":
+                new_line += "    "
+                new_col_end += 4
+            else:
+                new_line += line[j]
+                new_col_end += 1
+        for j in range(col_end, len(line)):
+            new_line += line[j]
+
         # Append to result
-        result += line + '\n'
-        result += ' ' * col_start + '^' * (col_end - col_start)
+        result += new_line + '\n'
+        result += ' ' * new_col_start + '^' * (new_col_end - new_col_start)
 
         # Re-calculate indexes
         idx_start = idx_end

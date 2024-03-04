@@ -28,7 +28,7 @@ class Lexer:
         self.text = text  # raw code we have to execute
         self.pos = Position(-1, 0, -1, file_name, text)  # actual position of the lexer
         self.current_char: str | None = None
-        self.metas: dict[str, str] = {}
+        self.metas: dict[str, str | bool] = {}
         self.advance()
 
     def get_char(self, pos: Position):
@@ -39,10 +39,12 @@ class Lexer:
         self.pos.advance(self.current_char)  # advance in position
         # set the new current char - the next one in the code or None if this is EOF (end of file)
         self.current_char = self.get_char(self.pos)
+
         # if you want to know where tf you are in the file when it throws at you an unclear error,
         # uncomment these lines and change the right values:
         # if self.pos.index in [7583, 5547]:
         #     print(self.pos.index, self.pos.line_number, self.current_char, self.next_char())
+
         return self.current_char
 
     def next_char(self):
@@ -88,35 +90,47 @@ class Lexer:
                 self.advance()
 
             elif self.current_char == "@":  # metas
+                # ##########################################################################################################
+                # # Note : this is an indev feature. This is not documented: read, edit and use this code at your own risk #
+                # ##########################################################################################################
+                pos_start = self.pos.copy()
                 if not self.is_empty_file(tokens):
                     return [], InvalidSyntaxError(
                         self.pos.copy(), self.pos.advance(),
                         "expected metas to be at the beginning of a file.",
                         "src.lexer.lexer.Lexer.make_tokens"
                     )
-                self.advance()
-                for c in "meta ":
-                    if not self.current_char == c:
+                current_char = self.advance()
+                for c in "meta":
+                    if not current_char == c:
                         return [], InvalidSyntaxError(
-                            self.pos.copy(), self.pos.advance(),
+                            pos_start, self.pos.advance(),
                             "expected keyword `meta`.",
                             "src.lexer.lexer.Lexer.make_tokens"
                         )
-                    self.advance()
+                    current_char = self.advance()
+
+                if current_char is not None and current_char not in " \N{NBSP}\N{NNBSP}\t":
+                    return [], InvalidSyntaxError(
+                        self.pos.copy(), self.pos.advance(),
+                        "expected whitespace.",
+                        "src.lexer.lexer.Lexer.make_tokens"
+                    )
+                current_char = self.advance()
                 
                 meta_name = ""
-                while self.current_char is not None and self.current_char in LETTERS:  # type:ignore
-                    meta_name += self.current_char
-                    self.advance()
+                while current_char is not None and current_char in LETTERS:
+                    meta_name += current_char
+                    current_char = self.advance()
 
                 meta_argument = ""
-                if self.current_char is not None and self.current_char in " ":  # type:ignore
-                    self.advance()
-                    while self.current_char is not None and self.current_char in LETTERS:  # type:ignore
-                        meta_argument += self.current_char
-                        self.advance()
+                if current_char is not None and current_char in " \N{NBSP}\N{NNBSP}\t":
+                    current_char = self.advance()
+                    while current_char is not None and current_char in LETTERS:
+                        meta_argument += current_char
+                        current_char = self.advance()
 
-                if self.current_char is not None and self.current_char not in ";\n":  # type:ignore
+                if current_char is not None and current_char not in ";\n":
                     return [], InvalidSyntaxError(
                         self.pos.copy(), self.pos.advance(),
                         "expected newline.",
@@ -124,7 +138,18 @@ class Lexer:
                     )
                 self.advance()
 
+                if meta_name == "":
+                    return [], InvalidSyntaxError(
+                        pos_start, self.pos.copy(),
+                        "expected a meta name.",
+                        "src.lexer.lexer.Lexer.make_tokens"
+                    )
+
                 print(f"[META] (indev feature) {meta_name=} {meta_argument=}")
+                if meta_argument == "":
+                    self.metas[meta_name] = True
+                else:
+                    self.metas[meta_name] = meta_argument
 
             elif self.current_char in DIGITS + '.':  # the char is a digit: we generate a number
                 there_is_a_space_or_a_tab_or_a_comment = False

@@ -133,7 +133,7 @@ class Parser:
         """Check for a token of type tok_type, eventually with value tok_value. Returns the result.
 
         * `errmsg` is the error message that should be used if the token is not found. Note that the returned error
-          is InvalidSyntaxError. Any occurence of the substring "%toktype% is replaced by tok_type.
+          is InvalidSyntaxError. Any occurence of the substring "%toktype% is replaced by the current token’s type.
         * if `tok_type` is a str, it checks for TT[tok_type]. If it is a list, it checks if the type of the current
           token is in the list. Note that the values in the list need to be values of the TT dict, not the keys.
         * `tok_value`, if given, is used in the .matches() method. It can not be a list.
@@ -154,18 +154,26 @@ class Parser:
             else:
                 condition = self.current_token.type not in tok_type
             if condition:
+                if self.current_token.type in TOKENS_NOT_TO_QUOTE:
+                    current_tok_type = self.current_token.type
+                else:
+                    current_tok_type = f"'{self.current_token.type}'"
                 return result.failure(InvalidSyntaxError(
                     pos_start, pos_end,
-                    errmsg.replace("%toktype%", self.current_token.type),
+                    errmsg.replace("%toktype%", current_tok_type),
                     f"src.parser.parser.Parser.{origin_file}"
                 ))
         else:
             if isinstance(tok_type, list):
                 raise ValueError("please don’t use tok type lists AND tok values.")
             if not self.current_token.matches(TT[tok_type], tok_value):
+                if self.current_token.type in TOKENS_NOT_TO_QUOTE:
+                    current_tok_type = self.current_token.type
+                else:
+                    current_tok_type = f"'{self.current_token.type}'"
                 return result.failure(InvalidSyntaxError(
                     pos_start, pos_end,
-                    errmsg.replace("%toktype%", self.current_token.type),
+                    errmsg.replace("%toktype%", current_tok_type),
                     f"src.parser.parser.Parser.{origin_file}"
                 ))
         if del_a_then:
@@ -1495,12 +1503,9 @@ class Parser:
             assert iterable_ is not None
 
             # KEYWORD:THEN
-            if not self.current_token.matches(TT["KEYWORD"], 'then'):
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected 'then'.",
-                    "src.parser.parser.Parser.for_expr"
-                ))
+            result = self.check_for(result, "expected 'then'.", "KEYWORD", "then", "for_expr")
+            if result.error is not None:
+                return result
             then_tok = self.current_token.copy()
 
             result.register_advancement()
@@ -1520,16 +1525,13 @@ class Parser:
                     return result
                 assert body is not None
 
-                if not self.current_token.matches(TT["KEYWORD"], 'end'):
-                    return result.failure(InvalidSyntaxError(
-                        for_tok.pos_start, for_tok.pos_end,
-                        "this 'for' was never closed (by 'end').",
-                        "src.parser.parser.Parser.for_expr"
-                    ))
-                del self.then_s[-1]
-
-                result.register_advancement()
-                self.advance()
+                result = self.check_for_and_advance(
+                    result, "this 'for' was never closed (by 'end')",
+                    "KEYWORD", "end", "for_expr", for_tok.pos_start, for_tok.pos_end,
+                    del_a_then=True
+                )
+                if result.error is not None:
+                    return result
                 assert not isinstance(body, list)
                 assert not isinstance(iterable_, list)
 
@@ -1544,20 +1546,12 @@ class Parser:
             assert not isinstance(iterable_, list)
 
             return result.success(ForNodeList(var_name, body, iterable_))
-        elif self.current_token.type != TT["EQ"]:
-            if self.current_token.type in TOKENS_NOT_TO_QUOTE:
-                error_msg = f"expected 'in' or '=', but got {self.current_token.type}."
-            else:
-                error_msg = f"expected 'in' or '=', but got '{self.current_token.type}'."
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end, error_msg,
-                "src.parser.parser.Parser.for_expr"
-            ))
 
         # EQ expr KEYWORD:TO expr (KEYWORD:STEP expr)? KEYWORD:THEN statement | (NEWLINE statements KEYWORD:END)
-        result.register_advancement()
-        self.advance()
-
+        result = self.check_for_and_advance(result, "expected 'in' or '=', but got %toktype%.", "EQ",
+                                            None, "for_expr")
+        if result.error is not None:
+            return result
         # expr
         start_value = result.register(self.expr())
         if result.error is not None:
@@ -1565,15 +1559,10 @@ class Parser:
         assert start_value is not None
 
         # KEYWORD:TO
-        if not self.current_token.matches(TT["KEYWORD"], 'to'):
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                f"expected 'to'.",
-                "src.parser.parser.Parser.for_expr"
-            ))
-
-        result.register_advancement()
-        self.advance()
+        result = self.check_for_and_advance(result, "expected 'to'", "KEYWORD",
+                                            "to", "for_expr")
+        if result.error is not None:
+            return result
 
         # expr
         end_value = result.register(self.expr())
@@ -1594,12 +1583,9 @@ class Parser:
             step_value = None
 
         # KEYWORD:THEN
-        if not self.current_token.matches(TT["KEYWORD"], 'then'):
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'then'.",
-                "src.parser.parser.Parser.for_expr"
-            ))
+        result = self.check_for(result, "expected 'then'.", "KEYWORD", "then", "for_expr")
+        if result.error is not None:
+            return result
         then_tok = self.current_token.copy()
 
         result.register_advancement()
@@ -1620,15 +1606,13 @@ class Parser:
             assert body is not None
 
             # KEYWORD:END
-            if not self.current_token.matches(TT["KEYWORD"], 'end'):
-                return result.failure(InvalidSyntaxError(
-                    for_tok.pos_start, for_tok.pos_end,
-                    "this 'for' was never closed (by 'end').", "src.parser.parser.Parser.for_expr"
-                ))
-            del self.then_s[-1]
+            result = self.check_for_and_advance(
+                result, "this 'for' was never closed (by 'end')", "KEYWORD", "end",
+                "for_expr", for_tok.pos_start, for_tok.pos_end, del_a_then=True
+            )
+            if result.error is not None:
+                return result
 
-            result.register_advancement()
-            self.advance()
             assert not isinstance(start_value, list)
             assert not isinstance(end_value, list)
             assert not isinstance(step_value, list)
@@ -1653,15 +1637,9 @@ class Parser:
         assert self.current_token is not None
 
         # KEYWORD:WHILE expr KEYWORD:THEN statement | (NEWLINE statements KEYWORD:END)
-        if not self.current_token.matches(TT["KEYWORD"], 'while'):
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'while'.",
-                "src.parser.parser.Parser.while_expr"
-            ))
-
-        result.register_advancement()
-        self.advance()
+        result = self.check_for_and_advance(result, "expected 'while'", "KEYWORD", "while", "while_expr")
+        if result.error is not None:
+            return result
 
         # expr
         condition = result.register(self.expr())
@@ -1670,12 +1648,9 @@ class Parser:
         assert condition is not None
 
         # KEYWORD:THEN
-        if not self.current_token.matches(TT["KEYWORD"], 'then'):
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'then'.",
-                "src.parser.parser.Parser.while_expr"
-            ))
+        result = self.check_for(result, "expected 'then'.", "KEYWORD", "then", "while_expr")
+        if result.error is not None:
+            return result
         then_tok = self.current_token.copy()
 
         result.register_advancement()
@@ -1696,15 +1671,12 @@ class Parser:
             assert body is not None
 
             # KEYWORD:END
-            if not self.current_token.matches(TT["KEYWORD"], 'end'):
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected 'end'.", "src.parser.parser.Parser.while_expr"
-                ))
-            del self.then_s[-1]
+            result = self.check_for_and_advance(result, "expected 'end'.", "KEYWORD", "end",
+                                                "while_expr", del_a_then=True)
+            
+            if result.error is not None:
+                return result
 
-            result.register_advancement()
-            self.advance()
             assert not isinstance(body, list)
             assert not isinstance(condition, list)
 
@@ -1914,16 +1886,10 @@ class Parser:
         assert body is not None
 
         # KEYWORD:END
-        if not self.current_token.matches(TT["KEYWORD"], 'end'):
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'end'.",
-                "src.parser.parser.Parser.func_def"
-            ))
-        del self.then_s[-1]
-
-        result.register_advancement()
-        self.advance()
+        self.check_for_and_advance(result, "expected 'end'.", "KEYWORD", "end",
+                                   "func_def", del_a_then=True)
+        if result.error is not None:
+            return result
         assert not isinstance(body, list)
 
         return result.success(FuncDefNode(

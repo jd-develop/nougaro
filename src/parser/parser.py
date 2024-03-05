@@ -1526,7 +1526,7 @@ class Parser:
                 assert body is not None
 
                 result = self.check_for_and_advance(
-                    result, "this 'for' was never closed (by 'end')",
+                    result, "this 'for' was never closed (by 'end').",
                     "KEYWORD", "end", "for_expr", for_tok.pos_start, for_tok.pos_end,
                     del_a_then=True
                 )
@@ -1559,7 +1559,7 @@ class Parser:
         assert start_value is not None
 
         # KEYWORD:TO
-        result = self.check_for_and_advance(result, "expected 'to'", "KEYWORD",
+        result = self.check_for_and_advance(result, "expected 'to'.", "KEYWORD",
                                             "to", "for_expr")
         if result.error is not None:
             return result
@@ -1607,7 +1607,7 @@ class Parser:
 
             # KEYWORD:END
             result = self.check_for_and_advance(
-                result, "this 'for' was never closed (by 'end')", "KEYWORD", "end",
+                result, "this 'for' was never closed (by 'end').", "KEYWORD", "end",
                 "for_expr", for_tok.pos_start, for_tok.pos_end, del_a_then=True
             )
             if result.error is not None:
@@ -1637,7 +1637,7 @@ class Parser:
         assert self.current_token is not None
 
         # KEYWORD:WHILE expr KEYWORD:THEN statement | (NEWLINE statements KEYWORD:END)
-        result = self.check_for_and_advance(result, "expected 'while'", "KEYWORD", "while", "while_expr")
+        result = self.check_for_and_advance(result, "expected 'while'.", "KEYWORD", "while", "while_expr")
         if result.error is not None:
             return result
 

@@ -494,6 +494,14 @@ class Math(ModuleFunction):
 
         base = exec_context.symbol_table.getf('base')  # we get the base
         if base is None:
+            if value.value <= 0:
+                assert value.pos_start is not None
+                assert value.pos_end is not None
+                return RTResult().failure(RunTimeError(
+                    value.pos_start, value.pos_end,
+                    f"math domain error: illegal value for logarithm: {value.value}.",
+                    exec_context, origin_file="lib_.math.Math.execute_math_log"
+                ))
             value_to_return = Number(math.log(value.value))
         else:
             if not isinstance(base, Number):  # we check if the base is a number

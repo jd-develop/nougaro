@@ -11,7 +11,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Better error messages
 * Rewrite argument handling in `shell.py` using `argparse` (arguments have changed, use `(nougaro) -h` to view the new arguments)
 * Change repo image
-* Fix a crash in `math.log`
+* Fix crashes in `math.log`
 * Fix several overflow crashes
 * Fix other crashes
 * `list(list_value)` now returns an unlinked copy of the original list

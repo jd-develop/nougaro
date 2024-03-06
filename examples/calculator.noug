@@ -226,7 +226,7 @@ while True then
         elif token == "log" and len(stack) > 1 and is_num(stack(-1)) and is_num(stack(-2)) then
             var number = stack(-2)
             var base = stack(-1)
-            if number < 0 or base < 0 then
+            if number <= 0 or base <= 0 then
                 print_in_red("Error: math domain error with logarithm")
                 var should_continue = True
                 break
@@ -237,7 +237,7 @@ while True then
             append(stack, logbase)
         elif token == "ln" and len(stack) > 0 and is_num(stack(-1)) then
             var number = stack(-1)
-            if number < 0 then
+            if number <= 0 then
                 print_in_red("Error: math domain error with logarithm")
                 var should_continue = True
                 break

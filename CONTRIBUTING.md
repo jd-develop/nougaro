@@ -26,6 +26,100 @@ Please report unacceptable behavior by [mail](mailto:jd-develop@laposte.net).
 Nougaro is a high-level object-oriented programming language interpreted in Python.
 To understand my code, you can first read [this file](how_it_works.md), then read the comments of the code files.
 
+### Repository structure
+
+```
+File or directory               Brief explaination
+/                               Repository root
+|- .github/                     Files related to GitHub (issues, actions…)
+|- config/                      Config files, such as noug_version.json that
+|                                 stores the Nougaro version, or .nconf files
+|                                 that stores 1 or 0.
+|- examples/                    Examples (.noug files)
+|- lib_/                        Libraries (importable using import (...),
+|  |                              which imports either (...).noug or (...)_.py)
+|  |- lib_to_make_libs.py       This file is the "base file" to make libs in
+|  |                              Python
+|- src/                         Directory containing every other source code
+|  |                              file (except for shell.py)
+|  |- errors/                           
+|  |  |- errors.py              Source code for nougaro errors
+|  |  |- strings_with_arrows.py
+|  |  |                         This file generates the '^^^^^' under the
+|  |  |                           problematic line in error msgs, using
+|  |  |                           position start and position end
+|  |- lexer/                    Every file related to the Lexer
+|  |  |- lexer.py               Source code for the Lexer
+|  |  |- position.py            Class that stores the position in a file
+|  |  |                           (index, line number, column)
+|  |  |- token_types.py         File containing different constants such as TT
+|  |  |                           (Token Types)
+|  |  |- token.py               The Token class
+|  |- parser/                   Every file related to the Parser
+|  |  |- grammar.txt            Explicitation of the syntax — not actually a
+|  |  |                           file that Nougaro uses, more a "documenta-
+|  |  |                           tion" file
+|  |  |- nodes.py               Every node (the parent Node class and every
+|  |  |                           other nodes)
+|  |  |- parse_result.py        Result of parsing (notably contains the error
+|  |  |                           and position)
+|  |  |- parser.py              Source code for the Parser
+|  |- runtime/                    Every file related to the Interpreter (and
+|  |  |                           runtime)
+|  |  |- values/                Source code for Values
+|  |  |  |- basevalues/         Source code for Values except functions
+|  |  |  |  |- basevalues.py    Base values (except functions and the parent
+|  |  |  |  |                     Value class)
+|  |  |  |  |- value.py         Parent Value class for all values
+|  |  |  |- functions/          Source code for Functions
+|  |  |  |  |- base_builtin_func.py
+|  |  |  |  |                   Parent class of all built-in functions. The
+|  |  |  |  |                     actual built-in functions are stored in
+|  |  |  |  |                     builtin_function.py.
+|  |  |  |  |- base_function.py
+|  |  |  |  |                   Parent class of all functions.
+|  |  |  |  |- builtin_function.py
+|  |  |  |  |                   Behaviour of built-in functions (such as print,
+|  |  |  |  |                     input, etc.)
+|  |  |  |  |- function.py      The Function class a user can instantiate using
+|  |  |  |  |                   def.
+|  |  |  |- tools/
+|  |  |  |  |- is_type.py       To check if a Value is of a certain type
+|  |  |  |  |- py2noug.py       Converts Nougaro values to Python values and
+|  |  |  |  |                     vice-versa.
+|  |  |  |- number_constants.py
+|  |  |  |                      The definition of True, False and null
+|  |  |- context.py             The Context class, that stores the current
+|  |  |                           scope’s name, symbol table, and so on.
+|  |  |- interpreter.py         Source code for the Interpreter
+|  |  |- runtime_result.py      The Runtime Result class, that stores the
+|  |  |                           current error, or if the function should
+|  |  |                           return or the loop break, etc.
+|  |  |- set_symbol_table.py    Sets the symbol table to its default value
+|  |  |                           (with all the built-in functions and names)
+|  |  |- symbol_table.py        Source code for the Symbol Table (kind of a
+|  |  |                           dictionnary with all the variables)
+|  |- constants.py              Some constants, such as DIGITS ("0123456789"),
+|  |                              or valid characters for an identifier.
+|  |- misc.py                   Miscellaneous stuff
+|  |- nougaro.py                Described in how_it_works.md
+|- tests/                       Directory containing files to test Nougaro
+|  |- lib_tests/, lib_test.noug, test_import_in_current_dir.noug
+|  |                            Files used to test to import nougaro libs that
+|  |                              are inside the current directory
+|  |- test_file.noug            File used to test nougaro. It is written in
+|  |                              nougaro
+|  |- *.py                      Unit tests
+|- build.bat                    Compiles the project to .exe
+|- build.sh                     Compiles the project to GNU/Linux binary
+|- changelog.md                 Changelog
+|- example.noug                 Run with example()
+|- how_it_works.md              This file explains how Nougaro works
+|- run_tests.sh                 This file runs tests
+|- shell.py                     Base file of the project
+|- todo.md                      A todo-list
+```
+
 ## How can I contribute?
 
 ### Bug report / feature request

@@ -7,6 +7,8 @@
 
 echo 0 > config/SHOULD_TEST_PRINT_OK
 
+echo "WARNING! Make sure you are using Python 3.11 or newer. Current Python version: $(python3 --version)"
+
 python3 shell.py tests/test_file.noug
 # python3 shell.py -c "__test__(1)"  # use this to print "OK (thing)" when (thing) is tested, useful for debugging
 return_code=$?

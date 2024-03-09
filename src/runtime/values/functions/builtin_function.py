@@ -1561,8 +1561,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                 license_file.close()
                 return RTResult().success(NoneValue(False))
         else:  # we open the GPL3 in the default system app
-            # todo: test on macOS and BSD
-            # tested on Windows, Linux
+            # todo: test on BSD
+            # tested on Windows, Linux, macOS
             import platform
             system = platform.system()
             if system == "Darwin":  # macOS

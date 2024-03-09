@@ -38,7 +38,7 @@ class Error:
             origin_file: str = "(undetermined)"
     ):
         noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.parent.absolute())
-        with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug:
+        with open(os.path.abspath(noug_dir + "/config/debug.nconf")) as debug:
             self.print_origin_file = bool(int(debug.read()))
         self.pos_start = pos_start
         self.pos_end = pos_end

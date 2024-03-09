@@ -59,10 +59,10 @@ def run(
 ) -> tuple[Value, None] | tuple[None, Error]:
     """Run the given code.
     The code is given through the `text` argument."""
-    with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug_f:
+    with open(os.path.abspath(noug_dir + "/config/debug.nconf")) as debug_f:
         debug_on = bool(int(debug_f.read()))
 
-    with open(os.path.abspath(noug_dir + "/config/print_context.conf")) as print_context:
+    with open(os.path.abspath(noug_dir + "/config/print_context.nconf")) as print_context:
         print_context = bool(int(print_context.read()))
 
     if version is None:

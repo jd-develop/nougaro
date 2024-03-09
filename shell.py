@@ -146,10 +146,41 @@ def print_result_and_error(result: Value | None, error: Error | None, args: argp
 def main():
     noug_dir = os.path.abspath(pathlib.Path(__file__).parent.absolute())
 
-    with open(os.path.abspath(noug_dir + "/config/debug.conf")) as debug_f:
+    abspaths = {
+        "debug": os.path.abspath(noug_dir + "/config/debug.nconf"),
+        "debug_old": os.path.abspath(noug_dir + "/config/debug.conf"),
+        "print_context": os.path.abspath(noug_dir + "/config/print_context.nconf"),
+        "print_context_old": os.path.abspath(noug_dir + "/config/print_context.conf")
+    }
+
+    if not os.path.exists(abspaths["debug"]):
+        if os.path.exists(abspaths["debug_old"]):
+            with open(abspaths["debug_old"]) as debug_of:
+                debug_old = debug_of.read()
+            if debug_old not in ["0", "1", "0\n", "1\n"]:
+                debug_old = "0"
+            with open(abspaths["debug"], "w+") as debug_nf:
+                debug_nf.write(debug_old)
+        else:
+            with open(abspaths["debug"], "w+") as debug_nf:
+                debug_nf.write("0")
+
+    if not os.path.exists(abspaths["print_context"]):
+        if os.path.exists(abspaths["print_context_old"]):
+            with open(abspaths["print_context_old"]) as print_context_of:
+                print_context_old = print_context_of.read()
+            if print_context_old not in ["0", "1", "0\n", "1\n"]:
+                print_context_old = "0"
+            with open(abspaths["print_context"], "w+") as print_context_nf:
+                print_context_nf.write(print_context_old)
+        else:
+            with open(abspaths["print_context"], "w+") as print_context_nf:
+                print_context_nf.write("0")
+
+    with open(abspaths["debug"]) as debug_f:
         debug_on = bool(int(debug_f.read()))
 
-    with open(os.path.abspath(noug_dir + "/config/print_context.conf")) as print_context_f:
+    with open(abspaths["print_context"]) as print_context_f:
         print_context = bool(int(print_context_f.read()))
 
     argument_parser = argparse.ArgumentParser(prog="nougaro",

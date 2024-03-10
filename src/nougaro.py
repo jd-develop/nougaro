@@ -28,6 +28,7 @@ from src.errors.errors import *
 from src.runtime.values.basevalues.value import Value
 from src.runtime.values.basevalues.basevalues import String, List, NoneValue
 from src.misc import nice_str_from_idk
+import src.conffiles
 # built-in python imports
 import json
 import os.path
@@ -59,11 +60,15 @@ def run(
 ) -> tuple[Value, None] | tuple[None, Error]:
     """Run the given code.
     The code is given through the `text` argument."""
-    with open(os.path.abspath(noug_dir + "/config/debug.nconf")) as debug_f:
-        debug_on = bool(int(debug_f.read()))
+    debug = src.conffiles.access_data("debug")
+    if debug is None:
+        debug = 0
+    debug_on = bool(int(debug))
 
-    with open(os.path.abspath(noug_dir + "/config/print_context.nconf")) as print_context:
-        print_context = bool(int(print_context.read()))
+    print_context = src.conffiles.access_data("print_context")
+    if print_context is None:
+        print_context = 0
+    print_context = bool(int(print_context))
 
     if version is None:
         with open(os.path.abspath(noug_dir + "/config/noug_version.json")) as ver_json:

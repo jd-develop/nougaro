@@ -26,6 +26,7 @@ from src.misc import print_in_red
 from src.runtime.values.basevalues.value import Value
 from src.runtime.values.basevalues.basevalues import List
 from src.errors.errors import Error
+import src.conffiles
 # built in python imports
 import json
 import sys
@@ -146,50 +147,25 @@ def print_result_and_error(result: Value | None, error: Error | None, args: argp
 def main():
     noug_dir = os.path.abspath(pathlib.Path(__file__).parent.absolute())
 
-    abspaths = {
-        "debug": os.path.abspath(noug_dir + "/config/debug.nconf"),
-        "debug_old": os.path.abspath(noug_dir + "/config/debug.conf"),
-        "print_context": os.path.abspath(noug_dir + "/config/print_context.nconf"),
-        "print_context_old": os.path.abspath(noug_dir + "/config/print_context.conf")
-    }
+    src.conffiles.create_or_update_config_files()
 
-    if not os.path.exists(abspaths["debug"]):
-        if os.path.exists(abspaths["debug_old"]):
-            with open(abspaths["debug_old"]) as debug_of:
-                debug_old = debug_of.read()
-            if debug_old not in ["0", "1", "0\n", "1\n"]:
-                debug_old = "0"
-            with open(abspaths["debug"], "w+") as debug_nf:
-                debug_nf.write(debug_old)
-        else:
-            with open(abspaths["debug"], "w+") as debug_nf:
-                debug_nf.write("0")
+    debug = src.conffiles.access_data("debug")
+    if debug is None:
+        debug = 0
+    debug_on = bool(int(debug))
 
-    if not os.path.exists(abspaths["print_context"]):
-        if os.path.exists(abspaths["print_context_old"]):
-            with open(abspaths["print_context_old"]) as print_context_of:
-                print_context_old = print_context_of.read()
-            if print_context_old not in ["0", "1", "0\n", "1\n"]:
-                print_context_old = "0"
-            with open(abspaths["print_context"], "w+") as print_context_nf:
-                print_context_nf.write(print_context_old)
-        else:
-            with open(abspaths["print_context"], "w+") as print_context_nf:
-                print_context_nf.write("0")
+    print_context = src.conffiles.access_data("print_context")
+    if print_context is None:
+        print_context = 0
+    print_context = bool(int(print_context))
 
-    with open(abspaths["debug"]) as debug_f:
-        debug_on = bool(int(debug_f.read()))
-
-    with open(abspaths["print_context"]) as print_context_f:
-        print_context = bool(int(print_context_f.read()))
-
-    argument_parser = argparse.ArgumentParser(prog="nougaro",
-                                              description="Nougaro: a programming language.",
-                                              epilog="Any other argument is passed in Nougaro. Arguments "
-                                                     "can be retrieved using the built-in __args__ "
-                                                     "variable. "
-                                                     "For any other information, the documentation is available at "
-                                                     "https://github.com/jd-develop/nougaro/wiki")
+    argument_parser = argparse.ArgumentParser(
+        prog="nougaro",
+        description="Nougaro: a programming language.",
+        epilog="Any other argument is passed in Nougaro. Arguments can be retrieved using the built-in __args__"
+               "variable. For any other information, the documentation is available at "
+               "https://github.com/jd-develop/nougaro/wiki"
+    )
     
     argument_parser.add_argument("-c", "--command", help="run a command with shell output.")
     argument_parser.add_argument("-d", "--cd", "--command_dont_verbose", help="run a command without shell output.", dest="command_")
@@ -248,6 +224,9 @@ def main():
             if debug_on:
                 print()
                 print(f"Current working directory is {work_dir} ({type(work_dir)})")
+                print(f"Current config files directory is {src.conffiles.CONFIG_DIRECTORY} ({type(src.conffiles.CONFIG_DIRECTORY)})")
+                data_version = src.conffiles.access_data("DATA_VERSION")
+                print(f"Current data version is {data_version} ({type(data_version)})")
                 print(f"Python version is {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]} "
                       f"({list(sys.version_info)})")
                 print("DEBUG mode is ENABLED")

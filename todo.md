@@ -63,7 +63,7 @@
 * [ ] add `tkinter`
 * [ ] add `webbrowser`
 * [X] add `unicodedata` (finished 9/10/23)
-* [ ] move config files to `~/.config` under Linux and BSD, `~/Library/Preferences` under macOS, and `%appdata%` under Windaube
+* [X] move config files to `~/.config` under Linux and BSD, `~/Library/Preferences` under macOS, and `%appdata%` under Windaube. [QT documentation about where config files should be stored.](https://doc.qt.io/qt-6/qsettings.html#platform-specific-notes) (finished 10/03/2024, still to test under macOS and Windows)
 
 ## 0.20.0 beta (goal: July 2024)
 

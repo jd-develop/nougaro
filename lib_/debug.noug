@@ -5,12 +5,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Debug: some debug tools
+import _conffiles as cf
 
-var _CONF_DEBUG_FILE = __noug_dir__ + "/config/debug.nconf"
-var _PRINT_CONTEXT_CONF_DEBUG_FILE = __noug_dir__ + "/config/print_context.nconf"
-
-var is_debug_enabled = int(read _CONF_DEBUG_FILE)
-var should_print_context = int(read _PRINT_CONTEXT_CONF_DEBUG_FILE)
+var is_debug_enabled = int(cf.access_data("debug"))
+var should_print_context = int(cf.access_data("print_context"))
 
 
 def enable_all()
@@ -26,25 +24,25 @@ end
 
 
 def debug_mode_enable()
-	write "1" !>> _CONF_DEBUG_FILE
-	print("DEBUG mode is now ENABLED.")
+    cf.write_data("debug", "1")
+    print("DEBUG mode is now ENABLED.")
 end
 
 
 def debug_mode_disable()
-	write "0" !>> _CONF_DEBUG_FILE
-	print("DEBUG mode is now DISABLED.")
+    cf.write_data("debug", "0")
+    print("DEBUG mode is now DISABLED.")
 end
 
 
 def print_context()
-    write "1" !>> _PRINT_CONTEXT_CONF_DEBUG_FILE
+    cf.write_data("print_context", "1")
     print("PRINT CONTEXT debug option is now ENABLED.")
 end
 
 
 def stop_print_context()
-    write "0" !>> _PRINT_CONTEXT_CONF_DEBUG_FILE
+    cf.write_data("print_context", "0")
     print("PRINT CONTEXT debug option is now DISABLED.")
 end
 

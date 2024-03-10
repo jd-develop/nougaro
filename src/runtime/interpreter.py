@@ -21,6 +21,7 @@ from src.runtime.context import Context
 from src.misc import clear_screen, RunFunction
 from src.runtime.symbol_table import SymbolTable
 from src.lexer.position import Position
+import src.conffiles
 # built-in python imports
 from inspect import signature
 import os.path
@@ -36,9 +37,10 @@ _ORIGIN_FILE = "src.runtime.interpreter.Interpreter"
 # noinspection PyPep8Naming
 class Interpreter:
     def __init__(self, run: RunFunction, noug_dir_: str, args: list[String], work_dir: str):
-        noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.parent.absolute())
-        with open(os.path.abspath(noug_dir + "/config/debug.nconf")) as debug_file:
-            self.debug = bool(int(debug_file.read()))
+        debug = src.conffiles.access_data("debug")
+        if debug is None:
+            debug = 0
+        self.debug = bool(int(debug))
         self.run = run
         self.noug_dir = noug_dir_
         self.args = args

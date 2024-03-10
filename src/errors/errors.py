@@ -14,9 +14,8 @@ from __future__ import annotations
 from src.errors.strings_with_arrows import string_with_arrows
 from src.lexer.position import Position
 from src.runtime.context import Context
+import src.conffiles
 # built-in python imports
-import os
-import pathlib
 import traceback
 # special typing import
 from typing import TYPE_CHECKING
@@ -37,9 +36,10 @@ class Error:
             details: str,
             origin_file: str = "(undetermined)"
     ):
-        noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.parent.absolute())
-        with open(os.path.abspath(noug_dir + "/config/debug.nconf")) as debug:
-            self.print_origin_file = bool(int(debug.read()))
+        debug = src.conffiles.access_data("debug")
+        if debug is None:
+            debug = 0
+        self.print_origin_file = bool(int(debug))
         self.pos_start = pos_start
         self.pos_end = pos_end
         self.error_name = error_name  # e.g. IllegalCharError
@@ -50,8 +50,8 @@ class Error:
         """Returns a printable clean error message with all the information.
         It includes the file name, the problematic line number and the line itself, the error name and the details.
         """
-        assert self.pos_start is not None, f"error from {self.origin_file}, {self.details=}"
-        assert self.pos_end is not None, f"error from {self.origin_file}, {self.details=}"
+        assert self.pos_start is not None, f"{self.error_name} from {self.origin_file}, {self.details=}"
+        assert self.pos_end is not None, f"{self.error_name} from {self.origin_file}, {self.details=}"
         string_line = string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end)
 
         if len(string_line) != 0 and string_line[0] == "\n":
@@ -82,6 +82,10 @@ class Error:
             result += '\t' + line + '\n '
         result += f'{self.error_name}: {self.details}' if self.details != '' else f'{self.error_name}'
         return result
+    
+    def set_pos(self, pos_start: Position, pos_end: Position):
+        self.pos_start = pos_start
+        self.pos_end = pos_end
 
 
 class IllegalCharError(Error):
@@ -166,11 +170,7 @@ class RunTimeError(Error):
             return f"(from {self.origin_file})\nTraceback (most recent call last):\n" + result
         else:
             return "Traceback (most recent call last):\n" + result
-
-    def set_pos(self, pos_start: Position, pos_end: Position):
-        self.pos_start = pos_start
-        self.pos_end = pos_end
-
+        
 
 class RTIndexError(RunTimeError):
     """Index error (like '[1, 2](2)')"""
@@ -218,7 +218,7 @@ class RTTypeErrorF(RTTypeError):
 
 
 class RTFileNotFoundError(RunTimeError):
-    """File not found (like `open "this_file_does_not_exist"`)"""
+    """File not found (like `open "this_file_does_not_exist"`). Set `custom` to True to use `file_name` as the error message."""
     def __init__(self, pos_start: Position, pos_end: Position, file_name: str, context: Context,
                  origin_file: str = "(undetermined)", folder: bool = False, custom: bool = False):
         if custom:

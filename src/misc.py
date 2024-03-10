@@ -56,10 +56,13 @@ def is_num(value: Any) -> bool:
     return False
 
 
-def does_tok_type_exist(tok_type: str):
+def is_tok_type(tok_type: str):
     """Return True if the token type exists (e.g. 'TT_EQ' exists, but 'TT_FOO' does not)"""
     from src.lexer.token_types import TT
     return tok_type in TT
+
+
+does_tok_type_exist = is_tok_type  # alias for retro-compatibility
 
 
 def is_keyword(word: str):
@@ -71,7 +74,7 @@ def is_keyword(word: str):
 def clear_screen():
     # depends on the os
     # if windows -> 'cls'
-    # if Linux, macOS or UNIX -> 'clear'
+    # if GNU/Linux, macOS or Unix -> 'clear'
     # TODO: find more OSes to include here OR find another way to clear the screen
     os.system('cls' if (os.name.lower() == "nt" or os.name.lower().startswith("windows")) else 'clear')
 
@@ -80,6 +83,12 @@ def nice_str_from_idk(idk: Any) -> String:
     """Returns a NOUGARO string from either a PYTHON value either a NOUGARO string"""
     if isinstance(idk, String):
         return idk
+    elif isinstance(idk, Value):
+        string, error = idk.to_str_()
+        if error is None:
+            assert string is not None
+            return string
+        return String(idk.to_python_str())
     elif isinstance(idk, str):
         return String(idk)
     else:

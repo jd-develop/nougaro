@@ -16,7 +16,7 @@ from src.lexer.position import Position
 # built-in python imports
 import pprint
 # special typing import
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.runtime.values.basevalues.value import Value
 
@@ -53,7 +53,7 @@ class RTResult:
         self.break_or_continue_pos = None
         self.return_pos = None
 
-    def register(self, result: Self):
+    def register(self, result: RTResult):
         """Register another result in this result"""
         if not self.old_should_return:  # True -> DON'T TOUCH IT, False -> change to the new
             self.old_should_return = self.should_return()
@@ -106,8 +106,8 @@ class RTResult:
     def should_return(self):  # if we should stop the interpretation because of an error, or a statement
         #                               (return, break, continue)
         return (
-            self.error or
-            self.function_return_value or
+            self.error is not None or
+            self.function_return_value is not None or
             self.loop_should_continue or
             self.loop_should_break
         )

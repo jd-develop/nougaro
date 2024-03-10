@@ -20,8 +20,7 @@ from src.misc import *
 from src.errors.errors import *
 from src.runtime.values.tools.py2noug import py2noug, noug2py
 # built-in python imports
-from os import system as os_system
-import os.path
+import os
 import random
 import sys
 import subprocess
@@ -1409,7 +1408,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         try:  # we execute the command
-            to_return_value = os_system(str(cmd.value))
+            to_return_value = os.system(str(cmd.value))
             return RTResult().success(String(str(to_return_value)))
         except Exception as e:
             assert self.pos_start is not None

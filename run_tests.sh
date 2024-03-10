@@ -5,23 +5,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+if [ ! "$1" ]; then python=python3; else python=$1; fi
 echo 0 > config/SHOULD_TEST_PRINT_OK
 
-echo "WARNING! Make sure you are using Python 3.11 or newer. Current Python version: $(python3 --version)"
+echo "WARNING! Make sure you are using Python 3.11 or newer. Current Python version: $($python --version)"
 
-python3 shell.py tests/test_file.noug
-# python3 shell.py -c "__test__(1)"  # use this to print "OK (thing)" when (thing) is tested, useful for debugging
+$python shell.py tests/test_file.noug
 return_code=$?
 if [ $return_code != 0 ]; then exit $return_code; fi
 
-python3 shell.py tests/test_import_in_current_dir.noug
+$python shell.py tests/test_import_in_current_dir.noug
 return_code=$?
 if [ $return_code != 0 ]; then exit $return_code; fi
 
-python3 shell.py -v
+$python shell.py -v
 return_code=$?
 if [ $return_code != 0 ]; then exit $return_code; fi
 
-python3 -m tests.tests
+$python -m tests.tests
 return_code=$?
 if [ $return_code != 0 ]; then exit $return_code; fi
+

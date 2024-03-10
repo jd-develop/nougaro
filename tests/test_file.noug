@@ -4,6 +4,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 import time
+import _conffiles
 
 
 def test_nougaro(print_OK)
@@ -12,6 +13,8 @@ def test_nougaro(print_OK)
     assert __noug_version__ == "0.17.0-beta"
     import noug_version
     assert noug_version.version_list == [0, 17, 0, "beta", 0]
+
+    print("Config directory is " + _conffiles.CONFIG_DIRECTORY + ".")
 
     print("Hello Toulouse!")  # the entire world is actually Toulouse, trust me. If you say 'pain au chocolat', you're not in the world.
     # comment
@@ -489,7 +492,7 @@ def test_nougaro(print_OK)
     if print_OK then print("OK loops 2")
 
     # files
-    assert (read __noug_dir__ + "/tests/test_file.noug" 9) == "def test_nougaro(print_OK)\n"
+    assert (read __noug_dir__ + "/tests/test_file.noug" 10) == "def test_nougaro(print_OK)\n"
     assert (write "hey" !>> __noug_dir__ + "/example_file" 2) == "hey"
     assert (read __noug_dir__ + "/example_file" 2) in ["hey\n", "hey"]
     assert (write "Hello world!" !>> __noug_dir__ + "/example_file" 2) == "Hello world!"

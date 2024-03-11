@@ -47,6 +47,10 @@ if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
         exit $return_code
     fi
 
+    echo "Removing bloat… This may cause error messages, don’t worry."
+    find . -type d -execdir rm -rf __pycache__/ \;
+
+    echo "Copying…"
     cp -r example.noug LICENSE README.md shell.py CODE_OF_CONDUCT.md CONTRIBUTING.md how_it_works.md tests/ examples lib_ src config repo-image.png shell.dist/
 
     echo "Renaming and compressing…"

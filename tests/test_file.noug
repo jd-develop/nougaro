@@ -4,7 +4,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 import time
-import _conffiles
+import _conffiles as cf
 
 
 def test_nougaro(print_OK)
@@ -14,7 +14,7 @@ def test_nougaro(print_OK)
     import noug_version
     assert noug_version.version_list == [0, 17, 0, "beta", 0]
 
-    print("Config directory is " + _conffiles.CONFIG_DIRECTORY + ".")
+    print("Config directory is " + cf.CONFIG_DIRECTORY + ".")
 
     print("Hello Toulouse!")  # the entire world is actually Toulouse, trust me. If you say 'pain au chocolat', you're not in the world.
     # comment
@@ -622,6 +622,6 @@ def test_nougaro(print_OK)
 end
 
 
-var _SHOULD_PRINT_OK_FILE = __noug_dir__ + "/config/SHOULD_TEST_PRINT_OK"
-var _SHOULD_PRINT_OK = read _SHOULD_PRINT_OK_FILE
-test_nougaro(int(_SHOULD_PRINT_OK))  # _SHOULD_PRINT_OK is defined when calling __test__
+var _should_print_ok = cf.access_data("SHOULD_TEST_PRINT_OK", 1)
+if _should_print_ok == None then var _should_print_ok = "0"
+test_nougaro(int(_should_print_ok))

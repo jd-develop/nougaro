@@ -6,7 +6,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 if [ ! "$1" ]; then python=python3; else python=$1; fi
-echo 0 > config/SHOULD_TEST_PRINT_OK
 
 echo "WARNING! Make sure you are using Python 3.11 or newer. Current Python version: $($python --version)"
 

@@ -1671,8 +1671,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         print("Please also run unittests if you want to build nougaro.")
 
-        with open(os.path.abspath(noug_dir + "/config/SHOULD_TEST_PRINT_OK"), "w+") as should_i_print_ok_f:
-            should_i_print_ok_f.write(str(int(should_i_print_ok.is_true())))
+        src.conffiles.write_data("SHOULD_TEST_PRINT_OK", str(int(should_i_print_ok.is_true())))
 
         if should_i_return.is_true():
             return self.execute_run(exec_ctx, run, noug_dir, work_dir)

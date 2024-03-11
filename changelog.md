@@ -23,6 +23,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * `«` and `»` are now valid string delimiters
 * Fix some bugs, such as #18
 * Moved config files to the right directory depending on the OS (such as `~/.config`). More infos in the docstring of the src.conffiles file.
+* Add a `version_id`. Incremented at least each new version. The current `version_id` is 2.
 
 ### Calculator
 * Now, the stack is kept at the end of a command. You can make computations using multiple commands, like in Unix’ `dc`.

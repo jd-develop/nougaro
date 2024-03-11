@@ -30,33 +30,85 @@ the aforementionned directories, they are copied (with data-version=1) and event
 import os
 import platform
 import pathlib
-import shutil
+import json
+
+DATA_VERSION = 3
+
+
+def _write_readme(readme_file: str, version_guide_file: str, version: str, version_id: str):
+    """Writes the README and the version guide"""
+    if not os.path.isfile(readme_file):
+        with open(readme_file, "w+") as readme:
+            readme.writelines([
+                "# Config files\n",
+                "This directory stores the Nougaro config files.\n",
+                "The config files of the version `version_id` are stored under"
+                "`./version_id/data_version`.\n",
+                "Please refer to `./version_guide.txt` to know what is the `version_id` of your nougaro version.\n"
+            ])
+    
+    if os.path.isfile(version_guide_file):
+        with open(version_guide_file, "r+") as versions_f:
+            versions = versions_f.readlines()
+    else:
+        versions = []
+    
+    if f"Version {version} has an id of {version_id}.\n" not in versions:
+        with open(version_guide_file, "a+") as versions_f_ap:
+            versions_f_ap.write(f"Version {version} has an id of {version_id}.\n")
 
 
 def _determine_config_directory():
     """And create it if it doesn’t exists"""
     system = platform.system()
     if system == "Darwin":  # macOS
-        config_directory = os.path.expanduser("~/Library/Preferences/org.jd-develop.nougaro/")
-        if not os.path.isdir(config_directory):
-            os.mkdir(config_directory)
+        root_config_directory = os.path.abspath(os.path.expanduser("~/Library/Preferences/org.jd-develop.nougaro/"))
+        if not os.path.isdir(root_config_directory):
+            os.mkdir(root_config_directory)
     elif system == "Windows":  # Windows
-        config_directory = os.path.expandvars('%APPDATA%\\jd-develop\\nougaro\\')
-        if not os.path.isdir(os.path.expandvars('%APPDATA%\\jd-develop\\')):
-            os.mkdir(os.path.expandvars('%APPDATA%\\jd-develop\\'))
-        if not os.path.isdir(config_directory):
-            os.mkdir(config_directory)
+        jd_develop_directory = os.path.expandvars('%APPDATA%\\jd-develop\\')
+        root_config_directory = os.path.abspath(os.path.expandvars('%APPDATA%\\jd-develop\\nougaro\\'))
+        if not os.path.isdir(jd_develop_directory):
+            os.mkdir(jd_develop_directory)
+        if not os.path.isdir(root_config_directory):
+            os.mkdir(root_config_directory)
     else:  # Unix and GNU/Linux
-        config_directory = os.path.expanduser("~/.config/jd-develop/nougaro/")
-        if not os.path.isdir(os.path.expanduser("~/.config/jd-develop/")):
-            os.mkdir(os.path.expanduser("~/.config/jd-develop/"))
-        if not os.path.isdir(config_directory):
-            os.mkdir(config_directory)
-    return config_directory
+        jd_develop_directory = os.path.expanduser("~/.config/jd-develop/")
+        root_config_directory = os.path.abspath(os.path.expanduser("~/.config/jd-develop/nougaro/"))
+        if not os.path.isdir(jd_develop_directory):
+            os.mkdir(jd_develop_directory)
+        if not os.path.isdir(root_config_directory):
+            os.mkdir(root_config_directory)
+
+    noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.absolute())
+
+    with open(os.path.abspath(noug_dir + "/config/noug_version.json")) as ver_json:
+        # we load the nougaro version stored in noug_version.json
+        ver_json_loaded = json.load(ver_json)
+        major = ver_json_loaded.get("major")
+        minor = ver_json_loaded.get("minor")
+        patch = ver_json_loaded.get("patch")
+        phase = ver_json_loaded.get("phase")
+        phase_minor = ver_json_loaded.get("phase-minor")
+        version = f"{major}.{minor}.{patch}-{phase}"
+        if phase_minor != 0:
+            version += f".{phase_minor}"
+        version_id = ver_json_loaded.get("version-id")
+
+    _write_readme(root_config_directory + "/" + "README.md", root_config_directory + "/" + "version_guide.txt", version, str(version_id))
+    
+    version_directory = os.path.abspath(root_config_directory + "/" + str(version_id) + "/")
+    if not os.path.isdir(version_directory):
+        os.mkdir(version_directory)
+    config_directory = os.path.abspath(version_directory + "/" + str(DATA_VERSION) + "/")
+    if not os.path.isdir(config_directory):
+        os.mkdir(config_directory)
+
+    return config_directory + "/", root_config_directory + "/"
 
 
 try:
-    CONFIG_DIRECTORY = _determine_config_directory()
+    CONFIG_DIRECTORY, _LEGACY_CONFIG_DIRECTORY = _determine_config_directory()
 except FileExistsError as e:
     print("FATAL ERROR IN conffile MODULE. One of the directories already exist as a file.")
     print("Please report this bug at https://github.com/jd-develop/nougaro/issues/new/choose.")
@@ -64,18 +116,27 @@ except FileExistsError as e:
     raise e
 
 
-def _create_or_copy_files():
-    """Returns data version as an integer"""
+def _find_files_in_legacy_directories():
+    """Returns debug, print_context"""
     noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.absolute())
 
     abspaths = {
         "debug": os.path.abspath(noug_dir + "/config/debug.nconf"),
         "debug_old": os.path.abspath(noug_dir + "/config/debug.conf"),
         "print_context": os.path.abspath(noug_dir + "/config/print_context.nconf"),
-        "print_context_old": os.path.abspath(noug_dir + "/config/print_context.conf")
+        "print_context_old": os.path.abspath(noug_dir + "/config/print_context.conf"),
+        "debug_root_dir": os.path.abspath(_LEGACY_CONFIG_DIRECTORY + "debug.nconf"),
+        "print_context_root_dir": os.path.abspath(_LEGACY_CONFIG_DIRECTORY + "print_context.nconf"),
+        "were_copied": os.path.abspath(_LEGACY_CONFIG_DIRECTORY + "were_copied.nconf")
     }
 
-    if os.path.exists(abspaths["debug"]):
+    if os.path.exists(abspaths["were_copied"]):
+        return "0", "0"
+
+    if os.path.exists(abspaths["debug_root_dir"]):
+        with open(abspaths["debug_root_dir"], "r+") as debug_f:
+            debug = debug_f.read()
+    elif os.path.exists(abspaths["debug"]):
         with open(abspaths["debug"], "r+") as debug_f:
             debug = debug_f.read()
     elif os.path.exists(abspaths["debug_old"]):
@@ -84,7 +145,10 @@ def _create_or_copy_files():
     else:
         debug = "0"
 
-    if os.path.exists(abspaths["print_context"]):
+    if os.path.exists(abspaths["print_context_root_dir"]):
+        with open(abspaths["print_context_root_dir"], "r+") as print_context_f:
+            print_context = print_context_f.read()
+    elif os.path.exists(abspaths["print_context"]):
         with open(abspaths["print_context"], "r+") as print_context_f:
             print_context = print_context_f.read()
     elif os.path.exists(abspaths["print_context_old"]):
@@ -93,56 +157,44 @@ def _create_or_copy_files():
     else:
         print_context = "0"
     
+    if debug.endswith("\n"):
+        debug = debug[:-1]
+    if print_context.endswith("\n"):
+        print_context = print_context[:-1]
+
     if debug not in ["0", "1"]:
-        print("[CONFFILES] Warning: 'debug' was not set to 0 or 1, resetting to 0.")
+        print(f"[CONFFILES] Warning: 'debug' was not set to 0 or 1, resetting to 0.")
         debug = "0"
     if print_context not in ["0", "1"]:
         print("[CONFFILES] Warning: 'print_context' was not set to 0 or 1, resetting to 0.")
         print_context = "0"
 
-    data_ver = 1
-    with open(CONFIG_DIRECTORY + "DATA_VERSION.nconf", "w+") as data_ver_f:
-        data_ver_f.write(str(data_ver))
+    with open(abspaths["were_copied"], "w+") as wcf:
+        wcf.write("Files were copied and therefore no longer need to be copied.")
+
+    return debug, print_context
+
+
+def _create_or_copy_files():
+    """Returns data version as an integer"""
+    debug, print_context = _find_files_in_legacy_directories()
+
     with open(CONFIG_DIRECTORY + "debug.nconf", "w+") as debug_nnf:
         debug_nnf.write(debug)
     with open(CONFIG_DIRECTORY + "print_context.nconf", "w+") as print_context_nnf:
         print_context_nnf.write(print_context)
-    return data_ver
 
 
-def _unknown_data_version():
-    print("[CONFFILES] Warning: unknown data version. Resetting everything. A backup will be created (but it may fail).")
-    shutil.copytree(CONFIG_DIRECTORY, CONFIG_DIRECTORY[:-1]+"_BACKUP/", dirs_exist_ok=True)
-    shutil.rmtree(CONFIG_DIRECTORY)
-    _determine_config_directory()
-    _create_or_copy_files()
-
-
-def create_or_update_config_files():
+def create_config_files():
     # checks if the config path is empty (create or copy config files)
     if len(os.listdir(CONFIG_DIRECTORY)) == 0:
         _create_or_copy_files()
-
-    # update
-    if not os.path.exists(CONFIG_DIRECTORY + "DATA_VERSION.nconf"):
-        _unknown_data_version()
-        
-    with open(CONFIG_DIRECTORY + "DATA_VERSION.nconf", "r+") as data_version_f:
-        data_version = data_version_f.read()
-
-    try:
-        data_version = int(data_version)
-    except ValueError:
-        data_version = _unknown_data_version()
-
-    if data_version == 0:
-        _create_or_copy_files()
-    elif data_version == 1:
-        pass  # up to date
     
 
 def access_data(config_file: str):
     """Return None if the file does not exist."""
+    if config_file == "DATA_VERSION":
+        return str(DATA_VERSION)
     if not os.path.exists(CONFIG_DIRECTORY + config_file + ".nconf"):
         return None
     with open(CONFIG_DIRECTORY + config_file + ".nconf", "r+") as file:
@@ -151,7 +203,7 @@ def access_data(config_file: str):
 
 def write_data(config_file: str, data: str, silent: bool = False, return_error_messages: bool = False):
     if config_file == "DATA_VERSION":
-        errmsg = "[CONFFILES] Can not write in DATA_VERSION, too risky…"
+        errmsg = "[CONFFILES] Can not write in DATA_VERSION: name is reserved."
         if not silent:
             print(errmsg)
         if return_error_messages:

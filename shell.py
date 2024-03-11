@@ -147,7 +147,7 @@ def print_result_and_error(result: Value | None, error: Error | None, args: argp
 def main():
     noug_dir = os.path.abspath(pathlib.Path(__file__).parent.absolute())
 
-    src.conffiles.create_or_update_config_files()
+    src.conffiles.create_config_files()
 
     debug = src.conffiles.access_data("debug")
     if debug is None:
@@ -184,6 +184,7 @@ def main():
         version = f"{major}.{minor}.{patch}-{phase}"
         if phase_minor != 0:
             version += f".{phase_minor}"
+        version_id = ver_json_loaded.get("version-id")
 
     path, line_to_exec = check_arguments(args, noug_dir, version)
 
@@ -204,7 +205,10 @@ def main():
     if path == "<stdin>":  # we open the shell
         if should_print_stuff:
             # this text is always printed when we start the shell
-            print(f"Welcome to Nougaro {version} on {platform.system()}!")
+            if debug_on:
+                print(f"Welcome to Nougaro {version} (id {version_id}) on {platform.system()}!")
+            else:
+                print(f"Welcome to Nougaro {version} on {platform.system()}!")
             print(f"Contribute: https://github.com/jd-develop/nougaro/")
             print(f"Changelog: see {noug_dir}/changelog.md")
             print()

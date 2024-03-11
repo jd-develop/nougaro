@@ -3,5 +3,6 @@
     "minor": 17,
     "patch": 0,
     "phase": "beta",
-    "phase-minor": 0
+    "phase-minor": 0,
+    "version-id": 2
 }

@@ -28,7 +28,7 @@ if [[ $c == [Yy] && $d == [Yy] ]]; then
 fi
 
 if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
-    python3 -m pip install --upgrade pip wheel colorama nuitka --break-system-packages
+    python3 -m pip install --upgrade pip wheel colorama readline nuitka --break-system-packages
 
     return_code=$?
     if [ $return_code != 0 ]; then

@@ -35,11 +35,13 @@ import platform
 import pathlib
 import argparse
 from datetime import datetime
-if platform.system() in ["Linux", "Darwin"] or "BSD" in platform.system():
+if platform.system().lower() in ["linux", "darwin"] or "bsd" in platform.system().lower():
     try:
         import readline  # browse command history # type: ignore
     except ImportError:
-        pass
+        readline = None
+else:
+    readline = None
 
 
 def check_arguments(args: argparse.Namespace, noug_dir: str, version: str):
@@ -148,6 +150,15 @@ def main():
     noug_dir = os.path.abspath(pathlib.Path(__file__).parent.absolute())
 
     src.conffiles.create_config_files()
+
+    HISTORY_FILE = src.conffiles.ROOT_CONFIG_DIRECTORY + ".noughistory"
+    if readline is not None:
+        import atexit
+        if not os.path.exists(HISTORY_FILE):
+            with open(HISTORY_FILE, "w+") as histf:
+                histf.write("")
+        readline.read_history_file(HISTORY_FILE)
+        atexit.register(readline.write_history_file, HISTORY_FILE)
 
     debug = src.conffiles.access_data("debug")
     if debug is None:

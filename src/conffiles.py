@@ -109,6 +109,7 @@ def _determine_config_directory():
 
 try:
     CONFIG_DIRECTORY, _LEGACY_CONFIG_DIRECTORY = _determine_config_directory()
+    ROOT_CONFIG_DIRECTORY = _LEGACY_CONFIG_DIRECTORY
 except FileExistsError as e:
     print("FATAL ERROR IN conffile MODULE. One of the directories already exist as a file.")
     print("Please report this bug at https://github.com/jd-develop/nougaro/issues/new/choose.")

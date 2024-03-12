@@ -166,13 +166,15 @@ def main():
         try:
             import atexit
             if not os.path.exists(HISTORY_FILE):
+                if debug_on:
+                    print(f"[history] creating {HISTORY_FILE}")
                 with open(HISTORY_FILE, "w+") as histf:
                     histf.write("")
             readline.read_history_file(HISTORY_FILE)
             atexit.register(readline.write_history_file, HISTORY_FILE)
         except Exception as e:
             if debug_on:
-                print(f"[readline] Error: {e.__class__.__name__}: {e}")
+                print(f"[history] Error: {e.__class__.__name__}: {e}")
 
     argument_parser = argparse.ArgumentParser(
         prog="nougaro",

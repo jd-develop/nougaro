@@ -23,6 +23,13 @@ def test_nougaro(print_OK)
     multi-line
          comment
          */
+    /* multiline
+     * comment
+     *  /* nested
+     *   * pretty cool
+     *   */
+     *  # comment
+     */
 
     assert $ == "$"
     assert $test == "$test"

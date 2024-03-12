@@ -876,9 +876,22 @@ class Lexer:
         # current char is '*'
         self.advance()
 
+        opened_nested_comments = 0
+
         # None -> EOF
-        while self.current_char is not None and not (self.current_char == "*" and self.next_char() == "/"):
-            self.advance()
+        while self.current_char is not None:
+            if (self.current_char == "*" and self.next_char() == "/"):
+                if opened_nested_comments == 0:
+                    break
+                self.advance()
+                self.advance()
+                opened_nested_comments -= 1
+            elif (self.current_char == "/" and self.next_char() == "*"):
+                self.advance()
+                self.advance()
+                opened_nested_comments += 1
+            else:
+                self.advance()
         if self.current_char == "*":
             new_char = self.advance()
             if new_char == "/":

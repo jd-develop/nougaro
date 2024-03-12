@@ -24,7 +24,8 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Fix some bugs, such as #18
 * Moved config files to the right directory depending on the OS (such as `~/.config`). More infos in the docstring of the src.conffiles file.
 * Add a `version_id`. Incremented at least each new version. The current `version_id` is 2.
-* Under GNU/Linux and Unix, add an interactive history using `readline`. May not work properly with Unix.
+* Under GNU/Linux and Unix, add an interactive history using `readline`. May not work with non-GNU/Linux systems.
+* Allow for nested multi-line comments
 
 ### Calculator
 * Now, the stack is kept at the end of a command. You can make computations using multiple commands, like in Unix’ `dc`.

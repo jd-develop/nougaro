@@ -151,15 +151,6 @@ def main():
 
     src.conffiles.create_config_files()
 
-    HISTORY_FILE = src.conffiles.ROOT_CONFIG_DIRECTORY + ".noughistory"
-    if readline is not None:
-        import atexit
-        if not os.path.exists(HISTORY_FILE):
-            with open(HISTORY_FILE, "w+") as histf:
-                histf.write("")
-        readline.read_history_file(HISTORY_FILE)
-        atexit.register(readline.write_history_file, HISTORY_FILE)
-
     debug = src.conffiles.access_data("debug")
     if debug is None:
         debug = 0
@@ -169,6 +160,19 @@ def main():
     if print_context is None:
         print_context = 0
     print_context = bool(int(print_context))
+
+    HISTORY_FILE = src.conffiles.ROOT_CONFIG_DIRECTORY + ".noughistory"
+    if readline is not None:
+        try:
+            import atexit
+            if not os.path.exists(HISTORY_FILE):
+                with open(HISTORY_FILE, "w+") as histf:
+                    histf.write("")
+            readline.read_history_file(HISTORY_FILE)
+            atexit.register(readline.write_history_file, HISTORY_FILE)
+        except Exception as e:
+            if debug_on:
+                print(f"[readline] Error: {e.__class__.__name__}: {e}")
 
     argument_parser = argparse.ArgumentParser(
         prog="nougaro",

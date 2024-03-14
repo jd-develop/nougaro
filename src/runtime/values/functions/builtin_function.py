@@ -313,7 +313,9 @@ class BuiltInFunction(BaseBuiltInFunction):
         text_to_display = exec_ctx.symbol_table.getf('text_to_display')  # we get the text to display
         if isinstance(text_to_display, String) or isinstance(text_to_display, Number):
             text = input(text_to_display.value)
-        else:  # other types and not defined
+        elif text_to_display is not None:
+            text = input(text_to_display.to_python_str())
+        else:
             text = input()
         return RTResult().success(String(text))
 
@@ -335,7 +337,9 @@ class BuiltInFunction(BaseBuiltInFunction):
         while True:
             if isinstance(text_to_display, String) or isinstance(text_to_display, Number):
                 text = input(text_to_display.value)
-            else:  # other types and not defined
+            elif text_to_display is not None:
+                text = input(text_to_display.to_python_str())
+            else:
                 text = input()
 
             try:
@@ -363,10 +367,12 @@ class BuiltInFunction(BaseBuiltInFunction):
         while True:
             if isinstance(text_to_display, String) or isinstance(text_to_display, Number):
                 text = input(text_to_display.value)
+            elif text_to_display is not None:
+                text = input(text_to_display.to_python_str())
             else:
                 text = input()
-
-            try:  # other types and not defined
+            
+            try:
                 number = float(text)
                 break
             except ValueError:

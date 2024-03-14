@@ -27,6 +27,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Under GNU/Linux and Unix, add an interactive history using `readline`. May not work with non-GNU/Linux systems.
 * Allow to nest multi-line comments
 * Allow the use of NBSP and NNBSP as spaces
+* Fix a bug where values other than String and Number weren’t printed in `input`
 
 ### Calculator
 * Now, the stack is kept at the end of a command. You can make computations using multiple commands, like in Unix’ `dc`.

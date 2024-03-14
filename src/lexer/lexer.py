@@ -69,7 +69,7 @@ class Lexer:
         there_is_a_space_or_a_tab_or_a_comment = False
         while self.current_char is not None:  # None is EOF
             next_char = self.next_char()
-            if self.current_char in ' \t':  # tab and space
+            if self.current_char in ' \t\N{NBSP}\N{NNBSP}':  # tab and space
                 there_is_a_space_or_a_tab_or_a_comment = True
                 self.advance()
             elif self.current_char == '#':  # for comments

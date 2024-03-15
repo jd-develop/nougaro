@@ -514,7 +514,10 @@ def test_nougaro(print_OK)
 
     import math
     assert math.sqrt_pi == math.sqrt(math.pi)
+    assert math.sqrt_tau == math.sqrt(math.tau)
+    assert math.tau == math.pi*2
     assert int(math.sqrt_pi) == math.isqrt(int(math.pi))
+    assert int(math.sqrt_tau) == math.isqrt(int(math.tau))
     assert math.root(8, 3) == 2
     assert math.iroot(7.4) == math.isqrt(7)
     assert math.isqrt(26) == 5
@@ -522,11 +525,13 @@ def test_nougaro(print_OK)
     assert math.degrees(math.pi) == 180
     assert math.radians(180) == math.pi
     assert round(math.sin(math.pi), 5) == 0
+    assert round(math.sin(math.tau/2), 5) == 0
     assert round(math.cos(math.pi), 5) == -1
+    assert round(math.cos(math.tau/2), 5) == -1
     assert round(math.tan(math.pi), 5) == 0
-    assert round(math.tan(2*math.pi), 5) == round(math.tan(0), 5)
+    assert round(math.tan(2*math.pi), 5) == round(math.tan(0), 5) == round(math.tan(math.tau), 5)
     assert math.asin(0) == 0
-    assert round(math.acos(-1), 9) == round(math.pi, 9)
+    assert round(math.acos(-1), 9) == round(math.pi, 9) == round(math.tau/2, 9)
     assert math.abs(10) == 10
     assert math.abs(-10) == 10
     assert round(math.log(12, 2), 9) == round(math.log2(12), 9)

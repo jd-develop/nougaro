@@ -3,41 +3,52 @@
 This file is updated nearly every commit and copied to GH release changelog.
 
 ## 0.18.0-beta
+### Syntax
+* `«` and `»` are now valid string delimiters
+* Allow to nest multi-line comments
+* Allow the use of NBSP and NNBSP as spaces
+
+### Changes
+* `list(list_value)` now returns an unlinked copy of the original list
 * Remove `PROTECTED_VARS`, which means that variables can now use builtin names as identifiers.
+* Change repo image
+* Under GNU/Linux and Unix, add an interactive history using `readline`. May not work with non-GNU/Linux systems.
+
+### Built-in functions
 * Add `path_exists(path)` builtin function
 * Add `print_in_green(value)` and `print_in_green_ret(value)` builtins functions
 * Add miracle sort and panic sort
-* Add more tests
+
+### Fixes
 * Better error messages
-* Rewrite argument handling in `shell.py` using `argparse` (arguments have changed, use `(nougaro) -h` to view the new arguments)
-* Change repo image
 * Fix crashes in `math.log`
 * Fix several overflow crashes
 * Fix other crashes
-* `list(list_value)` now returns an unlinked copy of the original list
+* Fix some bugs, such as #18
+* Fix a bug where values other than String and Number weren’t printed in `input`
+
+### Libs
 * Add `noug_version.version_list`
+* Add `math.tau` and `math.sqrt_tau`.
+
+### Technical
+* Add more tests
+* Rewrite argument handling in `shell.py` using `argparse` (arguments have changed, use `(nougaro) -h` to view the new arguments)
 * (internal API) py2noug can now properly convert lists and tuples containing python values
 * (internal API) py2noug can now properly convert dicts, under a list of [key, value] lists
 * (internal API) add an alias `is_noug_num` to `is_n_num` function
 * (internal API) add an alias `is_tok_type` to `does_tok_type_exist` function
-* `«` and `»` are now valid string delimiters
-* Fix some bugs, such as #18
 * Moved config files to the right directory depending on the OS (such as `~/.config`). More infos in the docstring of the src.conffiles file.
 * Add a `version_id`. Incremented at least each new version. The current `version_id` is 2.
-* Under GNU/Linux and Unix, add an interactive history using `readline`. May not work with non-GNU/Linux systems.
-* Allow to nest multi-line comments
-* Allow the use of NBSP and NNBSP as spaces
-* Fix a bug where values other than String and Number weren’t printed in `input`
-* Add `math.tau` and `math.sqrt_tau`.
 
 ### Calculator
 * Now, the stack is kept at the end of a command. You can make computations using multiple commands, like in Unix’ `dc`.
   Note that if there is an error, the stack is left unchanged.
-* Add a bunch of debugging commands (such as `printi`, `prints`, `resets`, `rsi`, …) and aliases for existing commands (such as `quit`).
 * Add logarithm
+* Add a bunch of debugging commands (such as `printi`, `prints`, `resets`, `rsi`, …) and aliases for existing commands (such as `quit`).
+* Add `tau`
 * Better error messages
 * Move the RPN examples from the greeter to the help, and add an example
-* Add `tau`
 * If debug is enabled (through `debug.enable()` in Nougaro), it now prints tokens
 
 ## 0.17.0-beta

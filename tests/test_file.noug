@@ -10,9 +10,9 @@ import _conffiles as cf
 def test_nougaro(print_OK)
     var start_time = time.time()
     
-    assert __noug_version__ == "0.17.0-beta"
+    assert __noug_version__ == "0.18.0-beta"
     import noug_version
-    assert noug_version.version_list == [0, 17, 0, "beta", 0]
+    assert noug_version.version_list == [0, 18, 0, "beta", 0]
 
     print("Config directory is " + cf.CONFIG_DIRECTORY + ".")
 

@@ -39,7 +39,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * (internal API) add an alias `is_noug_num` to `is_n_num` function
 * (internal API) add an alias `is_tok_type` to `does_tok_type_exist` function
 * Moved config files to the right directory depending on the OS (such as `~/.config`). More infos in the docstring of the src.conffiles file.
-* Add a `version_id`. Incremented at least each new version. The current `version_id` is 2.
+* Add a `version_id`. Incremented at least each new version. The current `version_id` is 3.
 
 ### Calculator
 * Now, the stack is kept at the end of a command. You can make computations using multiple commands, like in Unix’ `dc`.

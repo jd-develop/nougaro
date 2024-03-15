@@ -22,7 +22,9 @@ import math
 
 # constants
 PI = Number(math.pi)
+TAU = Number(math.tau)
 SQRT_PI = Number(math.sqrt(math.pi))
+SQRT_TAU = Number(math.sqrt(math.tau))
 E = Number(math.e)
 
 
@@ -566,7 +568,9 @@ class Math(ModuleFunction):
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported
     # Constants
     "pi": PI,
+    "tau": TAU,
     "sqrt_pi": SQRT_PI,
+    "sqrt_tau": SQRT_TAU,
     "e": E,
 
     # Functions

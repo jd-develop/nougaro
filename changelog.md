@@ -28,6 +28,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Allow to nest multi-line comments
 * Allow the use of NBSP and NNBSP as spaces
 * Fix a bug where values other than String and Number weren’t printed in `input`
+* Add `math.tau` and `math.sqrt_tau`.
 
 ### Calculator
 * Now, the stack is kept at the end of a command. You can make computations using multiple commands, like in Unix’ `dc`.
@@ -36,6 +37,8 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Add logarithm
 * Better error messages
 * Move the RPN examples from the greeter to the help, and add an example
+* Add `tau`
+* If debug is enabled (through `debug.enable()` in Nougaro), it now prints tokens
 
 ## 0.17.0-beta
 

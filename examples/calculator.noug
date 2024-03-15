@@ -1,5 +1,6 @@
 # a simple Reverse Polish Notation calculator
 import math
+import debug
 
 print()
 print("Welcome to the Nougaro calculator!")
@@ -72,6 +73,7 @@ while True then
         print()
         print("Here all the constants:")
         print("           pi : 3.141592653589793")
+        print("          tau : 6.283185307179586")
         print("            e : " + str(math.e))
         print()
         print("Here all the variables:")
@@ -140,6 +142,8 @@ while True then
             append(tokens, "space")
         elif char in "+-*/^" then
             append(tokens, char)
+        elif char == 'a' and len(tokens) > 0 and tokens(-1) == "t" then
+            replace(tokens, -1, "ta")
         elif char == 'a' then
             append(tokens, char)
         elif char == 'n' and len(tokens) > 0 and tokens(-1) == "a" then
@@ -154,6 +158,8 @@ while True then
             replace(tokens, -1, "sqr")
         elif char == "t" and len(tokens) > 0 and tokens(-1) == "sqr" then
             replace(tokens, -1, "sqrt")
+        elif char == "t" then
+            append(tokens, char)
         elif char == "p" then
             append(tokens, char)
         elif char == "i" and len(tokens) > 0 and tokens(-1) == "p" then
@@ -176,6 +182,8 @@ while True then
              append(tokens, char)
         elif char == "e" then
              append(tokens, char)
+        elif char == "u" and len(tokens) > 0 and tokens(-1) == "ta" then
+            replace(tokens, -1, "tau")
         elif char == "\t" then
             print_in_red("Error: use spaces instead of tabulations.")
             var should_continue = True
@@ -187,6 +195,9 @@ while True then
         end
         if old_floating_point == floating_point then var floating_point = var old_floating_point = 0
     end
+
+    if debug.is_debug_enabled then \
+        print(tokens)
         
     if should_continue then continue
     
@@ -209,6 +220,8 @@ while True then
            end
         elif token == "pi" then
            append(stack, math.pi)
+        elif token == "tau" then
+           append(stack, math.tau)
         elif token == "ans" then
             append(stack, answer)
         elif token == "mod" and len(stack) > 1 and is_num(stack(-1)) and is_num(stack(-2)) then

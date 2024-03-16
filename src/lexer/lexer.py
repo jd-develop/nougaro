@@ -14,6 +14,7 @@ from src.lexer.token import Token
 from src.lexer.token_types import TT, KEYWORDS
 from src.constants import LETTERS, DIGITS, LETTERS_DIGITS, IDENTIFIERS_LEGAL_CHARS
 from src.errors.errors import InvalidSyntaxError, IllegalCharError, Error
+import src.conffiles
 # built-in python imports
 import unicodedata
 
@@ -23,12 +24,18 @@ import unicodedata
 # ##########
 class Lexer:
     """Transforms code into a list of tokens (lexical units)"""
-    def __init__(self, file_name: str, text: str):
+    def __init__(self, file_name: str, text: str, previous_metas: dict[str, str | bool] | None = None):
         self.file_name: str = file_name  # name of the file we're executing
         self.text = text  # raw code we have to execute
         self.pos = Position(-1, 0, -1, file_name, text)  # actual position of the lexer
         self.current_char: str | None = None
-        self.metas: dict[str, str | bool] = {}
+        if previous_metas is not None:
+            self.metas = previous_metas
+        else:
+            self.metas: dict[str, str | bool] = {}
+        debug = src.conffiles.access_data("debug")
+        assert debug is not None
+        self.debug = bool(int(debug))
         self.advance()
 
     def get_char(self, pos: Position):
@@ -90,9 +97,6 @@ class Lexer:
                 self.advance()
 
             elif self.current_char == "@":  # metas
-                # ##########################################################################################################
-                # # Note : this is an indev feature. This is not documented: read, edit and use this code at your own risk #
-                # ##########################################################################################################
                 pos_start = self.pos.copy()
                 if not self.is_empty_file(tokens):
                     return [], InvalidSyntaxError(
@@ -145,7 +149,8 @@ class Lexer:
                         "src.lexer.lexer.Lexer.make_tokens"
                     )
 
-                print(f"[META] (indev feature) {meta_name=} {meta_argument=}")
+                if self.debug:
+                    print(f"[META] (indev feature) {meta_name=} {meta_argument=}")
                 if meta_argument == "":
                     self.metas[meta_name] = True
                 else:
@@ -472,7 +477,11 @@ class Lexer:
         """
         pos_start = self.pos.copy()
         self.advance()
-        token_type = TT["BITWISEOR"]
+        legacy_abs = self.metas.get("legacyAbs")
+        if legacy_abs:
+            token_type = TT["LEGACYABS"]
+        else:
+            token_type = TT["BITWISEOR"]
 
         if self.current_char == '=':  # |=
             token_type = TT["BITWISEOREQ"]

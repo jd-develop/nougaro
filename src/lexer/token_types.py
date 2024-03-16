@@ -58,6 +58,7 @@ TT = {
     "GTEQ": ">>=",               # >>=
     
     "BITWISEOR": '|',            # |
+    "LEGACYABS": 'legacy absolute value',  # | (legacy absolute value)
     "BITWISEAND": '&',           # &
     "BITWISEXOR": '^^',          # ^^
     "BITWISENOT": '~',           # ~

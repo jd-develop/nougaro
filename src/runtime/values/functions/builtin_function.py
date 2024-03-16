@@ -1298,7 +1298,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         # we run the script
         assert exec_ctx.parent is not None
-        value, error = run(
+        value, error, _ = run(
             file_name, script, noug_dir,
             exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
             actual_context=f"{exec_ctx.parent.display_name}",
@@ -1377,7 +1377,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         assert exec_ctx.parent is not None
         # then we execute the file
-        value, error = run(
+        value, error, _ = run(
             file_name, script, noug_dir,
             exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
             actual_context=f"{exec_ctx.parent.display_name}",

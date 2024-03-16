@@ -1,0 +1,4 @@
+# this file tests the legacyAbs meta
+@meta legacyAbs
+
+assert |1| == |(-1)| == 1

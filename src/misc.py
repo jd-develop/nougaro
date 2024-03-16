@@ -109,8 +109,9 @@ class RunFunction(Protocol):
         use_default_symbol_table: bool = False,
         use_context: Context | None = None,
         args: Sequence[str | String] | None = None,
-        work_dir: str | None = None
-    ) -> tuple[Value, None] | tuple[None, Error]:
+        work_dir: str | None = None,
+        lexer_metas: dict[str, str | bool] | None = None
+    ) -> tuple[Value, None, dict[str, str | bool] | None] | tuple[None, Error, dict[str, str | bool] | None]:
         ...
 
 

@@ -56,6 +56,7 @@ class Interpreter:
         
     def init_methods(self):
         self._methods = {
+            "AbsNode": self.visit_AbsNode,
             "AssertNode": self.visit_AssertNode,
             "BinOpCompNode": self.visit_BinOpCompNode,
             "BinOpNode": self.visit_BinOpNode,
@@ -277,6 +278,26 @@ class Interpreter:
         return RTResult().success(
             String(node.token.value).set_context(ctx).set_pos(node.pos_start, node.pos_end)
         )
+
+    def visit_AbsNode(self, node: AbsNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
+        """Visit AbsNode"""
+        result = RTResult()
+        node_to_abs = node.node_to_abs
+        value_to_abs = result.register(self.visit(node_to_abs, ctx, methods_instead_of_funcs))
+        if result.should_return():
+            return result
+        if not isinstance(value_to_abs, Number):
+            assert value_to_abs is not None
+            assert value_to_abs.pos_start is not None
+            assert value_to_abs.pos_end is not None
+            return result.failure(RTTypeError(
+                value_to_abs.pos_start, value_to_abs.pos_end,
+                f"expected number, got {value_to_abs.type_}.",
+                ctx, origin_file=f"{_ORIGIN_FILE}.visit_AbsNode"
+            ))
+        new_value = value_to_abs.copy()
+        new_value.value = abs(new_value.value)
+        return result.success(new_value.set_context(ctx).set_pos(node.pos_start, node.pos_end))
 
     def visit_ListNode(self, node: ListNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit ListNode"""
@@ -1565,8 +1586,8 @@ class Interpreter:
             with open(path) as lib_:
                 text = lib_.read()
 
-            value, error = self.run(file_name=f"{name_to_import} (lib)", text=text, noug_dir=self.noug_dir,
-                                    exec_from=ctx.display_name, use_default_symbol_table=True, work_dir=self.work_dir)
+            value, error, _ = self.run(file_name=f"{name_to_import} (lib)", text=text, noug_dir=self.noug_dir,
+                                       exec_from=ctx.display_name, use_default_symbol_table=True, work_dir=self.work_dir)
             if error is not None:
                 return result.failure(error)
             if result.should_return():

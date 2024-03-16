@@ -191,6 +191,18 @@ class UnaryOpNode(Node):
 
     def __repr__(self):
         return f'unary_op:({self.op_token}, {self.node})'
+    
+
+class AbsNode(Node):
+    """Node for the legacy absolute value syntax (|-12|)"""
+    def __init__(self, node_to_abs: Node):
+        self.node_to_abs = node_to_abs
+
+        self.pos_start = self.node_to_abs.pos_start
+        self.pos_end = self.node_to_abs.pos_end
+
+    def __repr__(self):
+        return f'abs:({self.node_to_abs})'
 
 
 # TEST NODES
@@ -557,6 +569,7 @@ class ReadNode(Node):
         return f'read:({self.file_name_expr}>>{self.identifier} at line {self.line_number})'
 
 
+# MISC
 class DollarPrintNode(Node):
     """$identifier"""
     def __init__(self, identifier: Token, pos_start: Position, pos_end: Position):

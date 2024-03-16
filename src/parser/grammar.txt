@@ -38,7 +38,9 @@ factor        : (PLUS|MINUS) factor
 
 power         : call (DOT call)?* (POW factor)*
 
-call          : atom (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
+call          : abs (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
+
+abs           : (LEGACYABS)? atom (LEGACYABS)?
 
 atom          : (INT|FLOAT)(E_INFIX INT)?
               : STRING (STRING NEWLINE?*)?*

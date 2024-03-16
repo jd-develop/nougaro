@@ -26,8 +26,11 @@ class Parser:
         Please see grammar.txt for AST.
     """
 
-    def __init__(self, tokens: list[Token]):
+    def __init__(self, tokens: list[Token], metas: dict[str, str | bool] | None = None):
+        if metas is None:
+            metas = dict()
         self.tokens = tokens  # tokens from the lexer
+        self.metas = metas  # metas from the parser
         self.token_index = -1  # we start at -1, because we advance 2 lines after, so the index will be 0
         self.current_token: Token | None = None  # Token is imported in src.nodes
         self.advance()
@@ -933,80 +936,106 @@ class Parser:
 
     def call(self) -> ParseResult:
         """
-        call       : atom (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
+        call       : abs (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
         """
         result = ParseResult()
 
         # we check for atom
-        atom = result.register(self.atom())
+        abs_ = result.register(self.abs())
         if result.error is not None:
             return result
-        assert atom is not None
+        assert abs_ is not None
 
         assert self.current_token is not None
         # (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
-        if self.current_token.type == TT["LPAREN"]:
-            call_node = atom
+        if self.current_token.type != TT["LPAREN"]:
+            # not a function
+            return result.success(abs_)
+        
+        call_node = abs_
+        # the '*' at the end of the grammar rule
+        # in fact, if we have a()(), we call a, then we call its result. All of that is in one single grammar rule.
+        while self.current_token.type == TT["LPAREN"]:
+            result.register_advancement()
+            self.advance()
+            arg_nodes: list[tuple[Node, bool]] = []
 
-            # the '*' at the end of the grammar rule
-            # in fact, if we have a()(), we call a, then we call its result. All of that is in one single grammar rule.
-            while self.current_token.type == TT["LPAREN"]:
+            comma_expected = False
+            mul = False
+            # we check for the closing paren.
+            if self.current_token.type == TT["RPAREN"]:
                 result.register_advancement()
                 self.advance()
-                arg_nodes: list[tuple[Node, bool]] = []
-
-                comma_expected = False
-                mul = False
-                # we check for the closing paren.
-                if self.current_token.type == TT["RPAREN"]:
+            else:  # (MUL? expr (COMMA MUL? expr)?*)?
+                if self.current_token.type == TT["MUL"]:  # MUL?
+                    mul = True
+                    # we advance
                     result.register_advancement()
                     self.advance()
-                else:  # (MUL? expr (COMMA MUL? expr)?*)?
+                # expr
+                expr_ = result.register(self.expr())
+                if result.error is not None:
+                    return result
+                assert expr_ is not None
+                assert not isinstance(expr_, list)
+                expr_and_mul = (expr_, mul)
+                arg_nodes.append(expr_and_mul)
+                while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
+                    mul = False
+                    # we advance
+                    result.register_advancement()
+                    self.advance()
+
                     if self.current_token.type == TT["MUL"]:  # MUL?
                         mul = True
                         # we advance
                         result.register_advancement()
                         self.advance()
                     # expr
+                    # we register an expr then check for an error
                     expr_ = result.register(self.expr())
                     if result.error is not None:
                         return result
                     assert expr_ is not None
                     assert not isinstance(expr_, list)
                     expr_and_mul = (expr_, mul)
-                    arg_nodes.append(expr_and_mul)
-                    while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
-                        mul = False
-                        # we advance
-                        result.register_advancement()
-                        self.advance()
-
-                        if self.current_token.type == TT["MUL"]:  # MUL?
-                            mul = True
-                            # we advance
-                            result.register_advancement()
-                            self.advance()
-                        # expr
-                        # we register an expr then check for an error
-                        expr_ = result.register(self.expr())
-                        if result.error is not None:
-                            return result
-                        assert expr_ is not None
-                        assert not isinstance(expr_, list)
-                        expr_and_mul = (expr_, mul)
-                        
-                        arg_nodes.append(expr_and_mul)
-
-                    result = self.check_for_and_advance(result, "expected ',' or ')'." if comma_expected else "expected ')'.",
-                                                        "RPAREN", None, "call")
-                    if result.error is not None:
-                        return result
-                assert not isinstance(call_node, list)
                     
-                call_node = CallNode(call_node, arg_nodes)
+                    arg_nodes.append(expr_and_mul)
 
-            return result.success(call_node)
-        return result.success(atom)
+                result = self.check_for_and_advance(result, "expected ',' or ')'." if comma_expected else "expected ')'.",
+                                                    "RPAREN", None, "call")
+                if result.error is not None:
+                    return result
+            assert not isinstance(call_node, list)
+                
+            call_node = CallNode(call_node, arg_nodes)
+
+        return result.success(call_node)
+
+    def abs(self) -> ParseResult:
+        """
+        abs  : (LEGACYABS)? atom (LEGACYABS)?
+        """
+        result = ParseResult()
+        assert self.current_token is not None
+
+        abs_ = self.current_token.type == TT["LEGACYABS"]
+        if abs_:
+            result.register_advancement()
+            self.advance()
+
+        atom = result.register(self.atom())
+        if result.error is not None:
+            return result
+        assert atom is not None
+        assert isinstance(atom, Node)
+
+        if not abs_:
+            return result.success(atom)
+        result = self.check_for_and_advance(result, "expected '|'.", "LEGACYABS", None, "abs")
+        if result.error is not None:
+            return result
+        return result.success(AbsNode(atom))
 
     def atom(self) -> ParseResult:
         """

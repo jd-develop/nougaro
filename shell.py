@@ -99,7 +99,7 @@ def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: l
         error = None
     else:  # the file isn't empty, let's run it !
         try:
-            _, error = nougaro.run('<stdin>', file_content, noug_dir, version, args=args, work_dir=work_dir)
+            _, error, _ = nougaro.run('<stdin>', file_content, noug_dir, version, args=args, work_dir=work_dir)
         except KeyboardInterrupt:  # if CTRL+C, just exit the Nougaro shell
             print_in_red("\nKeyboardInterrupt")
             sys.exit()
@@ -244,6 +244,7 @@ def main():
                 print("PRINT CONTEXT debug option is ENABLED")
             print()  # blank line
 
+        previous_metas = None
         while True:  # the shell loop (like game loop in a video game but, obviously, Nougaro isn't a video game)
             try:  # we ask for an input to be interpreted
                 if should_print_stuff:
@@ -262,7 +263,8 @@ def main():
                 result, error = None, None
                 continue
             try:  # we try to run it
-                result, error = nougaro.run('<stdin>', text, noug_dir, VERSION, args=nougaro_args, work_dir=work_dir)
+                result, error, previous_metas = nougaro.run('<stdin>', text, noug_dir, VERSION, args=nougaro_args,
+                                                            work_dir=work_dir, lexer_metas=previous_metas)
             except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
                 print_in_red("\nKeyboardInterrupt")
                 continue  # continue the `while True` loop
@@ -276,7 +278,7 @@ def main():
             sys.exit()
 
         try:  # we try to run it
-            result, error = nougaro.run('<commandline>', line_to_exec, noug_dir, VERSION, args=nougaro_args, work_dir=work_dir)
+            result, error, _ = nougaro.run('<commandline>', line_to_exec, noug_dir, VERSION, args=nougaro_args, work_dir=work_dir)
         except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
             print_in_red("\nKeyboardInterrupt")
             sys.exit()

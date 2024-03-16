@@ -56,8 +56,9 @@ def run(
         use_default_symbol_table: bool = False,
         use_context: Context | None = None,
         args: Sequence[str | String] | None = None,
-        work_dir: str | None = None
-) -> tuple[Value, None] | tuple[None, Error]:
+        work_dir: str | None = None,
+        lexer_metas: dict[str, str | bool] | None = None
+) -> tuple[Value, None, dict[str, str | bool] | None] | tuple[None, Error, dict[str, str | bool] | None]:
     """Run the given code.
     The code is given through the `text` argument."""
     debug = src.conffiles.access_data("debug")
@@ -89,11 +90,12 @@ def run(
 
     # we make tokens with the Lexer
     if text is None:
-        return NoneValue(False), None
-    lexer = Lexer(file_name, text)
+        return NoneValue(False), None, lexer_metas
+    lexer = Lexer(file_name, text, previous_metas=lexer_metas)
     tokens, error = lexer.make_tokens()
+    lexer_metas = lexer.metas
     if error is not None:  # if there is any error, we just stop
-        return None, error
+        return None, error, lexer_metas
     assert tokens is not None
     if debug_on:
         print(tokens)
@@ -102,7 +104,7 @@ def run(
     parser = Parser(tokens)
     ast = parser.parse()
     if ast.error is not None:  # if there is any error, we just stop
-        return None, ast.error
+        return None, ast.error, lexer_metas
     assert ast.node is not None
     if debug_on:
         print(ast)
@@ -132,12 +134,12 @@ def run(
     if print_context:
         print(context.__str__())
     if result.error is not None:
-        return None, result.error
+        return None, result.error, lexer_metas
     assert result.value is not None
 
     # finally, return the value and the error given by the interpreter
     # errors are managed by the shell.py file that calls this `run` function
-    return result.value, None
+    return result.value, None, lexer_metas
 
 
 if __name__ == "__main__":

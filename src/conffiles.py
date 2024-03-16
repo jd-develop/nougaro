@@ -25,27 +25,32 @@ the aforementionned directories, they are copied (with data-version=1) and event
 
 # IMPORTS
 # nougaro modules imports
-# no imports
+import src.noug_version
 # built-in python imports
 import os
 import platform
 import pathlib
-import json
 
-DATA_VERSION = 3
+DATA_VERSION = 4
+
+README_TEXT = [
+    "# Config files\n",
+    "This directory stores the Nougaro config files.\n",
+    "The config files of the version `version_id` are stored under `./version_id/data_version`.\n",
+    "Please refer to `./version_guide.txt` to know what is the `version_id` of your nougaro version.\n"
+]
 
 
 def _write_readme(readme_file: str, version_guide_file: str, version: str, version_id: str):
     """Writes the README and the version guide"""
     if not os.path.isfile(readme_file):
         with open(readme_file, "w+") as readme:
-            readme.writelines([
-                "# Config files\n",
-                "This directory stores the Nougaro config files.\n",
-                "The config files of the version `version_id` are stored under"
-                "`./version_id/data_version`.\n",
-                "Please refer to `./version_guide.txt` to know what is the `version_id` of your nougaro version.\n"
-            ])
+            readme.writelines(README_TEXT)
+
+    with open(readme_file, "w+") as readme:
+        if readme.readlines() != README_TEXT:
+            readme.writelines(README_TEXT)
+    
     
     if os.path.isfile(version_guide_file):
         with open(version_guide_file, "r+") as versions_f:
@@ -80,20 +85,7 @@ def _determine_config_directory():
         if not os.path.isdir(root_config_directory):
             os.mkdir(root_config_directory)
 
-    noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.absolute())
-
-    with open(os.path.abspath(noug_dir + "/config/noug_version.json")) as ver_json:
-        # we load the nougaro version stored in noug_version.json
-        ver_json_loaded = json.load(ver_json)
-        major = ver_json_loaded.get("major")
-        minor = ver_json_loaded.get("minor")
-        patch = ver_json_loaded.get("patch")
-        phase = ver_json_loaded.get("phase")
-        phase_minor = ver_json_loaded.get("phase-minor")
-        version = f"{major}.{minor}.{patch}-{phase}"
-        if phase_minor != 0:
-            version += f".{phase_minor}"
-        version_id = ver_json_loaded.get("version-id")
+    version, version_id = src.noug_version.VERSION, src.noug_version.VERSION_ID
 
     _write_readme(root_config_directory + "/" + "README.md", root_config_directory + "/" + "version_guide.txt", version, str(version_id))
     
@@ -171,7 +163,7 @@ def _find_files_in_legacy_directories():
         print_context = "0"
 
     with open(abspaths["were_copied"], "w+") as wcf:
-        wcf.write("Files were copied and therefore no longer need to be copied.")
+        wcf.write("Legacy files no longer need to be copied.")
 
     return debug, print_context
 

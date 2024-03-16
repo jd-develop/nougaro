@@ -32,9 +32,6 @@ To understand my code, you can first read [this file](how_it_works.md), then rea
 File or directory               Brief explaination
 /                               Repository root
 |- .github/                     Files related to GitHub (issues, actions…)
-|- config/                      Config files, such as noug_version.json that
-|                                 stores the Nougaro version, or .nconf files
-|                                 that stores 1 or 0.
 |- examples/                    Examples (.noug files)
 |- lib_/                        Libraries (importable using import (...),
 |  |                              which imports either (...).noug or (...)_.py)
@@ -115,6 +112,7 @@ File or directory               Brief explaination
 |- changelog.md                 Changelog
 |- example.noug                 Run with example()
 |- how_it_works.md              This file explains how Nougaro works
+|- noug_version.json            Stores the Nougaro version
 |- run_tests.sh                 This file runs tests
 |- shell.py                     Base file of the project
 |- todo.md                      A todo-list

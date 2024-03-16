@@ -28,10 +28,9 @@ from src.errors.errors import *
 from src.runtime.values.basevalues.value import Value
 from src.runtime.values.basevalues.basevalues import String, List, NoneValue
 from src.misc import nice_str_from_idk
+import src.noug_version
 import src.conffiles
 # built-in python imports
-import json
-import os.path
 from typing import Sequence
 
 # ##########
@@ -71,17 +70,7 @@ def run(
     print_context = bool(int(print_context))
 
     if version is None:
-        with open(os.path.abspath(noug_dir + "/config/noug_version.json")) as ver_json:
-            # we get the nougaro version from noug_version.json
-            ver_json_loaded = json.load(ver_json)
-            major = ver_json_loaded.get("major")
-            minor = ver_json_loaded.get("minor")
-            patch = ver_json_loaded.get("patch")
-            phase = ver_json_loaded.get("phase")
-            phase_minor = ver_json_loaded.get("phase-minor")
-            version = f"{major}.{minor}.{patch}-{phase}"
-            if phase_minor != 0:
-                version += f".{phase_minor}"
+        version = src.noug_version.VERSION
 
     # we set version and context in the symbol table
     if args is None:

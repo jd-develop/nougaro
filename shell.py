@@ -26,9 +26,9 @@ from src.misc import print_in_red
 from src.runtime.values.basevalues.value import Value
 from src.runtime.values.basevalues.basevalues import List
 from src.errors.errors import Error
+from src.noug_version import VERSION, VERSION_ID
 import src.conffiles
 # built in python imports
-import json
 import sys
 import os
 import platform
@@ -190,24 +190,11 @@ def main():
     argument_parser.add_argument("file", nargs="?", help="name of the file to run.", default="<stdin>")
     args, nougaro_args = argument_parser.parse_known_args()
 
-    with open(os.path.abspath(noug_dir + "/config/noug_version.json")) as ver_json:
-        # we load the nougaro version stored in noug_version.json
-        ver_json_loaded = json.load(ver_json)
-        major = ver_json_loaded.get("major")
-        minor = ver_json_loaded.get("minor")
-        patch = ver_json_loaded.get("patch")
-        phase = ver_json_loaded.get("phase")
-        phase_minor = ver_json_loaded.get("phase-minor")
-        version = f"{major}.{minor}.{patch}-{phase}"
-        if phase_minor != 0:
-            version += f".{phase_minor}"
-        version_id = ver_json_loaded.get("version-id")
-
-    path, line_to_exec = check_arguments(args, noug_dir, version)
+    path, line_to_exec = check_arguments(args, noug_dir, VERSION)
 
     has_to_run_a_file = path not in ["<stdin>", "<commandline>"]
     if has_to_run_a_file:
-        execute_file(path, debug_on, noug_dir, version, nougaro_args)
+        execute_file(path, debug_on, noug_dir, VERSION, nougaro_args)
         return
 
     work_dir = os.getcwd()
@@ -223,9 +210,9 @@ def main():
         if should_print_stuff:
             # this text is always printed when we start the shell
             if debug_on:
-                print(f"Welcome to Nougaro {version} (id {version_id}) on {platform.system()}!")
+                print(f"Welcome to Nougaro {VERSION} (id {VERSION_ID}) on {platform.system()}!")
             else:
-                print(f"Welcome to Nougaro {version} on {platform.system()}!")
+                print(f"Welcome to Nougaro {VERSION} on {platform.system()}!")
             print(f"Contribute: https://github.com/jd-develop/nougaro/")
             print(f"Changelog: see {noug_dir}/changelog.md")
             print()
@@ -275,7 +262,7 @@ def main():
                 result, error = None, None
                 continue
             try:  # we try to run it
-                result, error = nougaro.run('<stdin>', text, noug_dir, version, args=nougaro_args, work_dir=work_dir)
+                result, error = nougaro.run('<stdin>', text, noug_dir, VERSION, args=nougaro_args, work_dir=work_dir)
             except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
                 print_in_red("\nKeyboardInterrupt")
                 continue  # continue the `while True` loop
@@ -289,7 +276,7 @@ def main():
             sys.exit()
 
         try:  # we try to run it
-            result, error = nougaro.run('<commandline>', line_to_exec, noug_dir, version, args=nougaro_args, work_dir=work_dir)
+            result, error = nougaro.run('<commandline>', line_to_exec, noug_dir, VERSION, args=nougaro_args, work_dir=work_dir)
         except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
             print_in_red("\nKeyboardInterrupt")
             sys.exit()

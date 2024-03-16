@@ -42,6 +42,8 @@
 
 ## 0.18.0 beta (goal: February 2024)
 
+### Release date: March 16th, 2024
+
 * [X] add `import ... as ...` (finished 16/10/2023)
 * [X] rewrite shell.py CLI args with `argparse` (finished 22/01/2024)
 

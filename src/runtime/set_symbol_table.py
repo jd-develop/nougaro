@@ -10,8 +10,8 @@
 # IMPORTS
 # nougaro modules imports
 from src.runtime.symbol_table import SymbolTable
-from src.runtime.values.number_constants import *
-from src.runtime.values.basevalues.basevalues import String, Value, NoneValue
+from src.runtime.values.number_constants import NULL, TRUE, FALSE
+from src.runtime.values.basevalues.basevalues import String, Value, NoneValue, Number
 from src.runtime.values.functions.builtin_function import BuiltInFunction
 # built-in python imports
 import platform

@@ -11,9 +11,9 @@
 # nougaro modules imports
 from src.lexer.position import Position
 from src.lexer.token import Token
-from src.lexer.token_types import *
-from src.constants import *
-from src.errors.errors import *
+from src.lexer.token_types import TT, KEYWORDS
+from src.constants import LETTERS, DIGITS, LETTERS_DIGITS, IDENTIFIERS_LEGAL_CHARS
+from src.errors.errors import InvalidSyntaxError, IllegalCharError, Error
 # built-in python imports
 import unicodedata
 

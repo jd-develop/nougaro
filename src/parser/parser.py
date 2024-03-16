@@ -9,7 +9,7 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.lexer.token_types import *
+from src.lexer.token_types import TT, TOKENS_NOT_TO_QUOTE, EQUALS
 from src.errors.errors import InvalidSyntaxError, Error
 from src.parser.parse_result import ParseResult
 from src.parser.nodes import *  # src.tokens.Token is imported in src.nodes

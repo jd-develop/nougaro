@@ -9,13 +9,16 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.runtime.values.basevalues.basevalues import Number, String, List, NoneValue, Value, Module, Constructor, Object
+from src.runtime.values.basevalues.basevalues import Number, String, List, NoneValue, Value, Module, Constructor
+from src.runtime.values.basevalues.basevalues import Object
 from src.runtime.values.number_constants import FALSE, TRUE
 from src.runtime.values.functions.function import Function, Method
 from src.runtime.values.functions.base_function import BaseFunction
 from src.parser.nodes import *
-from src.errors.errors import *
+from src.errors.errors import RunTimeError, RTNotDefinedError, RTTypeError, RTAttributeError, InvalidSyntaxError
+from src.errors.errors import RTAssertionError, RTIndexError, RTFileNotFoundError
 from src.lexer.token_types import TT, TOKENS_NOT_TO_QUOTE
+from src.lexer.token import Token
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
 from src.misc import clear_screen, RunFunction

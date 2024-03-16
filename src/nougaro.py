@@ -24,7 +24,8 @@ from src.parser.parser import Parser
 import src.runtime.interpreter
 from src.runtime.symbol_table import SymbolTable
 from src.runtime.set_symbol_table import set_symbol_table
-from src.errors.errors import *
+from src.errors.errors import Error
+from src.runtime.context import Context
 from src.runtime.values.basevalues.value import Value
 from src.runtime.values.basevalues.basevalues import String, List, NoneValue
 from src.misc import nice_str_from_idk

@@ -11,20 +11,24 @@
 # __future__ import (must be first)
 from __future__ import annotations
 # nougaro modules imports
+from src.runtime.values.basevalues.value import Value
 from src.runtime.values.functions.base_builtin_func import BaseBuiltInFunction
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.context import Context
-from src.runtime.values.basevalues.basevalues import *
-from src.runtime.values.number_constants import *
-from src.misc import *
-from src.errors.errors import *
+from src.runtime.runtime_result import RTResult
+from src.runtime.values.basevalues.basevalues import String, List, NoneValue, Module, Number
+from src.runtime.values.number_constants import FALSE, TRUE
+from src.misc import RunFunction, nice_str_from_idk, BuiltinFunctionDict, print_in_green, print_in_red, clear_screen
+from src.misc import is_keyword, is_tok_type
+from src.errors.errors import RTTypeErrorF, RTTypeError, RTIndexError, RTFileNotFoundError, RunTimeError, PythonError
 from src.runtime.values.tools.py2noug import py2noug, noug2py
+import src.conffiles
 # built-in python imports
 import os
 import random
 import sys
 import subprocess
-from typing import TYPE_CHECKING, Coroutine
+from typing import TYPE_CHECKING, Coroutine, Any
 if TYPE_CHECKING:
     from src.runtime.interpreter import Interpreter
 
@@ -1651,7 +1655,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
         result = RTResult()
         # then we return if this is a valid tok type or not.
-        return result.success(TRUE) if does_tok_type_exist(type_.value) else result.success(FALSE)
+        return result.success(TRUE) if is_tok_type(type_.value) else result.success(FALSE)
 
     builtin_functions["__is_valid_token_type__"] = {
         "function": execute___is_valid_token_type__,

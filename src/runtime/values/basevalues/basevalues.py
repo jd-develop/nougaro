@@ -176,8 +176,10 @@ class String(Value):
 
 
 class Number(Value):
-    def __init__(self, value: int | float):
+    def __init__(self, value: int | float | bool):
         super().__init__()
+        if isinstance(value, bool):
+            value = int(value)
         self.value = value
         if self.is_int():
             self.type_ = 'int'

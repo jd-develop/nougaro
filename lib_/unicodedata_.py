@@ -317,7 +317,7 @@ class UnicodeData(ModuleFunction):
         assert isinstance(form, String)
         assert isinstance(uni_str, String)
 
-        return RTResult().success(String(unicodedata.normalize(form.value, uni_str.value)))
+        return RTResult().success(String(unicodedata.normalize(form.value, uni_str.value)))  # type: ignore
 
     functions["normalize"] = {
         "function": execute_unicodedata_normalize,
@@ -344,7 +344,7 @@ class UnicodeData(ModuleFunction):
         assert isinstance(form, String)
         assert isinstance(uni_str, String)
 
-        return RTResult().success(Number(int(unicodedata.is_normalized(form.value, uni_str.value))))
+        return RTResult().success(Number(unicodedata.is_normalized(form.value, uni_str.value)))  # type: ignore
 
     functions["is_normalized"] = {
         "function": execute_unicodedata_is_normalized,

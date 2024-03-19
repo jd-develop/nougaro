@@ -902,6 +902,22 @@ class Parser:
                 return result
             assert factor is not None
             return result.success(UnaryOpNode(token, factor))
+        elif token.type == TT["LEGACYABS"]:
+            pos = (token.pos_start, token.pos_end)
+            result.register_advancement()
+            self.advance()
+
+            # we check for factor
+            factor = result.register(self.factor())
+            if result.error is not None:
+                return result
+            assert factor is not None
+
+            result = self.check_for_and_advance(
+                result, "this '|' (absolute value) was never closed, or an invalid expression was given.",
+                "LEGACYABS", None, "factor", *pos)
+
+            return result.success(AbsNode(factor))
 
         # power
         return self.power()
@@ -936,23 +952,23 @@ class Parser:
 
     def call(self) -> ParseResult:
         """
-        call       : abs (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
+        call       : atom (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
         """
         result = ParseResult()
 
         # we check for atom
-        abs_ = result.register(self.abs())
+        atom = result.register(self.atom())
         if result.error is not None:
             return result
-        assert abs_ is not None
+        assert atom is not None
 
         assert self.current_token is not None
         # (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
         if self.current_token.type != TT["LPAREN"]:
             # not a function
-            return result.success(abs_)
+            return result.success(atom)
         
-        call_node = abs_
+        call_node = atom
         # the '*' at the end of the grammar rule
         # in fact, if we have a()(), we call a, then we call its result. All of that is in one single grammar rule.
         while self.current_token.type == TT["LPAREN"]:
@@ -1011,31 +1027,6 @@ class Parser:
             call_node = CallNode(call_node, arg_nodes)
 
         return result.success(call_node)
-
-    def abs(self) -> ParseResult:
-        """
-        abs  : (LEGACYABS)? atom (LEGACYABS)?
-        """
-        result = ParseResult()
-        assert self.current_token is not None
-
-        abs_ = self.current_token.type == TT["LEGACYABS"]
-        if abs_:
-            result.register_advancement()
-            self.advance()
-
-        atom = result.register(self.atom())
-        if result.error is not None:
-            return result
-        assert atom is not None
-        assert isinstance(atom, Node)
-
-        if not abs_:
-            return result.success(atom)
-        result = self.check_for_and_advance(result, "expected '|'.", "LEGACYABS", None, "abs")
-        if result.error is not None:
-            return result
-        return result.success(AbsNode(atom))
 
     def atom(self) -> ParseResult:
         """

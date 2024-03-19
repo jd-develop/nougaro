@@ -283,7 +283,19 @@ class Interpreter:
         """Visit AbsNode"""
         result = RTResult()
         node_to_abs = node.node_to_abs
-        value_to_abs = result.register(self.visit(node_to_abs, ctx, methods_instead_of_funcs))
+        if isinstance(node_to_abs, list):
+            if len(node_to_abs) == 1:
+                value_to_abs = result.register(self.visit(node_to_abs[0], ctx, methods_instead_of_funcs))
+            else:
+                print(ctx)
+                print(
+                    f"NOUGARO INTERNAL ERROR: len(node.node) != 1 in {_ORIGIN_FILE}.visit_AbsNode.\n"
+                    f"{node_to_abs=}, {methods_instead_of_funcs=}\n"
+                    f"Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the "
+                    f"information above.")
+                raise Exception(f"len(node.node) != 1 in {_ORIGIN_FILE}.visit_AbsNode.")
+        else:
+            value_to_abs = result.register(self.visit(node_to_abs, ctx, methods_instead_of_funcs))
         if result.should_return():
             return result
         if not isinstance(value_to_abs, Number):

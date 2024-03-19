@@ -195,11 +195,15 @@ class UnaryOpNode(Node):
 
 class AbsNode(Node):
     """Node for the legacy absolute value syntax (|-12|)"""
-    def __init__(self, node_to_abs: Node):
+    def __init__(self, node_to_abs: Node | list[Node]):
         self.node_to_abs = node_to_abs
 
-        self.pos_start = self.node_to_abs.pos_start
-        self.pos_end = self.node_to_abs.pos_end
+        if isinstance(self.node_to_abs, list):
+            self.pos_start = self.node_to_abs[0].pos_start
+            self.pos_end = self.node_to_abs[-1].pos_end
+        else:
+            self.pos_start = self.node_to_abs.pos_start
+            self.pos_end = self.node_to_abs.pos_end
 
     def __repr__(self):
         return f'abs:({self.node_to_abs})'

@@ -14,6 +14,9 @@ This file is updated nearly every commit and copied to GH release changelog.
   * No value required
   * It makes the legacy absolute value possible: `|-1|`=`1`
   * However, it makes bitwise or not accessible.
+* Add `nbspBetweenFrenchGuillemets` meta
+  * No value required
+  * Experience the true french pain! (and I don’t talk about baguettes…) If you want to use the french string quotes (`«»`), you will have to put a no-break space (or a narrow no-break space) after the `«` and before the other `»`. Those (N)NBSP will not be counted in the string.
 
 ## 0.18.0-beta
 ### Syntax

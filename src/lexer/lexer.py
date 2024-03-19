@@ -543,6 +543,16 @@ class Lexer:
         unicode_char_name_exp_pos_start = self.pos.copy()
 
         self.advance()
+        if quote == "«" and self.metas.get("nbspBetweenFrenchGuillemets") is not None:
+            assert self.current_char is not None
+            if self.current_char not in "\N{NBSP}\N{NNBSP}":
+                return None, InvalidSyntaxError(
+                    pos_start, self.pos.copy(),
+                    "expected no break space or narrow no break space after '«', because nbspBetweenFrenchGuillemets "
+                    "meta is enabled.",
+                    "src.lexer.lexer.Lexer.make_string"
+                )
+            self.advance()
 
         escape_characters = {  # \n is a back line, \t is a tab
             'n': '\n',
@@ -557,7 +567,13 @@ class Lexer:
         # if escape_character, the last char is a \, so there is an escape sequence
         # if escape_character but self.current_char != closing_quote, we SHOULD continue looping because \" doesn't
         # close the str
-        while self.current_char != closing_quote or escape_character:
+        def current_char_is_closing_quote():
+            if closing_quote == "»" and self.metas.get("nbspBetweenFrenchGuillemets") is not None:
+                if self.current_char is None:
+                    return False
+                return self.current_char in "\N{NBSP}\N{NNBSP}" and self.next_char() == closing_quote
+            return self.current_char == closing_quote
+        while not current_char_is_closing_quote() or escape_character:
             if self.current_char is None:  # EOF: the string was not closed.
                 return None, InvalidSyntaxError(
                     pos_start, pos_start.copy().advance(),
@@ -650,6 +666,8 @@ class Lexer:
                 "'\\N{' expression never closed.",
                 origin_file="src.lexer.lexer.Lexer.make_string"
             )
+        if self.metas.get("nbspBetweenFrenchGuillemets") is not None and closing_quote == "»":
+            self.advance()
 
         self.advance()  # we advance after the str
         return Token(TT["STRING"], string_, pos_start, self.pos), None

@@ -628,6 +628,9 @@ def test_nougaro(print_OK)
 
     # metas
     import metas.legacyAbs
+    import metas.nbspBetweenFrenchGuillemets
+    assert «salut» == "salut" == 'salut'
+    assert « salut » == "\N{NBSP}salut\N{NBSP}"
     if print_OK then print("OK metas")
 
     # everything is fine in this file

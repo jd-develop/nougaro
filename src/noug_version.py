@@ -31,7 +31,8 @@ def _read_noug_version_json():
         if phase_minor != 0:
             version += f".{phase_minor}"
         version_id = ver_json_loaded.get("version-id")
-    return major, minor, patch, phase, phase_minor, version, version_id
+        data_version = ver_json_loaded.get("data-version")
+    return major, minor, patch, phase, phase_minor, version, version_id, data_version
 
 
-MAJOR, MINOR, PATCH, PHASE, PHASE_MINOR, VERSION, VERSION_ID = _read_noug_version_json()
+MAJOR, MINOR, PATCH, PHASE, PHASE_MINOR, VERSION, VERSION_ID, DATA_VERSION = _read_noug_version_json()

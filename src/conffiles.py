@@ -31,7 +31,7 @@ import os
 import platform
 import pathlib
 
-DATA_VERSION = 4
+DATA_VERSION = src.noug_version.DATA_VERSION
 
 README_TEXT = [
     "# Config files\n",

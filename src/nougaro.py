@@ -84,6 +84,8 @@ def run(
         new_args_strings: list[String] = list(map(nice_str_from_idk, args))
         global_symbol_table.set("__args__", List(new_args_values))
     global_symbol_table.set("__noug_version__", String(version))
+    global_symbol_table.set("__data_version__", String(src.noug_version.DATA_VERSION))
+    global_symbol_table.set("__version_id__", String(src.noug_version.VERSION_ID))
     global_symbol_table.set("__exec_from__", String(str(exec_from)))
     global_symbol_table.set("__actual_context__", String(actual_context))
     global_symbol_table.set("__noug_dir__", String(noug_dir))

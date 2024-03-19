@@ -4,11 +4,13 @@ This file is updated nearly every commit and copied to GH release changelog.
 
 ## 0.19.0-beta
 * Moved ./config/noug_version.json to ./noug_version.json
+* Data version is now stored in ./noug_version.json
+* Data version and version id can now be known using `__data_version__` and `__version_id__`.
 * (internal API) Noug version can now be retrieved using src.noug_version library
-* Data version has been increased to 4
+* Data version has been increased to 5
 
 ### Metas
-* Add a metas system
+* Add a “meta” system
   * Using the syntax `@meta metaName` or `@meta metaName metaValue` at the beginnig of a file, you can now enable special features
 * Add `legacyAbs` meta
   * No value required

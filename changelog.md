@@ -7,6 +7,14 @@ This file is updated nearly every commit and copied to GH release changelog.
 * (internal API) Noug version can now be retrieved using src.noug_version library
 * Data version has been increased to 4
 
+### Metas
+* Add a metas system
+  * Using the syntax `@meta metaName` or `@meta metaName metaValue` at the beginnig of a file, you can now enable special features
+* Add `legacyAbs` meta
+  * No value required
+  * It makes the legacy absolute value possible: `|-1|`=`1`
+  * However, it makes bitwise or not accessible.
+
 ## 0.18.0-beta
 ### Syntax
 * `«` and `»` are now valid string delimiters

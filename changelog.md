@@ -2,7 +2,7 @@
 
 This file is updated nearly every commit and copied to GH release changelog.
 
-## Next version
+## 0.19.0-beta
 * Moved ./config/noug_version.json to ./noug_version.json
 * (internal API) Noug version can now be retrieved using src.noug_version library
 * Data version has been increased to 4

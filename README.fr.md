@@ -35,7 +35,7 @@ Voici Nougaro bêta 0.17.0.
 
  Le fichier notepad++ n’était plus mis à jour, donc je l’ai supprimé du dépôt. Voici sa [dernière version](https://github.com/jd-develop/nougaro/blob/973303409d2f7a91d1b45e44f57ebdb517abde53/highlight%20theme%20for%20NPP.xml).
 
- Je prévois de créer une extension VSCode – si vous vous y connaissez, contactez-moi&nbsp;!
+ Je prévois de créer une [extension VSCode](https://github.com/jd-develop/nougaro-highlight-theme) – si vous vous y connaissez, contactez-moi&nbsp;!
 
 ## Comment ça marche&nbsp;?
 

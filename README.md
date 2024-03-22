@@ -35,7 +35,7 @@ Nougaro is a programming language interpreted in Python.
 
  The notepad++ file was no longer updated, so I deleted it from the repo. Here is [its last version](https://github.com/jd-develop/nougaro/blob/973303409d2f7a91d1b45e44f57ebdb517abde53/highlight%20theme%20for%20NPP.xml).
 
- I’m planning to create a VSCode extension – if you know something about that, contact me!
+ I’m planning to create a [VSCode extension](https://github.com/jd-develop/nougaro-highlight-theme) – if you know something about that, contact me!
 
 ## How it works?
 

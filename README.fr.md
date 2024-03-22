@@ -41,6 +41,13 @@ Voici Nougaro bêta 0.17.0.
 
  Tout est expliqué [ici](how_it_works.md) (en anglais…)
 
+## Buts du langage
+
+ Le but principal du langage est de me permettre de comprendre comment fonctionnent les langages
+ interprétés. Il n’est pas conçu pour être super rapide, sécurisé en terme de mémoire et de
+ dernière-génération, mais plutôt pour être facilement compréhensible. Je ne recommande pas d’utiliser
+ Nougaro dans des vrais projets.
+
 ## Remerciements
 
  Merci à [Mistera](https://github.com/mistera91) qui contribue épisodiquement.

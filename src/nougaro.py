@@ -83,9 +83,6 @@ def run(
         new_args_values: list[Value] = list(map(nice_str_from_idk, args))
         new_args_strings: list[String] = list(map(nice_str_from_idk, args))
         global_symbol_table.set("__args__", List(new_args_values))
-    global_symbol_table.set("__noug_version__", String(version))
-    global_symbol_table.set("__data_version__", String(src.noug_version.DATA_VERSION))
-    global_symbol_table.set("__version_id__", String(src.noug_version.VERSION_ID))
     global_symbol_table.set("__exec_from__", String(str(exec_from)))
     global_symbol_table.set("__actual_context__", String(actual_context))
     global_symbol_table.set("__noug_dir__", String(noug_dir))
@@ -120,7 +117,15 @@ def run(
         # don't forget to change the context symbol table to the global symbol table
         if use_default_symbol_table:
             context.symbol_table = default_symbol_table.copy()
-            context.symbol_table.set("__noug_version__", String(version))
+
+            if args is None:
+                new_args_values: list[Value] = []
+                new_args_strings: list[String] = []
+                context.symbol_table.set("__args__", List([]))
+            else:
+                new_args_values: list[Value] = list(map(nice_str_from_idk, args))
+                new_args_strings: list[String] = list(map(nice_str_from_idk, args))
+                context.symbol_table.set("__args__", List(new_args_values))
             context.symbol_table.set("__exec_from__", String(str(exec_from)))
             context.symbol_table.set("__actual_context__", String(actual_context))
             context.symbol_table.set("__noug_dir__", String(noug_dir))

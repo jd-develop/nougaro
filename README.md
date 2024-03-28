@@ -4,7 +4,7 @@
 
 ![Nougaro. A programming Language.](repo-image.png)
 
-This is Nougaro beta 0.17.0.
+This is Nougaro beta 0.18.0.
 
 Nougaro is a programming language interpreted in Python.
 

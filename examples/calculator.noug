@@ -28,7 +28,7 @@ while True then
     if calcul == "" then continue
     if calcul in ["clear", "cls"] then; clear(); continue; end
     if calcul in ["reseti", "ri"] then; var increment = 0; continue; end
-    if calcul in ["printi", "pi"] then; print(increment); continue; end
+    if calcul in ["printi"] then; print(increment); continue; end
     if calcul in ["rics", "csri", "rsi", "ris"] then
         var increment = 0
         var stack = []
@@ -79,7 +79,7 @@ while True then
         print("Here all the variables:")
         print("          ans : result of last operation")
         print("            i : value that gets incremented at each operation. Reset it with 'reseti' or 'ri'.")
-        print("                Print current value without incrementing with 'printi' or 'pi'.")
+        print("                Print current value without incrementing with 'printi'.")
         print()
         print("You can exit the calculator using 'exit', 'done' or 'quit'.")
         print("You can clear the screen using 'clear' or 'cls'.")

@@ -3,11 +3,6 @@
 This file is updated nearly every commit and copied to GH release changelog.
 
 ## 0.19.0-beta
-* Moved ./config/noug_version.json to ./noug_version.json
-* Data version is now stored in ./noug_version.json
-* Data version and version id can now be known using `__data_version__` and `__version_id__`.
-* (internal API) Noug version can now be retrieved using src.noug_version library
-* Data version has been increased to 5
 
 ### Metas
 * Add a “meta” system
@@ -19,6 +14,16 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Add `nbspBetweenFrenchGuillemets` meta
   * No value required
   * Experience the true french pain! (and I don’t talk about baguettes…) If you want to use the french string quotes (`«»`), you will have to put a no-break space (or a narrow no-break space) after the `«` and before the other `»`. Those (N)NBSP will not be counted in the string.
+
+### Calculator
+* Remove the possibility to print i with `pi` (it is now possible to get the value of π outside of an operation)
+
+## Technical
+* Moved `./config/noug_version.json` to `./noug_version.json`
+* Data version is now stored in `./noug_version.json`
+* Data version and version id can now be known using `__data_version__` and `__version_id__`.
+* (internal API) Noug version can now be retrieved using `src.noug_version` library
+* Data version has been increased to 5
 
 ## 0.18.0-beta
 ### Syntax

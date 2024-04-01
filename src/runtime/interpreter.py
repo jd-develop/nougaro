@@ -401,7 +401,7 @@ class Interpreter:
             result, error = left.bitwise_xor(right)
         else:
             print(ctx)
-            print("NOUGARO INTERNAL ERROR : Result is not defined after executing "
+            print("NOUGARO INTERNAL ERROR: Result is not defined after executing "
                   f"{_ORIGIN_FILE}.visit_BinOpNode because of an invalid token.\n"
                   f"{methods_instead_of_funcs=}\n"
                   "Please report this bug at https://jd-develop.github.io/nougaro/bugreport.html with the information "

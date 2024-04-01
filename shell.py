@@ -99,7 +99,7 @@ def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: l
         error = None
     else:  # the file isn't empty, let's run it !
         try:
-            _, error, _ = nougaro.run('<stdin>', file_content, noug_dir, version, args=args, work_dir=work_dir)
+            _, error, _ = nougaro.run(path, file_content, noug_dir, version, args=args, work_dir=work_dir)
         except KeyboardInterrupt:  # if CTRL+C, just exit the Nougaro shell
             print_in_red("\nKeyboardInterrupt")
             sys.exit()

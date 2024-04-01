@@ -1829,7 +1829,7 @@ class Parser:
                     if self.current_token.type == TT["KEYWORD"]:
                         return result.failure(InvalidSyntaxError(
                             self.current_token.pos_start, self.current_token.pos_end,
-                            f"expected identifier after coma. NB: usage of keyword as identifier is illegal.",
+                            f"expected identifier after comma. NB: usage of keyword as identifier is illegal.",
                             "src.parser.parser.Parser.func_def"
                         ))
 

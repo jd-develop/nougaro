@@ -4,6 +4,9 @@ This file is updated nearly every commit and copied to GH release changelog.
 
 ## 0.19.0-beta
 
+* Fix typos
+* Fix a huge bug where files were referred as `<stdin>` in the shell (and therefore in error messages, etc.)
+
 ### Metas
 * Add a “meta” system
   * Using the syntax `@meta metaName` or `@meta metaName metaValue` at the beginnig of a file, you can now enable special features

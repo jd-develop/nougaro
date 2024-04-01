@@ -40,7 +40,7 @@
 
 ### Release date: January 19th, 2024
 
-## 0.18.0 beta (goal: February 2024)
+## ✅ 0.18.0 beta (goal: February 2024)
 
 ### Release date: March 16th, 2024
 

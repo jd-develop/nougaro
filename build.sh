@@ -6,7 +6,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see https://www.gnu.org/licenses/.
 
-# This file is used to build Nougaro for Linux using Nuitka (requires python3)
+# This file is used to build Nougaro for GNU/Linux using Nuitka (requires python, by default python3)
+# You can pass your python command in this script as argument (example: ./build.sh python3.11)
+
+if [ ! "$1" ]; then python=python3; else python=$1; fi
 
 echo "WARNING: please execute this script ONLY in a safe environnement, like in a sandbox directory."
 echo "WARNING: this script may use Internet connection, and having an Internet connection is recommended. However, you can execute the script without any Internet connection."
@@ -15,8 +18,8 @@ read -p "Continue? [y/N] " -r c
 
 if [[ $c == [Yy] ]]; then
     echo "WARNING: a pip command will be executed (see below) and may (in edge cases) break your python installation or your OS (it won't)"
-    echo "WARNING: this is the command : 'python3 -m pip install --upgrade pip wheel colorama nuitka --break-system-packages'"
-    echo "WARNING: For information, the python version that will be used is $(python3 --version)."
+    echo "WARNING: this is the command : '$python -m pip install --upgrade pip wheel colorama nuitka --break-system-packages'"
+    echo "WARNING: For information, the python version that will be used is $($python --version). Please check if your python version is supported by Nougaro and by Nuitka!"
     read -p "Continue? [y/N] " -r d
 fi
 
@@ -28,7 +31,7 @@ if [[ $c == [Yy] && $d == [Yy] ]]; then
 fi
 
 if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
-    python3 -m pip install --upgrade pip wheel colorama nuitka --break-system-packages
+    $python -m pip install --upgrade pip wheel colorama nuitka --break-system-packages
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -39,7 +42,7 @@ if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
     read -p "Nougaro version: " -r nougversion
     read -p "Phase (beta for example): " -r nougphase
 
-    python3 -m nuitka --standalone --include-package=lib_ --no-deployment-flag=self-execution shell.py
+    $python -m nuitka --standalone --include-package=lib_ --no-deployment-flag=self-execution shell.py
 
     return_code=$?
     if [ $return_code != 0 ]; then
@@ -59,7 +62,7 @@ if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
 
     return_code=$?
     if [ $return_code != 0 ]; then
-        echo tar returned with error
+        echo "tar returned with error (you can compress the folder nougaro-$nougversion-$nougphase-linux-bin yourself if you want)"
         exit $return_code
     fi
 fi

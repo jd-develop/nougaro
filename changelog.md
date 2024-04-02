@@ -27,6 +27,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Data version and version id can now be known using `__data_version__` and `__version_id__`.
 * (internal API) Noug version can now be retrieved using `src.noug_version` library
 * Data version has been increased to 5
+* Made it possible to use a custom python command in `build.sh` by passing the command as parameter. Note that I forgot to mention that this is possible with `run_tests.sh` since 0.18.0-beta.
 
 ## 0.18.0-beta
 ### Syntax

@@ -152,20 +152,22 @@ Summary of the PEP8:
 * `if ... == True` -> `if ...`
 * etc.
 
-I recommend you reading the full PEP8, however you can just read the examples.
-If you're not sure, you can use the tool of the PyCharm IDE that checks your code while you're typing it.
+I recommend reading the full PEP8, however you can just read the examples.
+<!-- If you're not sure, you can use the tool of the PyCharm IDE that checks your code while you're typing it. -->
 
-The nougaro code should be great to read: you can follow the PEP8 here too, as the Nougaro syntax is not too different to the Python one.
+The Nougaro code should be great to read: you can follow the PEP8 here too, as the Nougaro syntax is not too different to the Python one.
 
 ### Git Commit Messages
 
-* Write your messages in english.
+* Write your messages in English.
 * Use the present tense ("Add feature" not "Added feature")
 * Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
 * Limit the first line to 50 characters or fewer.
 * If you number your commits, DO NOT use the <&nbsp;#&nbsp;> character, as it is used in GitHub.
 
+Remember that your commit message should always fit in the sentence “This commit will ‘…’.”
+
 ## Thank you!
 
-I'm glad you read until here, and I hope you will help us to build the Nougaro programming language!
+I’m glad you’ve read until here, and I hope you will help us to build the Nougaro programming language!
 If you have any question, please consider asking the community in the [GitHub discussions](https://github.com/jd-develop/nougaro/discussions), we will be happy to help you!

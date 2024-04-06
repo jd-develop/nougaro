@@ -12,7 +12,6 @@
 from __future__ import annotations
 # nougaro modules imports
 from src.runtime.context import Context
-from src.parser.nodes import Node
 from src.errors.errors import Error
 from src.runtime.values.basevalues.basevalues import String
 from src.runtime.values.basevalues.value import Value
@@ -125,15 +124,3 @@ class BuiltinFunctionDict(TypedDict):
     should_respect_args_number: bool
     run_noug_dir_work_dir: bool
     noug_dir: bool  # if run_noug_dir_work_dir is True then this is False
-
-
-# ##########
-# CUSTOM INTERPRETER VISIT METHOD
-# thanks to lancelote (https://github.com/lancelote) who works at JetBrains for these tricks
-# ##########
-class CustomInterpreterVisitMethod(Protocol):
-    """The type of the methods `visit_{name}` in Interpreter"""
-    # This class was made to bypass a pycharm bug.
-    def __call__(self, node: Node | None = None, exec_context: Context | None = None,
-                 other_context: Context | None = None, methods_instead_of_funcs: bool = False) -> RTResult:
-        ...

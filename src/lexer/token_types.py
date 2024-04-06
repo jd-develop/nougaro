@@ -2,14 +2,14 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # NO IMPORTS
 
-"""File for token types list. For Token class, please refer to ./token.py"""
+"""File for token types list. For Token class, please refer to src/lexer/token.py"""
 
 # dict of all the token types
 TT = {

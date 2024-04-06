@@ -9,9 +9,9 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.lexer.position import Position
-from src.lexer.token import Token
-from src.lexer.token_types import TT
+from src.lexer.position import Position as _Position
+from src.lexer.token import Token as _Token
+from src.lexer.token_types import TT as _TT
 # built-in python imports
 # no imports
 
@@ -28,8 +28,8 @@ class Node:
 # VALUE NODES
 class NumberNode(Node):
     """Node for numbers (both int and float). The tok type can be TT_INT or TT_FLOAT"""
-    def __init__(self, token: Token):
-        self.token: Token = token
+    def __init__(self, token: _Token):
+        self.token = token
         self.pos_start = self.token.pos_start
         self.pos_end = self.token.pos_end
 
@@ -39,7 +39,7 @@ class NumberNode(Node):
 
 class NumberENumberNode(Node):
     """Node for numbers like 10e2 or 4e-5"""
-    def __init__(self, num_token: Token, exponent_token: Token):
+    def __init__(self, num_token: _Token, exponent_token: _Token):
         self.num_token = num_token
         self.exponent_token = exponent_token
 
@@ -52,8 +52,8 @@ class NumberENumberNode(Node):
 
 class StringNode(Node):
     """Node for strings. Tok type can be TT_STRING"""
-    def __init__(self, token: Token):
-        self.token: Token = token
+    def __init__(self, token: _Token):
+        self.token = token
         self.pos_start = self.token.pos_start
         self.pos_end = self.token.pos_end
 
@@ -63,7 +63,7 @@ class StringNode(Node):
 
 class ListNode(Node):
     """Node for list. self.element_nodes is a list of nodes. Needs pos_start and pos_end when init."""
-    def __init__(self, element_nodes: list[tuple[Node, bool]], pos_start: Position, pos_end: Position):
+    def __init__(self, element_nodes: list[tuple[Node, bool]], pos_start: _Position, pos_end: _Position):
         self.element_nodes = element_nodes
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -78,11 +78,11 @@ class VarAssignNode(Node):
     I’m too bored to rewrite examples. TODO: rewrite examples"""
     def __init__(
             self,
-            var_names: list[list[Token | Node]],
+            var_names: list[list[_Token | Node]],
             value_nodes: list[Node] | None,
-            equal: Token = Token(TT["EQ"])
+            equal: _Token = _Token(_TT["EQ"])
     ):
-        self.var_names: list[list[Token | Node]] = var_names
+        self.var_names: list[list[_Token | Node]] = var_names
         self.value_nodes = value_nodes
         self.equal = equal
 
@@ -102,7 +102,7 @@ class VarAccessNode(Node):
     example: `foo`: var_name_tokens_list is [Token(TT_IDENTIFIER, 'foo')]
     example 2: `foo ? bar`: var_name_tokens_list is [Token(TT_IDENTIFIER, 'foo'), Token(TT_IDENTIFIER, 'bar')]
     """
-    def __init__(self, var_name_tokens_list: list[Token | Node], attr: bool = False):
+    def __init__(self, var_name_tokens_list: list[_Token | Node], attr: bool = False):
         self.var_name_tokens_list = var_name_tokens_list
         self.attr = attr
 
@@ -115,7 +115,7 @@ class VarAccessNode(Node):
 
 class VarDeleteNode(Node):
     """Node for variable delete, such as `del foo` where var_name_token is Token(TT_IDENTIFIER, 'foo')"""
-    def __init__(self, var_name_token: Token):
+    def __init__(self, var_name_token: _Token):
         self.var_name_token = var_name_token
         self.pos_start = self.var_name_token.pos_start
         self.pos_end = self.var_name_token.pos_end
@@ -129,7 +129,7 @@ class BinOpNode(Node):
     """Node for binary operations.
     Todo: rewrite examples
     """
-    def __init__(self, left_node: Node | list[Node], op_token: Token, right_node: Node | list[Node]):
+    def __init__(self, left_node: Node | list[Node], op_token: _Token, right_node: Node | list[Node]):
         self.left_node = left_node
         self.op_token = op_token
         self.right_node = right_node
@@ -155,7 +155,7 @@ class BinOpCompNode(Node):
     Yeah, you can use ReadNodes here x)
     But IDK who makes that, because results of 'read' statement are often put into a variable...
     """
-    def __init__(self, nodes_and_tokens_list: list[Node | Token | list[Node]]):
+    def __init__(self, nodes_and_tokens_list: list[Node | _Token | list[Node]]):
         self.nodes_and_tokens_list = nodes_and_tokens_list
 
         if isinstance(self.nodes_and_tokens_list[0], list):
@@ -179,7 +179,7 @@ class UnaryOpNode(Node):
         node is the node after the operator. In these examples, these are both NumberNode, the first with the number
                                              tok Token(TT_INT, 1) and the second with Token(TT_INT, 12)
     """
-    def __init__(self, op_token: Token, node: Node | list[Node]):
+    def __init__(self, op_token: _Token, node: Node | list[Node]):
         self.op_token = op_token
         self.node = node
 
@@ -238,12 +238,12 @@ class AssertNode(Node):
     In this example, assertion is a VarAccessNode (identifier: False), and errmsg is a StringNode.
     errmsg can be None, like in `assert False`.
     """
-    def __init__(self, assertion: Node, pos_start: Position, pos_end: Position, errmsg: Node | None = None):
+    def __init__(self, assertion: Node, pos_start: _Position, pos_end: _Position, errmsg: Node | None = None):
         self.assertion = assertion
         self.errmsg = errmsg
         if self.errmsg is None:
-            self.errmsg = StringNode(Token(
-                TT["STRING"],
+            self.errmsg = StringNode(_Token(
+                _TT["STRING"],
                 value='',
                 pos_start=pos_start.copy(),
                 pos_end=pos_end.copy()
@@ -268,14 +268,14 @@ class ForNode(Node):
     """
     def __init__(
             self,
-            var_name_token: Token,
+            var_name_token: _Token,
             start_value_node: Node,
             end_value_node: Node,
             step_value_node: Node | None,
             body_node: Node,
     ):
         # by default step_value_node is None
-        self.var_name_token: Token = var_name_token
+        self.var_name_token: _Token = var_name_token
         self.start_value_node: Node = start_value_node
         self.end_value_node: Node = end_value_node
         self.step_value_node: Node | None = step_value_node
@@ -296,11 +296,11 @@ class ForNodeList(Node):
         body_node is the node after the 'then'
         list_node is a VarAccessNode (identifier: b)
     """
-    def __init__(self, var_name_token: Token, body_node: Node, list_node: Node | ListNode):
+    def __init__(self, var_name_token: _Token, body_node: Node, list_node: Node | ListNode):
         # if list = [1, 2, 3]
         # for var in list is same as for var = 1 to 3 (step 1)
 
-        self.var_name_token: Token = var_name_token
+        self.var_name_token: _Token = var_name_token
         self.body_node = body_node
         self.list_node = list_node
 
@@ -348,7 +348,7 @@ class DoWhileNode(Node):
 
 class BreakNode(Node):
     """Node for `break` statement"""
-    def __init__(self, pos_start: Position, pos_end: Position):
+    def __init__(self, pos_start: _Position, pos_end: _Position):
         self.pos_start = pos_start
         self.pos_end = pos_end
 
@@ -358,7 +358,7 @@ class BreakNode(Node):
 
 class ContinueNode(Node):
     """Node for `continue` statement"""
-    def __init__(self, pos_start: Position, pos_end: Position):
+    def __init__(self, pos_start: _Position, pos_end: _Position):
         self.pos_start = pos_start
         self.pos_end = pos_end
 
@@ -378,8 +378,8 @@ class FuncDefNode(Node):
 
     Optional params are under the form (name, default value)
     """
-    def __init__(self, var_name_token: Token | None, param_names_tokens: list[Token], body_node: Node,
-                 should_auto_return: bool, optional_params: list[tuple[Token, Node]] = []):
+    def __init__(self, var_name_token: _Token | None, param_names_tokens: list[_Token], body_node: Node,
+                 should_auto_return: bool, optional_params: list[tuple[_Token, Node]] = []):
         self.var_name_token = var_name_token
         self.param_names_tokens = param_names_tokens
         self.optional_params = optional_params
@@ -409,7 +409,7 @@ class ClassNode(Node):
     should_auto_return is bool (it happens in one-line functions)
     If, in the function definition, the name is not defined (like in `def()->void()`), var_name_token is None
     """
-    def __init__(self, var_name_token: Token | None, parent_var_name_token: Token | None, body_node: Node,
+    def __init__(self, var_name_token: _Token | None, parent_var_name_token: _Token | None, body_node: Node,
                  should_auto_return: bool):
         self.var_name_token = var_name_token
         self.parent_var_name_token = parent_var_name_token
@@ -438,7 +438,7 @@ class CallNode(Node):
           arg_nodes is [VarAccessNode (identifier: bar), NumberNode (num: 1)]
     If there is no arguments given, arg_nodes is empty.
     """
-    def __init__(self, node_to_call: Node, arg_nodes: list[tuple[Node, bool]], keyword_arg_nodes: list[tuple[Token, Node, bool]] = []):
+    def __init__(self, node_to_call: Node, arg_nodes: list[tuple[Node, bool]], keyword_arg_nodes: list[tuple[_Token, Node, bool]] = []):
         self.node_to_call = node_to_call
         self.arg_nodes = arg_nodes
         self.keyword_arg_nodes = keyword_arg_nodes
@@ -460,7 +460,7 @@ class ReturnNode(Node):
     """Node for `return` structure.
     node_to_return is the node after the 'return' keyword. It may be None
     """
-    def __init__(self, node_to_return: Node | None, pos_start: Position, pos_end: Position):
+    def __init__(self, node_to_return: Node | None, pos_start: _Position, pos_end: _Position):
         self.node_to_return: Node | None = node_to_return
 
         self.pos_start = pos_start
@@ -475,10 +475,10 @@ class ImportNode(Node):
     """Node for `import` structure.
     identifier is the name of the module to import. It is a token. Example: Token(TT_IDENTIFIER, 'math')
     """
-    def __init__(self, identifiers: list[Token], pos_start: Position, pos_end: Position,
-                 as_identifier: Token | None = None):
-        self.identifiers: list[Token] = identifiers
-        self.as_identifier: Token | None = as_identifier
+    def __init__(self, identifiers: list[_Token], pos_start: _Position, pos_end: _Position,
+                 as_identifier: _Token | None = None):
+        self.identifiers: list[_Token] = identifiers
+        self.as_identifier: _Token | None = as_identifier
 
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -494,10 +494,10 @@ class ExportNode(Node):
     """Node for `export` structure.
     identifier is the name of the module to import. It is a token. Example: Token(TT_IDENTIFIER, 'lorem_ipsum')
     """
-    def __init__(self, expr_or_identifier: Node | Token, as_identifier: Token | None,
-                 pos_start: Position, pos_end: Position):
-        self.expr_or_identifier: Node | Token = expr_or_identifier
-        self.as_identifier: Token | None = as_identifier
+    def __init__(self, expr_or_identifier: Node | _Token, as_identifier: _Token | None,
+                 pos_start: _Position, pos_end: _Position):
+        self.expr_or_identifier: Node | _Token = expr_or_identifier
+        self.as_identifier: _Token | None = as_identifier
 
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -526,11 +526,11 @@ class WriteNode(Node):
     Note that when interpreting, if to_token type is TT_TO_AND_OVERWRITE, it overwrites one line if a line number is
         given, and all the file if it isn't the case.
     """
-    def __init__(self, expr_to_write: Node, file_name_expr: Node, to_token: Token, line_number: str | int,
-                 pos_start: Position, pos_end: Position):
+    def __init__(self, expr_to_write: Node, file_name_expr: Node, to_token: _Token, line_number: str | int,
+                 pos_start: _Position, pos_end: _Position):
         self.expr_to_write: Node = expr_to_write
         self.file_name_expr: Node = file_name_expr
-        self.to_token: Token = to_token
+        self.to_token = to_token
         self.line_number: str | int = line_number
 
         self.pos_start = pos_start
@@ -560,10 +560,10 @@ class ReadNode(Node):
               line_number is Python int 6
 
     """
-    def __init__(self, file_name_expr: Node, identifier: Token | None, line_number: int | str,
-                 pos_start: Position, pos_end: Position):
+    def __init__(self, file_name_expr: Node, identifier: _Token | None, line_number: int | str,
+                 pos_start: _Position, pos_end: _Position):
         self.file_name_expr: Node = file_name_expr
-        self.identifier: Token | None = identifier
+        self.identifier: _Token | None = identifier
         self.line_number: int | str = line_number
 
         self.pos_start = pos_start
@@ -576,8 +576,8 @@ class ReadNode(Node):
 # MISC
 class DollarPrintNode(Node):
     """$identifier"""
-    def __init__(self, identifier: Token, pos_start: Position, pos_end: Position):
-        self.identifier: Token = identifier
+    def __init__(self, identifier: _Token, pos_start: _Position, pos_end: _Position):
+        self.identifier = identifier
 
         self.pos_start = pos_start
         self.pos_end = pos_end

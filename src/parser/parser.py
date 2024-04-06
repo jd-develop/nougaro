@@ -12,7 +12,8 @@
 from src.lexer.token_types import TT, TOKENS_NOT_TO_QUOTE, EQUALS
 from src.errors.errors import InvalidSyntaxError, Error
 from src.parser.parse_result import ParseResult
-from src.parser.nodes import *  # src.tokens.Token is imported in src.nodes
+from src.lexer.token import Token
+from src.parser.nodes import *
 from src.lexer.position import Position
 # built-in python imports
 from typing import Any, Iterable, Callable
@@ -136,7 +137,7 @@ class Parser:
         """Check for a token of type tok_type, eventually with value tok_value. Returns the result.
 
         * `errmsg` is the error message that should be used if the token is not found. Note that the returned error
-          is InvalidSyntaxError. Any occurence of the substring "%toktype% is replaced by the current token’s type.
+          is InvalidSyntaxError. Any occurence of the substring "%toktype%" is replaced by the current token’s type.
         * if `tok_type` is a str, it checks for TT[tok_type]. If it is a list, it checks if the type of the current
           token is in the list. Note that the values in the list need to be values of the TT dict, not the keys.
         * `tok_value`, if given, is used in the .matches() method. It can not be a list.

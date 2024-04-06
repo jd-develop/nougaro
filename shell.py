@@ -37,7 +37,7 @@ import argparse
 from datetime import datetime
 if platform.system().lower() in ["linux", "darwin"] or "bsd" in platform.system().lower():
     try:
-        import readline  # browse command history # type: ignore
+        import readline  # browse command history
     except ImportError:
         readline = None
 else:

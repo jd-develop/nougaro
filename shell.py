@@ -214,7 +214,7 @@ def main():
             else:
                 print(f"Welcome to Nougaro {VERSION} on {platform.system()}!")
             print(f"Contribute: https://github.com/jd-develop/nougaro/")
-            print(f"Changelog: see {noug_dir}/changelog.md")
+            print(f"Changelog: see {noug_dir}/CHANGELOG.md")
             print()
             print("This program is under GPL license. For more details, type __gpl__()")
             print("or __gpl__(1) to stay in terminal.")

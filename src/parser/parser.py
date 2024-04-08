@@ -1720,15 +1720,7 @@ class Parser:
         result = ParseResult()
         assert self.current_token is not None
 
-        if not self.current_token.matches(TT["KEYWORD"], 'do'):
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'do'.",
-                "src.parser.parser.Parser.do_expr"
-            ))
-
-        result.register_advancement()
-        self.advance()
+        result = self.check_for_and_advance(result, "expected 'do'.", "KEYWORD", "do", "do_expr")
 
         # NEWLINE statements NEWLINE
         if self.current_token.type == TT["NEWLINE"]:
@@ -1749,15 +1741,7 @@ class Parser:
 
         # KEYWORD:THEN KEYWORD:LOOP KEYWORD:WHILE
         for expected_token in ["then", "loop", "while"]:
-        
-            if not self.current_token.matches(TT["KEYWORD"], expected_token):
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    f"expected '{expected_token}'.", "src.parser.parser.Parser.do_expr"
-                ))
-
-            result.register_advancement()
-            self.advance()
+            result = self.check_for_and_advance(result, f"expected '{expected_token}'.", "KEYWORD", expected_token, "do_expr")
 
         # expr
         condition = result.register(self.expr())
@@ -1771,23 +1755,14 @@ class Parser:
 
     def func_def(self) -> ParseResult:
         """
-            KEYWORD:DEF IDENTIFIER?
-            LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
-            (ARROW expr)
-            | (NEWLINE statements KEYWORD:END)
+            func_def      : KEYWORD:DEF IDENTIFIER? fund_def_args
+                            (ARROW expr)|(NEWLINE statements KEYWORD:END)
         """
         result = ParseResult()
         assert self.current_token is not None
 
-        if not self.current_token.matches(TT["KEYWORD"], 'def'):
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'def'.", "src.parser.parser.Parser.func_def"
-            ))
         def_tok = self.current_token.copy()
-
-        result.register_advancement()
-        self.advance()
+        result = self.check_for_and_advance(result, "expected 'def'.", "KEYWORD", None, "func_def")
 
         # IDENTIFIER?
         if self.current_token.type == TT["IDENTIFIER"]:
@@ -1796,22 +1771,13 @@ class Parser:
             self.advance()
 
             # LPAREN
-            if self.current_token.type != TT["LPAREN"]:
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected '('.", "src.parser.parser.Parser.func_def"
-                ))
+            errmsg = "expected '('."
         else:
             var_name_token = None
-            # LPAREN
-            if self.current_token.type != TT["LPAREN"]:
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected identifier or '('.", "src.parser.parser.Parser.func_def"
-                ))
+            errmsg = "expeted identifier or '('."
+        
+        result = self.check_for_and_advance(result, errmsg, "LPAREN", None, "func_def")
 
-        result.register_advancement()
-        self.advance()
         param_names_tokens: list[Token] = []
 
         # (IDENTIFIER (COMMA IDENTIFIER)*)?
@@ -1847,24 +1813,11 @@ class Parser:
                 result.register_advancement()
                 self.advance()
 
-            # RPAREN
-            if self.current_token.type != TT["RPAREN"]:
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected ',' or ')'.",
-                    "src.parser.parser.Parser.func_def"
-                ))
+            errmsg = "expected ',' or ')'."
         else:
-            # RPAREN
-            if self.current_token.type != TT["RPAREN"]:
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected identifier or ')'.",
-                    "src.parser.parser.Parser.func_def"
-                ))
-
-        result.register_advancement()
-        self.advance()
+            errmsg = "expected identifier or ')'."
+        
+        result = self.check_for_and_advance(result, errmsg, "RPAREN", None, "func_def")
 
         # ARROW expr
         if self.current_token.type == TT["ARROW"]:
@@ -1885,16 +1838,7 @@ class Parser:
                 should_auto_return=True
             ))
 
-        # NEWLINE statements KEYWORD:END
-        if self.current_token.type != TT["NEWLINE"]:
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "expected '->' or new line.",
-                "src.parser.parser.Parser.func_def"
-            ))
-
-        result.register_advancement()
-        self.advance()
+        result = self.check_for_and_advance(result, "expected '->' or new line.", "NEWLINE", None, "func_def")
 
         assert def_tok.pos_start is not None
         assert def_tok.pos_end is not None
@@ -1930,16 +1874,8 @@ class Parser:
         result = ParseResult()
         assert self.current_token is not None
 
-        if not self.current_token.matches(TT["KEYWORD"], 'class'):
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'class'.",
-                "src.parser.parser.Parser.class_def"
-            ))
         class_tok = self.current_token.copy()
-
-        result.register_advancement()
-        self.advance()
+        result = self.check_for_and_advance(result, "expected 'class'", "KEYWORD", "class", "class_def")
 
         # IDENTIFIER?
         if self.current_token.type == TT["IDENTIFIER"]:
@@ -1964,15 +1900,7 @@ class Parser:
                 parent_var_name_tok = None
 
             # RPAREN
-            if self.current_token.type != TT["RPAREN"]:
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    "expected ')'.",
-                    "src.parser.parser.Parser.class_def"
-                ))
-
-            result.register_advancement()
-            self.advance()
+            result = self.check_for_and_advance(result, "expected ')'.", "RPAREN", None, "class_def")
         else:
             parent_var_name_tok = None
 
@@ -1996,15 +1924,7 @@ class Parser:
             ))
 
         # NEWLINE statements KEYWORD:END
-        if self.current_token.type != TT["NEWLINE"]:
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "expected '->' or new line.",
-                "src.parser.parser.Parser.func_def"
-            ))
-
-        result.register_advancement()
-        self.advance()
+        result = self.check_for_and_advance(result, "expected '->' or new line.", "NEWLINE", None, "class_def")
 
         assert class_tok.pos_start is not None
         assert class_tok.pos_end is not None
@@ -2017,16 +1937,7 @@ class Parser:
         assert body is not None
 
         # KEYWORD:END
-        if not self.current_token.matches(TT["KEYWORD"], 'end'):
-            return result.failure(InvalidSyntaxError(
-                self.current_token.pos_start, self.current_token.pos_end,
-                "expected 'end'.",
-                "src.parser.parser.Parser.func_def"
-            ))
-        del self.then_s[-1]
-
-        result.register_advancement()
-        self.advance()
+        result = self.check_for_and_advance(result, "expected 'end'.", "KEYWORD", "end", "class_def", del_a_then=True)
         assert not isinstance(body, list)
 
         return result.success(ClassNode(

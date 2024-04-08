@@ -2,12 +2,12 @@
 
 This file is updated nearly every commit and copied to GH release changelog.
 
-## 0.19.0-beta
+Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.com). It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. The Nougaro changelog has another section, `Calculator`, keeping track of the changes relative to the Nougaro Calculator under the same 6-sections format.
 
-* Fix typos
-* Fix a huge bug where files were referred as `<stdin>` in the shell (and therefore in error messages, etc.)
+## 0.19.0-beta (Unreleased)
 
-### Metas
+### Added
+
 * Add a “meta” system
   * Using the syntax `@meta metaName` or `@meta metaName metaValue` at the beginnig of a file, you can now enable special features
 * Add `legacyAbs` meta
@@ -17,17 +17,24 @@ This file is updated nearly every commit and copied to GH release changelog.
 * Add `nbspBetweenFrenchGuillemets` meta
   * No value required
   * Experience the true french pain! (and I don’t talk about baguettes…) If you want to use the french string quotes (`«»`), you will have to put a no-break space (or a narrow no-break space) after the `«` and before the other `»`. Those (N)NBSP will not be counted in the string.
+* Data version and version id can now be known using `__data_version__` and `__version_id__`.
+* `[Technical]` Data version is now stored in `./noug_version.json`
+* `[Technical]` (internal API) Noug version can now be retrieved using `src.noug_version` library. It consists of 8 constants: `MAJOR`, `MINOR`, `PATCH`, `PHASE`, `PHASE_MINOR`, `VERSION` (`str`), `VERSION_ID`, `DATA_VERSION`.
+* `[Technical]` It is now possible to use a custom python command in `build.sh` by passing the command as parameter. Note that I forgot to mention that this is possible with `run_tests.sh` since 0.18.0-beta.
+
+### Changed
+
+* Moved `./config/noug_version.json` to `./noug_version.json`
+* Data version has been increased to 5
+
+### Fixed
+
+* Fix typos
+* Fix a bug where files were referred as `<stdin>` in the shell (and therefore in error messages, etc.)
 
 ### Calculator
+#### Removed
 * Remove the possibility to print i with `pi` (it is now possible to get the value of π outside of an operation)
-
-## Technical
-* Moved `./config/noug_version.json` to `./noug_version.json`
-* Data version is now stored in `./noug_version.json`
-* Data version and version id can now be known using `__data_version__` and `__version_id__`.
-* (internal API) Noug version can now be retrieved using `src.noug_version` library
-* Data version has been increased to 5
-* Made it possible to use a custom python command in `build.sh` by passing the command as parameter. Note that I forgot to mention that this is possible with `run_tests.sh` since 0.18.0-beta.
 
 ## 0.18.0-beta
 ### Syntax

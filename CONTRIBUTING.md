@@ -115,7 +115,7 @@ File or directory               Brief explaination
 |  |- *.py                      Unit tests
 |- build.bat                    Compiles the project to .exe
 |- build.sh                     Compiles the project to GNU/Linux binary
-|- changelog.md                 Changelog
+|- CHANGELOG.md                 Changelog
 |- example.noug                 Run with example()
 |- how_it_works.md              This file explains how Nougaro works
 |- noug_version.json            Stores the Nougaro version

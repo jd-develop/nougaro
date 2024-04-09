@@ -96,9 +96,15 @@ File or directory               Brief explaination
 |  |  |                           (with all the built-in functions and names)
 |  |  |- symbol_table.py        Source code for the Symbol Table (kind of a
 |  |  |                           dictionnary with all the variables)
+|  |- conffiles.py              This file manages configuration files (their
+|  |                              creation and access)
 |  |- constants.py              Some constants, such as DIGITS ("0123456789"),
 |  |                              or valid characters for an identifier.
 |  |- misc.py                   Miscellaneous stuff
+|  |- noug_version.py           Consists of eight constants: `MAJOR`, `MINOR`,
+|  |                              `PATCH`, `PHASE`, `PHASE_MINOR`, `VERSION`
+|  |                              (which is a `str`), `VERSION_ID`,
+|  |                              `DATA_VERSION`.
 |  |- nougaro.py                Described in how_it_works.md
 |- tests/                       Directory containing files to test Nougaro
 |  |- lib_tests/, lib_test.noug, test_import_in_current_dir.noug

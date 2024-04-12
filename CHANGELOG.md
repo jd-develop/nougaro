@@ -8,6 +8,7 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 
 ### Added
 
+* Add the `noug_version.clean_version_for_gh` function that generates a beautiful str for the GH issues or PRs.
 * Add a “meta” system
   * Using the syntax `@meta metaName` or `@meta metaName metaValue` at the beginnig of a file, you can now enable special features
   * As predicate, you can use `@`, `#@`, `%@`, `@@`, `-@` or `$@`.
@@ -36,6 +37,7 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 * Fix typos
 * Fix a bug where files were referred as `<stdin>` in the shell (and therefore in error messages, etc.)
 * Fix some crashes with imports (where values didn’t have any context)
+* Fix a bug where `__version_id__` and `__data_version` were strings, but their actual stored value was an integer
 * Unit tests now work properly when debug mode is enabled
 
 ### Calculator

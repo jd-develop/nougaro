@@ -22,16 +22,16 @@ def _read_noug_version_json():
     with open(os.path.abspath(noug_dir + "/noug_version.json")) as ver_json:
         # we load the nougaro version stored in noug_version.json
         ver_json_loaded = json.load(ver_json)
-        major = ver_json_loaded.get("major")
-        minor = ver_json_loaded.get("minor")
-        patch = ver_json_loaded.get("patch")
-        phase = ver_json_loaded.get("phase")
-        phase_minor = ver_json_loaded.get("phase-minor")
-        version = f"{major}.{minor}.{patch}-{phase}"
+        major: int = ver_json_loaded.get("major")
+        minor: int = ver_json_loaded.get("minor")
+        patch: int = ver_json_loaded.get("patch")
+        phase: str = ver_json_loaded.get("phase")
+        phase_minor: int = ver_json_loaded.get("phase-minor")
+        version: str = f"{major}.{minor}.{patch}-{phase}"
         if phase_minor != 0:
             version += f".{phase_minor}"
-        version_id = ver_json_loaded.get("version-id")
-        data_version = ver_json_loaded.get("data-version")
+        version_id: int = ver_json_loaded.get("version-id")
+        data_version: int = ver_json_loaded.get("data-version")
     return major, minor, patch, phase, phase_minor, version, version_id, data_version
 
 

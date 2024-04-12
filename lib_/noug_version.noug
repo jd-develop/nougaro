@@ -18,9 +18,27 @@ var phase_minor = if len(_noug_version_split) == 4 then int(_noug_version_split(
 
 var version_list = [major, minor, patch, phase, phase_minor]
 
+
+def clean_version_for_gh()
+    # this function creates a nice output of the OS and Nougaro version that you can put
+    # in the GH issues and PRs
+    var os = __os_name__
+    var os_version = __os_release__ + " " + __os_version__
+    var nougaro_version = __noug_version__ + " (id: " + __version_id__ +\
+                                         ", data_version: " + __data_version__ + ")"
+    var final_str = \
+        "* OS: " + os +\
+        "\n* OS version: " + os_version +\
+        "\n* Nougaro version: " + nougaro_version
+
+    return final_str
+end
+
+
 export major
 export minor
 export patch
 export phase
 export phase_minor
 export version_list
+export clean_version_for_gh

@@ -128,8 +128,8 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("__how_many_lines_of_code__", BuiltInFunction("__how_many_lines_of_code__"))
 
     symbol_table.set("__noug_version__", String(src.noug_version.VERSION))
-    symbol_table.set("__data_version__", String(src.noug_version.DATA_VERSION))
-    symbol_table.set("__version_id__", String(src.noug_version.VERSION_ID))
+    symbol_table.set("__data_version__", String(str(src.noug_version.DATA_VERSION)))
+    symbol_table.set("__version_id__", String(str(src.noug_version.VERSION_ID)))
 
     symbols_copy: dict[str, Value] = symbol_table.symbols.copy()
     if '__symbol_table__' in symbols_copy.keys():

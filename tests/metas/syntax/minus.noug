@@ -1,0 +1,1 @@
+-@meta setTheTestValueTo hi ; assert __the_test_value__ == "hi"

@@ -26,7 +26,8 @@ class TestLexer(unittest.TestCase):
         pos = src.lexer.position.Position(0, 0, 0, "", "ç")
         expected_error = src.errors.errors.IllegalCharError(
             pos, pos.copy().advance(),
-            "'ç' is an illegal character (U+E7, LATIN SMALL LETTER C WITH CEDILLA)"
+            "'ç' is an illegal character (U+E7, LATIN SMALL LETTER C WITH CEDILLA)",
+            origin_file="src.lexer.lexer.Lexer.make_tokens"
         )
 
         self.assertEqual(tokens, [])

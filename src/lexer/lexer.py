@@ -54,9 +54,24 @@ class Lexer:
 
         return self.current_char
 
-    def next_char(self):
+    def next_char(self, n_next_chars: int = 1):
         """Returns the next char without advancing"""
         new_pos = self.pos.copy().advance(self.current_char)
+
+        if n_next_chars != 1:
+            next_char = self.get_char(new_pos)
+            if next_char is not None:
+                chars_to_return = next_char
+            else:
+                chars_to_return = ""
+            
+            for _ in range(n_next_chars-1):
+                new_pos.advance(self.get_char(new_pos))
+                next_char = self.get_char(new_pos)
+                if next_char is not None:
+                    chars_to_return += next_char
+            return chars_to_return
+
         # get the next char in the code (or None if this is EOF (end of file))
         next_char = self.get_char(new_pos)
         return next_char
@@ -76,10 +91,17 @@ class Lexer:
         there_is_a_space_or_a_tab_or_a_comment = False
         while self.current_char is not None:  # None is EOF
             next_char = self.next_char()
+
+            maybe_meta = self.next_char(6) == "@meta " and self.current_char in "%-@$"
+
             if self.current_char in ' \t\N{NBSP}\N{NNBSP}':  # tab and space
                 there_is_a_space_or_a_tab_or_a_comment = True
                 self.advance()
             elif self.current_char == '#':  # for comments
+                if self.next_char(6) == "@meta ":
+                    self.advance()
+                    is_empty_file = self.is_empty_file(tokens)
+                    self.make_meta(is_empty_file, True)
                 there_is_a_space_or_a_tab_or_a_comment = True
                 self.skip_comment()
             elif self.current_char == '\\' and next_char is not None and next_char in ';\n':
@@ -96,65 +118,13 @@ class Lexer:
                 tokens.append(Token(TT["NEWLINE"], pos_start=self.pos))
                 self.advance()
 
-            elif self.current_char == "@":  # metas
-                pos_start = self.pos.copy()
-                if not self.is_empty_file(tokens):
-                    return [], InvalidSyntaxError(
-                        self.pos.copy(), self.pos.advance(),
-                        "expected metas to be at the beginning of a file.",
-                        "src.lexer.lexer.Lexer.make_tokens"
-                    )
-                current_char = self.advance()
-                for c in "meta":
-                    if not current_char == c:
-                        return [], InvalidSyntaxError(
-                            pos_start, self.pos.advance(),
-                            "expected keyword `meta`.",
-                            "src.lexer.lexer.Lexer.make_tokens"
-                        )
-                    current_char = self.advance()
-
-                if current_char is not None and current_char not in " \N{NBSP}\N{NNBSP}\t":
-                    return [], InvalidSyntaxError(
-                        self.pos.copy(), self.pos.advance(),
-                        "expected whitespace.",
-                        "src.lexer.lexer.Lexer.make_tokens"
-                    )
-                current_char = self.advance()
-                
-                meta_name = ""
-                while current_char is not None and current_char in LETTERS:
-                    meta_name += current_char
-                    current_char = self.advance()
-
-                meta_argument = ""
-                if current_char is not None and current_char in " \N{NBSP}\N{NNBSP}\t":
-                    current_char = self.advance()
-                    while current_char is not None and current_char in LETTERS:
-                        meta_argument += current_char
-                        current_char = self.advance()
-
-                if current_char is not None and current_char not in ";\n":
-                    return [], InvalidSyntaxError(
-                        self.pos.copy(), self.pos.advance(),
-                        "expected newline.",
-                        "src.lexer.lexer.Lexer.make_tokens"
-                    )
-                self.advance()
-
-                if meta_name == "":
-                    return [], InvalidSyntaxError(
-                        pos_start, self.pos.copy(),
-                        "expected a meta name.",
-                        "src.lexer.lexer.Lexer.make_tokens"
-                    )
-
-                if self.debug:
-                    print(f"[META] (indev feature) {meta_name=} {meta_argument=}")
-                if meta_argument == "":
-                    self.metas[meta_name] = True
-                else:
-                    self.metas[meta_name] = meta_argument
+            elif self.current_char == "@" or maybe_meta:  # metas
+                if maybe_meta:
+                    self.advance()
+                is_empty_file = self.is_empty_file(tokens)
+                none_or_error = self.make_meta(is_empty_file)
+                if none_or_error is not None:
+                    return [], none_or_error
 
             elif self.current_char in DIGITS + '.':  # the char is a digit: we generate a number
                 there_is_a_space_or_a_tab_or_a_comment = False
@@ -365,6 +335,75 @@ class Lexer:
         # append the end of file
         tokens.append(Token(TT["EOF"], pos_start=self.pos))
         return tokens, None
+
+    def make_meta(self, is_empty_file: bool, dont_panic_on_errors: bool = False) -> None | Error:
+        """Make meta. dont_panic_on_errors is set when meta predicate is #@, for instance."""
+        pos_start = self.pos.copy()
+        if not is_empty_file:
+            if dont_panic_on_errors: return
+            return InvalidSyntaxError(
+                self.pos.copy(), self.pos.advance(),
+                "expected metas to be at the beginning of a file.",
+                "src.lexer.lexer.Lexer.make_tokens"
+            )
+        current_char = self.advance()
+        for c in "meta":
+            if not current_char == c:
+                if dont_panic_on_errors: return
+                return InvalidSyntaxError(
+                    pos_start, self.pos.advance(),
+                    "expected keyword `meta`.",
+                    "src.lexer.lexer.Lexer.make_tokens"
+                )
+            current_char = self.advance()
+
+        if current_char is not None and current_char not in " \N{NBSP}\N{NNBSP}\t":
+            if dont_panic_on_errors: return
+            return InvalidSyntaxError(
+                self.pos.copy(), self.pos.advance(),
+                "expected whitespace.",
+                "src.lexer.lexer.Lexer.make_tokens"
+            )
+        current_char = self.advance()
+        
+        meta_name = ""
+        while current_char is not None and current_char in LETTERS:
+            meta_name += current_char
+            current_char = self.advance()
+
+        meta_argument = ""
+        if current_char is not None and current_char in " \N{NBSP}\N{NNBSP}\t":
+            current_char = self.advance()
+            while current_char is not None and current_char in LETTERS:
+                meta_argument += current_char
+                current_char = self.advance()
+        
+        if current_char is not None and current_char in " \N{NBSP}\N{NNBSP}\t":
+            current_char = self.advance()
+
+        if current_char is not None and current_char not in ";\n":
+            if dont_panic_on_errors: return
+            return InvalidSyntaxError(
+                self.pos.copy(), self.pos.advance(),
+                "expected newline.",
+                "src.lexer.lexer.Lexer.make_tokens"
+            )
+        self.advance()
+
+        if meta_name == "":
+            if dont_panic_on_errors: return
+            return InvalidSyntaxError(
+                pos_start, self.pos.copy(),
+                "expected a meta name.",
+                "src.lexer.lexer.Lexer.make_tokens"
+            )
+
+        if self.debug:
+            print(f"[META] (indev feature) {meta_name=} {meta_argument=}")
+        if meta_argument == "":
+            self.metas[meta_name] = True
+        else:
+            self.metas[meta_name] = meta_argument
 
     def make_plus(self):
         """Make + or += or ++ """

@@ -135,6 +135,14 @@ def run(
         context = use_context  # do not .copy() here
     interpreter.update_symbol_table(context)
 
+    if lexer_metas.get("setTheTestValueTo") is not None:
+        if isinstance(lexer_metas["setTheTestValueTo"], bool):
+            value_to_set = NoneValue(True)
+        else:
+            value_to_set = String(lexer_metas["setTheTestValueTo"])
+        assert context.symbol_table is not None
+        context.symbol_table.set("__the_test_value__", value_to_set)
+
     # visit the main node of the AST with the created context
     assert not isinstance(ast.node, list)
     result = interpreter.visit(ast.node, context, False, main_visit=True)

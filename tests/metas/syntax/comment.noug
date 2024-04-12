@@ -1,0 +1,2 @@
+#@meta setTheTestValueTo thisText
+assert __the_test_value__ == "thisText"

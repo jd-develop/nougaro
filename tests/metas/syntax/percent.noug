@@ -1,0 +1,2 @@
+%@meta setTheTestValueTo inolongerhaveanyideas
+assert __the_test_value__ == "inolongerhaveanyideas"

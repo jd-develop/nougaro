@@ -10,6 +10,7 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 
 * Add a “meta” system
   * Using the syntax `@meta metaName` or `@meta metaName metaValue` at the beginnig of a file, you can now enable special features
+  * As predicate, you can use `@`, `#@`, `%@`, `@@`, `-@` or `$@`.
 * Add `legacyAbs` meta
   * No value required
   * It makes the legacy absolute value possible: `|-1|`=`1`
@@ -17,6 +18,9 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 * Add `nbspBetweenFrenchGuillemets` meta
   * No value required
   * Experience the true french pain! (and I don’t talk about baguettes…) If you want to use the french string quotes (`«»`), you will have to put a no-break space (or a narrow no-break space) after the `«` and before the other `»`. Those (N)NBSP will not be counted in the string.
+* Add `setTheTestValueTo` meta
+  * Sets `__the_test_value__` to the str value given in the meta value
+  * If no value is given, it sets it to `None`.
 * Data version and version id can now be known using `__data_version__` and `__version_id__`.
 * Data version is now stored in `./noug_version.json`
 * `(Internal API)` Noug version can now be retrieved using `src.noug_version` library. It consists of 8 constants: `MAJOR`, `MINOR`, `PATCH`, `PHASE`, `PHASE_MINOR`, `VERSION` (`str`), `VERSION_ID`, `DATA_VERSION`.
@@ -31,6 +35,8 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 
 * Fix typos
 * Fix a bug where files were referred as `<stdin>` in the shell (and therefore in error messages, etc.)
+* Fix some crashes with imports (where values didn’t have any context)
+* Unit tests now work properly when debug mode is enabled
 
 ### Calculator
 #### Removed

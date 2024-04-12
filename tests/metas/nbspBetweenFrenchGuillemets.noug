@@ -1,4 +1,4 @@
-# this files tests the nbspBetweenFrenchGuillemets meta
+# this file tests the nbspBetweenFrenchGuillemets meta
 @meta nbspBetweenFrenchGuillemets
 
 assert « salut » == "salut" == 'salut'

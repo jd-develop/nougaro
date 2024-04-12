@@ -47,7 +47,7 @@ class Interpreter:
         self.run = run
         self.noug_dir = noug_dir_
         self.args = args
-        self.work_dir: str = work_dir
+        self.work_dir = work_dir
         self._methods = None
         self.init_methods()
         assert self._methods is not None
@@ -106,8 +106,9 @@ class Interpreter:
 
         PARAMETERS = signature(method).parameters
         match len(PARAMETERS):
-            case 0:  # def method(self) is 1 param, def staticmethod() is 0 param
-                result = method()  # type: ignore
+            # un-comment if you add some static methods without any parameters
+            # case 0:  # def method(self) is 1 param, def staticmethod() is 0 param
+            #     result = method()  # type: ignore
             case 1:  # def method(self) is 1 param, def staticmethod() is 0 param
                 result = method(node)  # type: ignore
             case 3:
@@ -831,7 +832,7 @@ class Interpreter:
         ctx.symbol_table.remove(var_name)
 
         self.update_symbol_table(ctx)
-        return result.success(NoneValue(False))
+        return result.success(NoneValue(False).set_context(ctx))
 
     def visit_IfNode(self, node: IfNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit IfNode"""
@@ -859,7 +860,7 @@ class Interpreter:
             assert else_value is not None
             return result.success(else_value)
 
-        return result.success(NoneValue(False))
+        return result.success(NoneValue(False).set_context(ctx))
 
     def visit_AssertNode(self, node: AssertNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit AssertNode"""
@@ -894,7 +895,7 @@ class Interpreter:
                 ctx, f"{_ORIGIN_FILE}.visit_AssertNode"
             ))
 
-        return result.success(NoneValue(False))
+        return result.success(NoneValue(False).set_context(ctx))
 
     def visit_ForNode(self, node: ForNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit ForNode. for i = start to end then"""
@@ -1505,7 +1506,7 @@ class Interpreter:
         else:  # only 'return'
             value = NoneValue(False)
 
-        return result.success_return(value, node.pos_start, node.pos_end)
+        return result.success_return(value.set_context(ctx), node.pos_start, node.pos_end)
 
     @staticmethod
     def visit_ContinueNode(node: ContinueNode) -> RTResult:
@@ -1636,7 +1637,7 @@ class Interpreter:
         ctx.symbol_table.set(import_as_name, module_value)
         self.update_symbol_table(ctx)
 
-        return result.success(module_value)
+        return result.success(module_value.set_context(ctx))
 
     def visit_ExportNode(self, node: ExportNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit ExportNode"""
@@ -1687,7 +1688,7 @@ class Interpreter:
         assert isinstance(export_as_name, str)
         ctx.what_to_export.set(export_as_name, value_to_export)
 
-        return result.success(value_to_export)
+        return result.success(value_to_export.set_context(ctx))
 
     def visit_WriteNode(self, node: WriteNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit WriteNode"""
@@ -1791,7 +1792,7 @@ class Interpreter:
                 )
             )
 
-        return result.success(str_to_write)
+        return result.success(str_to_write.set_context(ctx))
 
     def visit_ReadNode(self, node: ReadNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit ReadNode"""
@@ -1850,7 +1851,7 @@ class Interpreter:
             ctx.symbol_table.set(identifier.value, String(file_str))
             self.update_symbol_table(ctx)
 
-        return result.success(String(file_str))
+        return result.success(String(file_str).set_context(ctx))
 
     @staticmethod
     def visit_DollarPrintNode(node: DollarPrintNode, ctx: Context) -> RTResult:
@@ -1872,9 +1873,8 @@ class Interpreter:
             print(f"${node.identifier.value}")
             value_to_return = String(f"${node.identifier.value}").set_pos(node.pos_start, node.pos_end)
 
-        return result.success(value_to_return)
+        return result.success(value_to_return.set_context(ctx))
 
-    @staticmethod
-    def visit_NoNode() -> RTResult:
+    def visit_NoNode(self, node: NoNode, ctx: Context) -> RTResult:
         """There is no node"""
-        return RTResult().success(List([NoneValue(False)]))
+        return RTResult().success(List([NoneValue(False)]).set_context(ctx))

@@ -1,0 +1,2 @@
+$@meta setTheTestValueTo setTheTestValueTo
+assert __the_test_value__ == "setTheTestValueTo"

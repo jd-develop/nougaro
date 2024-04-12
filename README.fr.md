@@ -52,4 +52,4 @@ Voici Nougaro bêta 0.18.0.
 
  Merci à [Mistera](https://github.com/mistera91) qui contribue épisodiquement.
 
- Merci à [3fxcf9](https://github.com/3fxcf9) pour la [bannière du dépôt](repo-image.png).
+ Merci à [3fxcf9](https://github.com/3fxcf9) pour la [bannière du dépôt](repo-image/repo-image.png).

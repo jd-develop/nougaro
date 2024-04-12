@@ -51,4 +51,4 @@ Nougaro is a programming language interpreted in Python.
 
  Thanks to [Mistera](https://github.com/mistera91) who episodically contributes.
 
- Thanks to [3fxcf9](https://github.com/3fxcf9) for the [repository banner](repo-image.png).
+ Thanks to [3fxcf9](https://github.com/3fxcf9) for the [repository banner](repo-image/repo-image.png).

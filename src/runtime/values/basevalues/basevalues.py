@@ -159,7 +159,7 @@ class String(Value):
             for x in other.elements:
                 if self.get_comparison_eq(x)[0].is_true():
                     return TRUE.copy().set_context(self.context), None
-            return FALSE.set_context(self.context), None
+            return FALSE.copy().set_context(self.context), None
         elif isinstance(other, String):
             return Number(int(self.value in other.value)).set_context(self.context), None
         else:
@@ -470,7 +470,7 @@ class Number(Value):
             for x in other.elements:
                 if self.get_comparison_eq(x)[0].is_true():
                     return TRUE.copy().set_context(self.context), None
-            return FALSE.set_context(self.context), None
+            return FALSE.copy().set_context(self.context), None
         elif isinstance(other, String):
             return Number(int(str(self.value) in other.value)).set_context(self.context), None
         else:

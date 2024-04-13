@@ -1231,17 +1231,26 @@ class BuiltInFunction(BaseBuiltInFunction):
         "noug_dir": False
     }
 
-    def execute_rickroll(self):
-        """Hum... You haven't seen anything"""
-        # no params
+    def execute_rickroll(self, exec_ctx: Context):
+        """Hmm... You haven't seen anything"""
+        # btw: this function is purposefuly undocummented. Don’t include any
+        # changes in the changelog, or in git commits, or in the Wiki, etc.
+        # Also, please don’t delete it: it’s funny :)
+        assert exec_ctx.symbol_table is not None
+        type_ = exec_ctx.symbol_table.getf("type")
+        is_there_a_type = isinstance(type_, String)
+        if is_there_a_type and type_.value == "printer":
+            link = "jeg_TJvkSjg"
+        else:
+            link = "dQw4w9WgXcQ"
         import webbrowser
-        webbrowser.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", new=2)
-        return RTResult().success(String("I think you've been rickrolled..."))
+        webbrowser.open(f"https://www.youtube.com/watch?v={link}", new=2)
+        return RTResult().success(String(f"I think you've been rickrolled..."))
 
     builtin_functions["rickroll"] = {
         "function": execute_rickroll,
         "param_names": [],
-        "optional_params": [],
+        "optional_params": ["type"],
         "should_respect_args_number": False,
         "run_noug_dir_work_dir": False,
         "noug_dir": False

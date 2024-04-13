@@ -108,12 +108,8 @@ class BaseFunction(Value):
                     arg_value = args[i]
                     arg_value.set_context(exec_context)
                     exec_context.symbol_table.set(arg_name, arg_value)
-                elif (i - len(param_names) + 1) < len(optional_params):
+                elif (i - len(param_names)) < len(optional_params):
                     # the argument is in the optional parameters list
-
-                    # don't ask anything about the above condition. I don't understand how it works, but it works
-                    # if someone can explain me clearly why we put a +1, mail me: jd-dev@laposte.net
-                    # - Jean Dubois
                     arg_name = optional_params[(i - len(param_names))]
                     arg_value = args[i]
                     arg_value.set_context(exec_context)

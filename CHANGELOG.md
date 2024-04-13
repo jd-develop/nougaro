@@ -38,6 +38,7 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 * Fix a bug where files were referred as `<stdin>` in the shell (and therefore in error messages, etc.)
 * Fix some crashes with imports (where values didn’t have any context)
 * Fix a bug where `__version_id__` and `__data_version` were strings, but their actual stored value was an integer
+* Fix an internal bug where the first optional argument of functions whose `should_respect_args_number` was `False` was not populated. Never happen in real life because no such function take optional arguments, but you know, just in case.
 * Unit tests now work properly when debug mode is enabled
 
 ### Calculator

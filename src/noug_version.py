@@ -26,13 +26,15 @@ def _read_noug_version_json():
         minor: int = ver_json_loaded.get("minor")
         patch: int = ver_json_loaded.get("patch")
         phase: str = ver_json_loaded.get("phase")
-        phase_minor: int = ver_json_loaded.get("phase-minor")
-        version: str = f"{major}.{minor}.{patch}-{phase}"
-        if phase_minor != 0:
-            version += f".{phase_minor}"
+        release_serial: int = ver_json_loaded.get("release-serial")
+
         version_id: int = ver_json_loaded.get("version-id")
         data_version: int = ver_json_loaded.get("data-version")
-    return major, minor, patch, phase, phase_minor, version, version_id, data_version
+
+        version: str = f"{major}.{minor}.{patch}-{phase}"
+        if release_serial != 0:
+            version += f".{release_serial}"
+    return major, minor, patch, phase, release_serial, version, version_id, data_version
 
 
-MAJOR, MINOR, PATCH, PHASE, PHASE_MINOR, VERSION, VERSION_ID, DATA_VERSION = _read_noug_version_json()
+MAJOR, MINOR, PATCH, PHASE, RELEASE_SERIAL, VERSION, VERSION_ID, DATA_VERSION = _read_noug_version_json()

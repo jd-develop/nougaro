@@ -14,9 +14,9 @@ var minor = int(_noug_version_split(1))
 var patch = int(_patch_and_phase_split(0))
 var phase = _patch_and_phase_split(1)
 
-var phase_minor = if len(_noug_version_split) == 4 then int(_noug_version_split(3)) else 0
+var release_serial = if len(_noug_version_split) == 4 then int(_noug_version_split(3)) else 0
 
-var version_list = [major, minor, patch, phase, phase_minor]
+var version_list = [major, minor, patch, phase, release_serial]
 
 
 def clean_version_for_gh()
@@ -39,6 +39,7 @@ export major
 export minor
 export patch
 export phase
-export phase_minor
+export release_serial
+export release_serial as phase_minor  # DEPRECATED, will be removed in 0.20.0 (TODO)
 export version_list
 export clean_version_for_gh

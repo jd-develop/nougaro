@@ -604,7 +604,7 @@ def test_nougaro(print_OK)
 
     if print_OK then print("OK noug_version")
 
-    print("Please also test importing in current directory.")
+    print("Please also test importing in current directory (tested when using ./run_tests.sh).")
 
     # export ... as ...
     import debug

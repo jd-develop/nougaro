@@ -9,6 +9,13 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 ### Added
 
 * Add the `noug_version.clean_version_for_gh` function that generates a beautiful str for the GH issues or PRs.
+* Add `noug_version.release_serial` which is the same as `noug_version.phase_minor`, as it is now deprecated.
+* Data version and version id can now be known using `__data_version__` and `__version_id__`.
+* Data version is now stored in `./noug_version.json`
+* `(Internal API)` Noug version can now be retrieved using `src.noug_version` library. It consists of 8 constants: `MAJOR`, `MINOR`, `PATCH`, `PHASE`, `RELEASE_SERIAL`, `VERSION` (`str`), `VERSION_ID`, `DATA_VERSION`. It does not contains “phase minor”, as it is now called “release serial”.
+* `(Build scripts)` It is now possible to use a custom python command in `build.sh` by passing the command as parameter. Note that I forgot to mention that this is possible with `run_tests.sh` since 0.18.0-beta.
+
+#### Metas
 * Add a “meta” system
   * Using the syntax `@meta metaName` or `@meta metaName metaValue` at the beginnig of a file, you can now enable special features
   * As predicate, you can use `@`, `#@`, `%@`, `@@`, `-@` or `$@`.
@@ -22,22 +29,22 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 * Add `setTheTestValueTo` meta
   * Sets `__the_test_value__` to the str value given in the meta value
   * If no value is given, it sets it to `None`.
-* Data version and version id can now be known using `__data_version__` and `__version_id__`.
-* Data version is now stored in `./noug_version.json`
-* `(Internal API)` Noug version can now be retrieved using `src.noug_version` library. It consists of 8 constants: `MAJOR`, `MINOR`, `PATCH`, `PHASE`, `PHASE_MINOR`, `VERSION` (`str`), `VERSION_ID`, `DATA_VERSION`.
-* `(Build scripts)` It is now possible to use a custom python command in `build.sh` by passing the command as parameter. Note that I forgot to mention that this is possible with `run_tests.sh` since 0.18.0-beta.
 
 ### Changed
 
 * Moved `./config/noug_version.json` to `./noug_version.json`
+* Renamed “phase minor” to “release serial”. In `noug_version.json`, the key is renamed from `phase-minor` to `release-serial`. The different “phase minor” references are now deprecated (see the Deprecated section), and will be removed in 0.20.0
 * Data version has been increased to 5
+
+### Deprecated
+
+* `noug_version.phase_minor` is deprecated and will be deleted in 0.20.0.
 
 ### Fixed
 
 * Fix typos
 * Fix a bug where files were referred as `<stdin>` in the shell (and therefore in error messages, etc.)
 * Fix some crashes with imports (where values didn’t have any context)
-* Fix a bug where `__version_id__` and `__data_version` were strings, but their actual stored value was an integer
 * Fix an internal bug where the first optional argument of functions whose `should_respect_args_number` was `False` was not populated. Never happen in real life because no such function take optional arguments, but you know, just in case.
 * Unit tests now work properly when debug mode is enabled
 

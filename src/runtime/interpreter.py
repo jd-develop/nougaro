@@ -1599,8 +1599,11 @@ class Interpreter:
             with open(path) as lib_:
                 text = lib_.read()
 
-            value, error, _ = self.run(file_name=f"{name_to_import} (lib)", text=text, noug_dir=self.noug_dir,
-                                       exec_from=ctx.display_name, use_default_symbol_table=True, work_dir=self.work_dir)
+            value, error, _ = self.run(
+                file_name=f"{name_to_import} (lib)", text=text, noug_dir=self.noug_dir,
+                exec_from=ctx.display_name, use_default_symbol_table=True, work_dir=self.work_dir,
+                args=self.args
+            )
             if error is not None:
                 return result.failure(error)
             if result.should_return():

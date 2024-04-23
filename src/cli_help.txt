@@ -11,7 +11,9 @@ Arguments:
  [filename]      - run a file
 
 Options (assuming no filename is given):
- -c "command"    - run a command with shell output
+ -c "command"
+ --command "command"
+                 - run a command with shell output
  -d "command"
  --cd "command"
  --command-dont-verbose

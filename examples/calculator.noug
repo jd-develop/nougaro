@@ -24,7 +24,7 @@ while True then
     var calcul = input("calc> ")
     var should_continue = False
     
-    if calcul in ["exit", "done", "quit", "q"] then break
+    if calcul in ["exit", "exit()", "done", "quit", "q"] then break
     if calcul == "" then continue
     if calcul in ["clear", "cls"] then; clear(); continue; end
     if calcul in ["reseti", "ri"] then; var increment = 0; continue; end

@@ -43,14 +43,17 @@ else:
     readline = None
 
 
-def check_arguments(args: list[str], noug_dir: str, version: str):
-    """Returns a file to exec and the line to exec"""
+def check_arguments(args: list[str], noug_dir: str, version: str) -> tuple[str, str | None, bool]:
+    """Returns a file to exec, the line to exec, and dont_verbose"""
     line_to_exec = None
+    dont_verbose = False
     if len(args) == 0:
-        return "<stdin>", None
+        return "<stdin>", None, False
 
     if args[0] in ["-c", "-d", "--command", "--cd", "--command-dont-verbose"]:
         path = "<commandline>"
+        if args[0] in ["-d", "--cd", "--command-dont-verbose"]:
+            dont_verbose = True
         try:
             line_to_exec = args[1]
             del args[1]
@@ -61,6 +64,7 @@ def check_arguments(args: list[str], noug_dir: str, version: str):
         # TODO: test in windows cmd and powershell
         assert isinstance(line_to_exec, str), "please report this bug on GitHub: https://github.com/" \
                                               "jd-develop/nougaro/issues"
+        del args[0]
     elif args[0] in ["-v", "-V", "--version"]:
         print(version)
         sys.exit()
@@ -85,7 +89,7 @@ def check_arguments(args: list[str], noug_dir: str, version: str):
         else:  # valid file :)
             path = args[0]
 
-    return path, line_to_exec
+    return path, line_to_exec, dont_verbose
 
 
 def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: list[str]):
@@ -116,14 +120,14 @@ def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: l
         sys.exit(1)
 
 
-def print_result_and_error(result: Value | None, error: Error | None, args: list[str],
+def print_result_and_error(result: Value | None, error: Error | None, dont_verbose: bool,
                            exit_on_cd: bool = False, should_print_stuff: bool = True):
     if error is not None:  # there is an error, we print it in RED because OMG AN ERROR
         print_in_red(error.as_string())
         return
     if result is None:
         return
-    if exit_on_cd and args[0] in ["-d", "--cd", "--command-dont-verbose"]:
+    if exit_on_cd and dont_verbose:
         return
     if not isinstance(result, List):
         print("WARNING: Looks like something went wrong. Don't panic, and just report this bug at:\n"
@@ -191,7 +195,7 @@ def main():
     # Tested on Windows and Linux. Tested after compiling with Nuitka on Windows and Linux.
     del args[0]
 
-    path, line_to_exec = check_arguments(args, noug_dir, VERSION)
+    path, line_to_exec, dont_verbose = check_arguments(args, noug_dir, VERSION)
 
     has_to_run_a_file = path not in ["<stdin>", "<commandline>"]
     if has_to_run_a_file:
@@ -273,7 +277,7 @@ def main():
                 print_in_red("\nEOF")
                 break  # breaks the `while True` loop to the end of the file
 
-            print_result_and_error(result, error, args, should_print_stuff=should_print_stuff)
+            print_result_and_error(result, error, dont_verbose, should_print_stuff=should_print_stuff)
     elif path == "<commandline>":
         if line_to_exec == "":
             sys.exit()
@@ -287,7 +291,7 @@ def main():
             print_in_red("\nEOF")
             sys.exit()
 
-        print_result_and_error(result, error, args, True)
+        print_result_and_error(result, error, dont_verbose, True)
 
 
 if __name__ == '__main__':  # SOMEBODY ONCE TOLD ME it was good to do that

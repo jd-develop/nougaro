@@ -36,7 +36,7 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 * Renamed “phase minor” to “release serial”. In `noug_version.json`, the key is renamed from `phase-minor` to `release-serial`. The different “phase minor” references are now deprecated (see the Deprecated section), and will be removed in 0.20.0
 * Data version has been increased to 5
 * Argument handling has been rewritten back without `argparse`, it was causing more issues than it simplified things
-  * At this point, there are 1 known issue: using `-c`, `--command`, `-d`, `--cd`, etc. makes this argument available in Nougaro `__args__`.
+* Renamed the `--command_dont_verbose` CLI option to `--command-dont-verbose`.
 
 ### Deprecated
 
@@ -53,6 +53,7 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 ### Calculator
 #### Added
 * Add the possibility to print the current value (last value in stack) using `p`.
+* Add the possibility to exit with `exit()` (yes, it was frustrating)
 
 #### Removed
 * Remove the possibility to print i with `pi` (it is now possible to get the value of π outside of an operation)

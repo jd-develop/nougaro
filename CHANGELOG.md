@@ -49,6 +49,9 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 * Unit tests now work properly when debug mode is enabled
 
 ### Calculator
+#### Added
+* Add the possibility to print the current value (last value in stack) using `p`.
+
 #### Removed
 * Remove the possibility to print i with `pi` (it is now possible to get the value of π outside of an operation)
 

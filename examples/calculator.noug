@@ -29,6 +29,11 @@ while True then
     if calcul in ["clear", "cls"] then; clear(); continue; end
     if calcul in ["reseti", "ri"] then; var increment = 0; continue; end
     if calcul in ["printi"] then; print(increment); continue; end
+    if calcul in ["p"] then
+        if len(stack) == 0 then print(0) \
+        else print(stack(-1))
+        continue
+    end
     if calcul in ["rics", "csri", "rsi", "ris"] then
         var increment = 0
         var stack = []
@@ -85,6 +90,7 @@ while True then
         print("You can clear the screen using 'clear' or 'cls'.")
         print("You can view the stack using 'printstack', 'prints', 'pstack', 'ps' or 's'.")
         print("You can clear the stack using 'clearstack', 'clears', 'cstack', 'cs', 'resetstack', 'resets', 'rstack' or 'rs'.")
+        print("You can print the last value using 'p'.")
         print()
         continue
     end

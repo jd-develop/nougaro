@@ -122,3 +122,4 @@ tests.noug
 example_file
 sandbox/
 config/SHOULD_TEST_PRINT_OK
+custom_run_tests.sh

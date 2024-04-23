@@ -36,7 +36,7 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 * Renamed “phase minor” to “release serial”. In `noug_version.json`, the key is renamed from `phase-minor` to `release-serial`. The different “phase minor” references are now deprecated (see the Deprecated section), and will be removed in 0.20.0
 * Data version has been increased to 5
 * Argument handling has been rewritten back without `argparse`, it was causing more issues than it simplified things
-  * At this point, there are 2 known issues: importing a Nougaro library erases the arguments, and --help no longer works.
+  * At this point, there are 1 known issue: importing a Nougaro library erases the arguments.
 
 ### Deprecated
 

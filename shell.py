@@ -64,6 +64,12 @@ def check_arguments(args: list[str], noug_dir: str, version: str):
     elif args[0] in ["-v", "-V", "--version"]:
         print(version)
         sys.exit()
+    elif args[0] in ["-h", "-H", "--help"]:
+        with open(f"{noug_dir}/src/cli_help.txt") as help_file:
+            help_text = help_file.readlines()
+        for line in help_text[1:]:
+            print(line, end="")
+        sys.exit()
     else:
         if not os.path.exists(args[0]):  # we check if the file exist, if not we quit with an error message
             print_in_red(f"[nougaro] file '{args[0]}' does not exist.")
@@ -173,20 +179,6 @@ def main():
         except Exception as e:
             if debug_on:
                 print(f"[history] Error: {e.__class__.__name__}: {e}")
-
-    # argument_parser = argparse.ArgumentParser(
-    #     prog="nougaro",
-    #     description="Nougaro: a programming language.",
-    #     epilog="Any other argument is passed in Nougaro. Arguments can be retrieved using the built-in __args__"
-    #            "variable. For any other information, the documentation is available at "
-    #            "https://github.com/jd-develop/nougaro/wiki"
-    # )
-    
-    # argument_parser.add_argument("-c", "--command", help="run a command with shell output.")
-    # argument_parser.add_argument("-d", "--cd", "--command_dont_verbose", help="run a command without shell output.", dest="command_")
-    # argument_parser.add_argument("-v", "--version", help="print the version and exit.", action="store_true")
-    # argument_parser.add_argument("file", nargs="?", help="name of the file to run.", default="<stdin>")
-    # args, nougaro_args = argument_parser.parse_known_args()
 
     args = sys.argv.copy()
     # print(args)

@@ -1,0 +1,4 @@
+# this is because prior to commit 1ed9d27a20786d1f48d7b6ece524661a510800f9,
+# importing a lib written in Nougaro erased __args__
+import noug_version
+assert __args__ == ["tests/print_args/print_args_different1.noug"]

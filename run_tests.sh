@@ -21,7 +21,30 @@ $python shell.py -v
 return_code=$?
 if [ $return_code != 0 ]; then exit $return_code; fi
 
-$python -m tests.tests
+echo Testing arguments…
+
+$python shell.py tests/print_args/print_args1.noug
 return_code=$?
 if [ $return_code != 0 ]; then exit $return_code; fi
 
+$python shell.py tests/print_args/print_args2.noug foo bar
+return_code=$?
+if [ $return_code != 0 ]; then exit $return_code; fi
+
+$python shell.py tests/print_args/print_args_different1.noug
+return_code=$?
+if [ $return_code != 0 ]; then exit $return_code; fi
+
+$python shell.py tests/print_args/print_args_different2.noug foo bar
+return_code=$?
+if [ $return_code != 0 ]; then exit $return_code; fi
+
+$python shell.py -c "assert __args__ == ['salut']" salut
+return_code=$?
+if [ $return_code != 0 ]; then exit $return_code; fi
+
+echo Done. Running unit tests…
+
+$python -m tests.tests
+return_code=$?
+if [ $return_code != 0 ]; then exit $return_code; fi

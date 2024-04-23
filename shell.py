@@ -33,7 +33,6 @@ import sys
 import os
 import platform
 import pathlib
-import argparse
 from datetime import datetime
 if platform.system().lower() in ["linux", "darwin"] or "bsd" in platform.system().lower():
     try:
@@ -44,42 +43,41 @@ else:
     readline = None
 
 
-def check_arguments(args: argparse.Namespace, noug_dir: str, version: str):
+def check_arguments(args: list[str], noug_dir: str, version: str):
+    """Returns a file to exec and the line to exec"""
     line_to_exec = None
+    if len(args) == 0:
+        return "<stdin>", None
 
-    if args.command is not None or args.command_ is not None:
-        if args.command is not None and args.command_ is not None:
-            print_in_red("You can only provide one command argument, either '-c' or '-cd', but not both.")
-            sys.exit(1)
-        if args.file not in ["<stdin>", "<commandline>"]:
-            print_in_red("You can not provide a file in addition to a command.")
-            sys.exit(1)
+    if args[0] in ["-c", "-d", "--command", "--cd", "--command-dont-verbose"]:
         path = "<commandline>"
-        if args.command is not None:
-            line_to_exec = args.command
-        else:
-            line_to_exec = args.command_
+        try:
+            line_to_exec = args[1]
+            del args[1]
+        except IndexError:
+            print_in_red(f"[nougaro] expected argument with {args[0]}.")
+            sys.exit(1)
         # note that bash, zsh and fiSH automatically delete quotes.
         # TODO: test in windows cmd and powershell
         assert isinstance(line_to_exec, str), "please report this bug on GitHub: https://github.com/" \
                                               "jd-develop/nougaro/issues"
-    elif args.version:
+    elif args[0] in ["-v", "-V", "--version"]:
         print(version)
         sys.exit()
     else:
-        if args.file == "<stdin>":
-            path = "<stdin>"
-        elif args.file == "<stdout>":
-            print_in_red("[nougaro] fatal error: can not read <stdout>.")
-            sys.exit(1)
-        elif args.file == "<commandline>":
-            print_in_red("[nougaro] fatal error: no command given")
-            sys.exit(1)
-        elif not os.path.exists(args.file):  # we check if the file exist, if not we quit with an error message
-            print_in_red(f"[nougaro] file '{args.file}' does not exist.")
+        if not os.path.exists(args[0]):  # we check if the file exist, if not we quit with an error message
+            print_in_red(f"[nougaro] file '{args[0]}' does not exist.")
             sys.exit(-1)  # DO NOT USE exit() OR quit() PYTHON BUILTINS !!!
+        elif args[0] in ["<stdin>", "<stdout>", "<commandline>"]:
+            # these names can not be files : <stdin> is the shell input and <stdout> is his output
+            print_in_red(f"[nougaro] file '{args[0]}' can not be used by Nougaro because this name is used "
+                         f"internally.\n"
+                         f"[nougaro] This is not an unexpected error, you do not need to open an issue on "
+                         f"GitHub.\n"
+                         f"[nougaro] Note that the Nougaro shell will open.")
+            path = "<stdin>"  # this opens the shell
         else:  # valid file :)
-            path = args.file
+            path = args[0]
 
     return path, line_to_exec
 
@@ -112,14 +110,14 @@ def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: l
         sys.exit(1)
 
 
-def print_result_and_error(result: Value | None, error: Error | None, args: argparse.Namespace,
+def print_result_and_error(result: Value | None, error: Error | None, args: list[str],
                            exit_on_cd: bool = False, should_print_stuff: bool = True):
     if error is not None:  # there is an error, we print it in RED because OMG AN ERROR
         print_in_red(error.as_string())
         return
     if result is None:
         return
-    if exit_on_cd and args.command_ is not None:
+    if exit_on_cd and args[0] in ["-d", "--cd", "--command-dont-verbose"]:
         return
     if not isinstance(result, List):
         print("WARNING: Looks like something went wrong. Don't panic, and just report this bug at:\n"
@@ -176,25 +174,36 @@ def main():
             if debug_on:
                 print(f"[history] Error: {e.__class__.__name__}: {e}")
 
-    argument_parser = argparse.ArgumentParser(
-        prog="nougaro",
-        description="Nougaro: a programming language.",
-        epilog="Any other argument is passed in Nougaro. Arguments can be retrieved using the built-in __args__"
-               "variable. For any other information, the documentation is available at "
-               "https://github.com/jd-develop/nougaro/wiki"
-    )
+    # argument_parser = argparse.ArgumentParser(
+    #     prog="nougaro",
+    #     description="Nougaro: a programming language.",
+    #     epilog="Any other argument is passed in Nougaro. Arguments can be retrieved using the built-in __args__"
+    #            "variable. For any other information, the documentation is available at "
+    #            "https://github.com/jd-develop/nougaro/wiki"
+    # )
     
-    argument_parser.add_argument("-c", "--command", help="run a command with shell output.")
-    argument_parser.add_argument("-d", "--cd", "--command_dont_verbose", help="run a command without shell output.", dest="command_")
-    argument_parser.add_argument("-v", "--version", help="print the version and exit.", action="store_true")
-    argument_parser.add_argument("file", nargs="?", help="name of the file to run.", default="<stdin>")
-    args, nougaro_args = argument_parser.parse_known_args()
+    # argument_parser.add_argument("-c", "--command", help="run a command with shell output.")
+    # argument_parser.add_argument("-d", "--cd", "--command_dont_verbose", help="run a command without shell output.", dest="command_")
+    # argument_parser.add_argument("-v", "--version", help="print the version and exit.", action="store_true")
+    # argument_parser.add_argument("file", nargs="?", help="name of the file to run.", default="<stdin>")
+    # args, nougaro_args = argument_parser.parse_known_args()
+
+    args = sys.argv.copy()
+    # print(args)
+
+    # print(f"Arguments count: {len(sys.argv)}")
+    # for i, arg in enumerate(sys.argv):
+    #     print(f"Argument {i:>6}: {arg}")
+
+    # Uncomment 3 last lines to understand the following code.
+    # Tested on Windows and Linux. Tested after compiling with Nuitka on Windows and Linux.
+    del args[0]
 
     path, line_to_exec = check_arguments(args, noug_dir, VERSION)
 
     has_to_run_a_file = path not in ["<stdin>", "<commandline>"]
     if has_to_run_a_file:
-        execute_file(path, debug_on, noug_dir, VERSION, nougaro_args)
+        execute_file(path, debug_on, noug_dir, VERSION, args)
         return
 
     work_dir = os.getcwd()
@@ -263,7 +272,7 @@ def main():
                 result, error = None, None
                 continue
             try:  # we try to run it
-                result, error, previous_metas = nougaro.run('<stdin>', text, noug_dir, VERSION, args=nougaro_args,
+                result, error, previous_metas = nougaro.run('<stdin>', text, noug_dir, VERSION, args=args,
                                                             work_dir=work_dir, lexer_metas=previous_metas)
             except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
                 print_in_red("\nKeyboardInterrupt")
@@ -278,7 +287,7 @@ def main():
             sys.exit()
 
         try:  # we try to run it
-            result, error, _ = nougaro.run('<commandline>', line_to_exec, noug_dir, VERSION, args=nougaro_args, work_dir=work_dir)
+            result, error, _ = nougaro.run('<commandline>', line_to_exec, noug_dir, VERSION, args=args, work_dir=work_dir)
         except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
             print_in_red("\nKeyboardInterrupt")
             sys.exit()

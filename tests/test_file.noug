@@ -631,7 +631,9 @@ def test_nougaro(print_OK)
     import metas.nbspBetweenFrenchGuillemets
     import metas.syntax.at
     import metas.syntax.comment
+    import metas.syntax.dollar
     import metas.syntax.minus
+    import metas.syntax.percent
     assert «salut» == "salut" == 'salut'
     assert « salut » == "\N{NBSP}salut\N{NBSP}"
     if print_OK then print("OK metas")

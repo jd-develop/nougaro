@@ -294,6 +294,8 @@ def main():
             sys.exit()
 
         print_result_and_error(result, error, dont_verbose, True)
+        if error is not None:
+            sys.exit(1)
 
 
 if __name__ == '__main__':  # SOMEBODY ONCE TOLD ME it was good to do that

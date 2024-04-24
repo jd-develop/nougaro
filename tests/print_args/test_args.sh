@@ -7,28 +7,22 @@
 
 if [ ! "$1" ]; then python=python3; else python=$1; fi
 
-echo "WARNING! Make sure you are using Python 3.11 or newer. Current Python version: $($python --version)"
-
-$python shell.py tests/test_file.noug
+$python shell.py tests/print_args/print_args1.noug
 return_code=$?
 if [ $return_code != 0 ]; then exit $return_code; fi
 
-$python shell.py tests/test_import_in_current_dir.noug
+$python shell.py tests/print_args/print_args2.noug foo bar
 return_code=$?
 if [ $return_code != 0 ]; then exit $return_code; fi
 
-$python shell.py -v
+$python shell.py tests/print_args/print_args_different1.noug
 return_code=$?
 if [ $return_code != 0 ]; then exit $return_code; fi
 
-echo Testing arguments…
-
-./tests/print_args/test_args.sh $python
+$python shell.py tests/print_args/print_args_different2.noug foo bar
 return_code=$?
 if [ $return_code != 0 ]; then exit $return_code; fi
 
-echo Done. Running unit tests…
-
-$python -m tests.tests
+$python shell.py -c "assert __args__ == ['-c', 'salut']" salut
 return_code=$?
 if [ $return_code != 0 ]; then exit $return_code; fi

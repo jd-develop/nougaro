@@ -49,6 +49,7 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 * Fix some crashes with imports (where values didn’t have any context)
 * Fix an internal bug where the first optional argument of functions whose `should_respect_args_number` was `False` was not populated. Never happen in real life because no such function take optional arguments, but you know, just in case.
 * Unit tests now work properly when debug mode is enabled
+* Fix the fact that Nougaro exited with exit code 0 even when there was an error using `-c`, `-d`, etc.
 
 ### Calculator
 #### Added

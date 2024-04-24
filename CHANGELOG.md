@@ -11,11 +11,11 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 * Add the `noug_version.clean_version_for_gh` function that generates a beautiful str for the GH issues or PRs.
 * Add `noug_version.release_serial` which is the same as `noug_version.phase_minor`, as it is now deprecated.
 * Add `webbrowser` lib, which contains one function:
-  * `webbrowser.open(url, new=0, autoraise=True)`: display url using the default browser.
-        If new is 0, the url is opened in the same browser window if possible.
-        If new is 1, a new browser window is opened if possible.
-        If new is 2, a new tab is opened if possible.
-        If autoraise is True, the window is raised if possible (note that under many window managers this will occur
+  * `webbrowser.open(url, new=0, autoraise=True)`: display `url` using the default browser.
+        If `new` is 0, the `url` is opened in the same browser window if possible.
+        If `new` is 1, a new browser window is opened if possible.
+        If `new` is 2, a new tab is opened if possible.
+        If `autoraise` is True, the window is raised if possible (note that under many window managers this will occur
         regardless of the setting of this variable).
 * Data version and version ID can now be known using `__data_version__` and `__version_id__`.
 * Data version is now stored in `./noug_version.json`

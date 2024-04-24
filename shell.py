@@ -64,7 +64,9 @@ def check_arguments(args: list[str], noug_dir: str, version: str) -> tuple[str, 
         # TODO: test in windows cmd and powershell
         assert isinstance(line_to_exec, str), "please report this bug on GitHub: https://github.com/" \
                                               "jd-develop/nougaro/issues"
-        del args[0]
+        # del args[0]  # this line is commented because when you execute a file, say using `nougaro file.noug`,
+        #              # __args__(0) is set to `"file.noug"`, so when using `nougaro -c`, `-c` should be the default
+        #              # argument in __args__(0)
     elif args[0] in ["-v", "-V", "--version"]:
         print(version)
         sys.exit()

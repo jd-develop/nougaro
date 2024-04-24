@@ -2,26 +2,38 @@
 import math
 import debug
 
-print()
-print("Welcome to the Nougaro calculator!")
-print("Enter 'exit' to exit, 'cls' or 'clear' to clear the screen.")
-print("This calculator uses the Reverse Polish Notation.")
-print("Type 'help' for more info and for all the operators and constants.")
-print()
-print("Nougaro Calculator  Copyright (C) 2023-2024  Jean Dubois")
-print("This program comes with ABSOLUTELY NO WARRANTY.")
-print("This is free software, and you are welcome to redistribute it")
-print("under certain conditions.")
-print("You should have received a copy of the GNU General Public License")
-print("along with this program.  If not, see <https://www.gnu.org/licenses/>.")
-print()
+if len(__args__) >= 2 and __args__(1) in ["-d", "--dc-mode"] then
+    var verbose = 0
+else
+    var verbose = 1
+end
+
+if verbose then
+    print()
+    print("Welcome to the Nougaro calculator!")
+    print("Enter 'exit' to exit, 'cls' or 'clear' to clear the screen.")
+    print("This calculator uses the Reverse Polish Notation.")
+    print("Type 'help' for more info and for all the operators and constants.")
+    print()
+    print("Nougaro Calculator  Copyright (C) 2023-2024  Jean Dubois")
+    print("This program comes with ABSOLUTELY NO WARRANTY.")
+    print("This is free software, and you are welcome to redistribute it")
+    print("under certain conditions.")
+    print("You should have received a copy of the GNU General Public License")
+    print("along with this program.  If not, see <https://www.gnu.org/licenses/>.")
+    print()
+end
 
 var answer = 0
 var increment = 0
 
 var stack = []
 while True then
-    var calcul = input("calc> ")
+    if verbose then
+        var calcul = input("calc> ")
+    else
+        var calcul = input()
+    end
     var should_continue = False
     
     if calcul in ["exit", "exit()", "done", "quit", "q"] then break
@@ -37,22 +49,22 @@ while True then
     if calcul in ["rics", "csri", "rsi", "ris"] then
         var increment = 0
         var stack = []
-        print("Stack cleared and i set to 0.")
+        if verbose then print("Stack cleared and i set to 0.")
         continue
     end
     if calcul in ["resetstack", "rstack", "resets", "rs", "clearstack", "cstack", "clears", "cs"] then
         var stack = []
-        print("Stack cleared.")
+        if verbose then print("Stack cleared.")
         continue
     end
     if calcul in ["printstack", "pstack", "prints", "ps", "s"] then; print(stack); continue; end
     if calcul in ["psi", "pis", "spi"] then; print(stack); print(increment); continue; end
-    if calcul in ["help", "h"] then
+    if calcul in ["help"] then
         print("Welcome to the nougaro calculator help.")
         print("This calculator uses the Reverse Polish Notation (RPN)")
         print("Find out more about RPN on https://en.wikipedia.org/wiki/Reverse_Polish_notation")
         print("RPN examples:")
-        # the box-drawing characters may look bizarre if you’re on VSCode, but trust me, there is the right amount of
+        # the box-drawing characters may look bizarre if you’re in VSCode, but trust me, there is the right amount of
         # it!
         print("                   infix  │  postfix (RPN)")
         print("  ────────────────────────┼────────────────────────")
@@ -191,11 +203,13 @@ while True then
         elif char == "u" and len(tokens) > 0 and tokens(-1) == "ta" then
             replace(tokens, -1, "tau")
         elif char == "\t" then
-            print_in_red("Error: use spaces instead of tabulations.")
+            if verbose then print_in_red("Error: use spaces instead of tabulations.") \
+            else print_in_red("?")
             var should_continue = True
             break
         else
-            print_in_red("Error: illegal char: " + char)
+            if verbose then print_in_red("Error: illegal char: " + char) \
+            else print_in_red("?")
             var should_continue = True
             break
         end
@@ -220,7 +234,8 @@ while True then
             if stack(-1) >= 0 then
                 replace(stack, -1, math.sqrt(stack(-1)))
             else
-                print_in_red("Error: a negative number (" + str(stack(-1)) + ") doesn't have a square root (this calculator does not support complex numbers).")
+                if verbose then print_in_red("Error: a negative number (" + str(stack(-1)) + ") doesn't have a square root (this calculator does not support complex numbers).") \
+                else print_in_red("?")
                 var should_continue = True
                 break
            end
@@ -234,7 +249,8 @@ while True then
             var num1 = stack(-2)
             var num2 = stack(-1)
             if num2 == 0 then
-                print_in_red("Error: can not divide by 0")
+                if verbose then print_in_red("Error: can not divide by 0") \
+                else print_in_red("?")
                 var should_continue = True
                 break
             end
@@ -246,7 +262,8 @@ while True then
             var number = stack(-2)
             var base = stack(-1)
             if number <= 0 or base <= 0 then
-                print_in_red("Error: math domain error with logarithm")
+                if verbose then print_in_red("Error: math domain error with logarithm") \
+                else print_in_red("?")
                 var should_continue = True
                 break
             end
@@ -257,7 +274,8 @@ while True then
         elif token == "ln" and len(stack) > 0 and is_num(stack(-1)) then
             var number = stack(-1)
             if number <= 0 then
-                print_in_red("Error: math domain error with logarithm")
+                if verbose then print_in_red("Error: math domain error with logarithm") \
+                else print_in_red("?")
                 var should_continue = True
                 break
             end
@@ -278,7 +296,8 @@ while True then
                     var result = stack(-2) - stack(-1)
                 elif token == '/' then
                     if len(stack) != 0 and stack(-1) == 0 then
-                        print_in_red("Error: can not divide by 0")
+                        if verbose then print_in_red("Error: can not divide by 0") \
+                        else print_in_red("?")
                         var should_continue = True
                         break
                     end
@@ -292,7 +311,8 @@ while True then
                 elif token == "^" then
                     var result = stack(-2) ^ stack(-1)
                 else
-                    print_in_red("Error: invalid token: " + str(token))
+                    if verbose then print_in_red("Error: invalid token: " + str(token)) \
+                    else print_in_red("?")
                     var should_continue = True
                     break
                 end
@@ -300,7 +320,8 @@ while True then
                 pop(stack, -1)
                 append(stack, result)
             else
-                print_in_red("Error: maybe there is not enough values in stack, or maybe you just typed the beginning of a command.")
+                if verbose then print_in_red("Error: maybe there is not enough values in stack, or maybe you just typed the beginning of a command.") \
+                else print_in_red("?")
                 var should_continue = True
                 break
             end
@@ -310,12 +331,12 @@ while True then
     
     if should_continue then
         var stack = list(old_stack)
-        print("Stack is unchanged.")
+        if verbose then print("Stack is unchanged.")
         continue
     end
     
     if len(stack) >= 1 then
-        print(stack(-1))
+        if verbose then print(stack(-1))
         var answer = stack(-1)
         var increment += 1
     end

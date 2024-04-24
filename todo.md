@@ -34,7 +34,7 @@
 * [X] add possibility to read command line arguments (finished 26/10/2023)
 * [X] switch to semantic versioning (finished 16/10/23)
 * [X] return None in loops, even when there is a continue of a break (finished 24/11/2023)
-* [X] fix the fact that nougaro doesn't crash with an error code when there is an error
+* [X] fix the fact that Nougaro doesn't crash with an error code when there is an error
 
 ## ✅ 0.17.0 beta (goal: no goal, this is a crash-fixing version)
 
@@ -50,8 +50,8 @@
 ## 0.19.0 beta (goal: no goal)
 
 * [ ] add `tkinter`
-* [ ] add `webbrowser`
-* [X] add `unicodedata` (finished 9/10/23)
+* [X] add `webbrowser` (finished 24/04/2024)
+* [X] add `unicodedata` (finished 9/10/2023)
 * [X] move config files to `~/.config` under Linux and BSD, `~/Library/Preferences` under macOS, and `%appdata%` under Windaube. [QT documentation about where config files should be stored.](https://doc.qt.io/qt-6/qsettings.html#platform-specific-notes) (finished 10/03/2024, testing completed 11/03/2024)
 * [ ] add optional arguments in functions
   * [ ] Parser:

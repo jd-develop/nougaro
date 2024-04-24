@@ -2,6 +2,67 @@
 import math
 import debug
 
+def print_help(v)  # v is verbose
+    print("Welcome to the Nougaro calculator help.")
+    print("This calculator uses the Reverse Polish Notation (RPN)")
+    print("Find out more about RPN on https://en.wikipedia.org/wiki/Reverse_Polish_notation")
+    print("RPN examples:")
+    # the box-drawing characters may look bizarre if you’re in VSCode, but trust me, there is the right amount of
+    # it!
+    print("                   infix  │  postfix (RPN)")
+    print("  ────────────────────────┼────────────────────────")
+    print("                   1 + 1  │  1 1 +")
+    print("                   1 ^ 3  │  1 3 ^")
+    print("     (1 + 1) * (12 + 13)  │  1 1 + 12 13 + *")
+    print("  sqrt(ln(2)) + 63 mod 5  │  2 ln sqrt 63 5 mod +")
+    print()
+    print("Here all the binary operators with their syntax:")
+    print("      -number : negative number")
+    print("        a b + : addition")
+    print("        a b - : subtraction")
+    print("        a b * : multiplication")
+    print("        a b / : float division")
+    print("       a b // : quotient of integer division")
+    print("      a b mod : remainder of integer division")
+    print("        a b ^ : power")
+    print("   a base log : logarithm of base `base`")
+    print()
+    print("Here all the unary operators with their syntax:")
+    print("     num sqrt : square root")
+    print("         a ln : logarithm of base e")
+    print()
+    print("Here all the constants:")
+    print("           pi : 3.141592653589793")
+    print("          tau : 6.283185307179586")
+    print("            e : " + str(math.e))
+    print()
+    print("Here all the variables:")
+    print("          ans : result of last operation")
+    print("            i : value that gets incremented at each operation. Reset it with 'reseti' or 'ri'.")
+    print("                Print current value without incrementing with 'printi'.")
+    print()
+    print("You can exit the calculator using 'exit', 'done' or 'quit'.")
+    print("You can clear the screen using 'clear' or 'cls'.")
+    print("You can view the stack using 'printstack', 'prints', 'pstack', 'ps' or 's'.")
+    print("You can clear the stack using 'clearstack', 'clears', 'cstack', 'cs', 'resetstack', 'resets', 'rstack' or 'rs'.")
+    print("You can print the last value using 'p'.")
+    print("You can print this message using 'help'.")
+    if not v then print("[DC MODE ONLY] You can print the last error message with 'h'.")
+    print()
+    print("CLI usage assuming the command to run the Nougaro calculator is `nougcalc`:")
+    print(" nougcalc [-h] [-d|--dc-mode]")
+    print()
+    print("Options:")
+    print("-h               show this help message and exit")
+    print("-d --dc-mode     enters DC mode: a minimal, teletype-friendly mode.")
+    print()
+end
+
+if len(__args__) >= 2 and __args__(1) in ["-h", "--help"] then
+    print_help(0)
+    exit()
+end
+
 if len(__args__) >= 2 and __args__(1) in ["-d", "--dc-mode"] then
     var verbose = 0
 else
@@ -60,50 +121,7 @@ while True then
     if calcul in ["printstack", "pstack", "prints", "ps", "s"] then; print(stack); continue; end
     if calcul in ["psi", "pis", "spi"] then; print(stack); print(increment); continue; end
     if calcul in ["help"] then
-        print("Welcome to the nougaro calculator help.")
-        print("This calculator uses the Reverse Polish Notation (RPN)")
-        print("Find out more about RPN on https://en.wikipedia.org/wiki/Reverse_Polish_notation")
-        print("RPN examples:")
-        # the box-drawing characters may look bizarre if you’re in VSCode, but trust me, there is the right amount of
-        # it!
-        print("                   infix  │  postfix (RPN)")
-        print("  ────────────────────────┼────────────────────────")
-        print("                   1 + 1  │  1 1 +")
-        print("                   1 ^ 3  │  1 3 ^")
-        print("     (1 + 1) * (12 + 13)  │  1 1 + 12 13 + *")
-        print("  sqrt(ln(2)) + 63 mod 5  │  2 ln sqrt 63 5 mod +")
-        print()
-        print("Here all the binary operators with their syntax:")
-        print("      -number : negative number")
-        print("        a b + : addition")
-        print("        a b - : subtraction")
-        print("        a b * : multiplication")
-        print("        a b / : float division")
-        print("       a b // : quotient of integer division")
-        print("      a b mod : remainder of integer division")
-        print("        a b ^ : power")
-        print("   a base log : logarithm of base `base`")
-        print()
-        print("Here all the unary operators with their syntax:")
-        print("     num sqrt : square root")
-        print("         a ln : logarithm of base e")
-        print()
-        print("Here all the constants:")
-        print("           pi : 3.141592653589793")
-        print("          tau : 6.283185307179586")
-        print("            e : " + str(math.e))
-        print()
-        print("Here all the variables:")
-        print("          ans : result of last operation")
-        print("            i : value that gets incremented at each operation. Reset it with 'reseti' or 'ri'.")
-        print("                Print current value without incrementing with 'printi'.")
-        print()
-        print("You can exit the calculator using 'exit', 'done' or 'quit'.")
-        print("You can clear the screen using 'clear' or 'cls'.")
-        print("You can view the stack using 'printstack', 'prints', 'pstack', 'ps' or 's'.")
-        print("You can clear the stack using 'clearstack', 'clears', 'cstack', 'cs', 'resetstack', 'resets', 'rstack' or 'rs'.")
-        print("You can print the last value using 'p'.")
-        print()
+        print_help(verbose)
         continue
     end
     

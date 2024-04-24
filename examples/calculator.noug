@@ -89,6 +89,7 @@ var answer = 0
 var increment = 0
 
 var stack = []
+var error_msg = ""
 while True then
     if verbose then
         var calcul = input("calc> ")
@@ -122,6 +123,10 @@ while True then
     if calcul in ["psi", "pis", "spi"] then; print(stack); print(increment); continue; end
     if calcul in ["help"] then
         print_help(verbose)
+        continue
+    end
+    if calcul == "h" then
+        print_in_red(error_msg)
         continue
     end
     
@@ -221,13 +226,11 @@ while True then
         elif char == "u" and len(tokens) > 0 and tokens(-1) == "ta" then
             replace(tokens, -1, "tau")
         elif char == "\t" then
-            if verbose then print_in_red("Error: use spaces instead of tabulations.") \
-            else print_in_red("?")
+            var error_msg = "Error: use spaces instead of tabulations."
             var should_continue = True
             break
         else
-            if verbose then print_in_red("Error: illegal char: " + char) \
-            else print_in_red("?")
+            var error_msg = "Error: illegal char: " + char
             var should_continue = True
             break
         end
@@ -237,7 +240,10 @@ while True then
     if debug.is_debug_enabled then \
         print(tokens)
         
-    if should_continue then continue
+    if should_continue then
+        if verbose then print_in_red(error_msg) else print_in_red("?")
+        continue
+    end
     
     # parse
     var i = -1
@@ -252,8 +258,7 @@ while True then
             if stack(-1) >= 0 then
                 replace(stack, -1, math.sqrt(stack(-1)))
             else
-                if verbose then print_in_red("Error: a negative number (" + str(stack(-1)) + ") doesn't have a square root (this calculator does not support complex numbers).") \
-                else print_in_red("?")
+                var error_msg = "Error: a negative number (" + str(stack(-1)) + ") doesn't have a square root (this calculator does not support complex numbers)."
                 var should_continue = True
                 break
            end
@@ -267,8 +272,7 @@ while True then
             var num1 = stack(-2)
             var num2 = stack(-1)
             if num2 == 0 then
-                if verbose then print_in_red("Error: can not divide by 0") \
-                else print_in_red("?")
+                var error_msg = "Error: can not divide by 0"
                 var should_continue = True
                 break
             end
@@ -280,8 +284,7 @@ while True then
             var number = stack(-2)
             var base = stack(-1)
             if number <= 0 or base <= 0 then
-                if verbose then print_in_red("Error: math domain error with logarithm") \
-                else print_in_red("?")
+                var error_msg = "Error: math domain error with logarithm"
                 var should_continue = True
                 break
             end
@@ -292,8 +295,7 @@ while True then
         elif token == "ln" and len(stack) > 0 and is_num(stack(-1)) then
             var number = stack(-1)
             if number <= 0 then
-                if verbose then print_in_red("Error: math domain error with logarithm") \
-                else print_in_red("?")
+                var error_msg = "Error: math domain error with logarithm"
                 var should_continue = True
                 break
             end
@@ -314,8 +316,7 @@ while True then
                     var result = stack(-2) - stack(-1)
                 elif token == '/' then
                     if len(stack) != 0 and stack(-1) == 0 then
-                        if verbose then print_in_red("Error: can not divide by 0") \
-                        else print_in_red("?")
+                        var error_msg = "Error: can not divide by 0"
                         var should_continue = True
                         break
                     end
@@ -329,8 +330,7 @@ while True then
                 elif token == "^" then
                     var result = stack(-2) ^ stack(-1)
                 else
-                    if verbose then print_in_red("Error: invalid token: " + str(token)) \
-                    else print_in_red("?")
+                    var error_msg = "Error: invalid token: " + str(token)
                     var should_continue = True
                     break
                 end
@@ -338,8 +338,7 @@ while True then
                 pop(stack, -1)
                 append(stack, result)
             else
-                if verbose then print_in_red("Error: maybe there is not enough values in stack, or maybe you just typed the beginning of a command.") \
-                else print_in_red("?")
+                var error_msg = "Error: maybe there is not enough values in stack, or maybe you just typed the beginning of a command."
                 var should_continue = True
                 break
             end
@@ -349,6 +348,7 @@ while True then
     
     if should_continue then
         var stack = list(old_stack)
+        if verbose then print_in_red(error_msg) else print_in_red("?")
         if verbose then print("Stack is unchanged.")
         continue
     end

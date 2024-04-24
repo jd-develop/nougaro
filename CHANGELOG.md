@@ -56,6 +56,7 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 * Add the possibility to exit with `exit()` (yes, it was frustrating)
 * Add a “DC mode”, accessible using `-d` or `--dc-mode` option, which is a minimal, teletype-friendly mode.
 * Add the possibility to print the help message using `-h` CLI option.
+* Add the possibility to print the last error message with `h`.
 
 #### Removed
 * Remove the possibility to print i with `pi` (it is now possible to get the value of π outside of an operation)
@@ -63,7 +64,6 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 
 #### Known issues
 * Adding more dots into a float does the same thing as adding multiple floats (for instance, `1.9.12` gives `2.02`, which is the same as `1 0.9 + 0.12 +`)
-* In DC mode, you can’t know what the error message was using `h`.
 
 ## 0.18.0-beta
 ### Syntax

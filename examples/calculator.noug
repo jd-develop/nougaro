@@ -178,6 +178,10 @@ while True then
                 append(tokens, int(char))
             end
         elif char == '.' then
+            if floating_point != 0 then
+                var error_msg = "Error: a number can’t have more than two dots"
+                var should_continue = True
+            end
             append(tokens, '.')
         elif char == " " or char == chr(8239) or char == chr(160) then  # the 2 others are NNBSP and NBSP
             append(tokens, "space")

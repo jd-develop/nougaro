@@ -62,8 +62,8 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 * Remove the possibility to print i with `pi` (it is now possible to get the value of π outside of an operation)
 * Remove the possibility to print the help with `h`
 
-#### Known issues
-* Adding more dots into a float does the same thing as adding multiple floats (for instance, `1.9.12` gives `2.02`, which is the same as `1 0.9 + 0.12 +`)
+#### Fixed
+* Adding more dots into a float no longer does the same thing as adding multiple floats (for instance, `1.9.12` was previously parsed to `2.02`, which is the same as `1 0.9 + 0.12 +`)
 
 ## 0.18.0-beta
 ### Syntax

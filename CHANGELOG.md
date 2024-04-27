@@ -10,6 +10,7 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 
 * Add the `noug_version.clean_version_for_gh` function that generates a beautiful str for the GH issues or PRs.
 * Add `noug_version.release_serial` which is the same as `noug_version.phase_minor`, as it is now deprecated.
+* Add `math.factorial`, which computes factorial.
 * Add `webbrowser` lib, which contains one function:
   * `webbrowser.open(url, new=0, autoraise=True)`: display `url` using the default browser.
         If `new` is 0, the `url` is opened in the same browser window if possible.
@@ -65,6 +66,7 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 * Add a “DC mode”, accessible using `-d` or `--dc-mode` option, which is a minimal, teletype-friendly mode.
 * Add the possibility to print the help message using `-h` CLI option.
 * Add the possibility to print the last error message with `h`.
+* Add factorial with `number !`.
 
 #### Removed
 * Remove the possibility to print i with `pi` (it is now possible to get the value of π outside of an operation)

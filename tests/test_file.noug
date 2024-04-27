@@ -536,6 +536,8 @@ def test_nougaro(print_OK)
     assert math.abs(-10) == 10
     assert round(math.log(12, 2), 9) == round(math.log2(12), 9)
     assert math.e == 2.718281828459045
+    assert math.factorial(0) == 1
+    assert math.factorial(5) == 120
 
     if print_OK then print("OK math lib")
 

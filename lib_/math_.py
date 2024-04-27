@@ -564,6 +564,43 @@ class Math(ModuleFunction):
         "noug_dir": False
     }
 
+    def execute_math_factorial(self, exec_context: Context):
+        """Exactly like python 'factorial()'"""
+        # Params:
+        # * value
+        assert exec_context.symbol_table is not None
+        value = exec_context.symbol_table.getf('value')  # we get the value
+        if not (isinstance(value, Number) and isinstance(value.value, int)):  # we check if the value is a number
+            assert value is not None
+            assert value.pos_start is not None
+            assert value.pos_end is not None
+            return RTResult().failure(RTTypeErrorF(
+                value.pos_start, value.pos_end, "first", "math.factorial", "non-negative integer (int)", value,
+                exec_context, "lib_.math_.Math.execute_math_factorial"
+            ))
+        
+        if value.value < 0:
+            assert value.pos_start is not None
+            assert value.pos_end is not None
+            return RTResult().failure(RunTimeError(
+                value.pos_start, value.pos_end,
+                "first argument of function math.factorial should be a non-negative integer.",
+                exec_context, origin_file="lib_.math_.Math.execute_math_factorial"
+            ))
+
+        value_to_return = Number(math.factorial(value.value))
+
+        return RTResult().success(value_to_return)
+
+    functions["factorial"] = {
+        "function": execute_math_factorial,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
+
 
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported
     # Constants
@@ -589,4 +626,5 @@ WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the modu
     "abs": Math("abs"),
     "log": Math("log"),
     "log2": Math("log2"),
+    "factorial": Math("factorial"),
 }

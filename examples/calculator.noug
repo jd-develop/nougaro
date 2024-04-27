@@ -30,6 +30,7 @@ def print_help(v)  # v is verbose
     print("Here all the unary operators with their syntax:")
     print("     num sqrt : square root")
     print("         a ln : logarithm of base e")
+    print("          a ! : factorial")
     print()
     print("Here all the constants:")
     print("           pi : 3.141592653589793")
@@ -185,7 +186,7 @@ while True then
             append(tokens, '.')
         elif char == " " or char == chr(8239) or char == chr(160) then  # the 2 others are NNBSP and NBSP
             append(tokens, "space")
-        elif char in "+-*/^" then
+        elif char in "+-*/^!" then
             append(tokens, char)
         elif char == 'a' and len(tokens) > 0 and tokens(-1) == "t" then
             replace(tokens, -1, "ta")
@@ -306,6 +307,15 @@ while True then
             var natural_log = math.log(number)
             pop(stack, -1)
             append(stack, natural_log)
+        elif token == "!" and len(stack) > 0 and is_int(stack(-1)) then
+            var number = stack(-1)
+            if number < 0 then
+                var error_msg = "Error: math error with factorial (n<0)"
+                var should_continue = True
+                break
+            end
+            pop(stack, -1)
+            append(stack, math.factorial(number))
         elif token == "space" then
             void()
         elif token == "i" then

@@ -594,7 +594,7 @@ class Parser:
         if self.current_token.type == TT["TO"]:
             result = self.advance_and_check_for(
                 result, f"expected identifier, got {self.current_token.type}.",
-                "IDENTIFIER", None, "expr"
+                "IDENTIFIER", None, "read_expr"
             )
             if result.error is not None:
                 return result
@@ -756,15 +756,9 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            is_call = False
             call_node = identifier
-
-            is_lparen = self.current_token.type == TT["LPAREN"]
-            if is_lparen:
-                call_node_node = VarAccessNode([identifier], is_attr)
-                is_call = True
-            else:
-                call_node_node = VarAccessNode([identifier], is_attr)
+            call_node_node = VarAccessNode([identifier], is_attr)
+            is_call = self.current_token.type == TT["LPAREN"]
 
             while self.current_token.type == TT["LPAREN"]:
                 result.register_advancement()
@@ -777,49 +771,54 @@ class Parser:
                 if self.current_token.type == TT["RPAREN"]:
                     result.register_advancement()
                     self.advance()
-                else:  # (MUL? expr (COMMA MUL? expr)?*)?
+                    call_node_node = CallNode(call_node_node, arg_nodes)
+                    continue
+
+                # (MUL? expr (COMMA MUL? expr)?*)?
+                if self.current_token.type == TT["MUL"]:  # MUL?
+                    mul = True
+                    # we advance
+                    result.register_advancement()
+                    self.advance()
+                # expr
+                expr_node = result.register(self.expr())
+                if result.error is not None:
+                    return None, result.error
+                assert expr_node is not None
+                assert not isinstance(expr_node, list)
+
+                arg_nodes.append((expr_node, mul))
+                while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
+                    mul = False
+                    # we advance
+                    result.register_advancement()
+                    self.advance()
+
                     if self.current_token.type == TT["MUL"]:  # MUL?
                         mul = True
                         # we advance
                         result.register_advancement()
                         self.advance()
                     # expr
+                    # we register an expr then check for an error
                     expr_node = result.register(self.expr())
                     if result.error is not None:
-                        return None, result.error
+                        # type ignore is required because type checking strict is DUMB
+                        return None, result.error  # type: ignore
                     assert expr_node is not None
                     assert not isinstance(expr_node, list)
-
+                    
                     arg_nodes.append((expr_node, mul))
-                    while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
-                        mul = False
-                        # we advance
-                        result.register_advancement()
-                        self.advance()
 
-                        if self.current_token.type == TT["MUL"]:  # MUL?
-                            mul = True
-                            # we advance
-                            result.register_advancement()
-                            self.advance()
-                        # expr
-                        # we register an expr then check for an error
-                        expr_node = result.register(self.expr())
-                        if result.error is not None:
-                            # type ignore is required because type checking strict is DUMB
-                            return None, result.error  # type: ignore
-                        assert expr_node is not None
-                        assert not isinstance(expr_node, list)
-                        
-                        arg_nodes.append((expr_node, mul))
-
-                    result = self.check_for_and_advance(result, "expected ',' or ')'." if comma_expected else "expected ')'.",
-                                                        "RPAREN", None, "assign_identifier")
-                    if result.error is not None:
-                        return None, result.error
+                result = self.check_for_and_advance(
+                    result, "expected ',' or ')'." if comma_expected else "expected ')'.",
+                    "RPAREN", None, "assign_identifier"
+                )
+                if result.error is not None:
+                    return None, result.error
                 call_node_node = CallNode(call_node_node, arg_nodes)
 
-            if is_lparen:
+            if is_call:
                 call_node = call_node_node
 
             if self.current_token.type == TT["DOT"]:
@@ -828,16 +827,15 @@ class Parser:
                 result.register_advancement()
                 self.advance()
                 identifier_expected = True
+            elif is_call:
+                return None, InvalidSyntaxError(
+                    self.current_token.pos_start, self.current_token.pos_end,
+                    "expected dot.",
+                    origin_file="src.parser.parser.Parser.assign_identifier"
+                )
             else:
-                if is_call:
-                    return None, InvalidSyntaxError(
-                        self.current_token.pos_start, self.current_token.pos_end,
-                        "expected dot.",
-                        origin_file="src.parser.parser.Parser.assign_identifier"
-                    )
-                else:
-                    current_name_nodes_and_tokens_list.append(call_node)
-                    break
+                current_name_nodes_and_tokens_list.append(call_node)
+                break
 
         if identifier_expected:
             return None, InvalidSyntaxError(
@@ -857,7 +855,9 @@ class Parser:
         assert self.current_token is not None
 
         # (KEYWORD:NOT|BITWISENOT) comp_expr
-        if self.current_token.matches(TT["KEYWORD"], 'not') or self.current_token.type == TT["BITWISENOT"]:
+        is_not_keyword = self.current_token.matches(TT["KEYWORD"], 'not')
+        is_bitwise_not = self.current_token.type == TT["BITWISENOT"]
+        if is_not_keyword or is_bitwise_not:
             op_token = self.current_token
             result.register_advancement()
             self.advance()
@@ -932,8 +932,10 @@ class Parser:
             assert factor is not None
 
             result = self.check_for_and_advance(
-                result, "this '|' (absolute value) was never closed, or an invalid expression was given.",
-                "LEGACYABS", None, "factor", *pos)
+                result,
+                "this '|' (absolute value) was never closed, or an invalid expression was given.",
+                "LEGACYABS", None, "factor", *pos
+            )
 
             return result.success(AbsNode(factor))
 
@@ -1000,46 +1002,55 @@ class Parser:
             if self.current_token.type == TT["RPAREN"]:
                 result.register_advancement()
                 self.advance()
-            else:  # (MUL? expr (COMMA MUL? expr)?*)?
+
+                assert not isinstance(call_node, list)
+                call_node = CallNode(call_node, arg_nodes)
+                continue
+
+            # (MUL? expr (COMMA MUL? expr)?*)?
+            if self.current_token.type == TT["MUL"]:  # MUL?
+                mul = True
+                # we advance
+                result.register_advancement()
+                self.advance()
+            
+            # expr
+            expr_ = result.register(self.expr())
+            if result.error is not None:
+                return result
+            assert expr_ is not None
+            assert not isinstance(expr_, list)
+
+            expr_and_mul = (expr_, mul)
+            arg_nodes.append(expr_and_mul)
+            while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
+                mul = False
+                # we advance
+                result.register_advancement()
+                self.advance()
+
                 if self.current_token.type == TT["MUL"]:  # MUL?
                     mul = True
                     # we advance
                     result.register_advancement()
                     self.advance()
                 # expr
+                # we register an expr then check for an error
                 expr_ = result.register(self.expr())
                 if result.error is not None:
                     return result
                 assert expr_ is not None
                 assert not isinstance(expr_, list)
                 expr_and_mul = (expr_, mul)
+                
                 arg_nodes.append(expr_and_mul)
-                while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
-                    mul = False
-                    # we advance
-                    result.register_advancement()
-                    self.advance()
 
-                    if self.current_token.type == TT["MUL"]:  # MUL?
-                        mul = True
-                        # we advance
-                        result.register_advancement()
-                        self.advance()
-                    # expr
-                    # we register an expr then check for an error
-                    expr_ = result.register(self.expr())
-                    if result.error is not None:
-                        return result
-                    assert expr_ is not None
-                    assert not isinstance(expr_, list)
-                    expr_and_mul = (expr_, mul)
-                    
-                    arg_nodes.append(expr_and_mul)
-
-                result = self.check_for_and_advance(result, "expected ',' or ')'." if comma_expected else "expected ')'.",
-                                                    "RPAREN", None, "call")
-                if result.error is not None:
-                    return result
+            result = self.check_for_and_advance(
+                result, "expected ',' or ')'." if comma_expected else "expected ')'.",
+                "RPAREN", None, "call"
+            )
+            if result.error is not None:
+                return result
             assert not isinstance(call_node, list)
                 
             call_node = CallNode(call_node, arg_nodes)

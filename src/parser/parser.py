@@ -1281,8 +1281,34 @@ class Parser:
             pos_end = self.current_token.pos_end.copy()
             result.register_advancement()
             self.advance()
-        else:  # there are elements
-            # MUL? expr (COMMA MUL? expr)?*
+            return result.success(ListNode(
+                element_nodes, pos_start, pos_end
+            ))
+        
+        # there are elements
+        # MUL? expr (COMMA MUL? expr)?*
+        if self.current_token.type == TT["MUL"]:  # MUL?
+            mul = True
+            # we advance
+            result.register_advancement()
+            self.advance()
+        # expr
+        # we register an expr then check for an error
+        expr_ = result.register(self.expr())
+        if result.error is not None:
+            return result
+        assert expr_ is not None
+        assert not isinstance(expr_, list)
+        expr_and_mul = (expr_, mul)
+        
+        element_nodes.append(expr_and_mul)
+
+        while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
+            mul = False
+            # we advance
+            result.register_advancement()
+            self.advance()
+
             if self.current_token.type == TT["MUL"]:  # MUL?
                 mul = True
                 # we advance
@@ -1299,38 +1325,15 @@ class Parser:
             
             element_nodes.append(expr_and_mul)
 
-            while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
-                mul = False
-                # we advance
-                result.register_advancement()
-                self.advance()
+        pos_end = self.current_token.pos_end.copy()
 
-                if self.current_token.type == TT["MUL"]:  # MUL?
-                    mul = True
-                    # we advance
-                    result.register_advancement()
-                    self.advance()
-                # expr
-                # we register an expr then check for an error
-                expr_ = result.register(self.expr())
-                if result.error is not None:
-                    return result
-                assert expr_ is not None
-                assert not isinstance(expr_, list)
-                expr_and_mul = (expr_, mul)
-                
-                element_nodes.append(expr_and_mul)
-
-            pos_end = self.current_token.pos_end.copy()
-
-            result = self.check_for_and_advance(result, "'[' was never closed.", "RSQUARE",
-                                                None, "list_expr", pos_start, first_tok_pos_end)
-            if result.error is not None:
-                return result
-
+        result = self.check_for_and_advance(result, "'[' was never closed.", "RSQUARE",
+                                            None, "list_expr", pos_start, first_tok_pos_end)
+        if result.error is not None:
+            return result
         return result.success(ListNode(
             element_nodes, pos_start, pos_end
-        ))
+        ))        
 
     def if_expr(self) -> ParseResult:
         """
@@ -1514,21 +1517,16 @@ class Parser:
         self.advance()
 
         if self.current_token.type != TT["IDENTIFIER"]:
-            if self.current_token.type != TT["KEYWORD"]:
-                if self.current_token.type in TOKENS_NOT_TO_QUOTE:
-                    error_msg = f"expected identifier, but got {self.current_token.type}."
-                else:
-                    error_msg = f"expected identifier, but got '{self.current_token.type}'."
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end, error_msg,
-                    "src.parser.parser.Parser.for_expr"
-                ))
+            if self.current_token.type == TT["KEYWORD"]:
+                error_msg = "using keyword as identifier is illegal."
+            elif self.current_token.type in TOKENS_NOT_TO_QUOTE:
+                error_msg = f"expected identifier, but got {self.current_token.type}."
             else:
-                return result.failure(InvalidSyntaxError(
-                    self.current_token.pos_start, self.current_token.pos_end,
-                    f"using keyword as identifier is illegal.",
-                    "src.parser.parser.Parser.for_expr"
-                ))
+                error_msg = f"expected identifier, but got '{self.current_token.type}'."
+            return result.failure(InvalidSyntaxError(
+                self.current_token.pos_start, self.current_token.pos_end, error_msg,
+                "src.parser.parser.Parser.for_expr"
+            ))
 
         # IDENTIFIER
         var_name = self.current_token
@@ -1567,22 +1565,16 @@ class Parser:
                 body = result.register(self.statements(stop=[(TT["KEYWORD"], 'end')]))
                 if result.error is not None:
                     return result
-                assert body is not None
 
                 result = self.check_for_and_advance(
                     result, "this 'for' was never closed (by 'end').",
                     "KEYWORD", "end", "for_expr", for_tok.pos_start, for_tok.pos_end,
                     del_a_then=True
                 )
-                if result.error is not None:
-                    return result
-                assert not isinstance(body, list)
-                assert not isinstance(iterable_, list)
+            else:
+                # statement
+                body = result.register(self.statement())
 
-                return result.success(ForNodeList(var_name, body, iterable_))
-
-            # statement
-            body = result.register(self.statement())
             if result.error is not None:
                 return result
             assert body is not None
@@ -1647,25 +1639,16 @@ class Parser:
             body = result.register(self.statements(stop=[(TT["KEYWORD"], 'end')]))
             if result.error is not None:
                 return result
-            assert body is not None
 
             # KEYWORD:END
             result = self.check_for_and_advance(
                 result, "this 'for' was never closed (by 'end').", "KEYWORD", "end",
                 "for_expr", for_tok.pos_start, for_tok.pos_end, del_a_then=True
             )
-            if result.error is not None:
-                return result
-
-            assert not isinstance(start_value, list)
-            assert not isinstance(end_value, list)
-            assert not isinstance(step_value, list)
-            assert not isinstance(body, list)
-
-            return result.success(ForNode(var_name, start_value, end_value, step_value, body))
-
-        # statement
-        body = result.register(self.statement())
+        else:
+            # statement
+            body = result.register(self.statement())
+        
         if result.error is not None:
             return result
         assert body is not None
@@ -1712,22 +1695,15 @@ class Parser:
             body = result.register(self.statements(stop=[(TT["KEYWORD"], 'end')]))
             if result.error is not None:
                 return result
-            assert body is not None
 
             # KEYWORD:END
-            result = self.check_for_and_advance(result, "expected 'end'.", "KEYWORD", "end",
-                                                "while_expr", del_a_then=True)
-            
-            if result.error is not None:
-                return result
-
-            assert not isinstance(body, list)
-            assert not isinstance(condition, list)
-
-            return result.success(WhileNode(condition, body))
-
-        # statement
-        body = result.register(self.statement())
+            result = self.check_for_and_advance(
+                result, "expected 'end'.", "KEYWORD", "end", "while_expr", del_a_then=True
+            )
+        else:
+            # statement
+            body = result.register(self.statement())
+        
         if result.error is not None:
             return result
         assert body is not None
@@ -1804,7 +1780,9 @@ class Parser:
         param_names_tokens: list[Token] = []
 
         # (IDENTIFIER (COMMA IDENTIFIER)*)?
+        errmsg = "expected identifier or ')'."
         if self.current_token.type == TT["IDENTIFIER"]:
+            errmsg = "expected ',' or ')'."
             param_names_tokens.append(self.current_token)
             result.register_advancement()
             self.advance()
@@ -1817,13 +1795,8 @@ class Parser:
                 # IDENTIFIER
                 if self.current_token.type != TT["IDENTIFIER"]:
                     if self.current_token.type == TT["KEYWORD"]:
-                        return result.failure(InvalidSyntaxError(
-                            self.current_token.pos_start, self.current_token.pos_end,
-                            f"expected identifier after comma. NB: usage of keyword as identifier is illegal.",
-                            "src.parser.parser.Parser.func_def"
-                        ))
-
-                    if self.current_token.type in TOKENS_NOT_TO_QUOTE:
+                        error_msg = "expected identifier after comma. NB: usage of keyword as identifier is illegal."
+                    elif self.current_token.type in TOKENS_NOT_TO_QUOTE:
                         error_msg = f"expected identifier after comma, but got {self.current_token.type}."
                     else:
                         error_msg = f"expected identifier after comma, but got '{self.current_token.type}'."
@@ -1835,10 +1808,6 @@ class Parser:
                 param_names_tokens.append(self.current_token)
                 result.register_advancement()
                 self.advance()
-
-            errmsg = "expected ',' or ')'."
-        else:
-            errmsg = "expected identifier or ')'."
         
         result = self.check_for_and_advance(result, errmsg, "RPAREN", None, "func_def")
 

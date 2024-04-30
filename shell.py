@@ -270,8 +270,10 @@ def main():
                 result, error = None, None
                 continue
             try:  # we try to run it
-                result, error, previous_metas = nougaro.run('<stdin>', text, noug_dir, VERSION, args=args,
-                                                            work_dir=work_dir, lexer_metas=previous_metas)
+                result, error, previous_metas = nougaro.run(
+                    '<stdin>', text, noug_dir, VERSION, args=args,
+                    work_dir=work_dir, lexer_metas=previous_metas
+                )
             except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
                 print_in_red("\nKeyboardInterrupt")
                 continue  # continue the `while True` loop

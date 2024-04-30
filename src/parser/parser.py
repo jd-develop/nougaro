@@ -1077,189 +1077,184 @@ class Parser:
 
         # (INT|FLOAT)(E_INFIX INT)?
         if token.type in (TT["INT"], TT["FLOAT"]):
-            # we advance
-            result.register_advancement()
-            self.advance()
-
-            # (E_INFIX INT)?
-            if self.current_token.type == TT["E_INFIX"]:
-                # INT
-                self.advance_and_check_for(result, f"expected integer, got %toktype%.",
-                                           "INT", None, "atom")
-                if result.error is not None:
-                    return result
-                exp_token = self.current_token
-
-                # we advance
-                result.register_advancement()
-                self.advance()
-                return result.success(NumberENumberNode(token, exp_token))
-
-            # we return a NumberNode
-            return result.success(NumberNode(token))
-
+            expr = result.register(self.int_or_float(token))
         # STRING (STRING)?*
         elif token.type == TT["STRING"]:
-            assert isinstance(token.value, str)
-            # to_return_str is a python str. As we go along the (STRING)?*, we add these to our to_return_str
-            to_return_str = token.value  # actually just STRING, not (STRING)?* yet.
-            to_return_tok = token.copy()
-
-            # we advance
-            result.register_advancement()
-            self.advance()
-
-            # (STRING NEWLINE?*)?*
-            while self.current_token.type == TT["STRING"]:
-                assert isinstance(self.current_token.value, str)
-                to_return_str += self.current_token.value
-
-                result.register_advancement()
-                self.advance()
-
-                while self.current_token.type == TT["NEWLINE"]:
-                    next_ = self.next_token()
-                    if next_ is None:
-                        break
-                    if next_.type not in (TT["NEWLINE"], TT["STRING"]):
-                        break
-                    result.register_advancement()
-                    self.advance()
-
-            to_return_tok.value = to_return_str
-            return result.success(StringNode(to_return_tok))
-
+            expr = result.register(self.string_expr(token))
         # IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*
         elif token.type == TT["IDENTIFIER"]:
-            # the identifier is in the token in 'token'
-            # we advance
-            result.register_advancement()
-            self.advance()
-
-            # IDENTIFIER
-            # choices represent all the identifiers in atoms such as 'foo ? bar ? foo_ ? bar_'
-            choices: list[Node | Token] = [token]
-            # (INTERROGATIVE_PNT IDENTIFIER)?*
-            while self.current_token.type == TT["INTERROGATIVE_PNT"]:
-                # we advance
-                result.register_advancement()
-                self.advance()
-
-                value = self.current_token
-                # we check for identifier
-                if self.current_token.type != TT["IDENTIFIER"]:
-                    # eventually, the user could use a value instead of an identifier
-                    value = result.register(self.expr())
-                    if result.error is not None:
-                        return result
-                    assert value is not None
-                    # append the token to our list
-                    assert not isinstance(value, list)
-                    
-                    choices.append(value)
-                    break  # the expr is the final value we want to parse
-                    #        E.g.: `identifier ? identifier ? expr ? whatever` : we don't want the `? whatever`
-
-                # append the token to our list
-                choices.append(value)
-                # we advance
-                result.register_advancement()
-                self.advance()
-
-            return result.success(VarAccessNode(choices))
-
+            expr = result.register(self.identifier_and_interrogative_point(token))
         # LPAREN expr RPAREN
         elif token.type == TT["LPAREN"]:
-            # we advance
-            result.register_advancement()
-            self.advance()
-            # we register an expr
-            expr = result.register(self.expr())
-            if result.error is not None:  # we check for any error
-                return result
-            assert expr is not None
-            # we check for right parenthesis
-            result = self.check_for_and_advance(result, "expected ')'.", "RPAREN", None, "atom")
-            if result.error is not None:
-                return result
-            return result.success(expr)
-
+            expr = result.register(self.paren_expr())
         elif token.type == TT["DOLLAR"]:
-            result = self.advance_and_check_for(result, "expected identifier or nothing after '$'",
-                                                "IDENTIFIER", None, "atom")
-            if result.error is not None:
-                return result
-
-            identifier = self.current_token
-            result.register_advancement()
-            self.advance()
-
-            assert token.pos_start is not None
-            assert identifier.pos_end is not None
-            return result.success(DollarPrintNode(identifier, token.pos_start, identifier.pos_end))
-
+            expr = result.register(self.dollar_print_expr(token))
         # list_expr
         elif token.type == TT["LSQUARE"]:
-            list_expr = result.register(self.list_expr())
-            if result.error is not None:  # we check for error
-                return result
-            assert list_expr is not None
-            return result.success(list_expr)
+            expr = result.register(self.list_expr())
         # if_expr
         elif token.matches(TT["KEYWORD"], 'if'):
-            if_expr = result.register(self.if_expr())
-            if result.error is not None:  # We check for errors
-                return result
-            assert if_expr is not None
-            return result.success(if_expr)
+            expr = result.register(self.if_expr())
         # for_expr
         elif token.matches(TT["KEYWORD"], 'for'):
-            for_expr = result.register(self.for_expr())
-            if result.error is not None:  # We check for errors
-                return result
-            assert for_expr is not None
-            return result.success(for_expr)
+            expr = result.register(self.for_expr())
         # while_expr
         elif token.matches(TT["KEYWORD"], 'while'):
-            while_expr = result.register(self.while_expr())
-            if result.error is not None:  # We check for errors
-                return result
-            assert while_expr is not None
-            return result.success(while_expr)
+            expr = result.register(self.while_expr())
         # do_expr
         elif token.matches(TT["KEYWORD"], 'do'):
-            do_expr = result.register(self.do_expr())
-            if result.error is not None:  # We check for errors
-                return result
-            assert do_expr is not None
-            return result.success(do_expr)
+            expr = result.register(self.do_expr())
         # func_def
         elif token.matches(TT["KEYWORD"], 'def'):
-            func_def = result.register(self.func_def())
-            if result.error is not None:  # We check for errors
-                return result
-            assert func_def is not None
-            return result.success(func_def)
+            expr = result.register(self.func_def())
         # class_def
         elif token.matches(TT["KEYWORD"], 'class'):
-            class_def = result.register(self.class_def())
-            if result.error is not None:  # We check for errors
-                return result
-            assert class_def is not None
-            return result.success(class_def)
-
-        if self.current_token.matches(TT["KEYWORD"], "else"):
+            expr = result.register(self.class_def())
+        elif self.current_token.matches(TT["KEYWORD"], "else"):
             return result.failure(InvalidSyntaxError(
                 token.pos_start, token.pos_end,
                 "expected valid expression. Maybe you forgot to close an 'end'?",
                 "src.parser.parser.Parser.atom"
             ))
+        else:
+            return result.failure(InvalidSyntaxError(
+                token.pos_start, token.pos_end,
+                "expected valid expression.",
+                "src.parser.parser.Parser.atom"
+            ))
+        if result.error is not None:
+            return result
+        assert expr is not None
+        return result.success(expr)
 
-        return result.failure(InvalidSyntaxError(
-            token.pos_start, token.pos_end,
-            "expected valid expression.",
-            "src.parser.parser.Parser.atom"
-        ))
+    def int_or_float(self, token: Token) -> ParseResult:
+        result = ParseResult()
+        # we advance
+        result.register_advancement()
+        self.advance()
+        assert self.current_token is not None
+
+        # (E_INFIX INT)?
+        if self.current_token.type == TT["E_INFIX"]:
+            # INT
+            self.advance_and_check_for(
+                result, f"expected integer, got %toktype%.", "INT", None, "int_or_float"
+            )
+            if result.error is not None:
+                return result
+            exp_token = self.current_token
+
+            # we advance
+            result.register_advancement()
+            self.advance()
+            return result.success(NumberENumberNode(token, exp_token))
+
+        # we return a NumberNode
+        return result.success(NumberNode(token))
+
+    def string_expr(self, token: Token) -> ParseResult:
+        result = ParseResult()
+        assert isinstance(token.value, str)
+        # to_return_str is a python str. As we go along the (STRING)?*, we add these to our to_return_str
+        to_return_str = token.value  # actually just STRING, not (STRING)?* yet.
+        to_return_tok = token.copy()
+        assert self.current_token is not None
+
+        # we advance
+        result.register_advancement()
+        self.advance()
+
+        # (STRING NEWLINE?*)?*
+        while self.current_token.type == TT["STRING"]:
+            assert isinstance(self.current_token.value, str)
+            to_return_str += self.current_token.value
+
+            result.register_advancement()
+            self.advance()
+
+            while self.current_token.type == TT["NEWLINE"]:
+                next_ = self.next_token()
+                if next_ is None:
+                    break
+                if next_.type not in (TT["NEWLINE"], TT["STRING"]):
+                    break
+                result.register_advancement()
+                self.advance()
+
+        to_return_tok.value = to_return_str
+        return result.success(StringNode(to_return_tok))
+    
+    def identifier_and_interrogative_point(self, token: Token) -> ParseResult:
+        result = ParseResult()
+        # the identifier is in the token in 'token'
+        # we advance
+        result.register_advancement()
+        self.advance()
+        assert self.current_token is not None
+
+        # IDENTIFIER
+        # choices represent all the identifiers in atoms such as 'foo ? bar ? foo_ ? bar_'
+        choices: list[Node | Token] = [token]
+        # (INTERROGATIVE_PNT IDENTIFIER)?*
+        while self.current_token.type == TT["INTERROGATIVE_PNT"]:
+            # we advance
+            result.register_advancement()
+            self.advance()
+
+            value = self.current_token
+            # we check for identifier
+            if self.current_token.type != TT["IDENTIFIER"]:
+                # eventually, the user could use a value instead of an identifier
+                value = result.register(self.expr())
+                if result.error is not None:
+                    return result
+                assert value is not None
+                # append the token to our list
+                assert not isinstance(value, list)
+                
+                choices.append(value)
+                break  # the expr is the final value we want to parse
+                #        E.g.: `identifier ? identifier ? expr ? whatever` : we don't want the `? whatever`
+
+            # append the token to our list
+            choices.append(value)
+            # we advance
+            result.register_advancement()
+            self.advance()
+
+        return result.success(VarAccessNode(choices))
+
+    def paren_expr(self) -> ParseResult:
+        result = ParseResult()
+        # we advance
+        result.register_advancement()
+        self.advance()
+        # we register an expr
+        expr = result.register(self.expr())
+        if result.error is not None:  # we check for any error
+            return result
+        assert expr is not None
+        # we check for right parenthesis
+        result = self.check_for_and_advance(result, "expected ')'.", "RPAREN", None, "paren_expr")
+        if result.error is not None:
+            return result
+        return result.success(expr)
+    
+    def dollar_print_expr(self, token: Token) -> ParseResult:
+        result = ParseResult()
+        result = self.advance_and_check_for(result, "expected identifier or nothing after '$'",
+                                            "IDENTIFIER", None, "dollar_print_expr")
+        if result.error is not None:
+            return result
+
+        identifier = self.current_token
+        assert identifier is not None
+        result.register_advancement()
+        self.advance()
+
+        assert token.pos_start is not None
+        assert identifier.pos_end is not None
+        return result.success(DollarPrintNode(identifier, token.pos_start, identifier.pos_end.copy()))
 
     def list_expr(self) -> ParseResult:
         """

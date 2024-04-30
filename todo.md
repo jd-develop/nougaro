@@ -60,7 +60,7 @@
   * [ ] Runtime:
     * [ ] Update Function value and methods
     * [ ] Update Interpreter visit methods
-* [ ] rewrite parser to make it faster and easier to read
+* [X] rewrite parser to make it faster and easier to read (finished 30/04/2024)
 * [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
 * [ ] add builtin classes, or find a way to have builtin-methods in Values.
 * [ ] add `try catch`

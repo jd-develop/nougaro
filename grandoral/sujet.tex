@@ -39,7 +39,7 @@ Le premier vrai langage de programmation à proprement parler est Fortran, pour 
 FORmula TRANslating system, créé en 1954 pour le calcul scientifique \cite[p. 455]{berry}.
 Fortran était un langage compilé et haut-niveau, qui essayait au mieux de reproduire la
 notation mathématique. Jusqu’alors, un programme était une suite d’instructions pas-à-pas pour
-le processeur. En Fortran, l’idée était plutôt décrire le problème que l’on veut résoudre 
+le processeur. En Fortran, l’idée était plutôt de décrire le problème que l’on veut résoudre 
 \cite{imb-john-backus}, et cette idée va être à l’origine de tous les autres langages de
 programmations jusqu’à nos jours.
 
@@ -87,7 +87,7 @@ Nous ne nous intéresserons désormais qu’aux interpréteurs.
 Il y a trois grandes façons d’interpréter un programme\nobreakspace: analyser directement le code
 et l’exécuter dans la foulée, transformer le code vers une représentation intermédiaire et exécuter
 cette représentation, et compiler vers un langage intermédiaire plus simple et interpréter ce
-résultat. \cite{wikipedia-interpreter}
+résultat. \cite{wikipedia-interpreter} Je m’intéresserai à la seconde méthode.
 
 Un interpréteur est constitué de trois parties distinctes, chacune s’exécutant l’une après l’autre.
 Ces trois parties sont l’analyseur lexical (lexer), l’analyseur sémantique (parser), et l’interpréteur
@@ -162,7 +162,7 @@ de nœuds, qui sera elle-même stockée dans le nœud de la boucle \verb|for|. O
 jusqu’au \verb|end|.
 
 Une chose intéressante est l’appel de fonction\nobreakspace: on ne sait pas si c’est un simple accès à une
-variable ou un appel avant d’avoir trouvé le token \verb|lparen| correspondant à la parenthèse ouvrante.
+variable ou un appel avant d’avoir trouvé le jeton \verb|lparen| correspondant à la parenthèse ouvrante.
 
 C’est donc l’analyseur sémantique qui s’occupe de savoir si la grammaire est respectée. Dans notre
 exemple \verb|while for True in print 78.5 += "chaîne"|, l’analyseur sémantique
@@ -173,6 +173,13 @@ n’aurait pas renvoyé d’erreur.
 
 À la fin de l’analyse sémantique, on se retrouve avec une liste de nœuds, que l’on peut envoyer
 vers l’interpréteur, qui va s’occuper d’exécuter réellement le code.
+
+\subsection{Interpréteur}
+L’interpréteur, en anglais \textit{interpreter} ou plus spécifiquement \textit{runtime}, est la dernière
+étape, celle qui exécute l’arbre de syntaxe directement.
+L’interpréteur stocke un contexte, qui contient plusieurs informations utiles\nobreakspace:
+les variables dans un dictionnaire identifiant/valeurs, ou encore s’il faut arrêter ou continuer
+une boucle au cas où on aurait trouvé un mot-clé \verb|continue| ou \verb|break|.
 
 \printbibliography
 

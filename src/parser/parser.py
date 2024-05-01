@@ -1947,7 +1947,7 @@ class Parser:
             left_has_priority: bool = True
     ) -> ParseResult:
         """Binary operator such as 1+1 or 3==2
-        Can return BinOpCompNode, BinOpNode, or list."""
+        Can return BinOpCompNode, BinOpNode, any node, or list."""
         # if any func is a list, like [foo, bar()], the func is foo.bar()
         # param left_has_priority is used to know if we have to parse (for exemple) 3==3==3 into
         # ((int:3, ==, int:3), ==, int:3) (True) or (int:3, ==, int:3, ==, int:3) (False)
@@ -1997,4 +1997,10 @@ class Parser:
                 # we add our operator and operand to our list
                 nodes_and_tokens_list.append(op_token)
                 nodes_and_tokens_list.append(right)
+            # this is a messy bugfix tbh
+            if len(nodes_and_tokens_list) == 1 and isinstance(nodes_and_tokens_list[0], Node):
+                return result.success(nodes_and_tokens_list[0])
+            if len(nodes_and_tokens_list) == 1 and isinstance(nodes_and_tokens_list[0], list):
+                if len(nodes_and_tokens_list[0]) == 1:
+                    return result.success(nodes_and_tokens_list[0][0])
             return result.success(BinOpCompNode(nodes_and_tokens_list))

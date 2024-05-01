@@ -110,7 +110,7 @@ class VarAccessNode(Node):
         self.pos_end = self.var_name_tokens_list[-1].pos_end
 
     def __repr__(self):
-        return f'var_access:{self.var_name_tokens_list}({self.attr})'
+        return f'var_access:{self.var_name_tokens_list}' + ('(is attr in var assign)' if self.attr else '')
 
 
 class VarDeleteNode(Node):

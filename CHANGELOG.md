@@ -6,6 +6,8 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 
 ## 0.19.0-beta (Unreleased)
 
+This version improves a little bit performances in some cases.
+
 ### Added
 
 * Add the `noug_version.clean_version_for_gh` function that generates a beautiful str for the GH issues or PRs.

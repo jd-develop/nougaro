@@ -28,31 +28,27 @@
 
  Let's take the tokens from the previous example and put them into the parser. We get this:
 
-    list:[(bin_op_comp:(while:(bin_op_comp:(var_access:[identifier:"a"], !=, num:int:10) then:var_assign:([identifier:"a"] += [bin_op_comp:(num:int:1)]))), False)]
+    list:[(while:(bin_op_comp:([var_access:[identifier:"a"]], !=, [num:int:10]) then:var_assign:([[identifier:"a"]] += [num:int:1])), False)]
 
  Ouch... Let's organize this mess to explain it easier.
 
     list:[
-      (
-         bin_op_comp:(
-            while:(
-               bin_op_comp:(
-                  var_access:[identifier:"a"],
-                  !=,
-                  num:int:10
-               ) 
-            then:
-               var_assign:(
-                  [identifier:a] += [bin_op_comp:(num:int:1)]
-               )
-            )
-         ), False
-      )
+       (
+          while:(
+             bin_op_comp:(
+                [var_access:[identifier:"a"]],
+                !=,
+                [num:int:10]
+             )
+          then:
+             var_assign:(
+                [[identifier:"a"]] += [num:int:1]
+             )
+          ), False
+       )
     ]
 
- First, we have a `ListNode`. It contains only one other node, but if the code to execute had more lines, there would be more nodes. Every pased file or line of input is inside a `ListeNode`.
-
- Then, we have some `BinOpCompNode`s. The first one (inside the list), is purely decorative. I’m still investigating on why they pop randomly. However, the second one (inside the while) is really a comparison: we’ll get back to it later.
+ First, we have a `ListNode`. It contains only one other node, but if the code to execute had more lines, there would be more nodes. Every pased file or line of input is inside a `ListNode`.
 
  The node inside the `ListNode` is a `WhileNode` that is split into two parts: the `while` part including the condition, and the `then` part containing the body.
 

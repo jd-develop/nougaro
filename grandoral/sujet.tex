@@ -181,6 +181,17 @@ L’interpréteur stocke un contexte, qui contient plusieurs informations utiles
 les variables dans un dictionnaire identifiant/valeurs, ou encore s’il faut arrêter ou continuer
 une boucle au cas où on aurait trouvé un mot-clé \verb|continue| ou \verb|break|.
 
+L’interpréteur parcourt l’arbre de syntaxe, et exécute chaque nœud. Par exemple, s’il trouve un
+nœud \verb|CallNode| d’identifiant \verb|print| et d’argument \verb|a|, il va résoudre le nom
+\verb|a| dans sa table de symboles, puis va résoudre le nom \verb|print|, qui va afficher la 
+valeur de \verb|a| à l’écran.
+
+\section{Une implémentation en Python}
+(détailler le jour de l’oral si le temps)
+
+(parler des limites\nobreakspace: Python n’est pas fait pour de la production et surtout c’est
+très lent)
+
 \printbibliography
 
 \section*{Licence}

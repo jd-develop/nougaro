@@ -24,7 +24,7 @@ python -m pip install --upgrade pip nuitka wheel ordered-set colorama
 rem We delete useless files and directories
 for %%y in (.\.gitignore, .\.gitattributes, example_file, grammar.txt, tests.noug, todo.md) do if exist %%y (del %%y)
 
-for %%y in (.\.git, .\.github, .\.vscode, .\.idea, .\__pycache__, src\__pycache__, src\errors\__pycache__, src\lexer\__pycache__, src\parser\__pycache__, src\runtime\__pycache__, src\runtime\values\__pycache__, src\runtime\values\basevalues\__pycache__, src\runtime\values\defined_values\__pycache__, src\runtime\values\functions\__pycache__, lib_\runtime\values\tools\__pycache__, sandbox) do if exist %%y (rmdir /s /q %%y)
+for %%y in (.\.git, .\.github, .\.vscode, .\.idea, .\__pycache__, src\__pycache__, src\errors\__pycache__, src\lexer\__pycache__, src\parser\__pycache__, src\runtime\__pycache__, src\runtime\values\__pycache__, src\runtime\values\basevalues\__pycache__, src\runtime\values\functions\__pycache__, lib_\runtime\values\tools\__pycache__, sandbox) do if exist %%y (rmdir /s /q %%y)
 
 rem Then we ask for the version
 set /p NOUGVERSION="Nougaro version: "
@@ -34,9 +34,9 @@ rem We build
 python -m nuitka --standalone --windows-company-name=Nougaro --windows-product-name=Nougaro --windows-product-version=%NOUGVERSION% --include-package=lib_ --no-deployment-flag=self-execution shell.py
 
 rem We copy the important files to the created directory
-for %%y in (example.noug LICENSE README.md shell.py "CODE_OF_CONDUCT.md" CONTRIBUTING.md how_it_works.md repo-image.png noug_version.json) do xcopy %%y shell.dist\
+for %%y in (example.noug LICENSE README.md shell.py "CODE_OF_CONDUCT.md" CONTRIBUTING.md how_it_works.md noug_version.json) do xcopy %%y shell.dist\
 
-for %%y in (examples lib_ src tests) do xcopy /s /i %%y shell.dist\%%y
+for %%y in (examples lib_ src tests repo-image) do xcopy /s /i %%y shell.dist\%%y
 
 rem Then we rename our directory
 RENAME shell.dist nougaro-"%NOUGVERSION%"-%NOUGPHASE%-windows-exe

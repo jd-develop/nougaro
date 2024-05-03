@@ -35,7 +35,7 @@ if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
 
     return_code=$?
     if [ $return_code != 0 ]; then
-        echo pip returned with error
+        echo "pip returned with error (exit code $return_code)"
         exit $return_code
     fi
 
@@ -46,7 +46,7 @@ if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
 
     return_code=$?
     if [ $return_code != 0 ]; then
-        echo nuitka returned with error
+        echo "Nuitka returned with error (exit code $return_code)"
         exit $return_code
     fi
 
@@ -54,7 +54,7 @@ if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
     find . -type d -execdir rm -rf __pycache__/ \;
 
     echo "Copying…"
-    cp -r example.noug LICENSE README.md shell.py CODE_OF_CONDUCT.md CONTRIBUTING.md how_it_works.md tests/ examples/ lib_/ src/ noug_version.json repo-image.png repo-image.svg shell.dist/
+    cp -r example.noug LICENSE README.md shell.py CODE_OF_CONDUCT.md CONTRIBUTING.md how_it_works.md tests/ examples/ lib_/ src/ noug_version.json repo-image/ shell.dist/
 
     echo "Renaming and compressing…"
     mv shell.dist nougaro-"$nougversion"-"$nougphase"-linux-bin
@@ -63,6 +63,7 @@ if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
     return_code=$?
     if [ $return_code != 0 ]; then
         echo "tar returned with error (you can compress the folder nougaro-$nougversion-$nougphase-linux-bin yourself if you want)"
+        echo "Return code: $return_code"
         exit $return_code
     fi
 fi

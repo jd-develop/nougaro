@@ -80,7 +80,7 @@ class VarAssignNode(Node):
             self,
             var_names: list[list[_Token | Node]],
             value_nodes: list[Node] | None,
-            equal: _Token = _Token(_TT["EQ"])
+            equal: _Token
     ):
         self.var_names: list[list[_Token | Node]] = var_names
         self.value_nodes = value_nodes

@@ -22,18 +22,16 @@ class Token:
     A token have a type (keyword, int, str, identifier...) and sometimes a value ("foo", 123, break)
     Types are listed in src.lexer.token_types
     """
-    def __init__(self, type_: str, value: str | int | float | None = None, pos_start: Position | None = None,
-                 pos_end: Position | None = None):
+    def __init__(self, type_: str, pos_start: Position, pos_end: Position | None = None, value: str | int | float | None = None):
         self.type = type_  # type
         self.value = value  # value
-        self.pos_start = self.pos_end = None
 
-        if pos_start is not None:  # if there is a pos start given
-            self.pos_start = pos_start.copy()
-            self.pos_end = pos_start.copy()
+        self.pos_start: Position = pos_start.copy()
+        if pos_end is None:
+            self.pos_end: Position = pos_start.copy()
             self.pos_end.advance()  # the pos end is pos_start + 1
-        if pos_end is not None:
-            self.pos_end = pos_end.copy()
+        else:
+            self.pos_end: Position = pos_end.copy()
 
     def __repr__(self) -> str:
         if self.value is not None:
@@ -51,7 +49,7 @@ class Token:
 
     def copy(self):
         """Returns a copy of self"""
-        return Token(self.type, self.value, self.pos_start, self.pos_end)
+        return Token(self.type, self.pos_start, self.pos_end, self.value)
 
     def set_value(self, value: str | int | float | None):
         self.value = value

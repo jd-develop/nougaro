@@ -161,7 +161,7 @@ class Lexer:
                     tokens.append(tok)
                 elif there_is_a_space_or_a_tab_or_a_comment:
                     tokens.append(tok)
-                elif current_tok_is_positive_e_infix and tok.pos_start is not None and tok.value is not None:
+                elif current_tok_is_positive_e_infix and tok.value is not None:
                     tokens.append(Token(
                         TT['E_INFIX'],
                         pos_start=tok.pos_start,
@@ -191,7 +191,7 @@ class Lexer:
                         tokens.append(Token(
                             TT['E_INFIX'],
                             pos_start=tok.pos_start,
-                            pos_end=tok.pos_start.copy().advance() if tok.pos_start is not None else None
+                            pos_end=tok.pos_start.copy().advance()
                         ))
                         tokens.append(num.set_value(-1*num.value))
                 else:
@@ -709,7 +709,7 @@ class Lexer:
             self.advance()
 
         self.advance()  # we advance after the str
-        return Token(TT["STRING"], string_, pos_start, self.pos), None
+        return Token(TT["STRING"], pos_start, self.pos, string_), None
 
     def make_identifier(self):
         """Make an identifier or a keyword"""
@@ -722,7 +722,7 @@ class Lexer:
             self.advance()
 
         token_type = TT["KEYWORD"] if id_str in KEYWORDS else TT["IDENTIFIER"]  # KEYWORDS is the keywords list
-        return Token(token_type, id_str, pos_start, self.pos)
+        return Token(token_type, pos_start, self.pos, id_str)
 
     def make_number(
             self,
@@ -806,15 +806,15 @@ class Lexer:
 
         if mode == 'int':
             if dot_count == 0:  # if there is no dots, this is an INT, else this is a FLOAT
-                return Token(TT["INT"], int(num_str), pos_start, self.pos.copy()), None
+                return Token(TT["INT"], pos_start, self.pos.copy(), int(num_str)), None
             else:
-                return Token(TT["FLOAT"], float(num_str), pos_start, self.pos.copy()), None
+                return Token(TT["FLOAT"], pos_start, self.pos.copy(), float(num_str)), None
         elif mode == "hex":
-            return Token(TT["INT"], int(num_str, 16), pos_start, self.pos.copy()), None
+            return Token(TT["INT"], pos_start, self.pos.copy(), int(num_str, 16)), None
         elif mode == "oct":
-            return Token(TT["INT"], int(num_str, 8), pos_start, self.pos.copy()), None
+            return Token(TT["INT"], pos_start, self.pos.copy(), int(num_str, 8)), None
         elif mode == "bin":
-            return Token(TT["INT"], int(num_str, 2), pos_start, self.pos.copy()), None
+            return Token(TT["INT"], pos_start, self.pos.copy(), int(num_str, 2)), None
         else:
             raise Exception("The specified mode is incorrect...")
 
@@ -925,7 +925,7 @@ class Lexer:
             self.advance()
 
         token_type = TT["KEYWORD"] if identifier in KEYWORDS else TT["IDENTIFIER"]  # KEYWORDS is the keywords list
-        return Token(TT["DOLLAR"], pos_start=dollar_pos), Token(token_type, identifier, id_pos_start, self.pos)
+        return Token(TT["DOLLAR"], pos_start=dollar_pos), Token(token_type, id_pos_start, self.pos, identifier)
 
     def skip_comment(self):
         """Skip a comment (until back line or EOF)"""

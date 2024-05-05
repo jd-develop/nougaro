@@ -50,6 +50,7 @@ This version improves a little bit performances in some cases.
 #### Technical
 * Moved `./config/noug_version.json` to `./noug_version.json`
 * Data version has been increased to 5
+* Version ID has been increased to 4
 * Argument handling has been rewritten back without `argparse`, it was causing more issues than it simplified things
 * Renamed the `--command_dont_verbose` CLI option to `--command-dont-verbose`.
 * Each value now takes `pos_start` and `pos_end` arguments, so watch out if you’re making libs! These changes will be available in the documentation (along with everything else)

@@ -10,6 +10,7 @@ This version improves a little bit performances in some cases.
 
 ### Added
 
+#### Libs
 * Add the `noug_version.clean_version_for_gh` function that generates a beautiful str for the GH issues or PRs.
 * Add `noug_version.release_serial` which is the same as `noug_version.phase_minor`, as it is now deprecated.
 * Add `math.factorial`, which computes factorial.
@@ -20,11 +21,6 @@ This version improves a little bit performances in some cases.
         If `new` is 2, a new tab is opened if possible.
         If `autoraise` is True, the window is raised if possible (note that under many window managers this will occur
         regardless of the setting of this variable).
-* Data version and version ID can now be known using `__data_version__` and `__version_id__`.
-* Data version is now stored in `./noug_version.json`
-* `(lib to make libs)` Add `default_pos` function, which returns a tuple (Position, Position)
-* `(Internal API)` Noug version can now be retrieved using `src.noug_version` library. It consists of 8 constants: `MAJOR`, `MINOR`, `PATCH`, `PHASE`, `RELEASE_SERIAL`, `VERSION` (`str`), `VERSION_ID`, `DATA_VERSION`. It does not contains “phase minor”, as it is now called “release serial”.
-* `(Build scripts)` It is now possible to use a custom python command in `build.sh` by passing the command as parameter. Note that I forgot to mention that this is possible with `run_tests.sh` since 0.18.0-beta.
 
 #### Metas
 * Add a “meta” system
@@ -41,14 +37,22 @@ This version improves a little bit performances in some cases.
   * Sets `__the_test_value__` to the str value given in the meta value
   * If no value is given, it sets it to `None`.
 
-### Changed
+#### Technical
+* Data version and version ID can now be known using `__data_version__` and `__version_id__`.
+* Data version is now stored in `./noug_version.json`
+* `(lib to make libs)` Add `default_pos` function, which returns a tuple (Position, Position)
+* `(Internal API)` Noug version can now be retrieved using `src.noug_version` library. It consists of 8 constants: `MAJOR`, `MINOR`, `PATCH`, `PHASE`, `RELEASE_SERIAL`, `VERSION` (`str`), `VERSION_ID`, `DATA_VERSION`. It does not contains “phase minor”, as it is now called “release serial”.
+* `(Build scripts)` It is now possible to use a custom python command in `build.sh` by passing the command as parameter. Note that I forgot to mention that this is possible with `run_tests.sh` since 0.18.0-beta.
 
-* Moved `./config/noug_version.json` to `./noug_version.json`
+### Changed
 * Renamed “phase minor” to “release serial”. In `noug_version.json`, the key is renamed from `phase-minor` to `release-serial`. The different “phase minor” references are now deprecated (see the Deprecated section), and will be removed in 0.20.0
+
+#### Technical
+* Moved `./config/noug_version.json` to `./noug_version.json`
 * Data version has been increased to 5
 * Argument handling has been rewritten back without `argparse`, it was causing more issues than it simplified things
 * Renamed the `--command_dont_verbose` CLI option to `--command-dont-verbose`.
-* Each value now takes `pos_start` and `pos_end` arguments, watch out if you’re making libs! These changes will be available in the documentation (along with everything else)
+* Each value now takes `pos_start` and `pos_end` arguments, so watch out if you’re making libs! These changes will be available in the documentation (along with everything else)
 
 ### Deprecated
 

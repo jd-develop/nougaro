@@ -35,7 +35,8 @@ class BaseFunction(Value):
     def generate_new_context(self, use_self_context_ctx_table: bool = False):
         """Generates a new context with the right name, the right parent context and the right position"""
         # print(self.context)
-        new_context = Context(self.name, self.context, self.pos_start)
+        assert self.pos_start is not None
+        new_context = Context(self.name, self.pos_start, self.context)
         # set the symbol table to the parent one
         if use_self_context_ctx_table:
             assert self.context is not None

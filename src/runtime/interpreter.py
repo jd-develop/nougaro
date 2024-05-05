@@ -216,7 +216,10 @@ class Interpreter:
                 return result
             if len(node_or_list) != 1:
                 for node_ in node_or_list[1:]:
-                    new_ctx = Context(display_name=value.__repr__(), parent=context)
+                    assert node_.pos_start is not None
+                    new_ctx = Context(
+                        display_name=f"attribute of {value.__repr__()}", entry_pos=node_.pos_start, parent=context
+                    )
                     new_ctx.symbol_table = SymbolTable()
                     new_ctx.symbol_table.set_whole_table(value.attributes)
                     new_ctx.symbol_table.parent = context.symbol_table
@@ -671,7 +674,10 @@ class Interpreter:
                 assert isinstance(value, Value)
 
                 for node_or_tok in var_name[1:-1]:
-                    new_ctx = Context(display_name=value.__repr__(), parent=ctx)
+                    assert node_or_tok.pos_start is not None
+                    new_ctx = Context(
+                        display_name=f"attribute of {value.__repr__()}", entry_pos=node_or_tok.pos_start, parent=ctx
+                    )
                     new_ctx.symbol_table = SymbolTable()
                     new_ctx.symbol_table.set_whole_table(value.attributes)
                     new_ctx.symbol_table.parent = ctx.symbol_table
@@ -1175,7 +1181,8 @@ class Interpreter:
                 ))
             parent = parent_value
 
-        class_ctx = Context(class_name, ctx).set_symbol_table(SymbolTable(ctx.symbol_table))
+        assert node.pos_start is not None
+        class_ctx = Context(class_name, node.pos_start, ctx).set_symbol_table(SymbolTable(ctx.symbol_table))
         assert class_ctx.symbol_table is not None
         result.register(self.visit(body_node, class_ctx, methods_instead_of_funcs=True))
         if result.should_return():
@@ -1442,12 +1449,13 @@ class Interpreter:
                 obj_attrs[key] = value.copy()
         object_ = Object(obj_attrs, constructor).set_pos(constructor.pos_start, constructor.pos_end)
         object_.type_ = constructor.name
+        assert constructor.pos_start is not None
         if call_with_module_context:
             assert constructor.module_context is not None
-            inner_ctx = Context(constructor.name, constructor.module_context)
+            inner_ctx = Context(constructor.name, constructor.pos_start, constructor.module_context)
             inner_ctx.symbol_table = SymbolTable(constructor.module_context.symbol_table)
         else:
-            inner_ctx = Context(constructor.name, outer_context)
+            inner_ctx = Context(constructor.name, constructor.pos_start, outer_context)
             inner_ctx.symbol_table = SymbolTable(constructor.symbol_table)
 
         if object_to_set_this is None:

@@ -21,14 +21,12 @@ from typing import Self
 # ##########
 class Context:
     """Class for the interpreter Context"""
-    def __init__(self, display_name: str | None, parent: Self | None = None, parent_entry_pos: Position | None = None):
+    def __init__(self, display_name: str | None, entry_pos: Position, parent: Self | None = None):
         self.display_name = display_name  # name of the function we are in
         self.parent: Context | None = parent  # parent context
-        # self.parent_entry_pos is the pos_start of the parent context. It is used in errors tracebacks
-        self.parent_entry_pos: Position | None = parent_entry_pos
-        # ABOUT self.parent_entry_pos:
-        # I actually don't know why there is a parent_entry_pos to every context, but there is no pos_start.
-        # The entry pos seems to be the pos start of a context, but... Well, I don't know....
+        # self.entry_pos is the pos_start of the current context.
+        # It is used in errors tracebacks (class src.errors.errors.RunTimeError.generate_traceback)
+        self.entry_pos: Position = entry_pos
         self.symbol_table = None
         self.what_to_export: SymbolTable = SymbolTable()
 
@@ -36,7 +34,7 @@ class Context:
         """Repr the context under a dict form."""
         repr_dict = {'symbol_table': self.symbol_table,
                      'parent': self.parent,
-                     'parent_entry_pos': self.parent_entry_pos,
+                     'entry_pos': self.entry_pos,
                      'display_name': self.display_name,
                      'NB': 'this is __repr__ from src.context.Context (internal)'}
         return repr_dict
@@ -74,7 +72,7 @@ class Context:
 
     def copy(self):
         """Return a copy of self."""
-        new_ctx = Context(self.display_name, self.parent, self.parent_entry_pos)
+        new_ctx = Context(self.display_name, self.entry_pos, self.parent)
         assert self.symbol_table is not None
         new_ctx.symbol_table = self.symbol_table.copy()
         return new_ctx

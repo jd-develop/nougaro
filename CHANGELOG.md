@@ -60,6 +60,7 @@ This version improves a little bit performances in some cases.
 * Fix an internal bug where the first optional argument of functions whose `should_respect_args_number` was `False` was not populated. Never happen in real life because no such function take optional arguments, but you know, just in case.
 * Unit tests now work properly when debug mode is enabled
 * Fix the fact that Nougaro exited with exit code 0 even when there was an error using `-c`, `-d`, etc.
+* Sometimes, tracebacks in error messages indicated file `(unknown)` and line `(unknown)`: this has been fixed
 
 ### Calculator
 #### Added

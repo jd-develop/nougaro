@@ -155,15 +155,13 @@ class RunTimeError(Error):
     def generate_traceback(self):
         """Generate a traceback with the file(s) name, the line(s) number and the name of the function"""
         result = ''
+        assert self.pos_start is not None
         pos = self.pos_start
         ctx = self.context
 
         while ctx is not None:
-            if pos is not None:
-                result = f' In file {pos.file_name}, line {pos.line_number + 1}, in {ctx.display_name}:\n' + result
-            else:
-                result = f' In file (unknown), line (unknown), in {ctx.display_name}:\n' + result
-            pos = ctx.parent_entry_pos
+            result = f' In file {pos.file_name}, line {pos.line_number + 1}, in {ctx.display_name}:\n' + result
+            pos = ctx.entry_pos
             ctx = ctx.parent
 
         if self.print_origin_file:

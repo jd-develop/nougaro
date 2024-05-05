@@ -9,6 +9,7 @@
 
 # IMPORTS
 # nougaro modules imports
+from src.lexer.position import Position
 from src.runtime.values.basevalues.value import Value
 from src.runtime.values.basevalues.basevalues import NoneValue
 from src.runtime.values.number_constants import TRUE, FALSE
@@ -22,8 +23,8 @@ from src.runtime.symbol_table import SymbolTable
 
 class BaseFunction(Value):
     """Parent class for all the function classes (Function, BaseBuiltinFunction and its children)"""
-    def __init__(self, name: str | None, call_with_module_context: bool = False):
-        super().__init__()
+    def __init__(self, name: str | None, pos_start: Position, pos_end: Position, call_with_module_context: bool = False):
+        super().__init__(pos_start, pos_end)
         self.name: str = name if name is not None else '<function>'
         # (if 'name' is None, we have something like `def()->foo`)
         self.type_ = 'BaseFunction'
@@ -63,9 +64,9 @@ class BaseFunction(Value):
             assert last_arg.pos_end is not None
             assert self.context is not None
             return result.failure(RunTimeError(
-                    first_arg.pos_start, last_arg.pos_end,
-                    f"{len(args) - len(param_names + optional_params)} too many args passed into '{self.name}'.",
-                    self.context, origin_file="src.values.functions.base_function.BaseFunction.check_args()"
+                first_arg.pos_start, last_arg.pos_end,
+                f"{len(args) - len(param_names + optional_params)} too many args passed into '{self.name}'.",
+                self.context, origin_file="src.values.functions.base_function.BaseFunction.check_args()"
             ))
 
         # check if there is too few params
@@ -79,7 +80,7 @@ class BaseFunction(Value):
                 self.context, origin_file="src.values.functions.base_function.BaseFunction.check_args()"
             ))
 
-        return result.success(NoneValue())  # if there is the right number of params
+        return result.success(NoneValue(self.pos_start, self.pos_end))  # if there is the right number of params
 
     @staticmethod
     def populate_args(param_names: list[str], args: list[Value], exec_context: Context,
@@ -116,7 +117,7 @@ class BaseFunction(Value):
                     arg_value.set_context(exec_context)
                     exec_context.symbol_table.set(arg_name, arg_value)
                 else:  # the argument is not in the non-optional parameters list, nor in the optional
-                    # we don't need to continue to loop : we are at after the last argument that can be matched with
+                    # we don't need to continue to loop: we are at after the last argument that can be matched with
                     # a param. Breaking here may improve performance in some specific contexts
                     break
 
@@ -131,16 +132,16 @@ class BaseFunction(Value):
         if result.should_return():  # if there is an error
             return result
         self.populate_args(param_names, args, exec_context, optional_params, should_respect_args_number)
-        return result.success(NoneValue())
+        return result.success(NoneValue(self.pos_start, self.pos_end))
 
     def get_comparison_eq(self, other: Value):
-        return FALSE.copy().set_context(self.context), None
+        return FALSE.copy().set_pos(self.pos_start, self.pos_end).set_context(self.context), None
 
     def get_comparison_ne(self, other: Value):
-        return TRUE.copy().set_context(self.context), None
+        return TRUE.copy().set_pos(self.pos_start, self.pos_end).set_context(self.context), None
 
     def get_comparison_gte(self, other: Value):
-        return FALSE.copy().set_context(self.context), None
+        return FALSE.copy().set_pos(self.pos_start, self.pos_end).set_context(self.context), None
 
     def get_comparison_lte(self, other: Value):
-        return FALSE.copy().set_context(self.context), None
+        return FALSE.copy().set_pos(self.pos_start, self.pos_end).set_context(self.context), None

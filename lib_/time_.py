@@ -20,7 +20,7 @@ from lib_.lib_to_make_libs import *
 import time
 
 # CONSTANTS
-TIMEZONE = Number(time.timezone)
+TIMEZONE = Number(time.timezone, *default_pos())
 
 
 class Time(ModuleFunction):
@@ -54,7 +54,7 @@ class Time(ModuleFunction):
             ))
 
         time.sleep(seconds.value)  # we sleep
-        return RTResult().success(NoneValue(False))
+        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
     functions["sleep"] = {
         "function": execute_time_sleep,
@@ -82,7 +82,7 @@ class Time(ModuleFunction):
             ))
 
         time.sleep(milliseconds.value / 1000)  # ms/1000 = sec
-        return RTResult().success(NoneValue(False))
+        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
     functions["sleep_milliseconds"] = {
         "function": execute_time_sleep_milliseconds,
@@ -95,7 +95,7 @@ class Time(ModuleFunction):
 
     def execute_time_time(self):
         """Like python time.time()"""
-        return RTResult().success(Number(time.time()))
+        return RTResult().success(Number(time.time(), self.pos_start, self.pos_end))
 
     functions["time"] = {
         "function": execute_time_time,
@@ -109,8 +109,12 @@ class Time(ModuleFunction):
     def execute_time_epoch(self):
         """Like python time.gmtime(0), but returns a string"""
         epoch = time.gmtime(0)
-        return RTResult().success(String(f"{epoch.tm_year}/{epoch.tm_mon}/{epoch.tm_mday} "
-                                         f"{epoch.tm_hour}:{epoch.tm_min}:{epoch.tm_sec}"))
+        return RTResult().success(
+            String(
+                f"{epoch.tm_year}/{epoch.tm_mon}/{epoch.tm_mday} {epoch.tm_hour}:{epoch.tm_min}:{epoch.tm_sec}",
+                self.pos_start, self.pos_end
+            )
+        )
 
     functions["epoch"] = {
         "function": execute_time_epoch,

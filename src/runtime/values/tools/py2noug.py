@@ -9,6 +9,7 @@
 
 # IMPORTS
 # nougaro modules imports
+from src.lexer.position import Position as _Position, DEFAULT_POSITION
 from src.misc import is_num
 from src.runtime.values.basevalues.basevalues import String, Number, List, Value, NoneValue
 # built-in python imports
@@ -19,42 +20,67 @@ from typing import Any
 # argument in the "py2noug" function should be defined as "val"
 # (todo)
 # type val = Value | str | int | float | bool | list[val] | dict[val, val] | None
-def py2noug(value: Value | str | int | float | bool | list[Any] | dict[Any, Any] | None) -> Value:
+def py2noug(
+        value: Value | str | int | float | bool | list[Any] | dict[Any, Any] | tuple[Any, ...] | None,
+        pos_start: _Position, pos_end: _Position
+) -> Value:
     """Converts python values to nougaro ones"""
     if isinstance(value, Value):
         return value
     elif isinstance(value, str):
-        return String(value)
+        return String(value, pos_start, pos_end)
     elif is_num(value):
         # sometimes, type checking strict is very dumb
         assert isinstance(value, int) or isinstance(value, float)
-        return Number(value)
+        return Number(value, pos_start, pos_end)
     elif isinstance(value, bool):
-        return Number(int(value))
+        return Number(value, pos_start, pos_end)
     elif isinstance(value, list) or isinstance(value, tuple):
         list_ = list(value)  # we want a list instead of a tuple
-        list_ = list(map(py2noug, list_))  # todo: when project fully switches to 3.12 remove this: # type: ignore
-        return List(list_)
+        new_list: list[Value] = []
+        for elt in list_:
+            new_list.append(py2noug(elt, pos_start, pos_end))
+        return List(new_list, pos_start, pos_end)
     elif isinstance(value, dict):
         list_ = list(value.items())
-        list_ = list(map(py2noug, list_))  # todo: when project fully switches to 3.12 remove this: # type: ignore
-        return List(list_)
+        new_list: list[Value] = []
+        for elt in list_:
+            new_list.append(py2noug(elt, pos_start, pos_end))
+        return List(new_list, pos_start, pos_end)
     elif value is None:
-        return NoneValue()
+        return NoneValue(pos_start, pos_end)
     else:
-        return Value()  # we just return a base value if there is no equivalent...
+        return Value(pos_start, pos_end)  # we just return a base value if there is no equivalent...
 
 
 # todo: move this to unittests
-test_, err = py2noug(
-    {"a": ["b", 12], 13: "c"}
+_list1: Value = List(
+    [
+        String("a", DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()),
+        List([
+            String("b", DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()),
+            Number(12, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+            ], DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+    ], DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()
+)
+_list2: Value = List(
+    [Number(13, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()),
+     String("c", DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+    ], DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()
+)
+_list_to_comp_with: list[Value] = [
+    _list1,
+    _list2
+]
+
+_test_, _err = py2noug(
+    {"a": ["b", 12], 13: "c"}, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()
 ).get_comparison_eq(
-    List([
-        List([String("a"), List([String("b"), Number(12)])]),
-        List([Number(13), String("c")])
-    ]))
-assert test_ is not None
-assert test_.is_true()
+    List(_list_to_comp_with, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+)
+assert _test_ is not None
+assert _test_.is_true()
+assert _err is None
 
 
 def noug2py(value: Value, none_instead_of_raw_value: bool = True) -> Any:

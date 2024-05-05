@@ -90,7 +90,7 @@ class Statistics(ModuleFunction):
                 self.pos_start, self.pos_end, str(exception) + '.', exec_ctx
             ))
 
-        return RTResult().success(Number(mean_))
+        return RTResult().success(Number(mean_, self.pos_start, self.pos_end))
 
     functions["mean"] = {
         "function": execute_statistics_mean,
@@ -160,7 +160,7 @@ class Statistics(ModuleFunction):
                 exec_ctx, origin_file="lib_.statistics_.Statistics.execute_statistics_geometric_mean"
             ))
 
-        return RTResult().success(Number(geometric_mean_))
+        return RTResult().success(Number(geometric_mean_, self.pos_start, self.pos_end))
 
     functions["geometric_mean"] = {
         "function": execute_statistics_geometric_mean,
@@ -279,7 +279,7 @@ class Statistics(ModuleFunction):
                 exec_ctx, origin_file="lib_.statistics_.Statistics.execute_statistics_harmonic_mean"
             ))
 
-        return RTResult().success(Number(harmonic_mean_))
+        return RTResult().success(Number(harmonic_mean_, self.pos_start, self.pos_end))
 
     functions["harmonic_mean"] = {
         "function": execute_statistics_harmonic_mean,
@@ -336,7 +336,7 @@ class Statistics(ModuleFunction):
                 "lib_.statistics_.Statistics.execute_statistics_median"
             ))
 
-        return RTResult().success(Number(median_))
+        return RTResult().success(Number(median_, self.pos_start, self.pos_end))
 
     functions["median"] = {
         "function": execute_statistics_median,
@@ -427,7 +427,7 @@ class Statistics(ModuleFunction):
 
         n = exec_ctx.symbol_table.getf('n')  # we get 'n' (the number of quantiles we want)
         if n is None:  # if it's not defined, we want quartiles by default
-            n = Number(4)
+            n = Number(4, self.pos_start, self.pos_end)
 
         if not (isinstance(n, Number) and isinstance(n.value, int)):  # 'n' must be a number
             assert n.pos_start is not None
@@ -448,7 +448,7 @@ class Statistics(ModuleFunction):
 
         method = exec_ctx.symbol_table.getf('method')  # we get the method we use
         if method is None:
-            method = String('exclusive')  # if the method is not defined we use the exclusive method
+            method = String('exclusive', self.pos_start, self.pos_end)  # if the method is not defined we use the exclusive method
 
         if not isinstance(method, String):  # the method must be a string
             assert method.pos_start is not None
@@ -505,8 +505,8 @@ class Statistics(ModuleFunction):
                 "lib_.statistics_.Statistics.execute_statistics_quantiles"
             ))
 
-        new_quantiles = [py2noug(q) for q in quantiles_]
-        return RTResult().success(List(new_quantiles))
+        new_quantiles = [py2noug(q, self.pos_start, self.pos_end) for q in quantiles_]
+        return RTResult().success(List(new_quantiles, self.pos_start, self.pos_end))
 
     functions["quantiles"] = {
         "function": execute_statistics_quantiles,
@@ -554,7 +554,7 @@ class Statistics(ModuleFunction):
             ))
 
         scope = max(data_) - min(data_)  # we calculate the scope
-        return RTResult().success(Number(scope))
+        return RTResult().success(Number(scope, self.pos_start, self.pos_end))
 
     functions["scope"] = {
         "function": execute_statistics_scope,
@@ -602,7 +602,7 @@ class Statistics(ModuleFunction):
             ))
 
         mode = statistics.mode(data_)  # we calculate the mode
-        return RTResult().success(Number(mode))
+        return RTResult().success(Number(mode, self.pos_start, self.pos_end))
 
     functions["mode"] = {
         "function": execute_statistics_mode,
@@ -645,8 +645,8 @@ class Statistics(ModuleFunction):
             data_ = data.value
 
         multimode = statistics.multimode(data_)  # we calculate the multimode
-        new_multimode = [py2noug(e) for e in multimode]
-        return RTResult().success(List(new_multimode))
+        new_multimode = [py2noug(e, self.pos_start, self.pos_end) for e in multimode]
+        return RTResult().success(List(new_multimode, self.pos_start, self.pos_end))
 
     functions["multimode"] = {
         "function": execute_statistics_multimode,

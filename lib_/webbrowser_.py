@@ -64,7 +64,7 @@ class WebBrowser(ModuleFunction):
             ))
         
         if new is None:
-            new = Number(0).set_context(context)
+            new = Number(0, url.pos_end, self.pos_end).set_context(context)
         if not (isinstance(new, Number) and isinstance(new.value, int)):
             assert new.pos_start is not None
             assert new.pos_end is not None
@@ -93,7 +93,7 @@ class WebBrowser(ModuleFunction):
                 context, origin_file="lib_.webbrowser.WebBrowser.open"
             ))
 
-        return RTResult().success(NoneValue(False).set_context(context).set_pos(self.pos_start, self.pos_end))
+        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False).set_context(context))
 
     functions["open"] = {
         "function": open,

@@ -13,6 +13,7 @@
 # __future__ import (must be first)
 from __future__ import annotations
 # nougaro modules imports
+from src.lexer.position import DEFAULT_POSITION
 from src.runtime.values.functions.builtin_function import *
 from src.runtime.values.tools.py2noug import *
 from src.errors.errors import *
@@ -21,6 +22,7 @@ from src.errors.errors import *
 # no imports
 
 builtin_function_dict = BuiltinFunctionDict
+default_pos = lambda: (DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
 
 
 class ModuleFunction(BaseBuiltInFunction):
@@ -30,7 +32,7 @@ class ModuleFunction(BaseBuiltInFunction):
             link_for_bug_report: str = "https://jd-develop.github.io/nougaro/bugreport.html",
             functions: dict[str, BuiltinFunctionDict] | None = None
     ):
-        super().__init__(function_name)
+        super().__init__(function_name, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
         self.module_name = module_name
         self.link_for_bug_report: str = link_for_bug_report
         if functions is None:
@@ -54,13 +56,13 @@ class ModuleFunction(BaseBuiltInFunction):
         # generate the context and change the symbol table for the context
         exec_context = self.generate_new_context()
         assert exec_context.symbol_table is not None
-        exec_context.symbol_table.set("__exec_from__", String(exec_from))
-        exec_context.symbol_table.set("__actual_context__", String(self.name))
+        exec_context.symbol_table.set("__exec_from__", String(exec_from, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
+        exec_context.symbol_table.set("__actual_context__", String(self.name, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
         if cli_args is None:
-            exec_context.symbol_table.set("__args__", List([]))
+            exec_context.symbol_table.set("__args__", List([], DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
         else:
             cli_args_values: list[Value] = list(map(nice_str_from_idk, cli_args))
-            exec_context.symbol_table.set("__args__", List(cli_args_values))
+            exec_context.symbol_table.set("__args__", List(cli_args_values, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
 
         # get the method name and the method
         try:
@@ -124,7 +126,9 @@ class ModuleFunction(BaseBuiltInFunction):
 
     def copy(self):
         """Return a copy of self"""
-        copy = ModuleFunction(self.module_name, self.name, self.link_for_bug_report)
+        copy = ModuleFunction(
+            self.module_name, self.name, self.link_for_bug_report
+        )
         copy.module_context = self.module_context
         copy.attributes = self.attributes.copy()
         return self.set_context_and_pos_to_a_copy(copy)

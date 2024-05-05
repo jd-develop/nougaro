@@ -22,6 +22,7 @@ This version improves a little bit performances in some cases.
         regardless of the setting of this variable).
 * Data version and version ID can now be known using `__data_version__` and `__version_id__`.
 * Data version is now stored in `./noug_version.json`
+* `(lib to make libs)` Add `default_pos` function, which returns a tuple (Position, Position)
 * `(Internal API)` Noug version can now be retrieved using `src.noug_version` library. It consists of 8 constants: `MAJOR`, `MINOR`, `PATCH`, `PHASE`, `RELEASE_SERIAL`, `VERSION` (`str`), `VERSION_ID`, `DATA_VERSION`. It does not contains “phase minor”, as it is now called “release serial”.
 * `(Build scripts)` It is now possible to use a custom python command in `build.sh` by passing the command as parameter. Note that I forgot to mention that this is possible with `run_tests.sh` since 0.18.0-beta.
 
@@ -47,6 +48,7 @@ This version improves a little bit performances in some cases.
 * Data version has been increased to 5
 * Argument handling has been rewritten back without `argparse`, it was causing more issues than it simplified things
 * Renamed the `--command_dont_verbose` CLI option to `--command-dont-verbose`.
+* Each value now takes `pos_start` and `pos_end` arguments, watch out if you’re making libs! These changes will be available in the documentation (along with everything else)
 
 ### Deprecated
 

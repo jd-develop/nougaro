@@ -314,6 +314,11 @@ while True then
                 var should_continue = True
                 break
             end
+            if number >= 9223372036854775808 then
+                var error_msg = "Error: overflow with factorial (n>=9223372036854775808)"
+                var should_continue = True
+                break
+            end
             pop(stack, -1)
             append(stack, math.factorial(number))
         elif token == "space" then

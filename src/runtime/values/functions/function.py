@@ -11,6 +11,7 @@
 # __future__ import (must be first)
 from __future__ import annotations
 # nougaro modules imports
+from src.lexer.position import Position, DEFAULT_POSITION
 from src.parser.nodes import Node
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.values.basevalues.value import Value
@@ -28,8 +29,8 @@ if TYPE_CHECKING:
 
 class Function(BaseFunction):
     def __init__(self, name: str | None, body_node: Node, param_names: list[str], should_auto_return: bool,
-                 call_with_module_context: bool = False):
-        super().__init__(name, call_with_module_context)
+                 pos_start: Position, pos_end: Position, call_with_module_context: bool = False):
+        super().__init__(name, pos_start, pos_end, call_with_module_context)
         self.body_node = body_node
         self.param_names = param_names
         self.should_auto_return = should_auto_return
@@ -60,11 +61,15 @@ class Function(BaseFunction):
         # generate the context and update symbol table
         exec_context = self.generate_new_context(True)
         assert exec_context.symbol_table is not None
-        exec_context.symbol_table.set("__exec_from__", String(exec_from))
-        exec_context.symbol_table.set("__actual_context__", String(self.name))
+        exec_context.symbol_table.set(
+            "__exec_from__", String(exec_from, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+        )
+        exec_context.symbol_table.set(
+            "__actual_context__", String(self.name, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+        )
 
         cli_args_value: list[Value] = list(map(nice_str_from_idk, cli_args))
-        exec_context.symbol_table.set("__args__", List(cli_args_value))
+        exec_context.symbol_table.set("__args__", List(cli_args_value, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
         # print(self.context)
 
         # populate argument and check for errors
@@ -86,16 +91,25 @@ class Function(BaseFunction):
         #   takes the value
         # * if this is a multi-line function without a `return` statement, we have `None or None or (NoneValue)`: Python
         #   takes the NoneValue
-        return_value = (value if self.should_auto_return else None) or result.function_return_value or NoneValue(False)
+        return_value = \
+            (value if self.should_auto_return else None) or \
+            result.function_return_value or \
+            NoneValue(self.pos_start, self.pos_end, False)
         return result.success(return_value)
 
     def copy(self):
         """Return a copy of self"""
-        copy = Function(self.name, self.body_node, self.param_names, self.should_auto_return,
-                        self.call_with_module_context)
+        copy = Function(
+            self.name,
+            self.body_node,
+            self.param_names,
+            self.should_auto_return,
+            self.pos_start,
+            self.pos_end,
+            self.call_with_module_context
+        )
         copy.module_context = self.module_context
         copy.set_context(self.context)
-        copy.set_pos(self.pos_start, self.pos_end)
         copy.attributes = self.attributes.copy()
         return copy
 
@@ -103,8 +117,10 @@ class Function(BaseFunction):
 class Method(Function):
     """Parent class for methods (functions in classes)"""
     def __init__(self, name: str | None, body_node: Node, param_names: list[str], should_auto_return: bool,
-                 call_with_module_context: bool = False):
-        super().__init__(name, body_node, param_names, should_auto_return, call_with_module_context)
+                 pos_start: Position, pos_end: Position, call_with_module_context: bool = False):
+        super().__init__(
+            name, body_node, param_names, should_auto_return, pos_start, pos_end, call_with_module_context
+        )
         self.type_ = "method"
         self.object_: Value | None = None
 
@@ -113,11 +129,11 @@ class Method(Function):
 
     def copy(self):
         """Return a copy of self"""
-        copy = Method(self.name, self.body_node, self.param_names, self.should_auto_return,
-                      self.call_with_module_context)
+        copy = Method(
+            self.name, self.body_node, self.param_names, self.should_auto_return,
+            self.pos_start, self.pos_end, self.call_with_module_context)
         copy.object_ = self.object_
         copy.module_context = self.module_context
         copy.set_context(self.context)
-        copy.set_pos(self.pos_start, self.pos_end)
         copy.attributes = self.attributes.copy()
         return copy

@@ -21,7 +21,7 @@ import src.conffiles
 # no imports
 
 # constants
-CONFIG_DIRECTORY = String(src.conffiles.CONFIG_DIRECTORY)
+CONFIG_DIRECTORY = String(src.conffiles.CONFIG_DIRECTORY, *default_pos())
 
 
 class Conffiles(ModuleFunction):
@@ -67,7 +67,7 @@ class Conffiles(ModuleFunction):
         data = src.conffiles.access_data(file_name.value)
         if data is None:
             if not_found_ok.is_true():
-                return RTResult().success(NoneValue(False))
+                return RTResult().success(NoneValue(self.pos_start, self.pos_end, False).set_context(context))
             assert file_name.pos_start is not None
             assert file_name.pos_end is not None
             return RTResult().failure(RTFileNotFoundError(
@@ -75,7 +75,7 @@ class Conffiles(ModuleFunction):
                 origin_file="lib_._conffiles_.Conffiles.execute__conffiles_access_data", custom=True
             ))
         
-        return RTResult().success(String(data))
+        return RTResult().success(String(data, self.pos_start, self.pos_end).set_context(context))
 
     functions["access_data"] = {
         "function": execute__conffiles_access_data,
@@ -117,7 +117,7 @@ class Conffiles(ModuleFunction):
 
         if errmsg is not None:
             if name_reserved_ok.is_true():
-                return RTResult().success(NoneValue(False))
+                return RTResult().success(NoneValue(self.pos_start, self.pos_end, False).set_context(context))
             assert file_name.pos_start is not None
             assert file_name.pos_end is not None
             return RTResult().failure(RTFileNotFoundError(
@@ -125,7 +125,7 @@ class Conffiles(ModuleFunction):
                 origin_file="lib_._conffiles_.Conffiles.execute__conffiles_write_data", custom=True
             ))
         
-        return RTResult().success(NoneValue(False))
+        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False).set_context(context))
 
     functions["write_data"] = {
         "function": execute__conffiles_write_data,

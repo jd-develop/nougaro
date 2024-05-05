@@ -73,7 +73,7 @@ class Random(ModuleFunction):
             ))
 
         random_number = random.randint(a.value, b.value)
-        return RTResult().success(Number(random_number))
+        return RTResult().success(Number(random_number, self.pos_start, self.pos_end))
 
     functions["randint"] = {
         "function": execute_random_randint,
@@ -87,7 +87,7 @@ class Random(ModuleFunction):
     def execute_random_random(self):
         """Pick randomly a 16-digits float between 0 included and 1 included"""
         # No params.
-        return RTResult().success(Number(random.random()))
+        return RTResult().success(Number(random.random(), self.pos_start, self.pos_end))
 
     functions["random"] = {
         "function": execute_random_random,
@@ -176,7 +176,7 @@ class Random(ModuleFunction):
                 exec_ctx, "lib_.random_.Random.execute_random_seed"
             ))
         random.seed(seed.value)
-        return RTResult().success(NoneValue(False))
+        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
     
     functions["seed"] = {
         "function": execute_random_seed,

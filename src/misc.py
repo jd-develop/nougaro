@@ -11,6 +11,7 @@
 # __future__ import (must be first)
 from __future__ import annotations
 # nougaro modules imports
+from src.lexer.position import DEFAULT_POSITION
 from src.runtime.context import Context
 from src.errors.errors import Error
 from src.runtime.values.basevalues.basevalues import String
@@ -87,11 +88,11 @@ def nice_str_from_idk(idk: Any) -> String:
         if error is None:
             assert string is not None
             return string
-        return String(idk.to_python_str())
+        return String(idk.to_python_str(), DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
     elif isinstance(idk, str):
-        return String(idk)
+        return String(idk, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
     else:
-        return String(str(idk))
+        return String(str(idk), DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
 
 
 class RunFunction(Protocol):

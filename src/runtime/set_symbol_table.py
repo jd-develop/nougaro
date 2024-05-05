@@ -9,6 +9,7 @@
 
 # IMPORTS
 # nougaro modules imports
+from src.lexer.position import DEFAULT_POSITION
 from src.runtime.symbol_table import SymbolTable
 from src.runtime.values.number_constants import NULL, TRUE, FALSE
 from src.runtime.values.basevalues.basevalues import String, Value, NoneValue, Number
@@ -25,10 +26,10 @@ def set_symbol_table(symbol_table: SymbolTable):
     :param symbol_table: src.symbol_table.SymbolTable
     """
     # Constants
-    symbol_table.set("null", NULL)
-    symbol_table.set("True", TRUE)
-    symbol_table.set("False", FALSE)
-    symbol_table.set("None", NoneValue(True))
+    symbol_table.set("null", NULL.copy())
+    symbol_table.set("True", TRUE.copy())
+    symbol_table.set("False", FALSE.copy())
+    symbol_table.set("None", NoneValue(DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy(), True))
 
     # Built-in functions
     symbol_table.set("void", BuiltInFunction('void'))
@@ -87,9 +88,9 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("path_exists", BuiltInFunction('path_exists'))
 
     # Hum...
-    symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42))
-    symbol_table.set("numberOfHornsOnAnUnicorn", Number(1))
-    symbol_table.set("theLoneliestNumber", Number(1))
+    symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
+    symbol_table.set("numberOfHornsOnAnUnicorn", Number(1, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
+    symbol_table.set("theLoneliestNumber", Number(1, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
     symbol_table.set("rickroll", BuiltInFunction('rickroll'))
     symbol_table.set("nougaro", BuiltInFunction('nougaro'))
 
@@ -97,29 +98,36 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("exit", BuiltInFunction('exit'))
     symbol_table.set("system_call", BuiltInFunction('system_call'))
     symbol_table.set("__python__", BuiltInFunction('__python__'))
-    symbol_table.set('__os_name__', String(platform.system()))
-    symbol_table.set('__os_release__', String(platform.uname().release))
-    symbol_table.set('__os_version__', String(platform.uname().version))
+    symbol_table.set('__os_name__', String(platform.system(), DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
+    symbol_table.set('__os_release__', String(platform.uname().release, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
+    symbol_table.set('__os_version__', String(platform.uname().version, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
     symbol_table.set(
         '__python_version__',
-        String(str(sys.version_info[0]) + "." + str(sys.version_info[1]) + "." + str(sys.version_info[2])))
+        String(
+            str(sys.version_info[0]) + "." + str(sys.version_info[1]) + "." + str(sys.version_info[2]),
+            DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()
+        )
+    )
     # platform.system() may be 'Linux', 'Windows', 'Darwin', 'Java', etc. according to Python doc
     # it can also be 'FreeBSD', 'OpenBSD', [add here other OSes where you tested platform.system()]
-    symbol_table.set('__base_value__', Value())
+    symbol_table.set('__base_value__', Value(DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
 
     # GPL
-    symbol_table.set('__disclaimer_of_warranty__',
-                     String(
-                         "GNU GPL 3.0, 15, Disclaimer of Warranty:\n\n"
-                         "  THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY\n"
-                         "APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT\n"
-                         "HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY\n"
-                         "OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,\n"
-                         "THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\n"
-                         "PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM\n"
-                         "IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF\n"
-                         "ALL NECESSARY SERVICING, REPAIR OR CORRECTION."
-                     ))
+    symbol_table.set(
+        '__disclaimer_of_warranty__',
+        String(
+            "GNU GPL 3.0, 15, Disclaimer of Warranty:\n\n"
+            "  THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY\n"
+            "APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT\n"
+            "HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY\n"
+            "OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,\n"
+            "THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\n"
+            "PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM\n"
+            "IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF\n"
+            "ALL NECESSARY SERVICING, REPAIR OR CORRECTION.",
+            DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()
+        )
+    )
     symbol_table.set("__gpl__", BuiltInFunction('__gpl__'))
 
     symbol_table.set("__is_keyword__", BuiltInFunction('__is_keyword__'))
@@ -127,11 +135,22 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("__test__", BuiltInFunction("__test__"))
     symbol_table.set("__how_many_lines_of_code__", BuiltInFunction("__how_many_lines_of_code__"))
 
-    symbol_table.set("__noug_version__", String(src.noug_version.VERSION))
-    symbol_table.set("__data_version__", String(str(src.noug_version.DATA_VERSION)))
-    symbol_table.set("__version_id__", String(str(src.noug_version.VERSION_ID)))
+    symbol_table.set(
+        "__noug_version__", String(src.noug_version.VERSION, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+    )
+    symbol_table.set(
+        "__data_version__",
+        String(str(src.noug_version.DATA_VERSION), DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+    )
+    symbol_table.set(
+        "__version_id__",
+        String(str(src.noug_version.VERSION_ID), DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+    )
 
     symbols_copy: dict[str, Value] = symbol_table.symbols.copy()
     if '__symbol_table__' in symbols_copy.keys():
         del symbols_copy['__symbol_table__']
-    symbol_table.set('__symbol_table__', String(pprint.pformat(symbols_copy)))
+    symbol_table.set(
+        '__symbol_table__',
+        String(pprint.pformat(symbols_copy), DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+    )

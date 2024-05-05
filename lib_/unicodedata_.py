@@ -114,7 +114,7 @@ class UnicodeData(ModuleFunction):
                 exec_ctx,
                 origin_file="lib_.unicodedata_.UnicodeData.execute_unicodedata_lookup"
             ))
-        return RTResult().success(String(char))
+        return RTResult().success(String(char, self.pos_start, self.pos_end))
 
     functions["lookup"] = {
         "function": execute_unicodedata_lookup,
@@ -140,7 +140,7 @@ class UnicodeData(ModuleFunction):
         default = exec_ctx.symbol_table.getf("default")
 
         try:
-            name = String(unicodedata.name(char.value))
+            name = String(unicodedata.name(char.value), self.pos_start, self.pos_end)
         except ValueError as e:
             if default is None:
                 assert char.pos_start is not None
@@ -175,7 +175,7 @@ class UnicodeData(ModuleFunction):
             return is_unicode_char
         assert isinstance(char, String)
 
-        return RTResult().success(String(unicodedata.category(char.value)))
+        return RTResult().success(String(unicodedata.category(char.value), self.pos_start, self.pos_end))
 
     functions["category"] = {
         "function": execute_unicodedata_category,
@@ -198,7 +198,7 @@ class UnicodeData(ModuleFunction):
             return is_unicode_char
         assert isinstance(char, String)
 
-        return RTResult().success(String(unicodedata.bidirectional(char.value)))
+        return RTResult().success(String(unicodedata.bidirectional(char.value), self.pos_start, self.pos_end))
 
     functions["bidirectional"] = {
         "function": execute_unicodedata_bidirectional,
@@ -221,7 +221,7 @@ class UnicodeData(ModuleFunction):
             return is_unicode_char
         assert isinstance(char, String)
 
-        return RTResult().success(Number(unicodedata.combining(char.value)))
+        return RTResult().success(Number(unicodedata.combining(char.value), self.pos_start, self.pos_end))
 
     functions["combining"] = {
         "function": execute_unicodedata_combining,
@@ -244,7 +244,7 @@ class UnicodeData(ModuleFunction):
             return is_unicode_char
         assert isinstance(char, String)
 
-        return RTResult().success(String(unicodedata.east_asian_width(char.value)))
+        return RTResult().success(String(unicodedata.east_asian_width(char.value), self.pos_start, self.pos_end))
 
     functions["east_asian_width"] = {
         "function": execute_unicodedata_east_asian_width,
@@ -267,7 +267,7 @@ class UnicodeData(ModuleFunction):
             return is_unicode_char
         assert isinstance(char, String)
 
-        return RTResult().success(Number(unicodedata.mirrored(char.value)))
+        return RTResult().success(Number(unicodedata.mirrored(char.value), self.pos_start, self.pos_end))
 
     functions["mirrored"] = {
         "function": execute_unicodedata_mirrored,
@@ -290,7 +290,7 @@ class UnicodeData(ModuleFunction):
             return is_unicode_char
         assert isinstance(char, String)
 
-        return RTResult().success(String(unicodedata.decomposition(char.value)))
+        return RTResult().success(String(unicodedata.decomposition(char.value), self.pos_start, self.pos_end))
 
     functions["decomposition"] = {
         "function": execute_unicodedata_decomposition,
@@ -317,7 +317,13 @@ class UnicodeData(ModuleFunction):
         assert isinstance(form, String)
         assert isinstance(uni_str, String)
 
-        return RTResult().success(String(unicodedata.normalize(form.value, uni_str.value)))  # type: ignore
+        return RTResult().success(
+            String(
+                unicodedata.normalize(
+                    form.value, uni_str.value  # type: ignore
+                ), self.pos_start, self.pos_end
+            )
+        ) 
 
     functions["normalize"] = {
         "function": execute_unicodedata_normalize,
@@ -344,7 +350,14 @@ class UnicodeData(ModuleFunction):
         assert isinstance(form, String)
         assert isinstance(uni_str, String)
 
-        return RTResult().success(Number(unicodedata.is_normalized(form.value, uni_str.value)))  # type: ignore
+        return RTResult().success(
+            Number(
+                unicodedata.is_normalized(
+                    form.value, uni_str.value  # type: ignore
+                ),
+                self.pos_start, self.pos_end
+            )
+        )
 
     functions["is_normalized"] = {
         "function": execute_unicodedata_is_normalized,
@@ -358,7 +371,7 @@ class UnicodeData(ModuleFunction):
 
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported
     # constants
-    "unicodedata_version": String(UNICODEDATA_VERSION),
+    "unicodedata_version": String(UNICODEDATA_VERSION, *default_pos()),
     # functions
     "lookup": UnicodeData("lookup"),
     "name": UnicodeData("name"),

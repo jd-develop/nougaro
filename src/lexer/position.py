@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2023  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -37,6 +37,10 @@ class Position:
             self.colon = 0
 
         return self
+    
+    def set_file_name(self, new_file_name: str):
+        self.file_name = new_file_name
+        return self
 
     def __repr__(self):
         return f"Position at index {self.index} line {self.line_number} colon {self.colon}, in file {self.file_name}."
@@ -44,3 +48,6 @@ class Position:
     def copy(self):
         """Return a copy of self"""
         return Position(self.index, self.line_number, self.colon, self.file_name, self.file_txt)
+
+
+DEFAULT_POSITION = Position(0, 0, 0, "(builtin)", "")

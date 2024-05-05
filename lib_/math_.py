@@ -21,11 +21,11 @@ from lib_.lib_to_make_libs import *
 import math
 
 # constants
-PI = Number(math.pi)
-TAU = Number(math.tau)
-SQRT_PI = Number(math.sqrt(math.pi))
-SQRT_TAU = Number(math.sqrt(math.tau))
-E = Number(math.e)
+PI = Number(math.pi, *default_pos())
+TAU = Number(math.tau, *default_pos())
+SQRT_PI = Number(math.sqrt(math.pi), *default_pos())
+SQRT_TAU = Number(math.sqrt(math.tau), *default_pos())
+E = Number(math.e, *default_pos())
 
 
 class Math(ModuleFunction):
@@ -69,7 +69,7 @@ class Math(ModuleFunction):
             ))
 
         sqrt_ = math.sqrt(value.value)  # we calculate the square root
-        return RTResult().success(Number(sqrt_))
+        return RTResult().success(Number(sqrt_, self.pos_start, self.pos_end))
 
     functions["sqrt"] = {
         "function": execute_math_sqrt,
@@ -106,7 +106,7 @@ class Math(ModuleFunction):
             ))
 
         sqrt_ = math.isqrt(value.value)  # we calculate the square root
-        return RTResult().success(Number(sqrt_))
+        return RTResult().success(Number(sqrt_, self.pos_start, self.pos_end))
 
     functions["isqrt"] = {
         "function": execute_math_isqrt,
@@ -146,7 +146,7 @@ class Math(ModuleFunction):
 
         n = exec_context.symbol_table.getf('n')  # we get 'n'
         if n is None:  # if 'n' parameter is not filled, we set it to 2
-            n = Number(2).set_pos(value.pos_end, self.pos_end)
+            n = Number(2, value.pos_end, self.pos_end)
 
         if not isinstance(n, Number):  # we check if 'n' is a number
             assert n.pos_start is not None
@@ -156,7 +156,7 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_root"
             ))
 
-        value_to_return = Number(value.value ** (1 / n.value))  # we calculate the root
+        value_to_return = Number(value.value ** (1 / n.value), self.pos_start, self.pos_end)  # we calculate the root
 
         return RTResult().success(value_to_return)
 
@@ -198,7 +198,7 @@ class Math(ModuleFunction):
 
         n = exec_context.symbol_table.getf('n')  # we get 'n'
         if n is None:  # if 'n' parameter is not filled, we set it to 2
-            n = Number(2).set_pos(value.pos_end, self.pos_end)
+            n = Number(2, value.pos_end, self.pos_end)
 
         if not isinstance(n, Number):  # we check if 'n' is a number
             assert n.pos_start is not None
@@ -208,7 +208,7 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_root"
             ))
 
-        value_to_return = Number(int(value.value ** (1 / n.value)))  # we calculate the root
+        value_to_return = Number(int(value.value ** (1 / n.value)), self.pos_start, self.pos_end)  # we calculate the root
 
         return RTResult().success(value_to_return)
 
@@ -236,7 +236,7 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_degrees"
             ))
         degrees = math.degrees(value.value)
-        return RTResult().success(Number(degrees))
+        return RTResult().success(Number(degrees, self.pos_start, self.pos_end))
 
     functions["degrees"] = {
         "function": execute_math_degrees,
@@ -262,7 +262,7 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_radians"
             ))
         radians = math.radians(value.value)
-        return RTResult().success(Number(radians))
+        return RTResult().success(Number(radians, self.pos_start, self.pos_end))
 
     functions["radians"] = {
         "function": execute_math_radians,
@@ -288,7 +288,7 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_sin"
             ))
         sin = math.sin(value.value)
-        return RTResult().success(Number(sin))
+        return RTResult().success(Number(sin, self.pos_start, self.pos_end))
 
     functions["sin"] = {
         "function": execute_math_sin,
@@ -314,7 +314,7 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_cos"
             ))
         cos = math.cos(value.value)
-        return RTResult().success(Number(cos))
+        return RTResult().success(Number(cos, self.pos_start, self.pos_end))
 
     functions["cos"] = {
         "function": execute_math_cos,
@@ -340,7 +340,7 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_tan"
             ))
         tan = math.tan(value.value)
-        return RTResult().success(Number(tan))
+        return RTResult().success(Number(tan, self.pos_start, self.pos_end))
 
     functions["tan"] = {
         "function": execute_math_tan,
@@ -375,7 +375,7 @@ class Math(ModuleFunction):
                 "first argument of the built-in function ‘math.asin’ must be a number between -1 and 1.",
                 exec_context, "lib_.math_.Math.execute_math_asin"
             ))
-        return RTResult().success(Number(asin))
+        return RTResult().success(Number(asin, self.pos_start, self.pos_end))
 
     functions["asin"] = {
         "function": execute_math_asin,
@@ -410,7 +410,7 @@ class Math(ModuleFunction):
                 "first argument of the built-in function ‘math.acos’ must be a number between -1 and 1.",
                 exec_context, "lib_.math_.Math.execute_math_acos"
             ))
-        return RTResult().success(Number(acos))
+        return RTResult().success(Number(acos, self.pos_start, self.pos_end))
 
     functions["acos"] = {
         "function": execute_math_acos,
@@ -436,7 +436,7 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_atan"
             ))
         atan = math.atan(value.value)
-        return RTResult().success(Number(atan))
+        return RTResult().success(Number(atan, self.pos_start, self.pos_end))
 
     functions["atan"] = {
         "function": execute_math_atan,
@@ -504,7 +504,7 @@ class Math(ModuleFunction):
                     f"math domain error: illegal value for logarithm: {value.value}.",
                     exec_context, origin_file="lib_.math.Math.execute_math_log"
                 ))
-            value_to_return = Number(math.log(value.value))
+            value_to_return = Number(math.log(value.value), self.pos_start, self.pos_end)
         else:
             if not isinstance(base, Number):  # we check if the base is a number
                 assert base.pos_start is not None
@@ -514,7 +514,7 @@ class Math(ModuleFunction):
                     exec_context, "lib_.math_.Math.execute_math_log"
                 ))
             try:
-                value_to_return = Number(math.log(value.value, base.value))
+                value_to_return = Number(math.log(value.value, base.value), self.pos_start, self.pos_end)
             except ValueError as e:
                 assert self.pos_start is not None
                 assert self.pos_end is not None
@@ -551,7 +551,7 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_log2"
             ))
 
-        value_to_return = Number(math.log2(value.value))
+        value_to_return = Number(math.log2(value.value), self.pos_start, self.pos_end)
 
         return RTResult().success(value_to_return)
 
@@ -588,7 +588,12 @@ class Math(ModuleFunction):
                 exec_context, origin_file="lib_.math_.Math.execute_math_factorial"
             ))
 
-        value_to_return = Number(math.factorial(value.value))
+        try:
+            value_to_return = Number(math.factorial(value.value), self.pos_start, self.pos_end)
+        except OverflowError as e:
+            return RTResult().failure(RTOverflowError(
+                value.pos_start, value.pos_end, str(e) + ".", exec_context, origin_file="lib_.math_.Math.execute_math_factorial"
+            ))
 
         return RTResult().success(value_to_return)
 

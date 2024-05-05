@@ -20,6 +20,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.lexer.lexer import Lexer
+from src.lexer.position import DEFAULT_POSITION
 from src.parser.parser import Parser
 import src.runtime.interpreter
 from src.runtime.symbol_table import SymbolTable
@@ -78,18 +79,20 @@ def run(
     if args is None:
         new_args_values: list[Value] = []
         new_args_strings: list[String] = []
-        global_symbol_table.set("__args__", List([]))
+        global_symbol_table.set("__args__", List([], DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
     else:
         new_args_values: list[Value] = list(map(nice_str_from_idk, args))
         new_args_strings: list[String] = list(map(nice_str_from_idk, args))
-        global_symbol_table.set("__args__", List(new_args_values))
-    global_symbol_table.set("__exec_from__", String(str(exec_from)))
-    global_symbol_table.set("__actual_context__", String(actual_context))
-    global_symbol_table.set("__noug_dir__", String(noug_dir))
+        global_symbol_table.set("__args__", List(new_args_values, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
+    global_symbol_table.set("__exec_from__", String(str(exec_from), DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
+    global_symbol_table.set(
+        "__actual_context__", String(actual_context, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+    )
+    global_symbol_table.set("__noug_dir__", String(noug_dir, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
 
     # we make tokens with the Lexer
     if text is None:
-        return NoneValue(False), None, lexer_metas
+        return NoneValue(DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy(), False), None, lexer_metas
     lexer = Lexer(file_name, text, previous_metas=lexer_metas)
     tokens, error = lexer.make_tokens()
     lexer_metas = lexer.metas
@@ -111,7 +114,7 @@ def run(
     # run the code (interpreter)
     if work_dir is None:
         work_dir = noug_dir
-    interpreter = src.runtime.interpreter.Interpreter(run, noug_dir, new_args_strings, work_dir)
+    interpreter = src.runtime.interpreter.Interpreter(run, noug_dir, new_args_strings, work_dir, file_name)
     if use_context is None:
         assert tokens[0].pos_start is not None
         context = Context('<program>', tokens[0].pos_start, None)  # create the context of the interpreter
@@ -122,14 +125,22 @@ def run(
             if args is None:
                 new_args_values: list[Value] = []
                 new_args_strings: list[String] = []
-                context.symbol_table.set("__args__", List([]))
+                context.symbol_table.set("__args__", List([], DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
             else:
                 new_args_values: list[Value] = list(map(nice_str_from_idk, args))
                 new_args_strings: list[String] = list(map(nice_str_from_idk, args))
-                context.symbol_table.set("__args__", List(new_args_values))
-            context.symbol_table.set("__exec_from__", String(str(exec_from)))
-            context.symbol_table.set("__actual_context__", String(actual_context))
-            context.symbol_table.set("__noug_dir__", String(noug_dir))
+                context.symbol_table.set(
+                    "__args__", List(new_args_values, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+                )
+            context.symbol_table.set(
+                "__exec_from__", String(str(exec_from), DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+            )
+            context.symbol_table.set(
+                "__actual_context__", String(actual_context, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+            )
+            context.symbol_table.set(
+                "__noug_dir__", String(noug_dir, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+            )
         else:  # this is how the shell “remember” the values
             context.symbol_table = global_symbol_table
     else:
@@ -138,9 +149,9 @@ def run(
 
     if lexer_metas.get("setTheTestValueTo") is not None:
         if isinstance(lexer_metas["setTheTestValueTo"], bool):
-            value_to_set = NoneValue(True)
+            value_to_set = NoneValue(DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy(), True)
         else:
-            value_to_set = String(lexer_metas["setTheTestValueTo"])
+            value_to_set = String(lexer_metas["setTheTestValueTo"], DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
         assert context.symbol_table is not None
         context.symbol_table.set("__the_test_value__", value_to_set)
 

@@ -27,9 +27,10 @@ if TYPE_CHECKING:
 
 class Value:
     """The parent class to all the value classes (String, Number, List...)"""
-    def __init__(self):
-        self.pos_start = self.pos_end = self.context = None
-        self.set_pos()
+    def __init__(self, pos_start: Position, pos_end: Position):
+        self.pos_start: Position = pos_start
+        self.pos_end: Position = pos_end
+        self.context = None
         self.set_context()
         self.type_ = "BaseValue"
         self.attributes: dict[str, Value] = {}
@@ -43,7 +44,7 @@ class Value:
     def to_python_str(self) -> str:
         return "BaseValue"
 
-    def set_pos(self, pos_start: Position | None = None, pos_end: Position | None = None):
+    def set_pos(self, pos_start: Position, pos_end: Position):
         """Change self.pos_start and self.pos_end"""
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -345,7 +346,7 @@ class Value:
 
     def copy(self):
         """Return a copy of self"""
-        value = Value().set_pos(self.pos_start, self.pos_end).set_context(self.context)
+        value = Value(self.pos_start, self.pos_end).set_context(self.context)
         value.attributes = self.attributes.copy()
         value.call_with_module_context = self.call_with_module_context
         value.module_context = self.module_context

@@ -20,8 +20,8 @@ from src.lexer.token_types import TT as _TT
 # NODES
 # ##########
 class Node:
-    pos_start = None
-    pos_end = None
+    pos_start: _Position
+    pos_end: _Position
     attr = False
 
 

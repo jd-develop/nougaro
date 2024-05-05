@@ -11,6 +11,7 @@
 # __future__ import (must be first)
 from __future__ import annotations
 # nougaro modules imports
+from src.lexer.position import DEFAULT_POSITION
 from src.runtime.values.basevalues.value import Value
 from src.runtime.values.functions.base_builtin_func import BaseBuiltInFunction
 from src.runtime.values.functions.base_function import BaseFunction
@@ -35,7 +36,7 @@ if TYPE_CHECKING:
 
 class BuiltInFunction(BaseBuiltInFunction):
     def __init__(self, name: str, call_with_module_context: bool = False):
-        super().__init__(name, call_with_module_context)
+        super().__init__(name, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy(), call_with_module_context)
         self.cli_args = []
 
     def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
@@ -48,15 +49,19 @@ class BuiltInFunction(BaseBuiltInFunction):
         # generate the context and change the symbol table for the context
         exec_ctx = self.generate_new_context()
         assert exec_ctx.symbol_table is not None
-        exec_ctx.symbol_table.set("__exec_from__", String(exec_from))
-        exec_ctx.symbol_table.set("__actual_context__", String(self.name))
+        exec_ctx.symbol_table.set(
+            "__exec_from__", String(exec_from, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+        )
+        exec_ctx.symbol_table.set(
+            "__actual_context__", String(self.name, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
+        )
         if cli_args is None:
             self.cli_args = []
-            exec_ctx.symbol_table.set("__args__", List([]))
+            exec_ctx.symbol_table.set("__args__", List([], DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
         else:
             self.cli_args = cli_args.copy()
             new_cli_args: list[Value] = list(map(nice_str_from_idk, cli_args))
-            exec_ctx.symbol_table.set("__args__", List(new_cli_args))
+            exec_ctx.symbol_table.set("__args__", List(new_cli_args, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
 
         # get the method name and the method
         try:
@@ -136,7 +141,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     def execute_void(self):
         """Return nothing"""
         # No params.
-        return RTResult().success(NoneValue(False))
+        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
     builtin_functions["void"] = {
         "function": execute_void,
@@ -160,7 +165,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 print(str(value))
         else:  # the value is not defined, we just print a new line like in regular print() python builtin func
             print()
-        return RTResult().success(NoneValue(False))
+        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
     builtin_functions["print"] = {
         "function": execute_print,
@@ -184,7 +189,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 print_in_red(str(value))
         else:  # the value is not defined, we just print a new line like in regular print() python builtin func
             print_in_red()
-        return RTResult().success(NoneValue(False))
+        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
     builtin_functions["print_in_red"] = {
         "function": execute_print_in_red,
@@ -208,7 +213,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 print_in_green(str(value))
         else:  # the value is not defined, we just print a new line like in regular print() python builtin func
             print_in_green()
-        return RTResult().success(NoneValue(False))
+        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
     builtin_functions["print_in_green"] = {
         "function": execute_print_in_green,
@@ -228,15 +233,15 @@ class BuiltInFunction(BaseBuiltInFunction):
         if value is not None:  # if the value is defined
             try:
                 print(value.to_python_str())
-                return RTResult().success(String(value.to_python_str()))
+                return RTResult().success(String(value.to_python_str(), self.pos_start, self.pos_end))
             except AttributeError:
                 print(str(value))
-                return RTResult().success(String(str(value)))
+                return RTResult().success(String(str(value), self.pos_start, self.pos_end))
         else:
             # the value is not defined, we just print a new line like in regular print() python builtin func and return
             # an empty str
             print()
-            return RTResult().success(String(''))
+            return RTResult().success(String('', self.pos_start, self.pos_end))
 
     builtin_functions["print_ret"] = {
         "function": execute_print_ret,
@@ -257,20 +262,20 @@ class BuiltInFunction(BaseBuiltInFunction):
         if value is not None:  # if the value is defined
             try:
                 print_in_red(value.to_python_str())
-                if easter_egg is not None and value.to_python_str() == "Is there an easter egg in this program? That " \
-                                                                       "would be so cool!":
+                easter_egg_trigger = "Is there an easter egg in this program? That would be so cool!"
+                if easter_egg is not None and value.to_python_str() == easter_egg_trigger:
                     if isinstance(easter_egg, String) and easter_egg.value == "thanks":
                         print("You’re welcome :)")
-                    return RTResult().success(String("Here you go!"))
-                return RTResult().success(String(value.to_python_str()))
+                    return RTResult().success(String("Here you go!", self.pos_start, self.pos_end))
+                return RTResult().success(String(value.to_python_str(), self.pos_start, self.pos_end))
             except AttributeError:
                 print_in_red(str(value))
-                return RTResult().success(String(str(value)))
+                return RTResult().success(String(str(value), self.pos_start, self.pos_end))
         else:
             # the value is not defined, we just print a new line like in regular print() python builtin func and return
             # an empty str
             print_in_red()
-            return RTResult().success(String(''))
+            return RTResult().success(String('', self.pos_start, self.pos_end))
 
     builtin_functions["print_in_red_ret"] = {
         "function": execute_print_in_red_ret,
@@ -290,15 +295,15 @@ class BuiltInFunction(BaseBuiltInFunction):
         if value is not None:  # if the value is defined
             try:
                 print_in_green(value.to_python_str())
-                return RTResult().success(String(value.to_python_str()))
+                return RTResult().success(String(value.to_python_str(), self.pos_start, self.pos_end))
             except AttributeError:
                 print_in_green(str(value))
-                return RTResult().success(String(str(value)))
+                return RTResult().success(String(str(value), self.pos_start, self.pos_end))
         else:
             # the value is not defined, we just print a new line like in regular print() python builtin func and return
             # an empty str
             print_in_green()
-            return RTResult().success(String(''))
+            return RTResult().success(String('', self.pos_start, self.pos_end))
 
     builtin_functions["print_in_green_ret"] = {
         "function": execute_print_in_green_ret,
@@ -321,7 +326,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             text = input(text_to_display.to_python_str())
         else:
             text = input()
-        return RTResult().success(String(text))
+        return RTResult().success(String(text, self.pos_start, self.pos_end))
 
     builtin_functions["input"] = {
         "function": execute_input,
@@ -351,7 +356,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 break
             except ValueError:
                 print(f"'{text}' must be an integer. Try again: ")
-        return RTResult().success(Number(number))
+        return RTResult().success(Number(number, self.pos_start, self.pos_end))
 
     builtin_functions["input_int"] = {
         "function": execute_input_int,
@@ -381,7 +386,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 break
             except ValueError:
                 print(f"'{text}' must be a number. Try again: ")
-        return RTResult().success(Number(number))
+        return RTResult().success(Number(number, self.pos_start, self.pos_end))
     
     builtin_functions["input_num"] = {
         "function": execute_input_num,
@@ -396,7 +401,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Clear the screen"""
         # No params.
         clear_screen()
-        return RTResult().success(NoneValue(False))
+        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
     builtin_functions["clear"] = {
         "function": execute_clear,
@@ -627,7 +632,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         if index is None:
-            index = Number(-1)
+            index = Number(-1, self.pos_start, self.pos_end)
         if not isinstance(index, Number) or not isinstance(index.value, int):  # we check if the index is an int
             assert index is not None
             assert index.pos_start is not None
@@ -641,14 +646,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             element = list_.elements.pop(index.value)
             list_.update_should_print()
         except IndexError:  # except if the index is out of range
-            if index.pos_end is not None:
-                error_pos_start = list_.pos_start
-                error_pos_end = index.pos_end
-            else:
-                error_pos_start = self.pos_start
-                error_pos_end = self.pos_end
-            assert error_pos_start is not None
-            assert error_pos_end is not None
+            error_pos_start = list_.pos_start
+            error_pos_end = index.pos_end
             return RTResult().failure(RTIndexError(
                 error_pos_start, error_pos_end,
                 f'pop index {index.value} out of range.',
@@ -688,7 +687,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         if index is None:
-            index = Number(len(list_.elements))
+            index = Number(len(list_.elements), self.pos_start, self.pos_end)
 
         if not isinstance(index, Number) or not isinstance(index.value, int):
             assert index.pos_start is not None
@@ -769,7 +768,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                                 can_append = False
                     if can_append:  # if not duplicate, we append the element to the final list
                         final_list.append(e)
-                return RTResult().success(List(final_list))
+                return RTResult().success(List(final_list, self.pos_start, self.pos_end))
 
         list1.elements.extend(list2.elements)  # we finally extend
         list1.update_should_print()
@@ -929,10 +928,10 @@ class BuiltInFunction(BaseBuiltInFunction):
         list_ = [e.value for e in list_.elements if isinstance(e, Number)]
 
         if len(list_) == 0:
-            return RTResult().success(NoneValue())
+            return RTResult().success(NoneValue(self.pos_start, self.pos_end))
 
         max_ = max(list_)
-        return RTResult().success(Number(max_))
+        return RTResult().success(Number(max_, self.pos_start, self.pos_end))
     
     builtin_functions["max"] = {
         "function": execute_max,
@@ -990,10 +989,10 @@ class BuiltInFunction(BaseBuiltInFunction):
         list_ = [e.value for e in list_.elements if isinstance(e, Number)]
 
         if len(list_) == 0:
-            return RTResult().success(NoneValue())
+            return RTResult().success(NoneValue(self.pos_start, self.pos_end))
 
         max_ = min(list_)
-        return RTResult().success(Number(max_))
+        return RTResult().success(Number(max_, self.pos_start, self.pos_end))
 
     builtin_functions["min"] = {
         "function": execute_min,
@@ -1023,7 +1022,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_split"
             ))
         if char is None or isinstance(char, NoneValue):
-            char = String(' ')  # if there is no split char given, we split at the spaces
+            char = String(' ', self.pos_start, self.pos_end)  # if there is no split char given, we split at the spaces
         if not isinstance(char, String):
             assert char is not None
             assert char.pos_start is not None
@@ -1037,8 +1036,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         split_res = str_.value.split(char.value)
         new_list: list[Value] = []
         for e in split_res:
-            new_list.append(String(e))
-        final_list = List(new_list)
+            new_list.append(String(e, self.pos_start, self.pos_end))
+        final_list = List(new_list, self.pos_start, self.pos_end)
 
         return RTResult().success(final_list)
     
@@ -1078,7 +1077,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         value_to_get_type = exec_ctx.symbol_table.getf('value')  # we get the value
         assert value_to_get_type is not None
-        return RTResult().success(String(value_to_get_type.type_))  # we return its type
+        return RTResult().success(String(value_to_get_type.type_, self.pos_start, self.pos_end))  # we return its type
 
     builtin_functions["type"] = {
         "function": execute_type,
@@ -1095,7 +1094,9 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         assert exec_ctx.symbol_table is not None
         value_to_get_type = exec_ctx.symbol_table.getf('value')  # we get the value
-        return RTResult().success(String(str(type(value_to_get_type))))  # we return its python type
+        return RTResult().success(
+            String(str(type(value_to_get_type)), self.pos_start, self.pos_end)
+        )  # we return its python type
 
     builtin_functions["py_type"] = {
         "function": execute_py_type,
@@ -1218,9 +1219,9 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         if isinstance(value_, List):
-            return RTResult().success(Number(len(value_.elements)))
+            return RTResult().success(Number(len(value_.elements), self.pos_start, self.pos_end))
         else:
-            return RTResult().success(Number(len(value_.value)))
+            return RTResult().success(Number(len(value_.value), self.pos_start, self.pos_end))
 
     builtin_functions["len"] = {
         "function": execute_len,
@@ -1245,7 +1246,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             link = "dQw4w9WgXcQ"
         import webbrowser
         webbrowser.open(f"https://www.youtube.com/watch?v={link}", new=2)
-        return RTResult().success(String(f"I think you've been rickrolled..."))
+        return RTResult().success(String(f"I think you've been rickrolled...", self.pos_start, self.pos_end))
 
     builtin_functions["rickroll"] = {
         "function": execute_rickroll,
@@ -1338,7 +1339,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         example_name = exec_ctx.symbol_table.getf("example_name")  # we get the example name
         if example_name is None:
-            example_name = String("../example")
+            example_name = String("../example", self.pos_start, self.pos_end)
 
         if not isinstance(example_name, String):  # we check if it is a str
             assert example_name.pos_start is not None
@@ -1400,7 +1401,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         if return_example_value:
             return RTResult().success(value)
-        return RTResult().success(NoneValue(False))
+        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
     builtin_functions["example"] = {
         "function": execute_example,
@@ -1428,7 +1429,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         try:  # we execute the command
             to_return_value = os.system(str(cmd.value))
-            return RTResult().success(String(str(to_return_value)))
+            return RTResult().success(String(str(to_return_value), self.pos_start, self.pos_end))
         except Exception as e:
             assert self.pos_start is not None
             assert self.pos_end is not None
@@ -1461,7 +1462,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 value.pos_start, value.pos_end, "first", "lower", "str", value,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_lower"
             ))
-        return RTResult().success(String(value.value.lower()))  # we return the lower str
+        return RTResult().success(String(value.value.lower(), self.pos_start, self.pos_end))  # we return the lower str
 
     builtin_functions["lower"] = {
         "function": execute_lower,
@@ -1486,7 +1487,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 value.pos_start, value.pos_end, "first", "upper", "str", value,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_upper"
             ))
-        return RTResult().success(String(value.value.upper()))  # we return the upper str
+        return RTResult().success(String(value.value.upper(), self.pos_start, self.pos_end))  # we return the upper str
 
     builtin_functions["upper"] = {
         "function": execute_upper,
@@ -1513,7 +1514,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             import webbrowser
             song = random.choice(list(songs.keys()))
             webbrowser.open(songs[song], new=2)
-            return RTResult().success(String(song))
+            return RTResult().success(String(song, self.pos_start, self.pos_end))
         if not isinstance(song, String):  # we check if the song is a str
             assert song.pos_start is not None
             assert song.pos_end is not None
@@ -1523,15 +1524,15 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         if song.value == "help":  # help message
-            return RTResult().success(String(f"The available songs are: {', '.join(list(songs.keys()))}"))
+            return RTResult().success(
+                String(f"The available songs are: {', '.join(list(songs.keys()))}", self.pos_start, self.pos_end)
+            )
 
         import webbrowser
         try:
             webbrowser.open(songs[song.value], new=2)  # we open the song in the web browser
-            return RTResult().success(NoneValue(False))
+            return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
         except KeyError:
-            assert song.pos_start is not None
-            assert song.pos_end is not None
             return RTResult().failure(RunTimeError(
                 song.pos_start, song.pos_end,
                 f"'{song.value}' is not a song in the actual database. Available songs: "
@@ -1571,13 +1572,13 @@ class BuiltInFunction(BaseBuiltInFunction):
             print("A problem occurred while opening or printing the license.\n"
                   "You can read the license online by following this link :\n"
                   "https://www.gnu.org/licenses/gpl-3.0.txt")
-            return RTResult().success(NoneValue(False))
+            return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
         if print_in_term.is_true():  # we print the GPL3 in the terminal
             with open(os.path.abspath(noug_dir + "/LICENSE"), 'r+') as license_file:
                 print(license_file.read())
                 license_file.close()
-                return RTResult().success(NoneValue(False))
+                return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
         else:  # we open the GPL3 in the default system app
             # todo: test on BSD
             # tested on Windows, Linux, macOS
@@ -1605,7 +1606,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                       "automatically added.")
                 command = input("Enter the command of your text editor (example: vim, emacs, …): ")
                 subprocess.run((command, os.path.abspath(noug_dir + "/LICENSE")))
-            return RTResult().success(NoneValue(False))
+            return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
     builtin_functions["__gpl__"] = {
         "function": execute___gpl__,
@@ -1686,7 +1687,9 @@ class BuiltInFunction(BaseBuiltInFunction):
             should_i_print_ok = FALSE.copy()
         if should_i_return is None:
             should_i_return = FALSE.copy()
-        exec_ctx.symbol_table.set("file_name", String(os.path.abspath(noug_dir + "/tests/test_file.noug")))
+        exec_ctx.symbol_table.set(
+            "file_name", String(os.path.abspath(noug_dir + "/tests/test_file.noug"), self.pos_start, self.pos_end)
+        )
 
         print("Please also run unittests if you want to build nougaro.")
 
@@ -1698,7 +1701,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             result = self.execute_run(exec_ctx, run, noug_dir, work_dir)
             if result.error is not None:
                 return result
-            return RTResult().success(NoneValue(False))
+            return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
     builtin_functions["__test__"] = {
         "function": execute___test__,
@@ -1735,7 +1738,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         try:
-            return RTResult().success(Number(ord(chr_.to_python_str())))
+            return RTResult().success(Number(ord(chr_.to_python_str()), self.pos_start, self.pos_end))
         except Exception as e:
             assert self.pos_start is not None
             assert self.pos_end is not None
@@ -1778,7 +1781,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         try:
-            return RTResult().success(String(chr(ord_.value)))
+            return RTResult().success(String(chr(ord_.value), self.pos_start, self.pos_end))
         except Exception as e:
             assert self.pos_start is not None
             assert self.pos_end is not None
@@ -1845,7 +1848,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             print(f"\nTop files:")
             for top_file in top_:
                 print(f"{top_file}: {top_[top_file]}")
-        return RTResult().success(Number(total))
+        return RTResult().success(Number(total, self.pos_start, self.pos_end))
 
     builtin_functions["__how_many_lines_of_code__"] = {
         "function": execute___how_many_lines_of_code__,
@@ -1873,7 +1876,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         number_: int | float = number.value
         if n_digits is None:
-            return RTResult().success(Number(round(number_)))
+            return RTResult().success(Number(round(number_), self.pos_start, self.pos_end))
 
         if not (isinstance(n_digits, Number) and isinstance(n_digits.value, int)):
             assert n_digits.pos_start is not None
@@ -1883,7 +1886,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_round"
             ))
 
-        return RTResult().success(Number(round(number_, n_digits.value)))
+        return RTResult().success(Number(round(number_, n_digits.value), self.pos_start, self.pos_end))
 
     builtin_functions["round"] = {
         "function": execute_round,
@@ -1910,7 +1913,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
             ))
         if mode is None:
-            mode = String("timsort").set_pos(self.pos_start, self.pos_end)
+            mode = String("timsort", self.pos_start, self.pos_end)
         if not isinstance(mode, String):
             assert mode.pos_start is not None
             assert mode.pos_end is not None
@@ -2011,7 +2014,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 await asyncio.sleep(i_)
                 if mode == "sleep-verbose":
                     print(f"(sleep sort) Currently appending {i_} to the final list.")
-                sorted_.append(Number(i_))
+                sorted_.append(Number(i_, self.pos_start, self.pos_end))
 
             list_of_coroutines = [wait_and_append(i) for i in list_to_sort_only_nums]
             asyncio.run(execute_coroutine_list(list_of_coroutines))
@@ -2049,7 +2052,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
             ))
         
-        return result.success(List(sorted_))
+        return result.success(List(sorted_, self.pos_start, self.pos_end))
 
     builtin_functions["sort"] = {
         "function": execute_sort,
@@ -2120,7 +2123,9 @@ class BuiltInFunction(BaseBuiltInFunction):
                 origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_startswith"
             ))
 
-        return RTResult().success(Number(int(str_.value.startswith(startswith.value))))
+        return RTResult().success(
+            Number(str_.value.startswith(startswith.value), self.pos_start, self.pos_end)
+        )
 
     builtin_functions["startswith"] = {
         "function": execute_startswith,
@@ -2158,7 +2163,9 @@ class BuiltInFunction(BaseBuiltInFunction):
                 origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_endswith"
             ))
 
-        return RTResult().success(Number(int(str_.value.endswith(endswith.value))))
+        return RTResult().success(
+            Number(str_.value.endswith(endswith.value), self.pos_start, self.pos_end)
+        )
 
     builtin_functions["endswith"] = {
         "function": execute_endswith,
@@ -2194,7 +2201,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_ctx,
                 origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute___python__"
             ))
-        return RTResult().success(py2noug(v))
+        return RTResult().success(py2noug(v, self.pos_start, self.pos_end))
 
     builtin_functions["__python__"] = {
         "function": execute___python__,
@@ -2221,7 +2228,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
         
         path_exists = os.path.exists(path.value)
-        return RTResult().success(Number(int(path_exists)))
+        return RTResult().success(Number(path_exists, self.pos_start, self.pos_end))
 
     builtin_functions["path_exists"] = {
         "function": execute_path_exists,

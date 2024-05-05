@@ -30,8 +30,8 @@ class Error:
     """Parent class for all the Nougaro errors."""
     def __init__(
             self,
-            pos_start: Position | None,
-            pos_end: Position | None,
+            pos_start: Position,
+            pos_end: Position,
             error_name: str,
             details: str,
             origin_file: str = "(undetermined)"
@@ -50,8 +50,6 @@ class Error:
         """Returns a printable clean error message with all the information.
         It includes the file name, the problematic line number and the line itself, the error name and the details.
         """
-        assert self.pos_start is not None, f"{self.error_name} from {self.origin_file}, {self.details=}"
-        assert self.pos_end is not None, f"{self.error_name} from {self.origin_file}, {self.details=}"
         string_line = string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end)
 
         if len(string_line) != 0 and string_line[0] == "\n":
@@ -96,7 +94,7 @@ class IllegalCharError(Error):
 
 class InvalidSyntaxError(Error):
     """Invalid Syntax"""
-    def __init__(self, pos_start: Position | None, pos_end: Position | None, details: str,
+    def __init__(self, pos_start: Position, pos_end: Position, details: str,
                  origin_file: str = "(undetermined)"):
         super().__init__(pos_start, pos_end, "InvalidSyntaxError", details, origin_file=origin_file)
 
@@ -124,8 +122,6 @@ class RunTimeError(Error):
         It includes a traceback with the file(s) name, the line(s) number with and the line itself,
         the error name and the details.
         """
-        assert self.pos_start is not None, f"error from {self.origin_file}, {self.details=}"
-        assert self.pos_end is not None, f"error from {self.origin_file}, {self.details=}"
         string_line = string_with_arrows(self.pos_start.file_txt, self.pos_start, self.pos_end)
 
         if len(string_line) != 0 and string_line[0] == "\n":
@@ -155,7 +151,6 @@ class RunTimeError(Error):
     def generate_traceback(self):
         """Generate a traceback with the file(s) name, the line(s) number and the name of the function"""
         result = ''
-        assert self.pos_start is not None
         pos = self.pos_start
         ctx = self.context
 

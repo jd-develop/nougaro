@@ -590,8 +590,6 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         if not isinstance(list_, List):  # we check if the list is a list
             assert list_ is not None
-            assert list_.pos_start is not None
-            assert list_.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 list_.pos_start, list_.pos_end, "first", "append", "list", list_,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_append"
@@ -624,8 +622,6 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         if not isinstance(list_, List):  # we check if the list is a list
             assert list_ is not None
-            assert list_.pos_start is not None
-            assert list_.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 list_.pos_start, list_.pos_end, "first", "pop", "list", list_,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_pop"
@@ -635,8 +631,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             index = Number(-1, self.pos_start, self.pos_end)
         if not isinstance(index, Number) or not isinstance(index.value, int):  # we check if the index is an int
             assert index is not None
-            assert index.pos_start is not None
-            assert index.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 index.pos_start, index.pos_end, "second", "pop", "integer", index,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_pop"
@@ -679,8 +673,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we check if everything OK
         if not isinstance(list_, List):
             assert list_ is not None
-            assert list_.pos_start is not None
-            assert list_.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 list_.pos_start, list_.pos_end, "first", "insert", "list", list_,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_insert"
@@ -690,8 +682,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             index = Number(len(list_.elements), self.pos_start, self.pos_end)
 
         if not isinstance(index, Number) or not isinstance(index.value, int):
-            assert index.pos_start is not None
-            assert index.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 index.pos_start, index.pos_end, "third", "insert", "integer", index,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_insert"
@@ -728,16 +718,12 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we check the types
         if not isinstance(list1, List):
             assert list1 is not None
-            assert list1.pos_start is not None
-            assert list1.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 list1.pos_start, list1.pos_end, "first", "extend", "list", list1,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_extend"
             ))
 
         assert list2 is not None
-        assert list2.pos_start is not None
-        assert list2.pos_end is not None
         if not isinstance(list2, List):
             return RTResult().failure(RTTypeErrorF(
                 list2.pos_start, list2.pos_end, "second", "extend", "list", list2,
@@ -793,8 +779,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         index_ = exec_ctx.symbol_table.getf('index')
 
         assert list_ is not None
-        assert list_.pos_start is not None
-        assert list_.pos_end is not None
         if not isinstance(list_, List):  # we check if the list is a list
             return RTResult().failure(RTTypeErrorF(
                 list_.pos_start, list_.pos_end, "first", "get", "list", list_,
@@ -802,8 +786,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         assert index_ is not None
-        assert index_.pos_start is not None
-        assert index_.pos_end is not None
         if not isinstance(index_, Number) or not isinstance(index_.value, int):  # we check if the index is a number
             return RTResult().failure(RTTypeErrorF(
                 index_.pos_start, index_.pos_end, "second", "get", "integer", index_,
@@ -841,8 +823,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         value = exec_ctx.symbol_table.getf('value')
 
         assert list_ is not None
-        assert list_.pos_start is not None
-        assert list_.pos_end is not None
         # we check the values
         if not isinstance(list_, List):
             return RTResult().failure(RTTypeErrorF(
@@ -851,8 +831,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         assert index_ is not None
-        assert index_.pos_start is not None
-        assert index_.pos_end is not None
         if not isinstance(index_, Number) or not isinstance(index_.value, int):
             return RTResult().failure(RTTypeErrorF(
                 index_.pos_start, index_.pos_end, "second", "replace", "integer", index_,
@@ -893,8 +871,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         list_ = exec_ctx.symbol_table.getf('list')
         assert list_ is not None
-        assert list_.pos_start is not None
-        assert list_.pos_end is not None
         if not isinstance(list_, List):
             return RTResult().failure(RTTypeErrorF(
                 list_.pos_start, list_.pos_end, "first", "max", "list", list_,
@@ -907,8 +883,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             ignore_not_num = FALSE.copy()
         if not isinstance(ignore_not_num, Number):
             assert ignore_not_num is not None
-            assert ignore_not_num.pos_start is not None
-            assert ignore_not_num.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 ignore_not_num.pos_start, ignore_not_num.pos_end, "second", "max", "number", ignore_not_num,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_max"
@@ -954,8 +928,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         list_ = exec_ctx.symbol_table.getf('list')
 
         assert list_ is not None
-        assert list_.pos_start is not None
-        assert list_.pos_end is not None
         if not isinstance(list_, List):
             return RTResult().failure(RTTypeErrorF(
                 list_.pos_start, list_.pos_end, "first", "min", "list", list_,
@@ -968,8 +940,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             ignore_not_num = FALSE.copy()
         if not isinstance(ignore_not_num, Number):
             assert ignore_not_num is not None
-            assert ignore_not_num.pos_start is not None
-            assert ignore_not_num.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 ignore_not_num.pos_start, ignore_not_num.pos_end, "second", "min", "number", ignore_not_num,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_min"
@@ -1015,8 +985,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we check the types
         if not isinstance(str_, String):
             assert str_ is not None
-            assert str_.pos_start is not None
-            assert str_.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 str_.pos_start, str_.pos_end, "first", "split", "str", str_,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_split"
@@ -1025,8 +993,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             char = String(' ', self.pos_start, self.pos_end)  # if there is no split char given, we split at the spaces
         if not isinstance(char, String):
             assert char is not None
-            assert char.pos_start is not None
-            assert char .pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 char.pos_start, char.pos_end, "second", "split", "str", char,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_split",
@@ -1211,8 +1177,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we check if the value is a list or a str
         if not isinstance(value_, List) and not isinstance(value_, String):
             assert value_ is not None
-            assert value_.pos_start is not None
-            assert value_.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value_.pos_start, value_.pos_end, "first", "len", "list", value_,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_len", or_="str"
@@ -1266,8 +1230,6 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         if not isinstance(file_name, String):  # we check if the file name's a str
             assert file_name is not None
-            assert file_name.pos_start is not None
-            assert file_name.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 file_name.pos_start, file_name.pos_end, "first", "run", "str", file_name,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_run"
@@ -1275,8 +1237,6 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         file_name = file_name.value
 
-        assert self.pos_start is not None
-        assert self.pos_end is not None
         try:  # we try to open the file
             with open(file_name, 'r+', encoding='UTF-8') as file:
                 script = file.read()
@@ -1342,8 +1302,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             example_name = String("../example", self.pos_start, self.pos_end)
 
         if not isinstance(example_name, String):  # we check if it is a str
-            assert example_name.pos_start is not None
-            assert example_name.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 example_name.pos_start, example_name.pos_end, "first", "example", "str", example_name,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_example"
@@ -1354,8 +1312,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             return_example_value = FALSE.copy()
 
         if not isinstance(return_example_value, Number):
-            assert return_example_value.pos_start is not None
-            assert return_example_value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 return_example_value.pos_start, return_example_value.pos_end,
                 "second", "example", "number", return_example_value,
@@ -1366,8 +1322,6 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         file_name = os.path.abspath(noug_dir + "/examples/" + example_name.value + ".noug")
 
-        assert self.pos_start is not None
-        assert self.pos_end is not None
         try:  # we try to open the example file
             with open(file_name, 'r+', encoding='UTF-8') as file:
                 script = file.read()
@@ -1420,8 +1374,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         cmd = exec_ctx.symbol_table.getf("cmd")  # we get the command
         if not isinstance(cmd, String):  # we check if it is a string
             assert cmd is not None
-            assert cmd.pos_start is not None
-            assert cmd.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 cmd.pos_start, cmd.pos_end, "first", "system_call", "str", cmd,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_system_call"
@@ -1431,8 +1383,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             to_return_value = os.system(str(cmd.value))
             return RTResult().success(String(str(to_return_value), self.pos_start, self.pos_end))
         except Exception as e:
-            assert self.pos_start is not None
-            assert self.pos_end is not None
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f"failed to call '{cmd}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
@@ -1456,8 +1406,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         value = exec_ctx.symbol_table.getf("value")  # we get the value
         if not isinstance(value, String):  # we check if it is a string
             assert value is not None
-            assert value.pos_start is not None
-            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "lower", "str", value,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_lower"
@@ -1481,8 +1429,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         value = exec_ctx.symbol_table.getf("value")  # we get the value
         if not isinstance(value, String):  # we check if it is a string
             assert value is not None
-            assert value.pos_start is not None
-            assert value.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 value.pos_start, value.pos_end, "first", "upper", "str", value,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_upper"
@@ -1516,8 +1462,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             webbrowser.open(songs[song], new=2)
             return RTResult().success(String(song, self.pos_start, self.pos_end))
         if not isinstance(song, String):  # we check if the song is a str
-            assert song.pos_start is not None
-            assert song.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 song.pos_start, song.pos_end, "first", "nougaro", "str", song,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_nougaro"
@@ -1560,8 +1504,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             print_in_term = FALSE.copy()
 
         if not isinstance(print_in_term, Number):  # we check if it is a number
-            assert print_in_term.pos_start is not None
-            assert print_in_term.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 print_in_term.pos_start, print_in_term.pos_end,
                 "first", "__gpl__", "number", print_in_term,
@@ -1627,8 +1569,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         word = exec_ctx.symbol_table.getf("word")
         if not isinstance(word, String):  # we check if it is a string
             assert word is not None
-            assert word.pos_start is not None
-            assert word.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 word.pos_start, word.pos_end, "first", "__is_keyword__", "str", word,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute___is_keyword__"
@@ -1656,8 +1596,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         type_ = exec_ctx.symbol_table.getf("type")
         if not isinstance(type_, String):  # we check if it is a string
             assert type_ is not None
-            assert type_.pos_start is not None
-            assert type_.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 type_.pos_start, type_.pos_end, "first", "__is_valid_token_type__", "str", type_,
                 exec_ctx,
@@ -1721,16 +1659,12 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         if not isinstance(chr_, String):  # we check if it is a string
             assert chr_ is not None
-            assert chr_.pos_start is not None
-            assert chr_.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 chr_.pos_start, chr_.pos_end, "first", "ord", "str", chr_,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_ord"
             ))
 
         if len(chr_.value) != 1:
-            assert chr_.pos_start is not None
-            assert chr_.pos_end is not None
             return RTResult().failure(RTTypeError(
                 chr_.pos_start, chr_.pos_end,
                 f"ord() expected a character, but string of length {len(chr_.value)} found.",
@@ -1740,8 +1674,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         try:
             return RTResult().success(Number(ord(chr_.to_python_str()), self.pos_start, self.pos_end))
         except Exception as e:
-            assert self.pos_start is not None
-            assert self.pos_end is not None
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f'Python error: {e.__class__.__name__}: {e}',
@@ -1765,8 +1697,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         ord_ = exec_ctx.symbol_table.getf("ord")  # we get the char
 
         assert ord_ is not None
-        assert ord_.pos_start is not None
-        assert ord_.pos_end is not None
         if not isinstance(ord_, Number):  # we check if it is a string
             return RTResult().failure(RTTypeErrorF(
                 ord_.pos_start, ord_.pos_end, "first", "chr", "int", ord_,
@@ -1783,8 +1713,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         try:
             return RTResult().success(String(chr(ord_.value), self.pos_start, self.pos_end))
         except Exception as e:
-            assert self.pos_start is not None
-            assert self.pos_end is not None
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f'Python error: {e.__class__.__name__}: {e}',
@@ -1867,8 +1795,6 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         if not isinstance(number, Number):
             assert number is not None
-            assert number.pos_start is not None
-            assert number.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 number.pos_start, number.pos_end, "first", "round", "number", number,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_round"
@@ -1879,8 +1805,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().success(Number(round(number_), self.pos_start, self.pos_end))
 
         if not (isinstance(n_digits, Number) and isinstance(n_digits.value, int)):
-            assert n_digits.pos_start is not None
-            assert n_digits.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 n_digits.pos_start, n_digits.pos_end, "second", "round", "int", n_digits,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_round"
@@ -1906,8 +1830,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         
         if not isinstance(list_, List):
             assert list_ is not None
-            assert list_.pos_start is not None
-            assert list_.pos_end is not None
             return result.failure(RTTypeErrorF(
                 list_.pos_start, list_.pos_end, "first", "sort", "list", list_,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
@@ -1915,8 +1837,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         if mode is None:
             mode = String("timsort", self.pos_start, self.pos_end)
         if not isinstance(mode, String):
-            assert mode.pos_start is not None
-            assert mode.pos_end is not None
             return result.failure(RTTypeErrorF(
                 mode.pos_start, mode.pos_end, "second", "sort", "str", mode,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
@@ -1952,8 +1872,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             try:
                 sorted_ = sorted(list_to_sort, key=lambda val: noug2py(val, False))
             except TypeError as e:
-                assert list_.pos_start is not None
-                assert list_.pos_end is not None
                 return result.failure(RTTypeError(
                     list_.pos_start, list_.pos_end,
                     str(e), exec_ctx,
@@ -1986,8 +1904,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             sorted_: list[Value] = []
             list_to_sort_only_nums: list[int] = []
             for i in list_to_sort:
-                assert i.pos_start is not None
-                assert i.pos_end is not None
                 if not isinstance(i, Number) or not isinstance(i.value, int):
                     return result.failure(RTTypeError(
                         i.pos_start, i.pos_end, 
@@ -2039,8 +1955,6 @@ class BuiltInFunction(BaseBuiltInFunction):
                     a = map(str, a)
                 a = list(a)
         else:  # mode is none of the above
-            assert mode_noug.pos_start is not None
-            assert mode_noug.pos_end is not None
             return result.failure(RunTimeError(
                 mode_noug.pos_start, mode_noug.pos_end,
                 "this mode does not exist. Available modes:\n"
@@ -2070,8 +1984,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         is_right_type = isinstance(list_or_str, List) or isinstance(list_or_str, String)
         assert list_or_str is not None
         if not is_right_type:
-            assert list_or_str.pos_start is not None
-            assert list_or_str.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 list_or_str.pos_start, list_or_str.pos_end,
                 "first", "reverse", "list", list_or_str, exec_ctx,
@@ -2102,8 +2014,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         str_ = exec_ctx.symbol_table.getf("str_")
         if not isinstance(str_, String):
             assert str_ is not None
-            assert str_.pos_start is not None
-            assert str_.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 str_.pos_start, str_.pos_end,
                 "first", "startswith", "str", str_,
@@ -2114,8 +2024,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         startswith = exec_ctx.symbol_table.getf("startswith")
         if not isinstance(startswith, String):
             assert startswith is not None
-            assert startswith.pos_start is not None
-            assert startswith.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 startswith.pos_start, startswith.pos_end,
                 "second", "startswith", "str", startswith,
@@ -2142,8 +2050,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         str_ = exec_ctx.symbol_table.getf("str_")
         if not isinstance(str_, String):
             assert str_ is not None
-            assert str_.pos_start is not None
-            assert str_.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 str_.pos_start, str_.pos_end,
                 "first", "endswith", "str", str_,
@@ -2154,8 +2060,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         endswith = exec_ctx.symbol_table.getf("endswith")
         if not isinstance(endswith, String):
             assert endswith is not None
-            assert endswith.pos_start is not None
-            assert endswith.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 endswith.pos_start, endswith.pos_end,
                 "second", "endswith", "str", endswith,
@@ -2182,8 +2086,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         source = exec_ctx.symbol_table.getf("source")
         if not isinstance(source, String):
             assert source is not None
-            assert source.pos_start is not None
-            assert source.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 source.pos_start, source.pos_end,
                 "first", "__python__", "str", source,
@@ -2193,8 +2095,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         try:
             v = eval(source.value)
         except Exception as e:
-            assert source.pos_start is not None
-            assert source.pos_end is not None
             return RTResult().failure(PythonError(
                 source.pos_start, source.pos_end,
                 e,
@@ -2218,8 +2118,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         path = exec_ctx.symbol_table.getf("path")
         if not isinstance(path, String):
             assert path is not None
-            assert path.pos_start is not None
-            assert path.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 path.pos_start, path.pos_end,
                 "first", "path_exists", "str", path,

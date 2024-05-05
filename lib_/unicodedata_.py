@@ -37,16 +37,12 @@ class UnicodeData(ModuleFunction):
     @staticmethod
     def is_unicode_char(char: Value, exec_ctx: Context, function: str) -> RTResult | None:
         if not isinstance(char, String):
-            assert char.pos_start is not None
-            assert char.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 char.pos_start, char.pos_end,
                 "first", f"unicodedata.{function}", "str", char, exec_ctx,
                 origin_file=f"lib_.unicodedata_.UnicodeData.is_unicode_char"
             ))
         if len(char) != 1:
-            assert char.pos_start is not None
-            assert char.pos_end is not None
             return RTResult().failure(RunTimeError(
                 char.pos_start, char.pos_end,
                 f"first argument of function unicodedata.{function} should be only one unicode character, not "
@@ -59,16 +55,12 @@ class UnicodeData(ModuleFunction):
     @staticmethod
     def is_valid_form_and_uni_str(form: Value, uni_str: Value, exec_ctx: Context, function: str) -> RTResult | None:
         if not isinstance(form, String):
-            assert form.pos_start is not None
-            assert form.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 form.pos_start, form.pos_end,
                 "first", f"unicodedata.{function}", "str", form, exec_ctx,
                 origin_file="lib_.unicodedata_.UnicodeData.is_valid_form_and_uni_str"
             ))
         if form.value not in ["NFC", "NFKC", "NFD", "NFKD"]:
-            assert form.pos_start is not None
-            assert form.pos_end is not None
             return RTResult().failure(RunTimeError(
                 form.pos_start, form.pos_end,
                 f"first argument of builtin function unicodedata.{function} should be 'NFC', 'NFKC', 'NFD' or 'NFKD', "
@@ -76,8 +68,6 @@ class UnicodeData(ModuleFunction):
                 exec_ctx, origin_file="lib_.unicodedata_.UnicodeData.is_valid_form_and_uni_str"
             ))
         if not isinstance(uni_str, String):
-            assert uni_str.pos_start is not None
-            assert uni_str.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 uni_str.pos_start, uni_str.pos_end,
                 "second", f"unicodedata.{function}", "str", uni_str, exec_ctx,
@@ -96,8 +86,6 @@ class UnicodeData(ModuleFunction):
         name = exec_ctx.symbol_table.getf("name")
         if not isinstance(name, String):
             assert name is not None
-            assert name.pos_start is not None
-            assert name.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 name.pos_start, name.pos_end,
                 "first", "unicodedata.lookup", "str", name, exec_ctx,
@@ -106,8 +94,6 @@ class UnicodeData(ModuleFunction):
         try:
             char = unicodedata.lookup(name.value)
         except KeyError as e:
-            assert name.pos_start is not None
-            assert name.pos_end is not None
             return RTResult().failure(RTNotDefinedError(
                 name.pos_start, name.pos_end,
                 str(e).replace('"', ''),
@@ -143,8 +129,6 @@ class UnicodeData(ModuleFunction):
             name = String(unicodedata.name(char.value), self.pos_start, self.pos_end)
         except ValueError as e:
             if default is None:
-                assert char.pos_start is not None
-                assert char.pos_end is not None
                 return RTResult().failure(RunTimeError(
                     char.pos_start, char.pos_end,
                     str(e),

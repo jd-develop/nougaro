@@ -46,8 +46,6 @@ class Time(ModuleFunction):
         seconds = exec_ctx.symbol_table.getf('seconds')  # we get the number of seconds we have to sleep
         if not isinstance(seconds, Number):  # we check if it is a number
             assert seconds is not None
-            assert seconds.pos_start is not None
-            assert seconds.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 seconds.pos_start, seconds.pos_end, "first", "time.sleep", "number", seconds,
                 exec_ctx, "lib_.time_.Time.execute_time_sleep"
@@ -73,8 +71,6 @@ class Time(ModuleFunction):
         milliseconds = exec_ctx.symbol_table.getf('milliseconds')  # we get the number of milliseconds we have to sleep
         if not isinstance(milliseconds, Number) or not milliseconds.is_int():  # we check if it is a number
             assert milliseconds is not None
-            assert milliseconds.pos_start is not None
-            assert milliseconds.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 milliseconds.pos_start, milliseconds.pos_end, "first", "time.sleep_milliseconds", "integer",
                 milliseconds,

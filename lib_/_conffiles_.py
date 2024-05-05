@@ -44,8 +44,6 @@ class Conffiles(ModuleFunction):
         not_found_ok = context.symbol_table.getf("not_found_ok")
         if not isinstance(file_name, String):
             assert file_name is not None
-            assert file_name.pos_start is not None
-            assert file_name.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 file_name.pos_start, file_name.pos_end, "first", "_conffiles.access_data", "str", file_name,
                 context, origin_file="lib_._conffiles_.Conffiles.execute__conffiles_access_data"
@@ -57,8 +55,6 @@ class Conffiles(ModuleFunction):
         if not_found_ok is None:
             not_found_ok = FALSE.copy()
         if not (isinstance(not_found_ok, Number) and isinstance(not_found_ok.value, int)):
-            assert not_found_ok.pos_start is not None
-            assert not_found_ok.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 not_found_ok.pos_start, not_found_ok.pos_end, "second", "_conffiles.access_data", "int", not_found_ok,
                 context, origin_file="lib_._conffiles_.Conffiles.execute__conffiles_access_data"
@@ -68,8 +64,6 @@ class Conffiles(ModuleFunction):
         if data is None:
             if not_found_ok.is_true():
                 return RTResult().success(NoneValue(self.pos_start, self.pos_end, False).set_context(context))
-            assert file_name.pos_start is not None
-            assert file_name.pos_end is not None
             return RTResult().failure(RTFileNotFoundError(
                 file_name.pos_start, file_name.pos_end, f"config file not found: {file_name}.", context,
                 origin_file="lib_._conffiles_.Conffiles.execute__conffiles_access_data", custom=True
@@ -94,8 +88,6 @@ class Conffiles(ModuleFunction):
         name_reserved_ok = context.symbol_table.getf("name_reserved_ok")
         if not isinstance(file_name, String):
             assert file_name is not None
-            assert file_name.pos_start is not None
-            assert file_name.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 file_name.pos_start, file_name.pos_end, "first", "_conffiles.write_data", "str", file_name,
                 context, origin_file="lib_._conffiles_.Conffiles.execute__conffiles_write_data"
@@ -106,8 +98,6 @@ class Conffiles(ModuleFunction):
         if name_reserved_ok is None:
             name_reserved_ok = FALSE.copy()
         if not (isinstance(name_reserved_ok, Number) and isinstance(name_reserved_ok.value, int)):
-            assert name_reserved_ok.pos_start is not None
-            assert name_reserved_ok.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 name_reserved_ok.pos_start, name_reserved_ok.pos_end, "second", "_conffiles.write_data", "int", name_reserved_ok,
                 context, origin_file="lib_._conffiles_.Conffiles.execute__conffiles_write_data"
@@ -118,8 +108,6 @@ class Conffiles(ModuleFunction):
         if errmsg is not None:
             if name_reserved_ok.is_true():
                 return RTResult().success(NoneValue(self.pos_start, self.pos_end, False).set_context(context))
-            assert file_name.pos_start is not None
-            assert file_name.pos_end is not None
             return RTResult().failure(RTFileNotFoundError(
                 file_name.pos_start, file_name.pos_end, f"config file name {file_name} is reserved.", context,
                 origin_file="lib_._conffiles_.Conffiles.execute__conffiles_write_data", custom=True

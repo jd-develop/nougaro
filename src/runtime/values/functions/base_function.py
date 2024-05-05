@@ -36,7 +36,6 @@ class BaseFunction(Value):
     def generate_new_context(self, use_self_context_ctx_table: bool = False):
         """Generates a new context with the right name, the right parent context and the right position"""
         # print(self.context)
-        assert self.pos_start is not None
         new_context = Context(self.name, self.pos_start, self.context)
         # set the symbol table to the parent one
         if use_self_context_ctx_table:
@@ -60,8 +59,6 @@ class BaseFunction(Value):
         if (len(args) > len(param_names + optional_params)) and should_respect_args_number:
             first_arg = args[len(param_names + optional_params)]
             last_arg = args[-1]
-            assert first_arg.pos_start is not None
-            assert last_arg.pos_end is not None
             assert self.context is not None
             return result.failure(RunTimeError(
                 first_arg.pos_start, last_arg.pos_end,
@@ -71,8 +68,6 @@ class BaseFunction(Value):
 
         # check if there is too few params
         if len(args) < len(param_names) and should_respect_args_number:
-            assert self.pos_start is not None
-            assert self.pos_end is not None
             assert self.context is not None
             return result.failure(RunTimeError(
                 self.pos_start, self.pos_end,

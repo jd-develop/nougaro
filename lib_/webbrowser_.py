@@ -56,8 +56,6 @@ class WebBrowser(ModuleFunction):
 
         if not isinstance(url, String):
             assert url is not None
-            assert url.pos_start is not None
-            assert url.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 url.pos_start, url.pos_end, "first", "webbrowser.open", "str", url,
                 context, "lib_.webbrowser_.WebBrowser.open"
@@ -66,15 +64,11 @@ class WebBrowser(ModuleFunction):
         if new is None:
             new = Number(0, url.pos_end, self.pos_end).set_context(context)
         if not (isinstance(new, Number) and isinstance(new.value, int)):
-            assert new.pos_start is not None
-            assert new.pos_end is not None
             return RTResult().failure(RTTypeErrorF(
                 new.pos_start, new.pos_end, "second", "webbrowser.open", "int", new,
                 context, "lib_.webbrowser_.WebBrowser.open"
             ))
         if not 0 <= new.value <= 2:
-            assert new.pos_start is not None
-            assert new.pos_end is not None
             return RTResult().failure(RunTimeError(
                 new.pos_start, new.pos_end, "the 'new' argument should either be 0 (same window), 1 (new window), or 2 (new tab)",
                 context, origin_file="lib_.webbrowser_.WebBrowser.open"
@@ -86,8 +80,6 @@ class WebBrowser(ModuleFunction):
         try:
             webbrowser.open(url.value, new.value, autoraise.is_true())
         except webbrowser.Error as e:
-            assert self.pos_start is not None
-            assert self.pos_end is not None
             return RTResult().failure(WebBrowserError(
                 self.pos_start, self.pos_end, f"{e}",
                 context, origin_file="lib_.webbrowser.WebBrowser.open"

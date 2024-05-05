@@ -55,8 +55,6 @@ class String(Value):
                 return String(self.value * other.value, self.pos_start, other.pos_end).set_context(self.context), None
             except OverflowError as e:
                 assert self.context is not None
-                assert self.pos_start is not None
-                assert other.pos_end is not None
                 return None, RTOverflowError(
                     self.pos_start, other.pos_end,
                     str(e), self.context,
@@ -82,8 +80,6 @@ class String(Value):
         try:
             return Number(int(float(value_to_convert)), self.pos_start, self.pos_end).set_context(self.context), None
         except ValueError:
-            assert self.pos_start is not None
-            assert self.pos_end is not None
             assert self.context is not None
             return None, RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
@@ -96,8 +92,6 @@ class String(Value):
         try:
             return Number(float(self.value), self.pos_start, self.pos_end).set_context(self.context), None
         except ValueError:
-            assert self.pos_start is not None
-            assert self.pos_end is not None
             assert self.context is not None
             return None, RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
@@ -207,8 +201,6 @@ class Number(Value):
                 return Number(self.value + other.value, self.pos_start, other.pos_end).set_context(self.context), None
             except OverflowError as e:
                 errmsg = str(e)
-                assert self.pos_start is not None
-                assert self.pos_end is not None
                 assert self.context is not None
                 return None, RTOverflowError(
                     self.pos_start, self.pos_end,
@@ -225,8 +217,6 @@ class Number(Value):
                 return Number(self.value - other.value, self.pos_start, other.pos_end).set_context(self.context), None
             except OverflowError as e:
                 errmsg = str(e)
-                assert self.pos_start is not None
-                assert self.pos_end is not None
                 assert self.context is not None
                 return None, RTOverflowError(
                     self.pos_start, self.pos_end,
@@ -251,8 +241,6 @@ class Number(Value):
                 return None, self.illegal_operation(other)
         except OverflowError as e:
             errmsg = str(e)
-            assert self.pos_start is not None
-            assert other.pos_end is not None
             assert self.context is not None
             return None, RTOverflowError(
                 self.pos_start, other.pos_end,
@@ -266,8 +254,6 @@ class Number(Value):
             try:
                 val = self.value / other.value
             except ZeroDivisionError:
-                assert other.pos_start is not None
-                assert other.pos_end is not None
                 assert self.context is not None
                 return None, RTArithmeticError(
                     other.pos_start, other.pos_end,
@@ -277,8 +263,6 @@ class Number(Value):
                 )
             except OverflowError as e:  # I hate python
                 errmsg = str(e)
-                assert self.pos_start is not None
-                assert other.pos_end is not None
                 assert self.context is not None
                 return None, RTOverflowError(
                     self.pos_start, other.pos_end,
@@ -293,8 +277,6 @@ class Number(Value):
     def modded_by(self, other: Value):  # MODULO
         if isinstance(other, Number):
             if other.value == 0:
-                assert other.pos_start is not None
-                assert other.pos_end is not None
                 assert self.context is not None
                 return None, RTArithmeticError(
                     other.pos_start, other.pos_end,
@@ -306,8 +288,6 @@ class Number(Value):
                 return Number(self.value % other.value, self.pos_start, other.pos_end).set_context(self.context), None
             except OverflowError as e:
                 errmsg = str(e)
-                assert self.pos_start is not None
-                assert other.pos_end is not None
                 assert self.context is not None
                 return None, RTOverflowError(
                     self.pos_start, other.pos_end,
@@ -321,8 +301,6 @@ class Number(Value):
     def floor_dived_by(self, other: Value):  # FLOOR_DIVISION
         if isinstance(other, Number):
             if other.value == 0:
-                assert other.pos_start is not None
-                assert other.pos_end is not None
                 assert self.context is not None
                 return None, RTArithmeticError(
                     other.pos_start, other.pos_end,
@@ -334,8 +312,6 @@ class Number(Value):
                 return Number(self.value // other.value, self.pos_start, other.pos_end).set_context(self.context), None
             except OverflowError as e:
                 errmsg = str(e)
-                assert self.pos_start is not None
-                assert other.pos_end is not None
                 assert self.context is not None
                 return None, RTOverflowError(
                     self.pos_start, other.pos_end,
@@ -352,8 +328,6 @@ class Number(Value):
                 return Number(self.value ** other.value, self.pos_start, other.pos_end).set_context(self.context), None
             except OverflowError as e:
                 assert self.context is not None
-                assert self.pos_start is not None, str(self)
-                assert other.pos_end is not None
                 return None, RTOverflowError(
                     self.pos_start, other.pos_end,
                     str(e), self.context,
@@ -542,8 +516,6 @@ class List(Value):
                 new_list.update_should_print()
                 return new_list, None
             except IndexError:
-                assert other.pos_start is not None
-                assert other.pos_end is not None
                 assert self.context is not None
                 return None, RTIndexError(
                     other.pos_start, other.pos_end,
@@ -577,8 +549,6 @@ class List(Value):
             try:
                 return self.elements[other.value], None
             except IndexError:
-                assert other.pos_start is not None
-                assert other.pos_end is not None
                 assert self.context is not None
                 return None, RTIndexError(
                     other.pos_start, other.pos_end,

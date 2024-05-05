@@ -220,7 +220,6 @@ class Interpreter:
                 return result
             if len(node_or_list) != 1:
                 for node_ in node_or_list[1:]:
-                    assert node_.pos_start is not None
                     new_ctx = Context(
                         display_name=f"attribute of {value.__repr__()}", entry_pos=node_.pos_start, parent=context
                     )
@@ -229,8 +228,6 @@ class Interpreter:
                     new_ctx.symbol_table.parent = context.symbol_table
 
                     if not (isinstance(node_, VarAccessNode) or isinstance(node_, CallNode)):
-                        assert node_.pos_start is not None
-                        assert node_.pos_end is not None
                         return result.failure(RunTimeError(
                             node_.pos_start, node_.pos_end,
                             f"unexpected node: {node_.__class__.__name__}.",
@@ -312,8 +309,6 @@ class Interpreter:
             return result
         if not isinstance(value_to_abs, Number):
             assert value_to_abs is not None
-            assert value_to_abs.pos_start is not None
-            assert value_to_abs.pos_end is not None
             return result.failure(RTTypeError(
                 value_to_abs.pos_start, value_to_abs.pos_end,
                 f"expected number, got {value_to_abs.type_}.",
@@ -339,8 +334,6 @@ class Interpreter:
                 if result.should_return() or extend_list_ is None:  # if there is an error
                     return result
                 if not isinstance(extend_list_, List):
-                    assert extend_list_.pos_start is not None
-                    assert extend_list_.pos_end is not None
                     return result.failure(RTTypeError(
                         extend_list_.pos_start, extend_list_.pos_end,
                         f"expected a list value after '*', but got {extend_list_.type_}.",
@@ -566,8 +559,6 @@ class Interpreter:
         VARIABLE_IS_DEFINED = value is not None
         if not VARIABLE_IS_DEFINED:
             if attribute_error:
-                assert node.pos_start is not None
-                assert node.pos_end is not None
                 assert isinstance(var_name, Token)
                 assert isinstance(var_name.value, str)
                 return result.failure(RTAttributeError(
@@ -577,16 +568,12 @@ class Interpreter:
 
             SINGLE_IDENTIFIER = len(var_names_list) == 1
             if SINGLE_IDENTIFIER:
-                assert node.pos_start is not None
-                assert node.pos_end is not None
                 assert isinstance(var_name, Token)
                 assert isinstance(var_name.value, str)
                 return self._undefined(
                     node.pos_start, node.pos_end, var_name.value, ctx, result, f"{_ORIGIN_FILE}.visit_VarAccessNode"
                 )
             else:  # none of the identifiers is defined
-                assert node.pos_start is not None
-                assert node.pos_end is not None
                 return result.failure(RTNotDefinedError(
                     node.pos_start, node.pos_end, f"none of the given identifiers is defined.", ctx,
                     f"{_ORIGIN_FILE}.visit_varAccessNode"
@@ -620,8 +607,6 @@ class Interpreter:
                 equal = TT["MINUSEQ"]
 
         if len(var_names) != len(values):
-            assert node.pos_start is not None
-            assert node.pos_end is not None
             return result.failure(RunTimeError(
                 node.pos_start, node.pos_end,
                 f"there should be the same amount of identifiers and values. "
@@ -636,8 +621,6 @@ class Interpreter:
             if IS_SINGLE_VAR_NAME:
                 NAME_IS_IDENTIFIER = isinstance(var_name[0], Token) and var_name[0].type == TT["IDENTIFIER"]
                 if not NAME_IS_IDENTIFIER:
-                    assert var_name[0].pos_start is not None
-                    assert var_name[0].pos_end is not None
                     return result.failure(RunTimeError(
                         var_name[0].pos_start, var_name[0].pos_end,
                         "excepted identifier.",
@@ -659,8 +642,6 @@ class Interpreter:
                     assert isinstance(var_name[0].value, str)
                     value = ctx.symbol_table.get(var_name[0].value)
                     if value is None:
-                        assert var_name[0].pos_start is not None
-                        assert var_name[0].pos_end is not None
                         return self._undefined(
                             var_name[0].pos_start, var_name[0].pos_end, var_name[0].value, ctx, result,
                             origin_file="src.runtime.interpreter.Interpreter.visit_VarAssignNode"
@@ -682,7 +663,6 @@ class Interpreter:
                 assert isinstance(value, Value)
 
                 for node_or_tok in var_name[1:-1]:
-                    assert node_or_tok.pos_start is not None
                     new_ctx = Context(
                         display_name=f"attribute of {value.__repr__()}", entry_pos=node_or_tok.pos_start, parent=ctx
                     )
@@ -694,8 +674,6 @@ class Interpreter:
                         assert isinstance(node_or_tok.value, str)
                         value = new_ctx.symbol_table.get(node_or_tok.value)
                         if value is None:
-                            assert node_or_tok.pos_start is not None
-                            assert node_or_tok.pos_end is not None
                             return self._undefined(
                                 node_or_tok.pos_start, node_or_tok.pos_end, node_or_tok.value, new_ctx, result,
                                 origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
@@ -711,8 +689,6 @@ class Interpreter:
                         ))
                     else:
                         if not (isinstance(node_or_tok, VarAccessNode) or isinstance(node_or_tok, CallNode)):
-                            assert node_or_tok.pos_start is not None
-                            assert node_or_tok.pos_end is not None
                             return result.failure(RunTimeError(
                                 node_or_tok.pos_start, node_or_tok.pos_end,
                                 f"unexpected node: {node_or_tok.__class__.__name__}.",
@@ -727,8 +703,6 @@ class Interpreter:
                 assert isinstance(var_name[-1], Token)
                 TOKEN_IS_IDENTIFIER = var_name[-1].type == TT["IDENTIFIER"]
                 if not TOKEN_IS_IDENTIFIER:
-                    assert var_name[-1].pos_start is not None
-                    assert var_name[-1].pos_end is not None
                     return result.failure(RunTimeError(
                         var_name[-1].pos_start, var_name[-1].pos_end,
                         "expected valid identifier.",
@@ -796,14 +770,10 @@ class Interpreter:
                     error = None
                     final_value = values[i]
             else:  # variable does not exist
-                assert node.pos_start is not None
-                assert node.pos_end is not None
                 return self._undefined(node.pos_start, node.pos_end, final_var_name, ctx, result,
                                        f"{_ORIGIN_FILE}.visit_VarAssignNode", edit=True)
 
             if error is not None:  # there is an error
-                assert node.pos_start is not None
-                assert node.pos_end is not None
                 error.set_pos(node.pos_start, node.pos_end)
                 return result.failure(error)
 
@@ -838,8 +808,6 @@ class Interpreter:
         assert ctx.symbol_table is not None
 
         if var_name not in ctx.symbol_table.symbols:  # the variable is not defined, so we can't delete it
-            assert node.pos_start is not None
-            assert node.pos_end is not None
             return self._undefined(node.pos_start, node.pos_end, var_name, ctx, result,
                                    f"{_ORIGIN_FILE}.visit_varDeleteNode")
 
@@ -892,8 +860,6 @@ class Interpreter:
             assert errmsg is not None
 
         if not isinstance(errmsg, String):  # we check if the error message is a String
-            assert errmsg.pos_start is not None
-            assert errmsg.pos_end is not None
             return result.failure(RTTypeError(
                 errmsg.pos_start, errmsg.pos_end,
                 f"error message should be a str, not {errmsg.type_}.",
@@ -901,8 +867,6 @@ class Interpreter:
             ))
 
         if assertion.is_false():  # the assertion is not true, we return an error
-            assert assertion.pos_start is not None
-            assert assertion.pos_end is not None
             return result.failure(RTAssertionError(
                 assertion.pos_start, assertion.pos_end,
                 errmsg.value,
@@ -921,8 +885,6 @@ class Interpreter:
             return result
         assert start_value is not None
         if not (isinstance(start_value, Number) and isinstance(start_value.value, int)):
-            assert start_value.pos_start is not None
-            assert start_value.pos_end is not None
             return result.failure(RTTypeError(
                 start_value.pos_start, start_value.pos_end,
                 f"start value should be an integer, not {start_value.type_}.",
@@ -934,8 +896,6 @@ class Interpreter:
             return result
         assert end_value is not None
         if not (isinstance(end_value, Number) and isinstance(end_value.value, int)):
-            assert end_value.pos_start is not None
-            assert end_value.pos_end is not None
             return result.failure(RTTypeError(
                 end_value.pos_start, end_value.pos_end,
                 f"end value should be an integer, not {end_value.type_}.",
@@ -950,8 +910,6 @@ class Interpreter:
         else:
             step_value = Number(1, node.start_value_node.pos_start, node.body_node.pos_start)  # no step value: default is 1
         if not (isinstance(step_value, Number) and isinstance(step_value.value, int)):
-            assert step_value.pos_start is not None
-            assert step_value.pos_end is not None
             return result.failure(RTTypeError(
                 step_value.pos_start, step_value.pos_end,
                 f"step value should be an integer, not {step_value.type_}.",
@@ -1012,8 +970,6 @@ class Interpreter:
         elif isinstance(iterable_, String):
             python_iterable = iterable_.to_python_str()
         else:  # this is not a list nor a str
-            assert node.list_node.pos_start is not None
-            assert node.list_node.pos_end is not None
             assert iterable_ is not None
             return result.failure(RTTypeError(
                 node.list_node.pos_start, node.list_node.pos_end,
@@ -1168,8 +1124,6 @@ class Interpreter:
             assert ctx.symbol_table is not None
             assert isinstance(parent_var_name, str)
             if not ctx.symbol_table.exists(parent_var_name):
-                assert node.parent_var_name_token.pos_start is not None
-                assert node.parent_var_name_token.pos_end is not None
                 return self._undefined(
                     node.parent_var_name_token.pos_start,
                     node.parent_var_name_token.pos_end,
@@ -1181,8 +1135,6 @@ class Interpreter:
             parent_value = ctx.symbol_table.get(parent_var_name)
             assert parent_value is not None
             if not isinstance(parent_value, Constructor):
-                assert node.parent_var_name_token.pos_start is not None
-                assert node.parent_var_name_token.pos_end is not None
                 return result.failure(RTTypeError(
                     node.parent_var_name_token.pos_start, node.parent_var_name_token.pos_end,
                     f"expected class constructor, got {parent_value.type_} instead.",
@@ -1191,7 +1143,6 @@ class Interpreter:
                 ))
             parent = parent_value
 
-        assert node.pos_start is not None
         class_ctx = Context(class_name, node.pos_start, ctx).set_symbol_table(SymbolTable(ctx.symbol_table))
         assert class_ctx.symbol_table is not None
         result.register(self.visit(body_node, class_ctx, methods_instead_of_funcs=True))
@@ -1239,8 +1190,6 @@ class Interpreter:
                     return result
                 assert list_ is not None
                 if not isinstance(list_, List):
-                    assert list_.pos_start is not None
-                    assert list_.pos_end is not None
                     return result.failure(RTTypeError(
                         list_.pos_start, list_.pos_end,
                         f"expected a list value after '*', but got {list_.type_}.",
@@ -1284,8 +1233,6 @@ class Interpreter:
 
         elif isinstance(value_to_call, Constructor):  # the value is an object constructor
             if len(node.arg_nodes) != 0:
-                assert node.arg_nodes[0][0].pos_start is not None
-                assert node.arg_nodes[0][0].pos_end is not None
                 return result.failure(RTTypeError(
                     node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
                     f"instanciation takes no arguments.",
@@ -1298,8 +1245,6 @@ class Interpreter:
         elif isinstance(value_to_call, List):  # the value is a list
             # get the element at the given index
             if len(node.arg_nodes) == 0:
-                assert node.pos_start is not None
-                assert node.pos_end is not None
                 return result.failure(RunTimeError(
                     node.pos_start, node.pos_end,
                     f"please give at least one index.",
@@ -1312,8 +1257,6 @@ class Interpreter:
                     return result
                 assert index is not None
                 if not (isinstance(index, Number) and isinstance(index.value, int)):
-                    assert index.pos_start is not None
-                    assert index.pos_end is not None
                     return result.failure(RunTimeError(
                         index.pos_start, index.pos_end,
                         f"indexes must be integers, not {index.type_}.",
@@ -1325,8 +1268,6 @@ class Interpreter:
                     return_value = value_to_call[index].copy().set_pos(node.pos_start, node.pos_end)
                     return result.success(return_value)
                 except IndexError:
-                    assert node.arg_nodes[0][0].pos_start is not None
-                    assert node.arg_nodes[0][0].pos_end is not None
                     return result.failure(RTIndexError(
                         node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
                         f'list index {index} out of range.',
@@ -1341,8 +1282,6 @@ class Interpreter:
                         return result
                     assert index is not None
                     if not (isinstance(index, Number) and isinstance(index.value, int)):
-                        assert arg_node[0].pos_start is not None
-                        assert arg_node[0].pos_end is not None
                         return result.failure(RunTimeError(
                             arg_node[0].pos_start, arg_node[0].pos_end,
                             f"indexes must be integers, not {index.type_}.",
@@ -1353,8 +1292,6 @@ class Interpreter:
                     try:
                         return_value_list.append(value_to_call[index])
                     except IndexError:
-                        assert arg_node[0].pos_start is not None
-                        assert arg_node[0].pos_end is not None
                         return result.failure(RTIndexError(
                             arg_node[0].pos_start, arg_node[0].pos_end,
                             f'list index {index} out of range.',
@@ -1368,8 +1305,6 @@ class Interpreter:
         elif isinstance(value_to_call, String):  # the value is a string
             # get the element at the given index
             if len(node.arg_nodes) == 0:
-                assert node.pos_start is not None
-                assert node.pos_end is not None
                 return result.failure(RunTimeError(
                     node.pos_start, node.pos_end,
                     f"please give at least one index.",
@@ -1381,8 +1316,6 @@ class Interpreter:
                     return result
                 assert index is not None
                 if not (isinstance(index, Number) and isinstance(index.value, int)):
-                    assert index.pos_start is not None
-                    assert index.pos_end is not None
                     return result.failure(RunTimeError(
                         index.pos_start, index.pos_end,
                         f"indexes must be integers, not {index.type_}.",
@@ -1395,8 +1328,6 @@ class Interpreter:
                     ).set_context(outer_context)
                     return result.success(return_value)
                 except IndexError:  # index error
-                    assert node.arg_nodes[0][0].pos_start is not None
-                    assert node.arg_nodes[0][0].pos_end is not None
                     return result.failure(RTIndexError(
                         node.arg_nodes[0][0].pos_start, node.arg_nodes[0][0].pos_end,
                         f'string index {index} out of range.',
@@ -1411,8 +1342,6 @@ class Interpreter:
                         return result
                     assert index is not None
                     if not (isinstance(index, Number) and isinstance(index.value, int)):
-                        assert index.pos_start is not None
-                        assert index.pos_end is not None
                         return result.failure(RunTimeError(
                             index.pos_start, index.pos_end,
                             f"indexes must be integers, not {index.type_}.",
@@ -1423,8 +1352,6 @@ class Interpreter:
                     try:
                         return_value += value_to_call.value[index]
                     except IndexError:
-                        assert arg_node[0].pos_start is not None
-                        assert arg_node[0].pos_end is not None
                         return result.failure(RTIndexError(
                             arg_node[0].pos_start, arg_node[0].pos_end,
                             f'string index {index} out of range.',
@@ -1435,8 +1362,6 @@ class Interpreter:
                 )
 
         else:  # the object is not callable
-            assert node.pos_start is not None
-            assert node.pos_end is not None
             return result.failure(RunTimeError(
                 node.pos_start, node.pos_end,
                 f"{value_to_call.type_} is not callable.",
@@ -1459,7 +1384,7 @@ class Interpreter:
                 obj_attrs[key] = value.copy()
         object_ = Object(obj_attrs, constructor, constructor.pos_start, constructor.pos_end)
         object_.type_ = constructor.name
-        assert constructor.pos_start is not None
+        
         if call_with_module_context:
             assert constructor.module_context is not None
             inner_ctx = Context(constructor.name, constructor.pos_start, constructor.module_context)
@@ -1559,8 +1484,6 @@ class Interpreter:
                 assert isinstance(identifier.value, str)
                 if should_be_dir:
                     if not os.path.isdir(path + identifier.value):
-                        assert identifier.pos_start is not None
-                        assert identifier.pos_end is not None
                         return result.failure(RTFileNotFoundError(
                             identifier.pos_start, identifier.pos_end, identifier.value, ctx,
                             origin_file=f"{_ORIGIN_FILE}.visit_ImportNode",
@@ -1574,8 +1497,6 @@ class Interpreter:
                     path += identifier.value + ".noug"
                     is_nougaro_lib = True
                 else:
-                    assert identifier.pos_start is not None
-                    assert identifier.pos_end is not None
                     return result.failure(RTFileNotFoundError(
                         identifier.pos_start, identifier.pos_end,
                         f"{identifier.value}.noug",
@@ -1635,16 +1556,12 @@ class Interpreter:
                 module = importlib.import_module(f"lib_.{name_to_import}_")
                 what_to_import = module.WHAT_TO_IMPORT
             except ImportError:
-                assert identifier.pos_start is not None
-                assert identifier.pos_end is not None
                 return result.failure(RTNotDefinedError(
                     identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
                     origin_file=f"{_ORIGIN_FILE}.visit_ImportNode\n"
                     "(troubleshooting: is python importlib working?)"
                 ))
         else:
-            assert identifier.pos_start is not None
-            assert identifier.pos_end is not None
             return result.failure(RTNotDefinedError(
                 identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
                 origin_file=f"{_ORIGIN_FILE}.visit_ImportNode\n"
@@ -1679,8 +1596,6 @@ class Interpreter:
             assert ctx.symbol_table is not None
             assert isinstance(expr_or_identifier.value, str)
             value_to_export = ctx.symbol_table.get(expr_or_identifier.value)
-            assert expr_or_identifier.pos_start is not None
-            assert expr_or_identifier.pos_end is not None
             if value_to_export is None:
                 return self._undefined(
                     expr_or_identifier.pos_start,
@@ -1733,8 +1648,6 @@ class Interpreter:
             return result
         assert str_to_write is not None
         if not isinstance(str_to_write, String):  # if the str is not a String
-            assert str_to_write.pos_start is not None
-            assert str_to_write.pos_end is not None
             return result.failure(RTTypeError(
                 str_to_write.pos_start, str_to_write.pos_end, f"expected str, got {str_to_write.type_}.", ctx,
                 f"{_ORIGIN_FILE}.visit_WriteNode"
@@ -1745,8 +1658,6 @@ class Interpreter:
             return result
         assert file_name is not None
         if not isinstance(file_name, String):  # if the file name is not a String
-            assert file_name.pos_start is not None
-            assert file_name.pos_end is not None
             return result.failure(RTTypeError(
                 file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", ctx,
                 f"{_ORIGIN_FILE}.visit_WriteNode"
@@ -1829,8 +1740,6 @@ class Interpreter:
             return result
         assert file_name is not None
         if not isinstance(file_name, String):  # check if the str is a String
-            assert file_name.pos_start is not None
-            assert file_name.pos_end is not None
             return result.failure(RTTypeError(
                 file_name.pos_start, file_name.pos_end, f"expected str, got {file_name.type_}.", ctx,
                 f"{_ORIGIN_FILE}.visit_ReadNode"

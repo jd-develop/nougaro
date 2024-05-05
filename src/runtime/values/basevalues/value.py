@@ -300,15 +300,12 @@ class Value:
 
     def illegal_operation(self, other: Value | None = None) -> RunTimeError:
         """Returns a RunTimeError with message 'illegal operation (with self/between self and other)"""
-        assert self.pos_start is not None
         if other is None:
-            assert self.pos_end is not None
             assert self.context is not None
             return RunTimeError(
                 self.pos_start, self.pos_end, f'illegal operation with {self.type_}.', self.context,
                 origin_file="src.values.value.Value.illegal_operation"
             )
-        assert other.pos_end is not None
         assert self.context is not None
         return RunTimeError(
             self.pos_start, other.pos_end, f'illegal operation between {self.type_} and {other.type_}.', self.context,
@@ -318,8 +315,6 @@ class Value:
     def can_not_compare(self, other: Value) -> RunTimeError:
         """Returns a RunTimeError with message 'can not compare self and other'"""
         assert self.context is not None
-        assert self.pos_start is not None
-        assert other.pos_end is not None
         return RunTimeError(
             self.pos_start, other.pos_end, f'can not compare {self.type_} and {other.type_}.', self.context,
             origin_file="src.values.value.Value.can_not_compare"
@@ -328,8 +323,6 @@ class Value:
     def can_not_be_in(self, other: Value):
         """Returns a RunTimeError with message 'other is not iterable or can not contain self'"""
         assert self.context is not None
-        assert self.pos_start is not None
-        assert other.pos_end is not None
         return RunTimeError(
             self.pos_start, other.pos_end, f'{other.type_} is not iterable or can not contain {self.type_}.',
             self.context, origin_file="src.values.value.Value.can_not_be_in"

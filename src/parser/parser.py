@@ -194,7 +194,6 @@ class Parser:
         The returned node in the parse result is ALWAYS a ListNode here.
         If stop is not specified or None, stop is [TT["EOF"]]"""
         assert self.current_token is not None
-        assert self.current_token.pos_start is not None
         if stop is None:
             stop = [TT["EOF"]]  # token(s) that stops parser in this function
         result = ParseResult()  # we create the result
@@ -289,7 +288,6 @@ class Parser:
             
             statements.append((statement, False))
 
-        assert self.current_token.pos_end is not None
         return result.success(ListNode(  # we put all the nodes parsed here into a ListNode
             statements,
             pos_start,
@@ -309,7 +307,6 @@ class Parser:
         # we create the result and get the pos start from the current token
         result = ParseResult()
         assert self.current_token is not None
-        assert self.current_token.pos_start is not None
         pos_start = self.current_token.pos_start.copy()
 
         # we check for tokens
@@ -444,7 +441,6 @@ class Parser:
         # we create the result and the pos start
         result = ParseResult()
         assert self.current_token is not None
-        assert self.current_token.pos_start is not None
         pos_start = self.current_token.pos_start.copy()
 
         # var_assign
@@ -570,7 +566,6 @@ class Parser:
         assert not isinstance(expr_to_write, list)
         assert not isinstance(file_name_expr, list)
 
-        assert self.current_token.pos_start is not None
         return result.success(WriteNode(
             expr_to_write, file_name_expr, to_token, line_number,
             pos_start, self.current_token.pos_start.copy()
@@ -614,7 +609,6 @@ class Parser:
             line_number = 'all'
         assert not isinstance(file_name_expr, list)
 
-        assert self.current_token.pos_start is not None
         return result.success(ReadNode(
             file_name_expr, identifier, line_number,
             pos_start, self.current_token.pos_start.copy()
@@ -647,14 +641,12 @@ class Parser:
             assert not isinstance(assertion, list)
             assert not isinstance(errmsg, list)
 
-            assert self.current_token.pos_start is not None
             return result.success(AssertNode(
                 assertion, pos_start, self.current_token.pos_start.copy(),
                 errmsg=errmsg
             ))
         assert not isinstance(assertion, list)
 
-        assert self.current_token.pos_start is not None
         return result.success(AssertNode(assertion, pos_start, self.current_token.pos_start.copy()))
 
     def var_assign(self) -> ParseResult:
@@ -664,7 +656,6 @@ class Parser:
         """
         result = ParseResult()
         assert self.current_token is not None
-        assert self.current_token.pos_start is not None
         pos_start = self.current_token.pos_start.copy()
 
         result = self.check_for_and_advance(
@@ -1252,8 +1243,6 @@ class Parser:
         result.register_advancement()
         self.advance()
 
-        assert token.pos_start is not None
-        assert identifier.pos_end is not None
         return result.success(DollarPrintNode(identifier, token.pos_start, identifier.pos_end.copy()))
 
     def list_expr(self) -> ParseResult:
@@ -1266,8 +1255,6 @@ class Parser:
         element_nodes: list[tuple[Node, bool]] = []
         # we copy the current token pos start
         assert self.current_token is not None
-        assert self.current_token.pos_start is not None
-        assert self.current_token.pos_end is not None
         pos_start = self.current_token.pos_start.copy()
         first_tok_pos_end = self.current_token.pos_end.copy()
 
@@ -1370,8 +1357,6 @@ class Parser:
 
         # now we know there is a 'else' keyword
         if self.current_token.matches(TT["KEYWORD"], 'else'):
-            assert self.current_token.pos_start is not None
-            assert self.current_token.pos_end is not None
             else_tok_pos = (self.current_token.pos_start.copy(), self.current_token.pos_end.copy())
             # we advance
             result.register_advancement()
@@ -1453,8 +1438,6 @@ class Parser:
 
         # NEWLINE statements (if_expr_b|if_expr_c?)*? KEYWORD:END
         if self.current_token.type == TT["NEWLINE"]:
-            assert then_tok.pos_start is not None
-            assert then_tok.pos_end is not None
             self.then_s.append((then_tok.pos_start, then_tok.pos_end))
             result.register_advancement()
             self.advance()
@@ -1555,8 +1538,6 @@ class Parser:
 
             # NEWLINE statements KEYWORD:END
             if self.current_token.type == TT["NEWLINE"]:
-                assert then_tok.pos_start is not None
-                assert then_tok.pos_end is not None
                 self.then_s.append((then_tok.pos_start, then_tok.pos_end))
                 result.register_advancement()
                 self.advance()
@@ -1629,8 +1610,6 @@ class Parser:
 
         # NEWLINE statements KEYWORD:END
         if self.current_token.type == TT["NEWLINE"]:
-            assert then_tok.pos_start is not None
-            assert then_tok.pos_end is not None
             self.then_s.append((then_tok.pos_start, then_tok.pos_end))
             result.register_advancement()
             self.advance()
@@ -1685,8 +1664,6 @@ class Parser:
 
         # NEWLINE statements KEYWORD:END
         if self.current_token.type == TT["NEWLINE"]:
-            assert then_tok.pos_start is not None
-            assert then_tok.pos_end is not None
             self.then_s.append((then_tok.pos_start, then_tok.pos_end))
             result.register_advancement()
             self.advance()
@@ -1832,8 +1809,6 @@ class Parser:
 
         result = self.check_for_and_advance(result, "expected '->' or new line.", "NEWLINE", None, "func_def")
 
-        assert def_tok.pos_start is not None
-        assert def_tok.pos_end is not None
         self.then_s.append((def_tok.pos_start, def_tok.pos_end))
 
         # statements
@@ -1918,8 +1893,6 @@ class Parser:
         # NEWLINE statements KEYWORD:END
         result = self.check_for_and_advance(result, "expected '->' or new line.", "NEWLINE", None, "class_def")
 
-        assert class_tok.pos_start is not None
-        assert class_tok.pos_end is not None
         self.then_s.append((class_tok.pos_start, class_tok.pos_end))
 
         # statements

@@ -116,7 +116,6 @@ def run(
         work_dir = noug_dir
     interpreter = src.runtime.interpreter.Interpreter(run, noug_dir, new_args_strings, work_dir, file_name)
     if use_context is None:
-        assert tokens[0].pos_start is not None
         context = Context('<program>', tokens[0].pos_start, None)  # create the context of the interpreter
         # don't forget to change the context symbol table to the global symbol table
         if use_default_symbol_table:

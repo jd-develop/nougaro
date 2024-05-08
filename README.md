@@ -44,8 +44,10 @@ Nougaro is a programming language interpreted in Python.
 ## Language goals
 
  The main goal of this language is, for me, to learn how interpreted languages work. It is not intended
- to be blazing fast, memory safe and bleeding edge, but to be easily understandable. I do not recommend
- to use Nougaro in real projects.
+ to be blazing fast, memory safe and bleeding edge, but to be easily understandable.
+
+> [!Important]
+> I do *not* recommend to use Nougaro in real projects.
 
 ## Acknowledgements
 

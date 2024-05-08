@@ -16,7 +16,7 @@ Options (assuming no filename is given):
                  - run a command with shell output
  -d "command"
  --cd "command"
- --command-dont-verbose
+ --command-dont-verbose "command"
                  - run a command without shell output
  --help -h       - show this message and exit.
  --version -V    - print version and exit.

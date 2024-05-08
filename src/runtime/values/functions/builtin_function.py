@@ -1803,9 +1803,9 @@ class BuiltInFunction(BaseBuiltInFunction):
                     all_files[f"{folder}/{file_dir}"] = len_
 
         if print_:
-            all_files_items: list[tuple[str, int]] = list(all_files.items())
-            all_files_sorted: list[tuple[str, int]] = sorted(all_files_items, key=lambda ele: ele[1], reverse=True)
-            all_files: dict[str, int] = {key: val for key, val in all_files_sorted}
+            all_files_items = list(all_files.items())
+            all_files_sorted = sorted(all_files_items, key=lambda ele: ele[1], reverse=True)
+            all_files = {key: val for key, val in all_files_sorted}
             top_keys = list(all_files.keys())[:6]
             top_values = [all_files[key] for key in top_keys]
             top_: dict[str, int] = {}

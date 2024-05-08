@@ -200,6 +200,72 @@ def test_nougaro(print_OK)
     assert (do var b += 1 then loop while b < 10) == [11]
     assert b == 11
 
+    var b = ( \
+        for i = 1 to 10 then
+            if i%5 == 0 then break \
+            else i
+        end \
+    )
+    assert b == [[1], [2], [3], [4], None]
+    var b = ( \
+        for i = 1 to 10 then
+            if i%5 == 0 then break and return 12 \
+            else i
+        end \
+    )
+    assert b == 12
+
+    var b = ( \
+        for i in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] then
+            if i%5 == 0 then break \
+            else i
+        end \
+    )
+    assert b == [[1], [2], [3], [4], None]
+    var b = ( \
+        for i in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] then
+            if i%5 == 0 then break and return 12 \
+            else i
+        end \
+    )
+    assert b == 12
+
+    var i = 1
+    var b = ( \
+        while i <= 10 then
+            if i%5 == 0 then break \
+            else i
+            var i++
+        end \
+    )
+    assert b == [[1, 2], [2, 3], [3, 4], [4, 5], None]
+    var b = ( \
+        while i <= 10 then
+            if i%5 == 0 then break and return 12 \
+            else i
+            var i++
+        end \
+    )
+    assert b == 12
+
+    var i = 1
+    var b = ( \
+        do
+            if i%5 == 0 then break \
+            else i
+            var i++
+        then loop while i <= 10 \
+    )
+    assert b == [[1, 2], [2, 3], [3, 4], [4, 5], None]
+    var b = ( \
+        do
+            if i%5 == 0 then break and return 12 \
+            else i
+            var i++
+        then loop while i <= 10 \
+    )
+    assert b == 12
+
     del b
 
     if print_OK then print("OK loops")

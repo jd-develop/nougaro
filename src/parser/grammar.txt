@@ -3,11 +3,11 @@ This is the syntax of the Nougaro language. This file is not actually parsed by 
 statements    : NEWLINE* statement (NEWLINE+ statement)* NEWLINE*
 
 statement     : KEYWORD:RETURN expr?
-              : KEYWORD:IMPORT IDENTIFIER (DOT IDENTIFIER)?* (AS IDENTIFIER)?
+              : KEYWORD:IMPORT IDENTIFIER (DOT IDENTIFIER)?* (KEYWORD:AS IDENTIFIER)?
               : KEYWORD:EXPORT expr AS IDENTIFIER
-              : KEYWORD:EXPORT IDENTIFIER (AS IDENTIFIER)?
+              : KEYWORD:EXPORT IDENTIFIER (KEYWORD:AS IDENTIFIER)?
               : KEYWORD:CONTINUE
-              : KEYWORD:BREAK
+              : KEYWORD:BREAK (KEYWORD:AND KEYWORD:RETURN expr)
               : expr
 
 expr          : var_assign

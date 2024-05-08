@@ -343,17 +343,20 @@ class DoWhileNode(Node):
         self.pos_end = self.body_node.pos_end
 
     def __repr__(self):
-        return f'do:({self.body_node} then loop while:{self.condition_node})'
+        return f"do:({self.body_node} then loop while:{self.condition_node})"
 
 
 class BreakNode(Node):
     """Node for `break` statement"""
-    def __init__(self, pos_start: _Position, pos_end: _Position):
+    def __init__(self, pos_start: _Position, pos_end: _Position, node_to_return: Node | list[Node] | None = None):
         self.pos_start = pos_start
         self.pos_end = pos_end
+        self.node_to_return = node_to_return
 
     def __repr__(self):
-        return 'break'
+        if self.node_to_return is not None:
+            return f"break and return {self.node_to_return}"
+        return "break"
 
 
 class ContinueNode(Node):
@@ -363,7 +366,7 @@ class ContinueNode(Node):
         self.pos_end = pos_end
 
     def __repr__(self):
-        return 'continue'
+        return "continue"
 
 
 # FUNCTION NODES

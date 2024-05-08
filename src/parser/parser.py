@@ -122,6 +122,7 @@ class Parser:
 
         result.register_advancement()
         self.advance()
+        return result
 
     def check_for(
             self,
@@ -296,13 +297,13 @@ class Parser:
 
     def statement(self) -> ParseResult:  # only one statement
         """
-        statement  : KEYWORD:RETURN expr?
-                   : KEYWORD:IMPORT IDENTIFIER (DOT IDENTIFIER)?* (AS IDENTIFIER)?
-                   : KEYWORD:EXPORT expr AS IDENTIFIER
-                   : KEYWORD:EXPORT IDENTIFIER (AS IDENTIFIER)
-                   : KEYWORD:CONTINUE
-                   : KEYWORD:BREAK
-                   : expr
+        statement     : KEYWORD:RETURN expr?
+              : KEYWORD:IMPORT IDENTIFIER (DOT IDENTIFIER)?* (KEYWORD:AS IDENTIFIER)?
+              : KEYWORD:EXPORT expr AS IDENTIFIER
+              : KEYWORD:EXPORT IDENTIFIER (KEYWORD:AS IDENTIFIER)?
+              : KEYWORD:CONTINUE
+              : KEYWORD:BREAK (IDENTIFIER)
+              : exprr
         """
         # we create the result and get the pos start from the current token
         result = ParseResult()
@@ -419,7 +420,17 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            return result.success(BreakNode(pos_start, self.current_token.pos_start.copy()))
+            expr_to_return = None
+            if self.current_token.matches(TT["KEYWORD"], "and"):
+                result = self.advance_check_for_and_advance(
+                    result, "expected keyword “return” after “and”.", "KEYWORD",
+                    "return", "statement"
+                )
+                expr_to_return = result.register(self.expr())
+                if result.error is not None:
+                    return result                
+
+            return result.success(BreakNode(pos_start, self.current_token.pos_start.copy(), expr_to_return))
 
         # expr
         expr = result.register(self.expr())

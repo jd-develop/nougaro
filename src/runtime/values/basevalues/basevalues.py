@@ -569,29 +569,33 @@ class List(Value):
         # TODO: maybe find something to improve speed of this method (is_eq in List)
         if isinstance(other, List):
             if len(self.elements) != len(other.elements):
-                return False
+                return False, None
             else:
                 for index, element in enumerate(self.elements):
                     comparison, error = element.get_comparison_eq(other.elements[index])
                     if error is not None:
-                        return None
+                        return None, error
                     assert comparison is not None
                     if comparison.is_true():
                         continue
                     else:
-                        return False
-                return True
+                        return False, None
+                return True, None
         else:
-            return None
+            return None, None
 
     def get_comparison_eq(self, other: Value):
-        is_eq = self.is_eq(other)
+        is_eq, error = self.is_eq(other)
+        if error is not None:
+            return None, error
         if is_eq is None:
-            return None, self.can_not_compare(other)
+            return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
         return Number(is_eq, self.pos_start, other.pos_end).set_context(self.context), None
 
     def get_comparison_ne(self, other: Value):
-        is_eq = self.is_eq(other)
+        is_eq, error = self.is_eq(other)
+        if error is not None:
+            return None, error
         if is_eq is None:
             return None, self.can_not_compare(other)
         return Number(not is_eq, self.pos_start, other.pos_end).set_context(self.context), None
@@ -600,7 +604,9 @@ class List(Value):
         return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
 
     def get_comparison_gte(self, other: Value):
-        is_eq = self.is_eq(other)
+        is_eq, error = self.is_eq(other)
+        if error is not None:
+            return None, error
         if is_eq is None:
             return None, self.can_not_compare(other)
         return Number(is_eq, self.pos_start, other.pos_end).set_context(self.context), None
@@ -609,7 +615,9 @@ class List(Value):
         return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
 
     def get_comparison_lte(self, other: Value):
-        is_eq = self.is_eq(other)
+        is_eq, error = self.is_eq(other)
+        if error is not None:
+            return None, error
         if is_eq is None:
             return None, self.can_not_compare(other)
         return Number(is_eq, self.pos_start, other.pos_end).set_context(self.context), None

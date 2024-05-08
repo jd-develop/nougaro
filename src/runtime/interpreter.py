@@ -493,7 +493,7 @@ class Interpreter:
             if error is not None:  # there is an error
                 return res.failure(error)
             assert test_result is not None
-            if test_result.value == FALSE.value:  # the test is false so far: no need to continue
+            if test_result.is_false():  # the test is false so far: no need to continue
                 return res.success(test_result.set_pos(node.pos_start, node.pos_end))
         return res.success(test_result.set_pos(node.pos_start, node.pos_end))
 
@@ -929,6 +929,7 @@ class Interpreter:
         assert ctx.symbol_table is not None
         assert isinstance(node.var_name_token.value, str)
 
+        value_to_return = None
         while condition():
             ctx.symbol_table.set(
                 node.var_name_token.value, Number(i, node.var_name_token.pos_start, node.var_name_token.pos_end)
@@ -942,6 +943,7 @@ class Interpreter:
                 continue  # will continue the 'while condition()' -> the interpreted 'for' loop is continued
 
             if result.loop_should_break:
+                value_to_return = result.break_value  # which is a Value or None
                 elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 break  # will break the 'while condition()' -> the interpreted 'for' loop is break
 
@@ -952,6 +954,8 @@ class Interpreter:
 
             elements.append(value)
 
+        if value_to_return is not None:
+            return result.success(value_to_return)
         return result.success(
             List(elements, node.pos_start, node.pos_end).set_context(ctx)
         )
@@ -979,6 +983,7 @@ class Interpreter:
 
         assert ctx.symbol_table is not None
         assert isinstance(node.var_name_token.value, str)
+        value_to_return = None
         for element in python_iterable:
             # we set the variable to the actual list element
             if isinstance(element, str):
@@ -993,6 +998,7 @@ class Interpreter:
                 #           continued
 
             if result.loop_should_break:
+                value_to_return = result.break_value  # which is a Value or None
                 elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 break  # will break the 'for e in iterable_.elements' -> the interpreted 'for' loop is break
 
@@ -1003,6 +1009,8 @@ class Interpreter:
 
             elements.append(value)
 
+        if value_to_return is not None:
+            return result.success(value_to_return)
         return result.success(
             List(elements, node.pos_start, node.pos_end).set_context(ctx)
         )
@@ -1017,6 +1025,7 @@ class Interpreter:
             return result
         assert condition is not None
 
+        value_to_return = None
         while condition.is_true():
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
@@ -1024,6 +1033,7 @@ class Interpreter:
                 continue
 
             if result.loop_should_break:
+                value_to_return = result.break_value  # which is a Value or None
                 elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 break
 
@@ -1039,6 +1049,8 @@ class Interpreter:
                 return result
             assert condition is not None
 
+        if value_to_return is not None:
+            return result.success(value_to_return)
         return result.success(
             List(elements, node.pos_start, node.pos_end).set_context(ctx)
         )
@@ -1048,6 +1060,7 @@ class Interpreter:
         result = RTResult()
         elements: list[Value] = []
 
+        value_to_return = None
         while True:
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
@@ -1055,6 +1068,7 @@ class Interpreter:
                 continue
 
             if result.loop_should_break:
+                value_to_return = result.break_value  # which is a Value or None
                 elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 break
 
@@ -1073,6 +1087,8 @@ class Interpreter:
             if not condition.is_true():  # the condition isn't true: we break the loop
                 break
 
+        if value_to_return is not None:
+            return result.success(value_to_return)
         return result.success(
             List(elements, node.pos_start, node.pos_end).set_context(ctx)
         )
@@ -1456,10 +1472,18 @@ class Interpreter:
         """Visit ContinueNode"""
         return RTResult().success_continue(node.pos_start, node.pos_end)  # set RTResult().loop_should_continue to True
 
-    @staticmethod
-    def visit_BreakNode(node: BreakNode) -> RTResult:
+    def visit_BreakNode(self, node: BreakNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit BreakNode"""
-        return RTResult().success_break(node.pos_start, node.pos_end)  # set RTResult().loop_should_continue to True
+        result = RTResult()
+
+        value_to_return = None
+        if node.node_to_return is not None:
+            value_to_return = self._visit_value_that_can_have_attributes(
+                node.node_to_return, result, ctx, methods_instead_of_funcs
+            )
+            if result.should_return() or isinstance(value_to_return, RTResult):
+                return result
+        return result.success_break(node.pos_start, node.pos_end, value_to_return)
 
     def visit_ImportNode(self, node: ImportNode, ctx: Context) -> RTResult:
         """Visit ImportNode"""

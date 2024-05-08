@@ -35,6 +35,8 @@ class RTResult:
         self.loop_should_break = False  # there is a 'break' statement
         self.old_should_return = False  # The old value of self.should_return()
 
+        self.break_value: Value | None = None
+
         self.break_or_continue_pos: tuple[Position, Position] | None = None
         self.return_pos: tuple[Position, Position] | None = None
 
@@ -49,6 +51,7 @@ class RTResult:
         self.loop_should_continue = False
         self.loop_should_break = False
         self.old_should_return = False
+        self.break_value = None
 
         self.break_or_continue_pos = None
         self.return_pos = None
@@ -66,6 +69,7 @@ class RTResult:
         self.function_return_value = result.function_return_value
         self.loop_should_continue = result.loop_should_continue
         self.loop_should_break = result.loop_should_break
+        self.break_value = result.break_value
         self.break_or_continue_pos = result.break_or_continue_pos
         self.return_pos = result.return_pos
 
@@ -90,11 +94,12 @@ class RTResult:
         self.loop_should_continue = True
         return self
 
-    def success_break(self, pos_start: Position, pos_end: Position):
+    def success_break(self, pos_start: Position, pos_end: Position, value_to_return: Value | None = None):
         """same as self.success for self.loop_should_break"""
         self.reset()
         self.break_or_continue_pos = (pos_start, pos_end)
         self.loop_should_break = True
+        self.break_value = value_to_return
         return self
 
     def failure(self, error: Error):
@@ -122,6 +127,7 @@ class RTResult:
             "error": self.error,
             "loop_should_continue": self.loop_should_continue,
             "loop_should_break": self.loop_should_break,
+            "break_value": self.break_value,
             "old_should_return": self.old_should_return,
             "break_or_continue_pos": self.break_or_continue_pos,
             "return_pos": self.return_pos

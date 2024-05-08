@@ -337,7 +337,7 @@ class Lexer:
         return tokens, None
 
     def make_meta(self, is_empty_file: bool, dont_panic_on_errors: bool = False) -> None | Error:
-        """Make meta. dont_panic_on_errors is set when meta predicate is #@, for instance."""
+        """Make meta. dont_panic_on_errors is set when meta prefix is #@, for instance."""
         pos_start = self.pos.copy()
         if not is_empty_file:
             if dont_panic_on_errors: return

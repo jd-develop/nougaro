@@ -32,3 +32,5 @@ echo Done. Running unit tests…
 $python -m tests.tests
 return_code=$?
 if [ $return_code != 0 ]; then exit $return_code; fi
+
+echo "Please also test the -i command line argument."

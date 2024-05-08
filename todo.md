@@ -47,12 +47,20 @@
 * [X] add `import ... as ...` (finished 16/10/2023)
 * [X] rewrite shell.py CLI args with `argparse` (finished 22/01/2024)
 
-## 0.19.0 beta (goal: no goal)
+## ✅ 0.19.0 beta (goal: no goal)
 
-* [ ] add `tkinter`
+### Release date: May 8th, 2024
+
 * [X] add `webbrowser` (finished 24/04/2024)
 * [X] add `unicodedata` (finished 9/10/2023)
 * [X] move config files to `~/.config` under Linux and BSD, `~/Library/Preferences` under macOS, and `%appdata%` under Windaube. [QT documentation about where config files should be stored.](https://doc.qt.io/qt-6/qsettings.html#platform-specific-notes) (finished 10/03/2024, testing completed 11/03/2024)
+
+## 0.20.0 beta (goal: July 2024)
+
+* [ ] add `tkinter`
+* [ ] add unit tests
+* [ ] add complex numbers
+* [X] add `-i` cli arg to execute a file then run a shell within it (finished 08/05/2024)
 * [ ] add optional arguments in functions
   * [ ] Parser:
     * [ ] Allow optional parameters, do not allow positional parameters after them (call + def)
@@ -66,12 +74,6 @@
 * [ ] add `try catch`
 * [ ] add `raise`
 * [ ] add `assert ... crashes (on Error) (with message "...")`
-
-## 0.20.0 beta (goal: July 2024)
-
-* [ ] add unit tests
-* [ ] add complex numbers
-* [ ] add `-i` cli arg to execute a file then run a shell within it.
 
 ## 1.0.0 release candidate (goal: October 2024)
 

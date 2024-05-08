@@ -6,6 +6,10 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 
 ## 0.20.0-beta (unreleased)
 
+### Added
+* Add the `-i` (or `--interactive`) CLI argument. Allows to run an interactive shell after executing
+  a file, within the context of that file (i.e. with all the variables)
+
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.
 

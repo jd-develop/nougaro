@@ -43,12 +43,13 @@ else:
     readline = None
 
 
-def check_arguments(args: list[str], noug_dir: str, version: str) -> tuple[str, str | None, bool]:
+def check_arguments(args: list[str], noug_dir: str, version: str) -> tuple[str, str | None, bool, bool]:
     """Returns a file to exec, the line to exec, and dont_verbose"""
     line_to_exec = None
     dont_verbose = False
+    interactive = False
     if len(args) == 0:
-        return "<stdin>", None, False
+        return "<stdin>", None, False, False
 
     if args[0] in ["-c", "-d", "--command", "--cd", "--command-dont-verbose"]:
         path = "<commandline>"
@@ -77,6 +78,9 @@ def check_arguments(args: list[str], noug_dir: str, version: str) -> tuple[str, 
             print(line, end="")
         sys.exit()
     else:
+        if args[0] in ["-i", "--interactive"]:
+            interactive = True
+            del args[0]
         if not os.path.exists(args[0]):  # we check if the file exist, if not we quit with an error message
             print_in_red(f"[nougaro] file '{args[0]}' does not exist.")
             sys.exit(-1)  # DO NOT USE exit() OR quit() PYTHON BUILTINS !!!
@@ -91,10 +95,10 @@ def check_arguments(args: list[str], noug_dir: str, version: str) -> tuple[str, 
         else:  # valid file :)
             path = args[0]
 
-    return path, line_to_exec, dont_verbose
+    return path, line_to_exec, dont_verbose, interactive
 
 
-def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: list[str]):
+def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: list[str], interactive: bool):
     work_dir = os.path.dirname(os.path.realpath(path))
     endswith_slash = work_dir.endswith("/") or work_dir.endswith("\\")
     if endswith_slash:
@@ -112,14 +116,19 @@ def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: l
             _, error, _ = nougaro.run(path, file_content, noug_dir, version, args=args, work_dir=work_dir)
         except KeyboardInterrupt:  # if CTRL+C, just exit the Nougaro shell
             print_in_red("\nKeyboardInterrupt")
-            sys.exit()
+            error = None
+            if not interactive:
+                sys.exit()
         except EOFError:
             print_in_red("\nEOF")
-            sys.exit()
+            error = None
+            if not interactive:
+                sys.exit()
 
     if error is not None:  # there is an error, so before exiting we have to say "OH NO IT'S BROKEN"
         print_in_red(error.as_string())
-        sys.exit(1)
+        if not interactive:
+            sys.exit(1)
 
 
 def print_result_and_error(result: Value | None, error: Error | None, dont_verbose: bool,
@@ -197,12 +206,14 @@ def main():
     # Tested on Windows and Linux. Tested after compiling with Nuitka on Windows and Linux.
     del args[0]
 
-    path, line_to_exec, dont_verbose = check_arguments(args, noug_dir, VERSION)
+    path, line_to_exec, dont_verbose, interactive = check_arguments(args, noug_dir, VERSION)
 
     has_to_run_a_file = path not in ["<stdin>", "<commandline>"]
     if has_to_run_a_file:
-        execute_file(path, debug_on, noug_dir, VERSION, args)
-        return
+        execute_file(path, debug_on, noug_dir, VERSION, args, interactive)
+        if not interactive:
+            return
+        path = "<stdin>"
 
     work_dir = os.getcwd()
     endswith_slash = work_dir.endswith("/") or work_dir.endswith("\\")
@@ -214,7 +225,7 @@ def main():
     should_print_stuff = sys.stdin.isatty()
 
     if path == "<stdin>":  # we open the shell
-        if should_print_stuff:
+        if should_print_stuff and not interactive:
             # this text is always printed when we start the shell
             if debug_on:
                 print(f"Welcome to Nougaro {VERSION} (id {VERSION_ID}) on {platform.system()}!")

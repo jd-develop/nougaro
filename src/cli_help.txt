@@ -18,8 +18,12 @@ Options (assuming no filename is given):
  --cd "command"
  --command-dont-verbose "command"
                  - run a command without shell output
- --help -h       - show this message and exit.
- --version -V    - print version and exit.
+ -i filename
+ --interactive filemane
+                 - run a file, then open the shell: this is like running the
+                   file interactively
+ --help -h       - show this message and exit
+ --version -V    - print version and exit
 
 Any other argument is passed in Nougaro. Arguments can be retrieved using the
 built-in __args__ variable. For any other information, the documentation is

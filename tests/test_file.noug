@@ -293,6 +293,18 @@ def test_nougaro(print_OK)
     var variable.test = 20
     # var e(variable).test = 20  # fixme: there is a .copy() somewhere I think
     assert variable.test == 20
+    assert is_constructor(Test4)
+    assert is_constructor(Test3)
+    assert not is_constructor(e)
+    assert is_func(e)
+    assert is_func(Test4().bar)
+    assert not is_func(Test4().b)
+    assert is_int(Test4().b)
+    assert is_object(Test4())
+    assert is_object(d)
+    assert not is_object(12)
+    assert not is_object(e)
+    assert not is_object(Test4().bar)
 
     # builtin funcs
     print("Please test these builtin functions after the execution of the test:")
@@ -327,13 +339,19 @@ def test_nougaro(print_OK)
     if print_OK then print("OK builtin funcs 2")
 
     assert is_int(123)
+    assert not is_int(123.4)
     assert is_float(3.14)
+    assert not is_float(314)
     assert is_num(123)
     assert is_num(3.14)
+    assert not is_num("abc")
     assert is_str("abc")
+    assert not is_str(12)
     assert is_list([1, 2, 3])
+    assert not is_list("abc")
     assert is_func(is_func)
     assert is_func(def()->null)
+    assert not is_func(123)
 
     assert is_int(debug.is_debug_enabled)
     assert is_num(debug.is_debug_enabled)
@@ -351,6 +369,9 @@ def test_nougaro(print_OK)
 
     assert is_func(def()->null)
     assert is_none(None)
+    assert not is_none(12)
+    assert is_module(debug)
+    assert not is_module(debug.enable)
 
     if print_OK then print("OK builtin funcs 3")
 

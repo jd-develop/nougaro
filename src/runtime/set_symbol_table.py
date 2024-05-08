@@ -56,6 +56,8 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("is_func", BuiltInFunction('is_func'))
     symbol_table.set("is_module", BuiltInFunction('is_module'))
     symbol_table.set("is_none", BuiltInFunction('is_none'))
+    symbol_table.set("is_object", BuiltInFunction('is_object'))
+    symbol_table.set("is_constructor", BuiltInFunction('is_constructor'))
     symbol_table.set("type", BuiltInFunction('type'))
     symbol_table.set("__py_type__", BuiltInFunction('py_type'))
     symbol_table.set("str", BuiltInFunction('str'))

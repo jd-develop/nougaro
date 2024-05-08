@@ -17,7 +17,7 @@ from src.runtime.values.functions.base_builtin_func import BaseBuiltInFunction
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.context import Context
 from src.runtime.runtime_result import RTResult
-from src.runtime.values.basevalues.basevalues import String, List, NoneValue, Module, Number
+from src.runtime.values.basevalues.basevalues import String, List, NoneValue, Module, Number, Object, Constructor
 from src.runtime.values.number_constants import FALSE, TRUE
 from src.misc import RunFunction, nice_str_from_idk, BuiltinFunctionDict, print_in_green, print_in_red, clear_screen
 from src.misc import is_keyword, is_tok_type
@@ -565,12 +565,50 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         # we get the value and check if it is a module
         assert exec_ctx.symbol_table is not None
-        is_none = isinstance(exec_ctx.symbol_table.getf('value'), Module)
+        is_module = isinstance(exec_ctx.symbol_table.getf('value'), Module)
         # TRUE and FALSE are defined in src/values/number_constants.py
-        return RTResult().success(TRUE.copy() if is_none else FALSE.copy())
+        return RTResult().success(TRUE.copy() if is_module else FALSE.copy())
 
     builtin_functions["is_module"] = {
         "function": execute_is_module,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
+
+    def execute_is_object(self, exec_ctx: Context):
+        """Check if 'value' is a Module"""
+        # Params:
+        # * value
+        # we get the value and check if it is an object
+        assert exec_ctx.symbol_table is not None
+        is_object = isinstance(exec_ctx.symbol_table.getf('value'), Object)
+        # TRUE and FALSE are defined in src/values/number_constants.py
+        return RTResult().success(TRUE.copy() if is_object else FALSE.copy())
+
+    builtin_functions["is_object"] = {
+        "function": execute_is_object,
+        "param_names": ["value"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir_work_dir": False,
+        "noug_dir": False
+    }
+
+    def execute_is_constructor(self, exec_ctx: Context):
+        """Check if 'value' is a Module"""
+        # Params:
+        # * value
+        # we get the value and check if it is a constructor
+        assert exec_ctx.symbol_table is not None
+        is_constructor = isinstance(exec_ctx.symbol_table.getf('value'), Constructor)
+        # TRUE and FALSE are defined in src/values/number_constants.py
+        return RTResult().success(TRUE.copy() if is_constructor else FALSE.copy())
+
+    builtin_functions["is_constructor"] = {
+        "function": execute_is_constructor,
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,

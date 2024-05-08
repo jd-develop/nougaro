@@ -9,6 +9,8 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 ### Added
 * Add the `-i` (or `--interactive`) CLI argument. Allows to run an interactive shell after executing
   a file, within the context of that file (i.e. with all the variables)
+* Add the `is_object` builtin function
+* Add the `is_constructor` builtin function
 
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.

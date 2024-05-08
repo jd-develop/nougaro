@@ -40,6 +40,5 @@ export minor
 export patch
 export phase
 export release_serial
-export release_serial as phase_minor  # DEPRECATED, will be removed in 0.20.0 (TODO)
 export version_list
 export clean_version_for_gh

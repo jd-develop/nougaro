@@ -11,7 +11,7 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
   a file, within the context of that file (i.e. with all the variables)
 * Add the `is_object` builtin function
 * Add the `is_constructor` builtin function
-* Add the `break (value)` syntax, which allows to return a certain value when breaking a loop.
+* Add the `break and return (value)` syntax, which allows to return a certain value when breaking a loop.
 
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.

@@ -4,9 +4,9 @@ This file is updated nearly every commit and copied to GH release changelog.
 
 Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.com). It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. The Nougaro changelog has another section, `Calculator`, keeping track of the changes relative to the Nougaro Calculator under the same 6-sections format.
 
-## 0.19.0-beta (Unreleased)
+## 0.19.0-beta
 
-This version improves a little bit performances in some cases.
+This version comes with a lot of new features, and one single deprecation (see “How to update” to know how to update your code). This version improves a little bit performances in some cases.
 
 ### Added
 
@@ -84,6 +84,10 @@ This version improves a little bit performances in some cases.
 
 #### Fixed
 * Adding more dots into a float no longer does the same thing as adding multiple floats (for instance, `1.9.12` was previously parsed to `2.02`, which is the same as `1 0.9 + 0.12 +`)
+
+### How to update
+> [!Important]
+> If you were using `noug_version.phase_minor`, simply replace it with `noug_version.release_serial`, as `phase_minor` is now deprecated.
 
 ## 0.18.0-beta
 ### Syntax

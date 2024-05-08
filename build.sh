@@ -54,7 +54,7 @@ if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
     find . -type d -execdir rm -rf __pycache__/ \;
 
     echo "Copying…"
-    cp -r example.noug LICENSE README.md shell.py CODE_OF_CONDUCT.md CONTRIBUTING.md how_it_works.md tests/ examples/ lib_/ src/ noug_version.json repo-image/ shell.dist/
+    cp -r example.noug LICENSE README.md README.fr.md shell.py CODE_OF_CONDUCT.md CONTRIBUTING.md how_it_works.md tests/ examples/ lib_/ src/ noug_version.json repo-image/ shell.dist/
 
     echo "Renaming and compressing…"
     mv shell.dist nougaro-"$nougversion"-"$nougphase"-linux-bin

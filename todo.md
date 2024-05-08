@@ -54,6 +54,7 @@
 * [X] add `webbrowser` (finished 24/04/2024)
 * [X] add `unicodedata` (finished 9/10/2023)
 * [X] move config files to `~/.config` under Linux and BSD, `~/Library/Preferences` under macOS, and `%appdata%` under Windaube. [QT documentation about where config files should be stored.](https://doc.qt.io/qt-6/qsettings.html#platform-specific-notes) (finished 10/03/2024, testing completed 11/03/2024)
+* [X] rewrite parser to make it faster and easier to read (finished 30/04/2024)
 
 ## 0.20.0 beta (goal: July 2024)
 
@@ -68,7 +69,6 @@
   * [ ] Runtime:
     * [ ] Update Function value and methods
     * [ ] Update Interpreter visit methods
-* [X] rewrite parser to make it faster and easier to read (finished 30/04/2024)
 * [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
 * [ ] add builtin classes, or find a way to have builtin-methods in Values.
 * [ ] add `try catch`

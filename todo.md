@@ -56,7 +56,7 @@
 * [X] move config files to `~/.config` under Linux and BSD, `~/Library/Preferences` under macOS, and `%appdata%` under Windaube. [QT documentation about where config files should be stored.](https://doc.qt.io/qt-6/qsettings.html#platform-specific-notes) (finished 10/03/2024, testing completed 11/03/2024)
 * [X] rewrite parser to make it faster and easier to read (finished 30/04/2024)
 
-## 0.20.0 beta (goal: July 2024)
+## 0.20.0 beta (goal: June 2024)
 
 * [ ] add `continue and append (value)`
 * [X] add `-i` cli arg to execute a file then run a shell within it (finished 08/05/2024)
@@ -67,11 +67,8 @@
   * [ ] Runtime:
     * [ ] Update Function value and methods
     * [ ] Update Interpreter visit methods
-* [ ] add `try catch`
-* [ ] add `raise`
-* [ ] add `assert ... crashes (on Error) (with message "...")`
 
-## 1.0.0 release candidate (goal: October 2024)
+## 1.0.0 release candidate (goal: September 2024)
 
 * [ ] create highlight extension for VSCode
 * [X] if possible, implement `break (name)` and `continue (name)` where (name) is `if`, `for`, … (finished 09/05/2024)
@@ -87,4 +84,7 @@
 * [ ] add complex numbers
 * [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
 * [ ] add builtin classes, or find a way to have builtin-methods in Values.
+* [ ] add `try catch`
+* [ ] add `raise`
+* [ ] add `assert ... crashes (on Error) (with message "...")`
 * [X] eventually remove protected variables (finished 20/01/2024)

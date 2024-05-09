@@ -6,8 +6,8 @@ statement     : KEYWORD:RETURN expr?
               : KEYWORD:IMPORT IDENTIFIER (DOT IDENTIFIER)?* (KEYWORD:AS IDENTIFIER)?
               : KEYWORD:EXPORT expr AS IDENTIFIER
               : KEYWORD:EXPORT IDENTIFIER (KEYWORD:AS IDENTIFIER)?
-              : KEYWORD:CONTINUE
-              : KEYWORD:BREAK (KEYWORD:AND KEYWORD:RETURN expr)
+              : KEYWORD:CONTINUE (COLON IDENTIFIER)?
+              : KEYWORD:BREAK (COLON IDENTIFIER)? (KEYWORD:AND KEYWORD:RETURN expr)?
               : expr
 
 expr          : var_assign
@@ -68,15 +68,19 @@ if_expr_c     : KEYWORD:ELSE
                 (statement
               | (NEWLINE statements KEYWORD:END))
 
-for_expr      : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr (KEYWORD:STEP expr)? KEYWORD:THEN
+for_expr      : KEYWORD:FOR (COLON IDENTIFIER)?
+                IDENTIFIER EQ expr KEYWORD:TO expr (KEYWORD:STEP expr)? KEYWORD:THEN
                 statement | (NEWLINE statements KEYWORD:END)
-              : KEYWORD:FOR IDENTIFIER KEYWORD:IN expr KEYWORD:THEN
+              : KEYWORD:FOR (COLON IDENTIFIER)?
+                IDENTIFIER KEYWORD:IN expr KEYWORD:THEN
                 statement | (NEWLINE statements KEYWORD:END)
 
-while_expr    : KEYWORD:WHILE expr KEYWORD:THEN
+while_expr    : KEYWORD:WHILE (COLON IDENTIFIER)?
+                expr KEYWORD:THEN
                 statement | (NEWLINE statements KEYWORD:END)
 
-do_expr       : KEYWORD:DO (statement | (NEWLINE statements)) KEYWORD:THEN KEYWORD:LOOP KEYWORD:WHILE expr
+do_expr       : KEYWORD:DO (COLON IDENTIFIER)?
+                (statement | (NEWLINE statements)) KEYWORD:THEN KEYWORD:LOOP KEYWORD:WHILE expr
 
 func_def      : KEYWORD:DEF IDENTIFIER? fund_def_args
                 (ARROW expr)|(NEWLINE statements KEYWORD:END)

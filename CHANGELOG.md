@@ -12,6 +12,9 @@ Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.c
 * Add the `is_object` builtin function
 * Add the `is_constructor` builtin function
 * Add the `break and return (value)` syntax, which allows to return a certain value when breaking a loop.
+* Add loop labels:
+  * Using the syntax `for:label`, `while:label` or `do:label`, you can label your loops.
+  * Using the syntax `break:label` and `continue:label`, you can break or continue an outer loop.
 
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.

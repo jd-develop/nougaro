@@ -78,7 +78,7 @@
 ## 1.0.0 release candidate (goal: October 2024)
 
 * [ ] create highlight extension for VSCode
-* [ ] if possible, implement `break (name)` and `continue (name)` where (name) is `if`, `for`, …
+* [X] if possible, implement `break (name)` and `continue (name)` where (name) is `if`, `for`, … (finished 09/05/2024)
 * [X] completely switch to [semver](https://semver.org) (finished 7/11/2023)
 
 ## Future releases

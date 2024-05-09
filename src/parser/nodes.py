@@ -273,20 +273,23 @@ class ForNode(Node):
             end_value_node: Node,
             step_value_node: Node | None,
             body_node: Node,
+            label: str | None = None
     ):
         # by default step_value_node is None
-        self.var_name_token: _Token = var_name_token
-        self.start_value_node: Node = start_value_node
-        self.end_value_node: Node = end_value_node
-        self.step_value_node: Node | None = step_value_node
-        self.body_node: Node = body_node
+        self.var_name_token = var_name_token
+        self.start_value_node = start_value_node
+        self.end_value_node = end_value_node
+        self.step_value_node = step_value_node
+        self.body_node = body_node
+        self.label = label
 
         self.pos_start = self.var_name_token.pos_start
         self.pos_end = self.body_node.pos_end
 
     def __repr__(self):
-        return f"for:({self.var_name_token} = {self.start_value_node} to {self.end_value_node} step " \
-               f"{self.step_value_node} then {self.body_node})"
+        label = f":{self.label}" if self.label is not None else ""
+        return f"for{label} {self.var_name_token} = {self.start_value_node} to {self.end_value_node} step " \
+               f"{self.step_value_node} then {self.body_node}"
 
 
 class ForNodeList(Node):
@@ -296,20 +299,23 @@ class ForNodeList(Node):
         body_node is the node after the 'then'
         list_node is a VarAccessNode (identifier: b)
     """
-    def __init__(self, var_name_token: _Token, body_node: Node, list_node: Node | ListNode):
+    def __init__(self, var_name_token: _Token, body_node: Node, list_node: Node | ListNode,
+                 label: str | None = None):
         # if list = [1, 2, 3]
         # for var in list is same as for var = 1 to 3 (step 1)
 
         self.var_name_token: _Token = var_name_token
         self.body_node = body_node
         self.list_node = list_node
+        self.label = label
 
         # Position
         self.pos_start = self.var_name_token.pos_start
         self.pos_end = self.body_node.pos_end
 
     def __repr__(self):
-        return f"for:({self.var_name_token} in {self.list_node} then {self.body_node})"
+        label = f":{self.label}" if self.label is not None else ""
+        return f"for{label} {self.var_name_token} in {self.list_node} then {self.body_node}"
 
 
 class WhileNode(Node):
@@ -318,15 +324,17 @@ class WhileNode(Node):
     Here, condition_node is a VarAccessNode (identifier: True)
           body_node is a CallNode (identifier: foo, no args)*
     """
-    def __init__(self, condition_node: Node, body_node: Node):
+    def __init__(self, condition_node: Node, body_node: Node, label: str | None = None):
         self.condition_node: Node = condition_node
         self.body_node: Node = body_node
+        self.label = label
 
         self.pos_start = self.condition_node.pos_start
         self.pos_end = self.body_node.pos_end
 
     def __repr__(self):
-        return f'while:({self.condition_node} then:{self.body_node})'
+        label = f":{self.label}" if self.label is not None else ""
+        return f'while{label} {self.condition_node} then {self.body_node} '
 
 
 class DoWhileNode(Node):
@@ -335,37 +343,49 @@ class DoWhileNode(Node):
     Here, body_node is a CallNode (identifier: foo, no args)
           condition_node is a VarAccessNode (identifier: True)
     """
-    def __init__(self, body_node: Node, condition_node: Node):
+    def __init__(self, body_node: Node, condition_node: Node, label: str | None = None):
         self.body_node = body_node
         self.condition_node = condition_node
+        self.label = label
 
         self.pos_start = self.condition_node.pos_start
         self.pos_end = self.body_node.pos_end
 
     def __repr__(self):
-        return f"do:({self.body_node} then loop while:{self.condition_node})"
+        label = f":{self.label}" if self.label is not None else ""
+        return f"do{label} {self.body_node} then loop while {self.condition_node}"
 
 
 class BreakNode(Node):
     """Node for `break` statement"""
-    def __init__(self, pos_start: _Position, pos_end: _Position, node_to_return: Node | list[Node] | None = None):
+    def __init__(self, pos_start: _Position, pos_end: _Position,
+                 node_to_return: Node | list[Node] | None = None,
+                 label: str | None = None):
         self.pos_start = pos_start
         self.pos_end = pos_end
         self.node_to_return = node_to_return
+        self.label = label
 
     def __repr__(self):
+        if self.label:
+            repr_ = f"break:{self.label}"
+        else:
+            repr_ = "break"
         if self.node_to_return is not None:
-            return f"break and return {self.node_to_return}"
-        return "break"
+            return f"{repr_} and return {self.node_to_return}"
+        return repr_
 
 
 class ContinueNode(Node):
     """Node for `continue` statement"""
-    def __init__(self, pos_start: _Position, pos_end: _Position):
+    def __init__(self, pos_start: _Position, pos_end: _Position, label: str | None = None):
         self.pos_start = pos_start
         self.pos_end = pos_end
+        self.label = label
 
     def __repr__(self):
+        if self.label is not None:
+            return f"continue:{self.label}"
         return "continue"
 
 

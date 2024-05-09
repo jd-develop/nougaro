@@ -303,6 +303,11 @@ class Lexer:
                 there_is_a_space_or_a_tab_or_a_comment = False
                 tokens.append(Token(TT["COMMA"], pos_start=self.pos))
                 self.advance()
+            # colon
+            elif self.current_char == ":":
+                there_is_a_space_or_a_tab_or_a_comment = False
+                tokens.append(Token(TT["COLON"], pos_start=self.pos))
+                self.advance()
 
             # dollar-print
             elif self.current_char == "$":

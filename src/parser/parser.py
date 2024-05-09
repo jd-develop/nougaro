@@ -298,12 +298,12 @@ class Parser:
     def statement(self) -> ParseResult:  # only one statement
         """
         statement     : KEYWORD:RETURN expr?
-              : KEYWORD:IMPORT IDENTIFIER (DOT IDENTIFIER)?* (KEYWORD:AS IDENTIFIER)?
-              : KEYWORD:EXPORT expr AS IDENTIFIER
-              : KEYWORD:EXPORT IDENTIFIER (KEYWORD:AS IDENTIFIER)?
-              : KEYWORD:CONTINUE
-              : KEYWORD:BREAK (IDENTIFIER)
-              : exprr
+                      : KEYWORD:IMPORT IDENTIFIER (DOT IDENTIFIER)?* (KEYWORD:AS IDENTIFIER)?
+                      : KEYWORD:EXPORT expr AS IDENTIFIER
+                      : KEYWORD:EXPORT IDENTIFIER (KEYWORD:AS IDENTIFIER)?
+                      : KEYWORD:CONTINUE (COLON IDENTIFIER)?
+                      : KEYWORD:BREAK (COLON IDENTIFIER)? (KEYWORD:AND KEYWORD:RETURN expr)?
+                      : expr
         """
         # we create the result and get the pos start from the current token
         result = ParseResult()
@@ -413,12 +413,38 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            return result.success(ContinueNode(pos_start, self.current_token.pos_start.copy()))
+            label = None
+            if self.current_token.type == TT["COLON"]:
+                result = self.advance_and_check_for(
+                    result, "expected label identifier after ':'.", "IDENTIFIER",
+                    origin_file="statement"
+                )
+                if result.error is not None:
+                    return result
+                label = self.current_token.value
+                assert isinstance(label, str)
+                result.register_advancement()
+                self.advance()
+
+            return result.success(ContinueNode(pos_start, self.current_token.pos_start.copy(), label))
 
         # KEYWORD:BREAK
         if self.current_token.matches(TT["KEYWORD"], 'break'):
             result.register_advancement()
             self.advance()
+
+            label = None
+            if self.current_token.type == TT["COLON"]:
+                result = self.advance_and_check_for(
+                    result, "expected label identifier after ':'.", "IDENTIFIER",
+                    origin_file="for_expr"
+                )
+                if result.error is not None:
+                    return result
+                label = self.current_token.value
+                assert isinstance(label, str)
+                result.register_advancement()
+                self.advance()
 
             expr_to_return = None
             if self.current_token.matches(TT["KEYWORD"], "and"):
@@ -426,11 +452,15 @@ class Parser:
                     result, "expected keyword “return” after “and”.", "KEYWORD",
                     "return", "statement"
                 )
+                if result.error is not None:
+                    return result
                 expr_to_return = result.register(self.expr())
                 if result.error is not None:
                     return result                
 
-            return result.success(BreakNode(pos_start, self.current_token.pos_start.copy(), expr_to_return))
+            return result.success(
+                BreakNode(pos_start, self.current_token.pos_start.copy(), expr_to_return, label)
+            )
 
         # expr
         expr = result.register(self.expr())
@@ -1495,10 +1525,12 @@ class Parser:
 
     def for_expr(self) -> ParseResult:
         """
-        for_expr   : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr (KEYWORD:STEP expr)? KEYWORD:THEN
-                     statement | (NEWLINE statements KEYWORD:END)
-                   : KEYWORD:FOR IDENTIFIER KEYWORD:IN expr KEYWORD:THEN
-                     statement | (NEWLINE statements KEYWORD:END)
+        for_expr      : KEYWORD:FOR (COLON IDENTIFIER)?
+                        IDENTIFIER EQ expr KEYWORD:TO expr (KEYWORD:STEP expr)? KEYWORD:THEN
+                        statement | (NEWLINE statements KEYWORD:END)
+                      : KEYWORD:FOR (COLON IDENTIFIER)?
+                        IDENTIFIER KEYWORD:IN expr KEYWORD:THEN
+                        statement | (NEWLINE statements KEYWORD:END)
         """
         result = ParseResult()
         assert self.current_token is not None
@@ -1509,6 +1541,19 @@ class Parser:
 
         result.register_advancement()
         self.advance()
+
+        label = None
+        if self.current_token.type == TT["COLON"]:
+            result = self.advance_and_check_for(
+                result, "expected label identifier after ':'.", "IDENTIFIER",
+                origin_file="for_expr"
+            )
+            if result.error is not None:
+                return result
+            label = self.current_token.value
+            assert isinstance(label, str)
+            result.register_advancement()
+            self.advance()
 
         if self.current_token.type != TT["IDENTIFIER"]:
             if self.current_token.type == TT["KEYWORD"]:
@@ -1573,7 +1618,7 @@ class Parser:
             assert not isinstance(body, list)
             assert not isinstance(iterable_, list)
 
-            return result.success(ForNodeList(var_name, body, iterable_))
+            return result.success(ForNodeList(var_name, body, iterable_, label))
 
         # EQ expr KEYWORD:TO expr (KEYWORD:STEP expr)? KEYWORD:THEN statement | (NEWLINE statements KEYWORD:END)
         result = self.check_for_and_advance(result, "expected 'in' or '=', but got %toktype%.", "EQ",
@@ -1647,9 +1692,14 @@ class Parser:
         assert not isinstance(step_value, list)
         assert not isinstance(body, list)
         
-        return result.success(ForNode(var_name, start_value, end_value, step_value, body))
+        return result.success(ForNode(var_name, start_value, end_value, step_value, body, label))
 
     def while_expr(self) -> ParseResult:
+        """
+        while_expr    : KEYWORD:WHILE (COLON IDENTIFIER)?
+                        expr KEYWORD:THEN
+                        statement | (NEWLINE statements KEYWORD:END)
+        """
         result = ParseResult()
         assert self.current_token is not None
 
@@ -1657,6 +1707,19 @@ class Parser:
         result = self.check_for_and_advance(result, "expected 'while'.", "KEYWORD", "while", "while_expr")
         if result.error is not None:
             return result
+
+        label = None
+        if self.current_token.type == TT["COLON"]:
+            result = self.advance_and_check_for(
+                result, "expected label identifier after ':'.", "IDENTIFIER",
+                origin_file="while_expr"
+            )
+            if result.error is not None:
+                return result
+            label = self.current_token.value
+            assert isinstance(label, str)
+            result.register_advancement()
+            self.advance()
 
         # expr
         condition = result.register(self.expr())
@@ -1698,16 +1761,32 @@ class Parser:
         assert not isinstance(body, list)
         assert not isinstance(condition, list)
 
-        return result.success(WhileNode(condition, body))
+        return result.success(WhileNode(condition, body, label))
 
     def do_expr(self) -> ParseResult:
         """
-        KEYWORD:DO (statement | (NEWLINE statements NEWLINE)) KEYWORD:THEN KEYWORD:LOOP KEYWORD:WHILE expr
+        do_expr: KEYWORD:DO (COLON IDENTIFIER)?
+                 (statement | (NEWLINE statements)) KEYWORD:THEN KEYWORD:LOOP KEYWORD:WHILE expr
         """
         result = ParseResult()
         assert self.current_token is not None
 
         result = self.check_for_and_advance(result, "expected 'do'.", "KEYWORD", "do", "do_expr")
+        if result.error is not None:
+            return result
+        
+        label = None
+        if self.current_token.type == TT["COLON"]:
+            result = self.advance_and_check_for(
+                result, "expected label identifier after ':'.", "IDENTIFIER",
+                origin_file="do_expr"
+            )
+            if result.error is not None:
+                return result
+            label = self.current_token.value
+            assert isinstance(label, str)
+            result.register_advancement()
+            self.advance()
 
         # NEWLINE statements NEWLINE
         if self.current_token.type == TT["NEWLINE"]:
@@ -1738,7 +1817,7 @@ class Parser:
         assert not isinstance(body, list)
         assert not isinstance(condition, list)
 
-        return result.success(DoWhileNode(body, condition))
+        return result.success(DoWhileNode(body, condition, label))
 
     def func_def(self) -> ParseResult:
         """

@@ -76,6 +76,7 @@ TT = {
     "LSQUARE": '[',              # [
     
     "COMMA": ',',                # ,
+    "COLON": ':',                # :
     "ARROW": '->',               # ->
     "INTERROGATIVE_PNT": '?',    # ?
 

@@ -124,16 +124,22 @@ class Interpreter:
         if main_visit:
             if result.loop_should_break:
                 assert result.break_or_continue_pos is not None
+                errmsg_label = ""
+                if result.break_label is not None:
+                    errmsg_label = f" Maybe you forgot to create a loop labelled {result.break_label}?"
                 return result.failure(RunTimeError(
                     result.break_or_continue_pos[0], result.break_or_continue_pos[1],
-                    "'break' outside of a loop.", ctx,
+                    f"'break' outside of a loop.{errmsg_label}", ctx,
                     origin_file=f"{_ORIGIN_FILE}.visit"
                 ))
             if result.loop_should_continue:
                 assert result.break_or_continue_pos is not None
+                errmsg_label = ""
+                if result.continue_label is not None:
+                    errmsg_label = f" Maybe you forgot to create a loop labelled {result.continue_label}?"
                 return result.failure(RunTimeError(
                     result.break_or_continue_pos[0], result.break_or_continue_pos[1],
-                    "'continue' outside of a loop.", ctx,
+                    f"'continue' outside of a loop.{errmsg_label}", ctx,
                     origin_file=f"{_ORIGIN_FILE}.visit"
                 ))
             if result.function_return_value is not None:
@@ -930,6 +936,8 @@ class Interpreter:
         assert isinstance(node.var_name_token.value, str)
 
         value_to_return = None
+        outer_loop_should_break = False
+        outer_loop_should_continue = False
         while condition():
             ctx.symbol_table.set(
                 node.var_name_token.value, Number(i, node.var_name_token.pos_start, node.var_name_token.pos_end)
@@ -940,20 +948,33 @@ class Interpreter:
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
                 elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
-                continue  # will continue the 'while condition()' -> the interpreted 'for' loop is continued
+                if result.continue_label is not None and node.label != result.continue_label:
+                    outer_loop_should_continue = True
+                    break
+                continue
 
             if result.loop_should_break:
                 value_to_return = result.break_value  # which is a Value or None
                 elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
-                break  # will break the 'while condition()' -> the interpreted 'for' loop is break
+                if result.break_label is not None and node.label != result.break_label:
+                    outer_loop_should_break = True
+                break
 
-            if result.should_return():
+            if result.should_return(True):
                 # if there is an error or a 'return' statement
                 return result
             assert value is not None
 
             elements.append(value)
 
+        if outer_loop_should_continue:
+            assert result.break_or_continue_pos is not None
+            pos_start, pos_end = result.break_or_continue_pos
+            return result.success_continue(pos_start, pos_end, result.continue_label)
+        if outer_loop_should_break:
+            assert result.break_or_continue_pos is not None
+            pos_start, pos_end = result.break_or_continue_pos
+            return result.success_break(pos_start, pos_end, result.break_value, result.break_label)
         if value_to_return is not None:
             return result.success(value_to_return)
         return result.success(
@@ -984,6 +1005,8 @@ class Interpreter:
         assert ctx.symbol_table is not None
         assert isinstance(node.var_name_token.value, str)
         value_to_return = None
+        outer_loop_should_break = False
+        outer_loop_should_continue = False
         for element in python_iterable:
             # we set the variable to the actual list element
             if isinstance(element, str):
@@ -994,21 +1017,35 @@ class Interpreter:
 
             if result.loop_should_continue:
                 elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
-                continue  # will continue the 'for e in iterable_.elements' -> the interpreted 'for' loop is
-                #           continued
+                if result.continue_label is not None and node.label != result.continue_label:
+                    outer_loop_should_continue = True
+                    break
+                continue
 
             if result.loop_should_break:
                 value_to_return = result.break_value  # which is a Value or None
                 elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
-                break  # will break the 'for e in iterable_.elements' -> the interpreted 'for' loop is break
+                if result.break_label is not None and node.label != result.break_label:
+                    outer_loop_should_break = True
+                break
 
-            if result.should_return():
+            if result.should_return(True):
                 # error or 'return' statement
                 return result
-            assert value is not None
+
+            if value is None:
+                value = NoneValue(node.body_node.pos_start, node.body_node.pos_end, False)
 
             elements.append(value)
-
+        
+        if outer_loop_should_continue:
+            assert result.break_or_continue_pos is not None
+            pos_start, pos_end = result.break_or_continue_pos
+            return result.success_continue(pos_start, pos_end, result.continue_label)
+        if outer_loop_should_break:
+            assert result.break_or_continue_pos is not None
+            pos_start, pos_end = result.break_or_continue_pos
+            return result.success_break(pos_start, pos_end, result.break_value, result.break_label)
         if value_to_return is not None:
             return result.success(value_to_return)
         return result.success(
@@ -1026,21 +1063,30 @@ class Interpreter:
         assert condition is not None
 
         value_to_return = None
+        outer_loop_should_break = False
+        outer_loop_should_continue = False
         while condition.is_true():
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
                 elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if result.continue_label is not None and node.label != result.continue_label:
+                    outer_loop_should_continue = True
+                    break
                 continue
 
             if result.loop_should_break:
                 value_to_return = result.break_value  # which is a Value or None
                 elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if result.break_label is not None and node.label != result.break_label:
+                    outer_loop_should_break = True
                 break
 
-            if result.should_return():
+            if result.should_return(True):
                 # error or 'return' statement
                 return result
-            assert value is not None
+            
+            if value is None:
+                value = NoneValue(node.body_node.pos_start, node.body_node.pos_end, False)
 
             elements.append(value)
 
@@ -1049,6 +1095,14 @@ class Interpreter:
                 return result
             assert condition is not None
 
+        if outer_loop_should_continue:
+            assert result.break_or_continue_pos is not None
+            pos_start, pos_end = result.break_or_continue_pos
+            return result.success_continue(pos_start, pos_end, result.continue_label)
+        if outer_loop_should_break:
+            assert result.break_or_continue_pos is not None
+            pos_start, pos_end = result.break_or_continue_pos
+            return result.success_break(pos_start, pos_end, result.break_value, result.break_label)
         if value_to_return is not None:
             return result.success(value_to_return)
         return result.success(
@@ -1061,21 +1115,30 @@ class Interpreter:
         elements: list[Value] = []
 
         value_to_return = None
+        outer_loop_should_break = False
+        outer_loop_should_continue = False
         while True:
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
                 elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if result.continue_label is not None and node.label != result.continue_label:
+                    outer_loop_should_continue = True
+                    break
                 continue
 
             if result.loop_should_break:
                 value_to_return = result.break_value  # which is a Value or None
                 elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if result.break_label is not None and node.label != result.break_label:
+                    outer_loop_should_break = True
                 break
 
-            if result.should_return():
+            if result.should_return(True):
                 # error or 'return' statement
                 return result
-            assert value is not None
+            
+            if value is None:
+                value = NoneValue(node.body_node.pos_start, node.body_node.pos_end, False)
 
             elements.append(value)
 
@@ -1087,6 +1150,14 @@ class Interpreter:
             if not condition.is_true():  # the condition isn't true: we break the loop
                 break
 
+        if outer_loop_should_continue:
+            assert result.break_or_continue_pos is not None
+            pos_start, pos_end = result.break_or_continue_pos
+            return result.success_continue(pos_start, pos_end, result.continue_label)
+        if outer_loop_should_break:
+            assert result.break_or_continue_pos is not None
+            pos_start, pos_end = result.break_or_continue_pos
+            return result.success_break(pos_start, pos_end, result.break_value, result.break_label)
         if value_to_return is not None:
             return result.success(value_to_return)
         return result.success(
@@ -1470,7 +1541,7 @@ class Interpreter:
     @staticmethod
     def visit_ContinueNode(node: ContinueNode) -> RTResult:
         """Visit ContinueNode"""
-        return RTResult().success_continue(node.pos_start, node.pos_end)  # set RTResult().loop_should_continue to True
+        return RTResult().success_continue(node.pos_start, node.pos_end, node.label)
 
     def visit_BreakNode(self, node: BreakNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
         """Visit BreakNode"""
@@ -1483,7 +1554,7 @@ class Interpreter:
             )
             if result.should_return() or isinstance(value_to_return, RTResult):
                 return result
-        return result.success_break(node.pos_start, node.pos_end, value_to_return)
+        return result.success_break(node.pos_start, node.pos_end, value_to_return, node.label)
 
     def visit_ImportNode(self, node: ImportNode, ctx: Context) -> RTResult:
         """Visit ImportNode"""

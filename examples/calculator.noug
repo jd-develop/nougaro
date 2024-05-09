@@ -59,6 +59,13 @@ def print_help(v)  # v is verbose
     print()
 end
 
+
+def print_error(error_msg, verbose)
+    print_in_red(if verbose then error_msg else "?")
+    if verbose then print("Stack is unchanged.")
+end
+
+
 if len(__args__) >= 2 and __args__(1) in ["-h", "--help"] then
     print_help(0)
     exit()
@@ -91,13 +98,12 @@ var increment = 0
 
 var stack = []
 var error_msg = ""
-while True then
+while:main_loop True then
     if verbose then
         var calcul = input("calc> ")
     else
         var calcul = input()
     end
-    var should_continue = False
     
     if calcul in ["exit", "exit()", "done", "quit", "q"] then break
     if calcul == "" then continue
@@ -181,7 +187,8 @@ while True then
         elif char == '.' then
             if floating_point != 0 then
                 var error_msg = "Error: a number can’t have more than two dots"
-                var should_continue = True
+                print_error(error_msg, verbose)
+                continue:main_loop
             end
             append(tokens, '.')
         elif char == " " or char == chr(8239) or char == chr(160) then  # the 2 others are NNBSP and NBSP
@@ -231,24 +238,19 @@ while True then
         elif char == "u" and len(tokens) > 0 and tokens(-1) == "ta" then
             replace(tokens, -1, "tau")
         elif char == "\t" then
-            var error_msg = "Error: use spaces instead of tabulations."
-            var should_continue = True
+            print_error("Error: use spaces instead of tabulations.", verbose)
+            continue:main_loop
             break
         else
             var error_msg = "Error: illegal char: " + char
-            var should_continue = True
-            break
+            print_error(error_msg, verbose)
+            continue:main_loop
         end
         if old_floating_point == floating_point then var floating_point = var old_floating_point = 0
     end
 
     if debug.is_debug_enabled then \
         print(tokens)
-        
-    if should_continue then
-        if verbose then print_in_red(error_msg) else print_in_red("?")
-        continue
-    end
     
     # parse
     var i = -1
@@ -264,8 +266,9 @@ while True then
                 replace(stack, -1, math.sqrt(stack(-1)))
             else
                 var error_msg = "Error: a negative number (" + str(stack(-1)) + ") doesn't have a square root (this calculator does not support complex numbers)."
-                var should_continue = True
-                break
+                print_error(error_msg, verbose)
+                var stack = list(old_stack)
+                continue:main_loop
            end
         elif token == "pi" then
            append(stack, math.pi)
@@ -278,8 +281,9 @@ while True then
             var num2 = stack(-1)
             if num2 == 0 then
                 var error_msg = "Error: can not divide by 0"
-                var should_continue = True
-                break
+                print_error(error_msg, verbose)
+                var stack = list(old_stack)
+                continue:main_loop
             end
             var mod = num1 % num2
             pop(stack, -1)
@@ -290,8 +294,9 @@ while True then
             var base = stack(-1)
             if number <= 0 or base <= 0 then
                 var error_msg = "Error: math domain error with logarithm"
-                var should_continue = True
-                break
+                print_error(error_msg, verbose)
+                var stack = list(old_stack)
+                continue:main_loop
             end
             var logbase = math.log(number, base)
             pop(stack, -1)
@@ -301,8 +306,9 @@ while True then
             var number = stack(-1)
             if number <= 0 then
                 var error_msg = "Error: math domain error with logarithm"
-                var should_continue = True
-                break
+                print_error(error_msg, verbose)
+                var stack = list(old_stack)
+                continue:main_loop
             end
             var natural_log = math.log(number)
             pop(stack, -1)
@@ -311,13 +317,15 @@ while True then
             var number = stack(-1)
             if number < 0 then
                 var error_msg = "Error: math error with factorial (n<0)"
-                var should_continue = True
-                break
+                print_error(error_msg, verbose)
+                var stack = list(old_stack)
+                continue:main_loop
             end
             if number >= 9223372036854775808 then
                 var error_msg = "Error: overflow with factorial (n>=9223372036854775808)"
-                var should_continue = True
-                break
+                print_error(error_msg, verbose)
+                var stack = list(old_stack)
+                continue:main_loop
             end
             pop(stack, -1)
             append(stack, math.factorial(number))
@@ -336,8 +344,9 @@ while True then
                 elif token == '/' then
                     if len(stack) != 0 and stack(-1) == 0 then
                         var error_msg = "Error: can not divide by 0"
-                        var should_continue = True
-                        break
+                        print_error(error_msg, verbose)
+                        var stack = list(old_stack)
+                        continue:main_loop
                     end
                     if len(tokens) >= i+2 and tokens(i+1) == "/" then
                         var result = stack(-2) // stack(-1)
@@ -350,26 +359,21 @@ while True then
                     var result = stack(-2) ^ stack(-1)
                 else
                     var error_msg = "Error: invalid token: " + str(token)
-                    var should_continue = True
-                    break
+                    print_error(error_msg, verbose)
+                    var stack = list(old_stack)
+                    continue:main_loop
                 end
                 pop(stack, -1)
                 pop(stack, -1)
                 append(stack, result)
             else
                 var error_msg = "Error: maybe there is not enough values in stack, or maybe you just typed the beginning of a command."
-                var should_continue = True
-                break
+                print_error(error_msg, verbose)
+                var stack = list(old_stack)
+                continue:main_loop
             end
         end
         var last_token = token
-    end
-    
-    if should_continue then
-        var stack = list(old_stack)
-        if verbose then print_in_red(error_msg) else print_in_red("?")
-        if verbose then print("Stack is unchanged.")
-        continue
     end
     
     if len(stack) >= 1 then

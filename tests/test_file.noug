@@ -347,7 +347,7 @@ def test_nougaro(print_OK)
     assert b == 6
 
     var b = (for:outer i = 0 to 10 then for:inner j = 0 to i then if i+j==5 then continue:outer elif i+j == 15 then break and return "15!" else i+j)
-    assert b = [[], [1], [2, 3], None, None, None, [6, 7, 8, 9, 10, 11], [7, 8, 9, 10, 11, 12, 13], "15!", "15!"]
+    assert b == [[], [1], [2, 3], None, None, None, [6, 7, 8, 9, 10, 11], [7, 8, 9, 10, 11, 12, 13], "15!", "15!"]
 
     del b
 

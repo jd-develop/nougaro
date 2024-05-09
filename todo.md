@@ -58,9 +58,7 @@
 
 ## 0.20.0 beta (goal: July 2024)
 
-* [ ] add `tkinter`
-* [ ] add unit tests
-* [ ] add complex numbers
+* [ ] add `continue and append (value)`
 * [X] add `-i` cli arg to execute a file then run a shell within it (finished 08/05/2024)
 * [ ] add optional arguments in functions
   * [ ] Parser:
@@ -69,8 +67,6 @@
   * [ ] Runtime:
     * [ ] Update Function value and methods
     * [ ] Update Interpreter visit methods
-* [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
-* [ ] add builtin classes, or find a way to have builtin-methods in Values.
 * [ ] add `try catch`
 * [ ] add `raise`
 * [ ] add `assert ... crashes (on Error) (with message "...")`
@@ -86,4 +82,9 @@
 * [ ] add `turtle`
 * [ ] add `socket`
 * [ ] add `requests`
+* [ ] add `tkinter`
+* [ ] add unit tests
+* [ ] add complex numbers
+* [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
+* [ ] add builtin classes, or find a way to have builtin-methods in Values.
 * [X] eventually remove protected variables (finished 20/01/2024)

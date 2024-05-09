@@ -4,7 +4,7 @@ Since 0.16.0-beta, Nougaro follows [Semantic Versioning](https://semver.org).
 
 This file is updated nearly every commit and copied to GH release changelog.
 
-Since 0.19.0-beta, we try using [this changelog format](https://keepachangelog.com). It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. The Nougaro changelog has another section, `Calculator`, keeping track of the changes relative to the Nougaro Calculator under the same 6-sections format.
+Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. The Nougaro changelog has another section, `Calculator`, keeping track of the changes relative to the Nougaro Calculator under the same 6-sections format.
 
 ## 0.20.0-beta (unreleased)
 

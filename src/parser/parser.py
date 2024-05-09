@@ -437,7 +437,7 @@ class Parser:
             if self.current_token.type == TT["COLON"]:
                 result = self.advance_and_check_for(
                     result, "expected label identifier after ':'.", "IDENTIFIER",
-                    origin_file="for_expr"
+                    origin_file="statement"
                 )
                 if result.error is not None:
                     return result

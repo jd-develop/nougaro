@@ -334,7 +334,7 @@ class WhileNode(Node):
 
     def __repr__(self):
         label = f":{self.label}" if self.label is not None else ""
-        return f'while{label} {self.condition_node} then {self.body_node} '
+        return f'while{label} {self.condition_node} then {self.body_node}'
 
 
 class DoWhileNode(Node):
@@ -367,7 +367,7 @@ class BreakNode(Node):
         self.label = label
 
     def __repr__(self):
-        if self.label:
+        if self.label is not None:
             repr_ = f"break:{self.label}"
         else:
             repr_ = "break"

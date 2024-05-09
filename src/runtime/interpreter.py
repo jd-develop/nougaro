@@ -126,7 +126,7 @@ class Interpreter:
                 assert result.break_or_continue_pos is not None
                 errmsg_label = ""
                 if result.break_label is not None:
-                    errmsg_label = f" Maybe you forgot to create a loop labelled {result.break_label}?"
+                    errmsg_label = f" Maybe you forgot to create a loop labelled '{result.break_label}'?"
                 return result.failure(RunTimeError(
                     result.break_or_continue_pos[0], result.break_or_continue_pos[1],
                     f"'break' outside of a loop.{errmsg_label}", ctx,
@@ -136,7 +136,7 @@ class Interpreter:
                 assert result.break_or_continue_pos is not None
                 errmsg_label = ""
                 if result.continue_label is not None:
-                    errmsg_label = f" Maybe you forgot to create a loop labelled {result.continue_label}?"
+                    errmsg_label = f" Maybe you forgot to create a loop labelled '{result.continue_label}'?"
                 return result.failure(RunTimeError(
                     result.break_or_continue_pos[0], result.break_or_continue_pos[1],
                     f"'continue' outside of a loop.{errmsg_label}", ctx,

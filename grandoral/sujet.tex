@@ -90,17 +90,17 @@ cette représentation, et compiler vers un langage intermédiaire plus simple et
 résultat. \cite{wikipedia-interpreter} Je m’intéresserai à la seconde méthode.
 
 Un interpréteur est constitué de trois parties distinctes, chacune s’exécutant l’une après l’autre.
-Ces trois parties sont l’analyseur lexical (lexer), l’analyseur sémantique (parser), et l’interpréteur
+Ces trois parties sont l’analyseur lexical (lexer), l’analyseur syntaxique (parser), et l’interpréteur
 à proprement parler.
 
 \subsection{Analyse lexicale}
 L’analyse lexicale a pour but de découper le code source en petits bouts, des 
 \guillemetleft\nobreakspace tokens\nobreakspace\guillemetright\nobreakspace en anglais,
 que l’on pourrait traduire en
-\guillemetleft\nobreakspace jetons\nobreakspace\guillemetright\nobreakspace.
+\guillemetleft\nobreakspace unités\nobreakspace\guillemetright\nobreakspace.
 
-Un jeton est composé d’un type, d’une position, et éventuellement d’une valeur.
-Ces jetons peuvent être de plusieurs types\nobreakspace: entier, flottant, chaîne de caractères,
+Une unité est composée d’un type, d’une position, et éventuellement d’une valeur.
+Ces unités peuvent être de plusieurs types\nobreakspace: entier, flottant, chaîne de caractères,
 signe \verb|+|, signe \verb|=|, mot-clé, symbole (identifiant), etc.
 
 Par exemple, le code suivant\nobreakspace:
@@ -113,7 +113,7 @@ for i = 0 to 10 then
 end
 \end{lstlisting}
 
-sera traduit par l’analyseur lexical vers la liste de jetons suivante\nobreakspace:
+sera traduit par l’analyseur lexical vers la liste d’unités suivante\nobreakspace:
 
 \begin{lstlisting}
 keyword:var, identifier:a, eq, int:0, newline,
@@ -126,27 +126,27 @@ keyword:end, end-of-file
 
 L’analyseur lexical repère les identifiants (\verb|identifier|), et les distingue des
 des mot-clés (\verb|keyword|) grâce à une liste. Les symboles \verb|=| et \verb|+=| sont
-traduits par les jetons \verb|eq| et \verb|pluseq|.
+traduits par les unités \verb|eq| et \verb|pluseq|.
 
 Il est important de noter que pour l’analyseur lexical, la notion de syntaxe n’existe pas encore.
 Par exemple, lui donner \verb|while for True in print 78.5 += "chaîne"| ne sortira pas d’erreur,
-et on aura la liste de jetons correspondante en sortie. Il n’y a pas non plus encore de notion de
+et on aura la liste d’unités correspondante en sortie. Il n’y a pas non plus encore de notion de
 contexte et de variables définies ou non, il ne donnera donc pas d’erreur si un identifiant n’est
 pas défini.
 
-La liste de jetons que l’analyseur lexical donnera en sortie sera donnée en entrée à l’étape
-suivante\nobreakspace: l’analyseur sémantique (ou parser).
+La liste d’unités que l’analyseur lexical donnera en sortie sera donnée en entrée à l’étape
+suivante\nobreakspace: l’analyseur syntaxique (ou parser).
 
-\subsection{Analyse sémantique}
-L’analyse sémantique a pour but de construire un arbre de syntaxe (en anglais Abstract Syntax
-Tree, AST), constitué de nœuds, à partir des jetons de l’anatyseur lexical et d’une grammaire
+\subsection{Analyse syntaxique}
+L’analyse syntaxique a pour but de construire un arbre de syntaxe (en anglais Abstract Syntax
+Tree, AST), constitué de nœuds, à partir des unités de l’analyseur lexical et d’une grammaire
 définie.
 
-Pour cela, il parcourt les jetons un à un et repère les structures, grâce à la dérivation descendante.
-Le but est, pour chaque jeton, de parcourir la grammaire qu’on s’est définie.
+Pour cela, il parcourt les unités une à une et repère les structures.
+Le but est, pour chaque unité, de parcourir la grammaire qu’on s’est définie.
 
 Par exemple, avec notre programme de tout à l’heure, on trouve d’abord un mot-clé \verb|var|. 
-On sait qu’on est dans une déclaration de variable, on sait alors que le jeton suivant doit
+On sait qu’on est dans une déclaration de variable, on sait alors que l’unité suivante doit
 impérativement être un identifiant. Si ce n’est pas le cas, on renvoie une erreur.
 Ici, on trouve un identifiant, de valeur \verb|a|. On doit ensuite trouver un signe \verb|=|,
 puis une valeur. La valeur peut être n’importe quelle expression, ici il s’agit simplement d’un
@@ -154,7 +154,7 @@ entier\nobreakspace: 0. On s’attend ensuite à trouver un retour-ligne, car ce
 Une fois qu’on a fait ça, on ajoute à notre liste de nœuds un nœud de déclaration de variable. Ce
 nœud possède une position, un nom de variable, une valeur.
 
-On continue à parcourir les jetons, en on trouve le mot-clé \verb|for|. On sait qu’on doit trouver
+On continue à parcourir les unités, en on trouve le mot-clé \verb|for|. On sait qu’on doit trouver
 ensuite un identifiant, puis il y a deux syntaxes (\verb|for i in| et \verb|for i = to|). Ici, on trouve
 un signe \verb|=|, on sait qu’on est dans la deuxième syntaxe. On continue donc jusqu’au \verb|then|,
 puis au retour-ligne. À partir de là, on ajoute chaque instruction présente dans la boucle à une liste
@@ -162,16 +162,16 @@ de nœuds, qui sera elle-même stockée dans le nœud de la boucle \verb|for|. O
 jusqu’au \verb|end|.
 
 Une chose intéressante est l’appel de fonction\nobreakspace: on ne sait pas si c’est un simple accès à une
-variable ou un appel avant d’avoir trouvé le jeton \verb|lparen| correspondant à la parenthèse ouvrante.
+variable ou un appel avant d’avoir trouvé l’unité \verb|lparen| correspondant à la parenthèse ouvrante.
 
-C’est donc l’analyseur sémantique qui s’occupe de savoir si la grammaire est respectée. Dans notre
-exemple \verb|while for True in print 78.5 += "chaîne"|, l’analyseur sémantique
+C’est donc l’analyseur syntaxique qui s’occupe de savoir si la grammaire est respectée. Dans notre
+exemple \verb|while for True in print 78.5 += "chaîne"|, l’analyseur syntaxique
 ne s’attendrait pas à trouver le \verb|for| après le \verb|while|, et renverrait donc une erreur.
-En revanche, l’analyseur sémantique ne s’occupe toujours pas de si une variable est définie ou non.
-Ainsi, si l’on avait pas définit la variable \verb|a| au début de notre code, l’analyseur sémantique
+En revanche, l’analyseur syntaxique ne s’occupe toujours pas de si une variable est définie ou non.
+Ainsi, si l’on n’avait pas définit la variable \verb|a| au début de notre code, l’analyseur syntaxique
 n’aurait pas renvoyé d’erreur.
 
-À la fin de l’analyse sémantique, on se retrouve avec une liste de nœuds, que l’on peut envoyer
+À la fin de l’analyse syntaxique, on se retrouve avec une liste de nœuds, que l’on peut envoyer
 vers l’interpréteur, qui va s’occuper d’exécuter réellement le code.
 
 \subsection{Interpréteur}

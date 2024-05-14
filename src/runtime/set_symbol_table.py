@@ -32,74 +32,20 @@ def set_symbol_table(symbol_table: SymbolTable):
     symbol_table.set("None", NoneValue(DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy(), True))
 
     # Built-in functions
-    symbol_table.set("void", BuiltInFunction('void'))
+    for function in BuiltInFunction.builtin_functions:
+        if function == "py_type":
+            continue
+        symbol_table.set(function, BuiltInFunction(function))
 
-    symbol_table.set("run", BuiltInFunction('run'))
-    symbol_table.set("example", BuiltInFunction('example'))
-
-    symbol_table.set("print", BuiltInFunction('print'))
-    symbol_table.set("print_in_red", BuiltInFunction('print_in_red'))
-    symbol_table.set("print_in_green", BuiltInFunction('print_in_green'))
-    symbol_table.set("print_ret", BuiltInFunction('print_ret'))
-    symbol_table.set("print_in_red_ret", BuiltInFunction('print_in_red_ret'))
-    symbol_table.set("print_in_green_ret", BuiltInFunction('print_in_green_ret'))
-    symbol_table.set("input", BuiltInFunction('input'))
-    symbol_table.set("input_int", BuiltInFunction('input_int'))
-    symbol_table.set("input_num", BuiltInFunction('input_num'))
-    symbol_table.set("clear", BuiltInFunction('clear'))
-
-    symbol_table.set("is_int", BuiltInFunction('is_int'))
-    symbol_table.set("is_float", BuiltInFunction('is_float'))
-    symbol_table.set("is_num", BuiltInFunction('is_num'))
-    symbol_table.set("is_str", BuiltInFunction('is_str'))
-    symbol_table.set("is_list", BuiltInFunction('is_list'))
-    symbol_table.set("is_func", BuiltInFunction('is_func'))
-    symbol_table.set("is_module", BuiltInFunction('is_module'))
-    symbol_table.set("is_none", BuiltInFunction('is_none'))
-    symbol_table.set("is_object", BuiltInFunction('is_object'))
-    symbol_table.set("is_constructor", BuiltInFunction('is_constructor'))
-    symbol_table.set("type", BuiltInFunction('type'))
     symbol_table.set("__py_type__", BuiltInFunction('py_type'))
-    symbol_table.set("str", BuiltInFunction('str'))
-    symbol_table.set("list", BuiltInFunction('list'))
-    symbol_table.set("int", BuiltInFunction('int'))
-    symbol_table.set("float", BuiltInFunction('float'))
-    symbol_table.set("round", BuiltInFunction('round'))
-
-    symbol_table.set("append", BuiltInFunction('append'))
-    symbol_table.set("pop", BuiltInFunction('pop'))
-    symbol_table.set("insert", BuiltInFunction('insert'))
-    symbol_table.set("extend", BuiltInFunction('extend'))
-    symbol_table.set("get", BuiltInFunction('get'))
-    symbol_table.set("replace", BuiltInFunction('replace'))
-    symbol_table.set("max", BuiltInFunction('max'))
-    symbol_table.set("min", BuiltInFunction('min'))
-    symbol_table.set("len", BuiltInFunction('len'))
-    symbol_table.set("sort", BuiltInFunction('sort'))
-    symbol_table.set("reverse", BuiltInFunction('reverse'))
     symbol_table.set("esrever", BuiltInFunction('reverse'))
-
-    symbol_table.set("split", BuiltInFunction('split'))
-    symbol_table.set("upper", BuiltInFunction('upper'))
-    symbol_table.set("lower", BuiltInFunction('lower'))
-    symbol_table.set("ord", BuiltInFunction('ord'))
-    symbol_table.set("chr", BuiltInFunction('chr'))
-    symbol_table.set("startswith", BuiltInFunction('startswith'))
-    symbol_table.set("endswith", BuiltInFunction('endswith'))
-
-    symbol_table.set("path_exists", BuiltInFunction('path_exists'))
 
     # Hum...
     symbol_table.set("answerToTheLifeTheUniverseAndEverything", Number(42, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
     symbol_table.set("numberOfHornsOnAnUnicorn", Number(1, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
     symbol_table.set("theLoneliestNumber", Number(1, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
-    symbol_table.set("rickroll", BuiltInFunction('rickroll'))
-    symbol_table.set("nougaro", BuiltInFunction('nougaro'))
 
     # Technical
-    symbol_table.set("exit", BuiltInFunction('exit'))
-    symbol_table.set("system_call", BuiltInFunction('system_call'))
-    symbol_table.set("__python__", BuiltInFunction('__python__'))
     symbol_table.set('__os_name__', String(platform.system(), DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
     symbol_table.set('__os_release__', String(platform.uname().release, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
     symbol_table.set('__os_version__', String(platform.uname().version, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
@@ -130,12 +76,6 @@ def set_symbol_table(symbol_table: SymbolTable):
             DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()
         )
     )
-    symbol_table.set("__gpl__", BuiltInFunction('__gpl__'))
-
-    symbol_table.set("__is_keyword__", BuiltInFunction('__is_keyword__'))
-    symbol_table.set("__is_valid_token_type__", BuiltInFunction('__is_valid_token_type__'))
-    symbol_table.set("__test__", BuiltInFunction("__test__"))
-    symbol_table.set("__how_many_lines_of_code__", BuiltInFunction("__how_many_lines_of_code__"))
 
     symbol_table.set(
         "__noug_version__", String(src.noug_version.VERSION, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())

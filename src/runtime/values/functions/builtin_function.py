@@ -1295,13 +1295,13 @@ class BuiltInFunction(BaseBuiltInFunction):
                     self.pos_start, self.pos_end,
                     f"failed to load script '{file_name}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'"
                     f".",
-                    exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_run"
+                    exec_ctx, origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_run"
                 ))
         except Exception as e:
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f"failed to load script '{file_name}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
-                exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_run"
+                exec_ctx, origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_run"
             ))
 
         # we run the script
@@ -1374,7 +1374,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f"failed to load script '{file_name}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
-                exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_example"
+                exec_ctx, origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_example"
             ))
 
         assert exec_ctx.parent is not None
@@ -1424,7 +1424,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f"failed to call '{cmd}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
-                exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_system_call"
+                exec_ctx, origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_system_call"
             ))
 
     builtin_functions["system_call"] = {
@@ -1519,7 +1519,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 song.pos_start, song.pos_end,
                 f"'{song.value}' is not a song in the actual database. Available songs: "
                 f"{', '.join(list(songs.keys()))}",
-                exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_nougaro"
+                exec_ctx, origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_nougaro"
             ))
 
     builtin_functions["nougaro"] = {
@@ -1913,7 +1913,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 return result.failure(RTTypeError(
                     list_.pos_start, list_.pos_end,
                     str(e), exec_ctx,
-                    origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
+                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
                 ))
         elif mode == "stalin":  # stalin sort
             for i in range(len(list_to_sort)):
@@ -1947,7 +1947,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                         i.pos_start, i.pos_end, 
                         f"sleep mode: expected list of int, but found {i.type_} inside the list.",
                         exec_ctx,
-                        origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
+                        origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
                     ))
                 if i.value < 0:
                     return result.failure(RTTypeError(
@@ -1955,7 +1955,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                         f"sleep mode: expected list of positive integers, but found negative integer {i.value} inside "
                         f"the list.",
                         exec_ctx,
-                        origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
+                        origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
 
                     ))
                 list_to_sort_only_nums.append(i.value)
@@ -2001,7 +2001,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 "\t* 'sleep',\n"
                 "\t* 'miracle',\n"
                 "\t* 'panic'.",
-                exec_ctx, origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_sort"
+                exec_ctx, origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
             ))
         
         return result.success(List(sorted_, self.pos_start, self.pos_end))
@@ -2025,7 +2025,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().failure(RTTypeErrorF(
                 list_or_str.pos_start, list_or_str.pos_end,
                 "first", "reverse", "list", list_or_str, exec_ctx,
-                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_reverse",
+                origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_reverse",
                 or_="str"
             ))
 
@@ -2056,7 +2056,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 str_.pos_start, str_.pos_end,
                 "first", "startswith", "str", str_,
                 exec_ctx,
-                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_startswith"
+                origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_startswith"
             ))
 
         startswith = exec_ctx.symbol_table.getf("startswith")
@@ -2066,7 +2066,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 startswith.pos_start, startswith.pos_end,
                 "second", "startswith", "str", startswith,
                 exec_ctx,
-                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_startswith"
+                origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_startswith"
             ))
 
         return RTResult().success(
@@ -2092,7 +2092,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 str_.pos_start, str_.pos_end,
                 "first", "endswith", "str", str_,
                 exec_ctx,
-                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_endswith"
+                origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_endswith"
             ))
 
         endswith = exec_ctx.symbol_table.getf("endswith")
@@ -2102,7 +2102,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 endswith.pos_start, endswith.pos_end,
                 "second", "endswith", "str", endswith,
                 exec_ctx,
-                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_endswith"
+                origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_endswith"
             ))
 
         return RTResult().success(
@@ -2128,7 +2128,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 source.pos_start, source.pos_end,
                 "first", "__python__", "str", source,
                 exec_ctx,
-                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute___python__"
+                origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute___python__"
             ))
         try:
             v = eval(source.value)
@@ -2137,7 +2137,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 source.pos_start, source.pos_end,
                 e,
                 exec_ctx,
-                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute___python__"
+                origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute___python__"
             ))
         return RTResult().success(py2noug(v, self.pos_start, self.pos_end))
 
@@ -2160,7 +2160,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 path.pos_start, path.pos_end,
                 "first", "path_exists", "str", path,
                 exec_ctx,
-                origin_file="src.runtime.values.function.builtin_function.BuiltInFunction.execute_path_exists"
+                origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_path_exists"
             ))
         
         path_exists = os.path.exists(path.value)

@@ -19,9 +19,20 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 * Add the `is_object` builtin function
 * Add the `is_constructor` builtin function
 
+#### Metas
+* Add the `appendNoneOnContinue` meta
+  * Takes no argument
+  * If enabled, loops will append `None` to  their result if there is a `continue` (see the Changed section)
+* Add the `appendNoneOnBreak` meta
+  * Takes no argument
+  * If enabled, loops will append `None` to  their result if there is a `break` (see the Changed section)
+
 #### Command line interface
 * Add the `-i` (or `--interactive`) CLI argument. Allows to run an interactive shell after executing
   a file, within the context of that file (i.e. with all the variables)
+
+### Changed
+* Loops no longer append `None` to their result if there is a `continue` or `break`. Use `appendNoneOnContinue` and `appendNoneOnBreak` metas if you still want to do that.
 
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.

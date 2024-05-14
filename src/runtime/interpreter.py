@@ -39,7 +39,8 @@ _ORIGIN_FILE = "src.runtime.interpreter.Interpreter"
 # ##########
 # noinspection PyPep8Naming
 class Interpreter:
-    def __init__(self, run: RunFunction, noug_dir_: str, args: list[String], work_dir: str, file_name: str = ""):
+    def __init__(self, run: RunFunction, noug_dir_: str, args: list[String], work_dir: str,
+                 lexer_metas: dict[str, str | bool], file_name: str = ""):
         debug = src.conffiles.access_data("debug")
         if debug is None:
             debug = 0
@@ -49,6 +50,7 @@ class Interpreter:
         self.args = args
         self.work_dir = work_dir
         self.file_name = file_name
+        self.lexer_metas = lexer_metas
         self._methods = None
         self.init_methods()
         assert self._methods is not None
@@ -947,7 +949,8 @@ class Interpreter:
 
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnContinue") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.continue_label is not None and node.label != result.continue_label:
                     outer_loop_should_continue = True
                     break
@@ -955,7 +958,8 @@ class Interpreter:
 
             if result.loop_should_break:
                 value_to_return = result.break_value  # which is a Value or None
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnBreak") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.break_label is not None and node.label != result.break_label:
                     outer_loop_should_break = True
                 break
@@ -1016,7 +1020,8 @@ class Interpreter:
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
 
             if result.loop_should_continue:
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnContinue") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.continue_label is not None and node.label != result.continue_label:
                     outer_loop_should_continue = True
                     break
@@ -1024,7 +1029,8 @@ class Interpreter:
 
             if result.loop_should_break:
                 value_to_return = result.break_value  # which is a Value or None
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnBreak") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.break_label is not None and node.label != result.break_label:
                     outer_loop_should_break = True
                 break
@@ -1068,7 +1074,8 @@ class Interpreter:
         while condition.is_true():
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnContinue") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.continue_label is not None and node.label != result.continue_label:
                     outer_loop_should_continue = True
                     break
@@ -1076,7 +1083,8 @@ class Interpreter:
 
             if result.loop_should_break:
                 value_to_return = result.break_value  # which is a Value or None
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnBreak") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.break_label is not None and node.label != result.break_label:
                     outer_loop_should_break = True
                 break
@@ -1120,7 +1128,8 @@ class Interpreter:
         while True:
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnContinue") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.continue_label is not None and node.label != result.continue_label:
                     outer_loop_should_continue = True
                     break
@@ -1128,7 +1137,8 @@ class Interpreter:
 
             if result.loop_should_break:
                 value_to_return = result.break_value  # which is a Value or None
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnBreak") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.break_label is not None and node.label != result.break_label:
                     outer_loop_should_break = True
                 break
@@ -1304,7 +1314,7 @@ class Interpreter:
                 exec_from = f"{outer_context.display_name} from {outer_context.parent.display_name}"
 
             return_value = result.register(value_to_call.execute(
-                args, Interpreter, self.run, self.noug_dir,
+                args, Interpreter, self.run, self.noug_dir, self.lexer_metas,
                 exec_from=exec_from,
                 use_context=use_context,
                 cli_args=self.args,

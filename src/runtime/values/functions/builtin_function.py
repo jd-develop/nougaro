@@ -40,8 +40,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         self.cli_args = []
 
     def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
-                exec_from: str = "<invalid>", use_context: Context | None = None, cli_args: list[String] | None = None,
-                work_dir: str | None = None) -> RTResult:
+                lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>", use_context: Context | None = None,
+                cli_args: list[String] | None = None, work_dir: str | None = None):
         # execute a built-in function
         # create the result
         result = RTResult()

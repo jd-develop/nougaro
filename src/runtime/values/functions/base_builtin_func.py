@@ -34,8 +34,8 @@ class BaseBuiltInFunction(BaseFunction):
         return self.__repr__()
 
     def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
-                exec_from: str = "<invalid>", use_context: Context | None = None, cli_args: list[String] | None = None,
-                work_dir: str | None = None):
+                lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>", use_context: Context | None = None,
+                cli_args: list[String] | None = None, work_dir: str | None = None):
         return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
     def no_visit_method(self, exec_ctx: Context):

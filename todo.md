@@ -58,7 +58,7 @@
 
 ## 0.20.0 beta (goal: June 2024)
 
-* [ ] add `continue and append (value)`
+* [X] add `continue and append (value)` (completed as no longer planned on 14/05/2024)
 * [X] add `-i` cli arg to execute a file then run a shell within it (finished 08/05/2024)
 * [ ] add optional arguments in functions
   * [ ] Parser:

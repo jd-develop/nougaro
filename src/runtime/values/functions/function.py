@@ -43,8 +43,8 @@ class Function(BaseFunction):
         return self.__repr__()
 
     def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
-                exec_from: str = "<invalid>", use_context: Context | None = None, cli_args: list[String] | None = None,
-                work_dir: str | None = None):
+                lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>", use_context: Context | None = None,
+                cli_args: list[String] | None = None, work_dir: str | None = None):
         if work_dir is None:
             work_dir = noug_dir
         # execute the function
@@ -54,7 +54,7 @@ class Function(BaseFunction):
             cli_args = []
 
         # create an interpreter to run the code inside the function
-        interpreter = interpreter_(run, noug_dir, cli_args, work_dir)
+        interpreter = interpreter_(run, noug_dir, cli_args, work_dir, lexer_metas)
 
         if use_context is not None:
             self.context = use_context

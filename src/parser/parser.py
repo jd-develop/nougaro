@@ -1932,6 +1932,7 @@ class Parser:
         assert self.current_token is not None
 
         class_tok = self.current_token.copy()
+        pos_start = class_tok.pos_start.copy()
         result = self.check_for_and_advance(result, "expected 'class'", "KEYWORD", "class", "class_def")
 
         # IDENTIFIER?
@@ -1977,7 +1978,8 @@ class Parser:
                 var_name_token,
                 parent_var_name_tok,
                 body,
-                should_auto_return=True
+                True,
+                pos_start
             ))
 
         # NEWLINE statements KEYWORD:END
@@ -1999,7 +2001,8 @@ class Parser:
             var_name_token,
             parent_var_name_tok,
             body,
-            should_auto_return=False
+            False,
+            pos_start
         ))
 
     def bin_op(

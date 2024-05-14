@@ -37,6 +37,9 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.
 
+### Fixed
+* Fix position start of constructors in error messages.
+
 ## 0.19.0-beta (2024-05-08)
 
 This version comes with a lot of new features, and one single deprecation (see “How to update” to know how to update your code). This version improves a little bit performances in some cases.

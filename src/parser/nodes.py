@@ -433,19 +433,13 @@ class ClassNode(Node):
     If, in the function definition, the name is not defined (like in `def()->void()`), var_name_token is None
     """
     def __init__(self, var_name_token: _Token | None, parent_var_name_token: _Token | None, body_node: Node,
-                 should_auto_return: bool):
+                 should_auto_return: bool, pos_start: _Position):
         self.var_name_token = var_name_token
         self.parent_var_name_token = parent_var_name_token
         self.body_node = body_node
         self.should_auto_return = should_auto_return
 
-        if self.var_name_token is not None:  # a name is given: we take its pos_start as our pos_start
-            self.pos_start = self.var_name_token.pos_start
-        elif self.parent_var_name_token is not None:  # there is no name given, but there is a parent given.
-            self.pos_start = self.parent_var_name_token.pos_start
-        else:  # there is no name nor parameters given, we take the body's pos_start as our pos_start.
-            self.pos_start = self.body_node.pos_start
-
+        self.pos_start = pos_start
         self.pos_end = self.body_node.pos_end
 
     def __repr__(self):

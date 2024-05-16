@@ -36,6 +36,11 @@ class Conffiles(ModuleFunction):
         copy = Conffiles(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
     
+    def get_comparison_eq(self, other: Value):
+        if isinstance(other, Conffiles):
+            return Number(self.name == other.name, self.pos_start, other.pos_end).set_context(self.context), None
+        return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
+    
     # functions
     def execute__conffiles_access_data(self, context: Context):
         """Returns the asked data. RTFileNotFoundError if file not found, or None if not_found_ok=True"""

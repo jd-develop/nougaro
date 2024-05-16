@@ -33,6 +33,11 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 
 ### Changed
 * Loops no longer append `None` to their result if there is a `continue` or `break`. Use `appendNoneOnContinue` and `appendNoneOnBreak` metas if you still want to do that.
+* Rework completely equality and other comparisons to be more consistant
+  * Built-in functions and module functions can now be equal (if they’re the same)
+  * Strings can now be less than or equal to others, according to the alphabetical order.
+    For instance, `"foo" > "bar"`, and `"hello" < "world"`.
+  * (work in progress)
 
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.

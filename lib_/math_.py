@@ -39,6 +39,11 @@ class Math(ModuleFunction):
         """Return a copy of self"""
         copy = Math(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
+    
+    def get_comparison_eq(self, other: Value):
+        if isinstance(other, Math):
+            return Number(self.name == other.name, self.pos_start, other.pos_end).set_context(self.context), None
+        return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
 
     # =========
     # FUNCTIONS

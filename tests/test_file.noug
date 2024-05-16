@@ -153,6 +153,16 @@ def test_nougaro(print_OK)
     assert 1 >= 1
     assert 0 < 1
     assert 1 <= 1
+    assert 0.1 < 1 <= 1 <= 2
+    assert not 0.1 > 1 >= 1 >= 2
+    assert "foo" > "bar"
+    assert "foo" >= "bar"
+    assert "hello" < "world"
+    assert "hello" <= "world"
+    assert "hello" <= "hello"
+    assert "hello" >= "hello"
+    assert "hello" == "hello"
+    assert not "hello" != "hello"
     assert True
     assert True and True
     assert True or False
@@ -466,6 +476,15 @@ def test_nougaro(print_OK)
     print("* run")
     print("* example")
     print("* __test__")
+
+    assert print != void
+    assert void != 3
+    assert system_call != __python__
+    assert print == print
+    var sort_alias = sort
+    assert sort_alias == sort
+    assert sort_alias != 0.2
+    assert sort_alias != time
 
     assert print(hello) == None
     assert print(1) == None

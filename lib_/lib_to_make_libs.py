@@ -43,6 +43,11 @@ class ModuleFunction(BaseBuiltInFunction):
     def add_function(self, name: str, func_dict: BuiltinFunctionDict):
         self.functions[name] = func_dict
 
+    def get_comparison_eq(self, other: Value):
+        if isinstance(other, ModuleFunction):
+            return Number(self.name == other.name, self.pos_start, other.pos_end).set_context(self.context), None
+        return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
+
     def __repr__(self):
         return f'<built-in lib function {self.module_name}.{self.name}>'
 

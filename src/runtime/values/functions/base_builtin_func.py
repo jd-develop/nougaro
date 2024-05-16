@@ -11,7 +11,7 @@
 # nougaro modules imports
 from src.lexer.position import Position
 from src.runtime.values.basevalues.value import Value
-from src.runtime.values.basevalues.basevalues import NoneValue, String
+from src.runtime.values.basevalues.basevalues import NoneValue, String, Number
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.context import Context
 from src.runtime.runtime_result import RTResult
@@ -32,6 +32,11 @@ class BaseBuiltInFunction(BaseFunction):
     
     def to_python_str(self):
         return self.__repr__()
+    
+    def get_comparison_eq(self, other: Value):
+        if isinstance(other, BaseBuiltInFunction):
+            return Number(self.name == other.name, self.pos_start, other.pos_end).set_context(self.context), None
+        return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
 
     def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
                 lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>", use_context: Context | None = None,

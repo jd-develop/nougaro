@@ -37,6 +37,7 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
   * Built-in functions and module functions can now be equal (if they’re the same)
   * Strings can now be less than or equal to others, according to the alphabetical order.
     For instance, `"foo" > "bar"`, and `"hello" < "world"`.
+  * `<`, `<=`, `>`, `>=` comparisons now crash when used on lists, modules, constructors, objects, None.
   * (work in progress)
 * Modules written in Python now need to have a library version. If a module doesn’t have the same
   library version as the current Nougaro version, an error is thrown. Library version is currently `1`.

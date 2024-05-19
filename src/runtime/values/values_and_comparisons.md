@@ -35,3 +35,18 @@ A number SHOULD NOT be equal to, less or greather than any other value than Numb
 
 ## String
 String comparisons SHOULD be the same as in Python. Strings SHOULD NOT be equal to any other value and the GT, GTE, LT, LTE comparisons SHOULD fail between a string and any other value.
+
+## List
+Two lists SHOULD be equal if and only if they have the same length and that every element of each list are equal two by two. GT, GTE, LT, LTE comparisons SHOULD fail.
+
+## Modules
+Two modules SHOULD be equal if they have the same name. GT, GTE, LT, LTE comparisons SHOULD fail.
+
+## Constructors
+Two constructors, as of 0.20.0, SHOULD NOT be equal. GT, GTE, LT, LTE comparisons SHOULD fail.
+
+## Objects
+Two objects, as of 0.20.0, SHOULD NOT be equal. GT, GTE, LT, LTE comparisons SHOULD fail.
+
+## NoneValue
+Two NoneValues SHOULD be equal. GT, GTE, LT, LTE comparisons SHOULD fail.

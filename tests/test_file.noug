@@ -174,6 +174,14 @@ def test_nougaro(print_OK)
     assert True or 1/0
     import debug
     assert not 10 == debug and 10 != debug and not debug == 10 and debug != 10
+    assert None == None
+    assert None != 10
+    assert 10 != None
+    assert debug == debug
+    assert debug != None
+    assert None != debug
+    assert not debug != debug
+    assert not None != None
     assert not (False and 1/0)
     assert True or 1/0
     var a = 1

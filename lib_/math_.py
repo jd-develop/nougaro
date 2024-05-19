@@ -20,6 +20,8 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import math
 
+__LIB_VERSION__ = 1
+
 # constants
 PI = Number(math.pi, *default_pos())
 TAU = Number(math.tau, *default_pos())

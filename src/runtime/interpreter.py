@@ -24,6 +24,7 @@ from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
 from src.runtime.symbol_table import SymbolTable
 from src.misc import clear_screen, RunFunction
+from src.noug_version import LIB_VERSION
 import src.conffiles
 # built-in python imports
 from inspect import signature
@@ -1631,7 +1632,6 @@ class Interpreter:
             print(f"path is {path}")
             print(f"name to import is {name_to_import}")
             print(f"{is_nougaro_lib=}, {is_python_lib=}")
-            print("==========")
 
         as_identifier = node.as_identifier
         if as_identifier is None:
@@ -1659,13 +1659,31 @@ class Interpreter:
         elif is_python_lib:
             try:
                 module = importlib.import_module(f"lib_.{name_to_import}_")
-                what_to_import = module.WHAT_TO_IMPORT
+                try:
+                    what_to_import = module.WHAT_TO_IMPORT
+                    lib_version = module.__LIB_VERSION__
+                except AttributeError:
+                    return result.failure(RunTimeError(
+                        identifier.pos_start, identifier.pos_end,
+                        f"module '{name_to_import}' doesn’t seem to be a valid module.",
+                        ctx, origin_file=f"{_ORIGIN_FILE}.visit_ImportNode"
+                    ))
             except ImportError:
                 return result.failure(RTNotDefinedError(
                     identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
                     origin_file=f"{_ORIGIN_FILE}.visit_ImportNode\n"
                     "(troubleshooting: is python importlib working?)"
                 ))
+            if lib_version != LIB_VERSION:
+                return result.failure(RunTimeError(
+                    identifier.pos_start, identifier.pos_end,
+                    f"module '{name_to_import}' is not compatible with the current version of Nougaro. "
+                    f"Its library version is {lib_version}, while this version of Nougaro only "
+                    f"supports library version {LIB_VERSION}.",
+                    ctx, origin_file=f"{_ORIGIN_FILE}.visit_ImportNode"
+                ))
+            if self.debug:
+                print(f"Lib version is {lib_version}, wich is supported.")
         else:
             return result.failure(RTNotDefinedError(
                 identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
@@ -1681,6 +1699,9 @@ class Interpreter:
         )
         ctx.symbol_table.set(import_as_name, module_value)
         self.update_symbol_table(ctx)
+
+        if self.debug:
+            print("==========")
 
         return result.success(module_value.set_context(ctx))
 

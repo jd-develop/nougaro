@@ -19,6 +19,8 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import time
 
+__LIB_VERSION__ = 1
+
 # CONSTANTS
 TIMEZONE = Number(time.timezone, *default_pos())
 

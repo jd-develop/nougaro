@@ -38,6 +38,8 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
   * Strings can now be less than or equal to others, according to the alphabetical order.
     For instance, `"foo" > "bar"`, and `"hello" < "world"`.
   * (work in progress)
+* Modules written in Python now need to have a library version. If a module doesn’t have the same
+  library version as the current Nougaro version, an error is thrown. Library version is currently `1`.
 
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.

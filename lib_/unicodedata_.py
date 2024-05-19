@@ -19,6 +19,7 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import unicodedata
 
+__LIB_VERSION__ = 1
 UNICODEDATA_VERSION = unicodedata.unidata_version
 
 

@@ -19,6 +19,8 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import random
 
+__LIB_VERSION__ = 1
+
 
 class Random(ModuleFunction):
     """ Random module """

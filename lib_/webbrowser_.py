@@ -19,6 +19,8 @@ from lib_.lib_to_make_libs import *  # useful stuff to make libs.
 # built-in python imports
 import webbrowser
 
+__LIB_VERSION__ = 1
+
 
 class WebBrowserError(RunTimeError):
     """WebBrowserError is an error that can be triggered ONLY via functions in this module."""

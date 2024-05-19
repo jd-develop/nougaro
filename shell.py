@@ -26,7 +26,7 @@ from src.misc import print_in_red
 from src.runtime.values.basevalues.value import Value
 from src.runtime.values.basevalues.basevalues import List
 from src.errors.errors import Error
-from src.noug_version import VERSION, VERSION_ID
+from src.noug_version import VERSION, VERSION_ID, DATA_VERSION, LIB_VERSION
 import src.conffiles
 # built in python imports
 import sys
@@ -251,8 +251,8 @@ def main():
                 print()
                 print(f"Current working directory is {work_dir} ({type(work_dir)})")
                 print(f"Current config files directory is {src.conffiles.CONFIG_DIRECTORY} ({type(src.conffiles.CONFIG_DIRECTORY)})")
-                data_version = src.conffiles.access_data("DATA_VERSION")
-                print(f"Current data version is {data_version} ({type(data_version)})")
+                print(f"Current data version is {DATA_VERSION} ({type(DATA_VERSION)})")
+                print(f"Current lib version is {LIB_VERSION} ({type(LIB_VERSION)})")
                 print(f"Python version is {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]} "
                       f"({list(sys.version_info)})")
                 print("DEBUG mode is ENABLED")

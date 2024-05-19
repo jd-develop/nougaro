@@ -63,8 +63,7 @@ This version comes with a lot of new features, and one single deprecation (see �
         If `new` is 0, the `url` is opened in the same browser window if possible.
         If `new` is 1, a new browser window is opened if possible.
         If `new` is 2, a new tab is opened if possible.
-        If `autoraise` is True, the window is raised if possible (note that under many window managers this will occur
-        regardless of the setting of this variable).
+        If `autoraise` is True, the window is raised if possible (note that under many window managers this will occur regardless of the setting of this variable).
 
 #### Metas
 * Add a “meta” system

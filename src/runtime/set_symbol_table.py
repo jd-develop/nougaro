@@ -33,11 +33,8 @@ def set_symbol_table(symbol_table: SymbolTable):
 
     # Built-in functions
     for function in BuiltInFunction.builtin_functions:
-        if function == "py_type":
-            continue
         symbol_table.set(function, BuiltInFunction(function))
 
-    symbol_table.set("__py_type__", BuiltInFunction('py_type'))
     symbol_table.set("esrever", BuiltInFunction('reverse'))
 
     # Hum...

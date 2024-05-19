@@ -1107,7 +1107,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             String(str(type(value_to_get_type)), self.pos_start, self.pos_end)
         )  # we return its python type
 
-    builtin_functions["py_type"] = {
+    builtin_functions["__py_type__"] = {
         "function": execute_py_type,
         "param_names": ["value"],
         "optional_params": [],

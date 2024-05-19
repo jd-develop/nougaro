@@ -41,6 +41,8 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
   * (work in progress)
 * Modules written in Python now need to have a library version. If a module doesn’t have the same
   library version as the current Nougaro version, an error is thrown. Library version is currently `1`.
+* Numbers can no longer have trailing underscore at the beginning or at the end.
+* `10eanystringofcharacters-10` is no longer lexed to `10e-10`, and throws an error instead.
 
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.

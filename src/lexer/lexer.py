@@ -150,12 +150,12 @@ class Lexer:
                         and self.current_char != "."
                 )
                 next_char = self.next_char()
-                if next_char is not None:
+
+                current_tok_is_negative_e_infix = False
+                if next_char is not None and tok.value in ["e", "E"]:
                     current_tok_is_negative_e_infix = (
                         current_tok_is_maybe_e_infix and self.current_char == "-" and next_char in DIGITS
                     )
-                else:
-                    current_tok_is_negative_e_infix = False
 
                 if len(tokens) == 0:
                     tokens.append(tok)
@@ -747,6 +747,12 @@ class Lexer:
         if self.current_char == '-':
             num_str += '-'
             self.advance()
+        if self.current_char == "_":
+            return None, InvalidSyntaxError(
+                pos_start, self.pos.copy(),
+                "trailing underscore at the start of the literal is not allowed.",
+                "src.lexer.lexer.Lexer.make_number"
+            )
 
         # if char is still a number or a dot
         while self.current_char is not None and self.current_char in digits + '_':
@@ -808,6 +814,13 @@ class Lexer:
                 if number_with_error[1] is not None:
                     return None, number_with_error[1]
                 return number_with_error[0], None
+
+        if last_was_underscore:
+            return None, InvalidSyntaxError(
+                pos_start, self.pos.copy(),
+                "trailing underscore is not allowed.",
+                "src.lexer.lexer.Lexer.make_number"
+            )
 
         if mode == 'int':
             if dot_count == 0:  # if there is no dots, this is an INT, else this is a FLOAT

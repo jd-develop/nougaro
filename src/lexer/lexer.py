@@ -158,69 +158,12 @@ class Lexer:
                     there_is_a_space_or_a_tab_or_a_comment = False
                     continue
 
-                # todo: move that in a ‘make_e_infix’ method
-                token_enswith_digit = (
-                    current_tok_is_maybe_e_infix and tok.value is not None and tok.value[1:] != "" and
-                    set(tok.value[1:]) <= set(DIGITS + "_") and not tok.value[1:].startswith("_")
-                )
-                current_tok_is_unsigned_e_infix = (
-                    token_enswith_digit and self.current_char != "."
-                )
-                next_char = self.next_char()
+                tokens_to_append, error = self.make_e_infix(tok, len(tokens), there_is_a_space_or_a_tab_or_a_comment)
+                if error is not None:
+                    return [], error
+                assert tokens_to_append is not None
+                tokens.extend(tokens_to_append)
 
-                current_tok_is_negative_e_infix = False
-                if next_char is not None and tok.value in ["e", "E"]:
-                    current_tok_is_negative_e_infix = (
-                        current_tok_is_maybe_e_infix and self.current_char == "-" and next_char in DIGITS
-                    )
-
-                current_tok_is_positive_e_infix = False
-                if next_char is not None and tok.value in ["e", "E"]:
-                    current_tok_is_positive_e_infix = (
-                        current_tok_is_maybe_e_infix and self.current_char == "+" and next_char in DIGITS
-                    )
-
-                if len(tokens) == 0:
-                    tokens.append(tok)
-                elif there_is_a_space_or_a_tab_or_a_comment:
-                    tokens.append(tok)
-                elif current_tok_is_unsigned_e_infix and tok.value is not None:
-                    tokens.append(Token(
-                        TT['E_INFIX'],
-                        pos_start=tok.pos_start,
-                        pos_end=tok.pos_start.copy().advance()
-                    ))
-                    tokens.append(Token(
-                        TT['INT'],
-                        value=int(tok.value[1:]),
-                        pos_start=tok.pos_start.copy().advance().advance(),
-                        pos_end=tok.pos_end
-                    ))
-                elif current_tok_is_negative_e_infix or current_tok_is_positive_e_infix:
-                    self.advance()
-
-                    num, error = self.make_number(_0prefixes=False)
-                    if error is not None or num is None:
-                        return [], error
-
-                    assert isinstance(num.value, int) or isinstance(num.value, float)
-                    if num.type == TT["FLOAT"]:
-                        return [], InvalidSyntaxError(
-                            num.pos_start, num.pos_end,
-                            "expected int, got float.",
-                            origin_file="src.lexer.lexer.Lexer.make_tokens"
-                        )
-                    tokens.append(Token(
-                        TT['E_INFIX'],
-                        pos_start=tok.pos_start,
-                        pos_end=tok.pos_start.copy().advance()
-                    ))
-                    if current_tok_is_negative_e_infix:
-                        tokens.append(num.set_value(-1*num.value))
-                    else:
-                        tokens.append(num.set_value(num.value))
-                else:
-                    tokens.append(tok)
                 there_is_a_space_or_a_tab_or_a_comment = False
             elif self.current_char in "'\"«":  # the char is a quote: str
                 there_is_a_space_or_a_tab_or_a_comment = False
@@ -969,6 +912,79 @@ class Lexer:
 
         token_type = TT["KEYWORD"] if identifier in KEYWORDS else TT["IDENTIFIER"]  # KEYWORDS is the keywords list
         return Token(TT["DOLLAR"], pos_start=dollar_pos), Token(token_type, id_pos_start, self.pos, identifier)
+    
+    def make_e_infix(
+            self,
+            tok: Token, 
+            len_tokens: int,
+            there_is_a_space_or_a_tab_or_a_comment: bool
+    ) -> tuple[list[Token], None] | tuple[None, Error]:
+        assert tok.value is None or isinstance(tok.value, str)
+
+        token_enswith_digit = (
+            tok.value is not None and tok.value[1:] != "" and
+            set(tok.value[1:]) <= set(DIGITS + "_") and not tok.value[1:].startswith("_")
+        )
+        current_tok_is_unsigned_e_infix = (
+            token_enswith_digit and self.current_char != "."
+        )
+        next_char = self.next_char()
+
+        current_tok_is_negative_e_infix = False
+        if next_char is not None and tok.value in ["e", "E"]:
+            current_tok_is_negative_e_infix = (
+                self.current_char == "-" and next_char in DIGITS
+            )
+
+        current_tok_is_positive_e_infix = False
+        if next_char is not None and tok.value in ["e", "E"]:
+            current_tok_is_positive_e_infix = (
+                self.current_char == "+" and next_char in DIGITS
+            )
+
+        if len_tokens == 0:
+            return [tok], None
+        elif there_is_a_space_or_a_tab_or_a_comment:
+            return [tok], None
+        elif current_tok_is_unsigned_e_infix and tok.value is not None:
+            return [Token(
+                TT['E_INFIX'],
+                pos_start=tok.pos_start,
+                pos_end=tok.pos_start.copy().advance()
+            ), Token(
+                TT['INT'],
+                value=int(tok.value[1:]),
+                pos_start=tok.pos_start.copy().advance().advance(),
+                pos_end=tok.pos_end
+            )], None
+        elif current_tok_is_negative_e_infix or current_tok_is_positive_e_infix:
+            self.advance()
+
+            num, error = self.make_number(_0prefixes=False)
+            if error is not None:
+                return None, error
+            assert num is not None
+
+            assert isinstance(num.value, int) or isinstance(num.value, float)
+            if num.type == TT["FLOAT"]:
+                return None, InvalidSyntaxError(
+                    num.pos_start, num.pos_end,
+                    "expected int, got float.",
+                    origin_file="src.lexer.lexer.Lexer.make_tokens"
+                )
+            list_to_return: list[Token] = []
+            list_to_return.append(Token(
+                TT['E_INFIX'],
+                pos_start=tok.pos_start,
+                pos_end=tok.pos_start.copy().advance()
+            ))
+            if current_tok_is_negative_e_infix:
+                list_to_return.append(num.set_value(-1*num.value))
+            else:
+                list_to_return.append(num.set_value(num.value))
+            return list_to_return, None
+        else:
+            return [tok], None
 
     def skip_comment(self):
         """Skip a comment (until back line or EOF)"""

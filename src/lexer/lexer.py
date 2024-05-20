@@ -90,6 +90,8 @@ class Lexer:
 
         there_is_a_space_or_a_tab_or_a_comment = False
         while self.current_char is not None:  # None is EOF
+            # todo: as I’m a never nester, move the body of this loop in another method, such
+            # as determine_next_token
             next_char = self.next_char()
 
             maybe_meta = self.next_char(6) == "@meta " and self.current_char in "%-@$"
@@ -156,6 +158,7 @@ class Lexer:
                     there_is_a_space_or_a_tab_or_a_comment = False
                     continue
 
+                # todo: move that in a ‘make_e_infix’ method
                 token_enswith_digit = (
                     current_tok_is_maybe_e_infix and tok.value is not None and tok.value[1:] != "" and
                     set(tok.value[1:]) <= set(DIGITS + "_") and not tok.value[1:].startswith("_")

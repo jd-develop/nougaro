@@ -10,7 +10,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.errors.errors import RunTimeError, RTNotDefinedError, RTTypeError, RTAttributeError, InvalidSyntaxError
-from src.errors.errors import RTAssertionError, RTIndexError, RTFileNotFoundError
+from src.errors.errors import RTAssertionError, RTIndexError, RTFileNotFoundError, RTRecursionError
 from src.lexer.token_types import TT, TOKENS_NOT_TO_QUOTE
 from src.lexer.token import Token
 from src.lexer.position import Position, DEFAULT_POSITION
@@ -1314,13 +1314,19 @@ class Interpreter:
             else:
                 exec_from = f"{outer_context.display_name} from {outer_context.parent.display_name}"
 
-            return_value = result.register(value_to_call.execute(
-                args, Interpreter, self.run, self.noug_dir, self.lexer_metas,
-                exec_from=exec_from,
-                use_context=use_context,
-                cli_args=self.args,
-                work_dir=self.work_dir
-            ))
+            try:
+                return_value = result.register(value_to_call.execute(
+                    args, Interpreter, self.run, self.noug_dir, self.lexer_metas,
+                    exec_from=exec_from,
+                    use_context=use_context,
+                    cli_args=self.args,
+                    work_dir=self.work_dir
+                ))
+            except RecursionError as e:
+                return result.failure(RTRecursionError(
+                    node.pos_start, node.pos_end, str(e), outer_context,
+                    f"{_ORIGIN_FILE}.visit_CallNode"
+                ))
 
             if result.should_return():  # check for errors
                 return result

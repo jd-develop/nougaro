@@ -11,12 +11,15 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 This version may in some cases improve performance.
 
 ### Added
+
+* Add `RecursionError`, accessible in libs using `RTRecursionError`.
+* Allow the `+` sign in a e-infix expression (such as `10e+3`)
+
 #### Flow control
 * Add the `break and return (value)` syntax, which allows to return a certain value when breaking a loop.
 * Add loop labels:
   * Using the syntax `for:label`, `while:label` or `do:label`, you can label your loops.
   * Using the syntax `break:label` and `continue:label`, you can break or continue an outer loop.
-* Allow the `+` sign in a e-infix expression (such as `10e+3`)
 
 #### Builtins
 * Add the `is_object` builtin function
@@ -52,6 +55,7 @@ This version may in some cases improve performance.
 ### Fixed
 * Fix position start of constructors in error messages.
 * `10eanystringofcharacters-10` is no longer parsed to `10e-10`, and throws an error instead.
+* Fix a crash on maximum recursion depth exceeded.
 
 ## 0.19.0-beta (2024-05-08)
 

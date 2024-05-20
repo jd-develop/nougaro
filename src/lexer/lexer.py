@@ -141,13 +141,27 @@ class Lexer:
                 except IndexError:
                     last_tok_is_number = False
                 current_tok_is_identifier = tok.type == TT['IDENTIFIER']
+
+                if not last_tok_is_number or not current_tok_is_identifier:
+                    tokens.append(tok)
+                    there_is_a_space_or_a_tab_or_a_comment = False
+                    continue
+
                 current_tok_is_maybe_e_infix: bool = (
-                        tok.value is not None and last_tok_is_number and current_tok_is_identifier and
-                        (tok.value.startswith('e') or tok.value.startswith('E'))
+                    tok.value is not None and last_tok_is_number and current_tok_is_identifier and
+                    (tok.value.startswith('e') or tok.value.startswith('E'))
                 )
-                current_tok_is_positive_e_infix = (
-                        current_tok_is_maybe_e_infix and tok.value is not None and tok.value[1:].isdigit()
-                        and self.current_char != "."
+                if not current_tok_is_maybe_e_infix:
+                    tokens.append(tok)
+                    there_is_a_space_or_a_tab_or_a_comment = False
+                    continue
+
+                token_enswith_digit = (
+                    current_tok_is_maybe_e_infix and tok.value is not None and tok.value[1:] != "" and
+                    set(tok.value[1:]) <= set(DIGITS + "_") and not tok.value[1:].startswith("_")
+                )
+                current_tok_is_unsigned_e_infix = (
+                    token_enswith_digit and self.current_char != "."
                 )
                 next_char = self.next_char()
 
@@ -157,11 +171,17 @@ class Lexer:
                         current_tok_is_maybe_e_infix and self.current_char == "-" and next_char in DIGITS
                     )
 
+                current_tok_is_positive_e_infix = False
+                if next_char is not None and tok.value in ["e", "E"]:
+                    current_tok_is_positive_e_infix = (
+                        current_tok_is_maybe_e_infix and self.current_char == "+" and next_char in DIGITS
+                    )
+
                 if len(tokens) == 0:
                     tokens.append(tok)
                 elif there_is_a_space_or_a_tab_or_a_comment:
                     tokens.append(tok)
-                elif current_tok_is_positive_e_infix and tok.value is not None:
+                elif current_tok_is_unsigned_e_infix and tok.value is not None:
                     tokens.append(Token(
                         TT['E_INFIX'],
                         pos_start=tok.pos_start,
@@ -173,7 +193,7 @@ class Lexer:
                         pos_start=tok.pos_start.copy().advance().advance(),
                         pos_end=tok.pos_end
                     ))
-                elif current_tok_is_negative_e_infix:
+                elif current_tok_is_negative_e_infix or current_tok_is_positive_e_infix:
                     self.advance()
 
                     num, error = self.make_number(_0prefixes=False)
@@ -187,13 +207,15 @@ class Lexer:
                             "expected int, got float.",
                             origin_file="src.lexer.lexer.Lexer.make_tokens"
                         )
-                    else:
-                        tokens.append(Token(
-                            TT['E_INFIX'],
-                            pos_start=tok.pos_start,
-                            pos_end=tok.pos_start.copy().advance()
-                        ))
+                    tokens.append(Token(
+                        TT['E_INFIX'],
+                        pos_start=tok.pos_start,
+                        pos_end=tok.pos_start.copy().advance()
+                    ))
+                    if current_tok_is_negative_e_infix:
                         tokens.append(num.set_value(-1*num.value))
+                    else:
+                        tokens.append(num.set_value(num.value))
                 else:
                     tokens.append(tok)
                 there_is_a_space_or_a_tab_or_a_comment = False

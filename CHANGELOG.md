@@ -8,12 +8,15 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 
 ## 0.20.0-beta (unreleased)
 
+This version may in some cases improve performance.
+
 ### Added
 #### Flow control
 * Add the `break and return (value)` syntax, which allows to return a certain value when breaking a loop.
 * Add loop labels:
   * Using the syntax `for:label`, `while:label` or `do:label`, you can label your loops.
   * Using the syntax `break:label` and `continue:label`, you can break or continue an outer loop.
+* Allow the `+` sign in a e-infix expression (such as `10e+3`)
 
 #### Builtins
 * Add the `is_object` builtin function
@@ -42,13 +45,13 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 * Modules written in Python now need to have a library version. If a module doesn’t have the same
   library version as the current Nougaro version, an error is thrown. Library version is currently `1`.
 * Numbers can no longer have trailing underscore at the beginning or at the end.
-* `10eanystringofcharacters-10` is no longer lexed to `10e-10`, and throws an error instead.
 
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.
 
 ### Fixed
 * Fix position start of constructors in error messages.
+* `10eanystringofcharacters-10` is no longer parsed to `10e-10`, and throws an error instead.
 
 ## 0.19.0-beta (2024-05-08)
 

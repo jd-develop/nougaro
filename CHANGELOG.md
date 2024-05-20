@@ -12,7 +12,7 @@ This version may in some cases improve performance.
 
 ### Added
 
-* Add `RecursionError`, accessible in libs using `RTRecursionError`.
+#### Syntax
 * Allow the `+` sign in a e-infix expression (such as `10e+3`)
 
 #### Flow control
@@ -37,7 +37,15 @@ This version may in some cases improve performance.
 * Add the `-i` (or `--interactive`) CLI argument. Allows to run an interactive shell after executing
   a file, within the context of that file (i.e. with all the variables)
 
+#### Technical and debug
+* Add `RecursionError`, accessible in libs using `RTRecursionError`.
+* Add the `print_time` debug option: add `debug.should_print_time` (0 or 1), `debug.print_time()`, `debug.stop_print_time()`. This option prints the total time different parts of Nougaro took to complete.
+
 ### Changed
+#### Syntax
+* Numbers can no longer have trailing underscore at the beginning or at the end.
+
+#### Runtime
 * Loops no longer append `None` to their result if there is a `continue` or `break`. Use `appendNoneOnContinue` and `appendNoneOnBreak` metas if you still want to do that.
 * Rework completely equality and other comparisons to be more consistant
   * Built-in functions and module functions can now be equal (if they’re the same)
@@ -45,9 +53,12 @@ This version may in some cases improve performance.
     For instance, `"foo" > "bar"`, and `"hello" < "world"`.
   * `<`, `<=`, `>`, `>=` comparisons now crash when used on lists, modules, constructors, objects, None.
   * (work in progress)
+
+#### Technical and debug
 * Modules written in Python now need to have a library version. If a module doesn’t have the same
   library version as the current Nougaro version, an error is thrown. Library version is currently `1`.
-* Numbers can no longer have trailing underscore at the beginning or at the end.
+* `debug.enable_all()` and `debug.disable_all()` now also enable or disable the `print_time` debug option.
+* Data version has been increased to `6`.
 
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.

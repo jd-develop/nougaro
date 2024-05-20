@@ -180,6 +180,11 @@ def main():
         print_context = 0
     print_context = bool(int(print_context))
 
+    print_time = src.conffiles.access_data("print_time")
+    if print_time is None:
+        print_time = 0
+    print_time = bool(int(print_time))
+
     HISTORY_FILE = src.conffiles.ROOT_CONFIG_DIRECTORY + ".noughistory"
     if readline is not None:
         try:
@@ -260,6 +265,10 @@ def main():
                 if not debug_on:
                     print()
                 print("PRINT CONTEXT debug option is ENABLED")
+            if print_time:
+                if not (debug_on or print_context):
+                    print()
+                print("PRINT TIME debug option is ENABLED")
             print()  # blank line
 
         previous_metas = None

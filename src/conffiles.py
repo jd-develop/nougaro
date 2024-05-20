@@ -176,6 +176,8 @@ def _create_or_copy_files():
         debug_nnf.write(debug)
     with open(CONFIG_DIRECTORY + "print_context.nconf", "w+") as print_context_nnf:
         print_context_nnf.write(print_context)
+    with open(CONFIG_DIRECTORY + "print_time.nconf", "w+") as print_context_nnf:
+        print_context_nnf.write("0")
 
 
 def create_config_files():

@@ -90,8 +90,6 @@ class Lexer:
 
         there_is_a_space_or_a_tab_or_a_comment = False
         while self.current_char is not None:  # None is EOF
-            # todo: as I’m a never nester, move the body of this loop in another method, such
-            # as determine_next_token
             next_char = self.next_char()
 
             maybe_meta = self.next_char(6) == "@meta " and self.current_char in "%-@$"
@@ -307,6 +305,7 @@ class Lexer:
 
         # append the end of file
         tokens.append(Token(TT["EOF"], pos_start=self.pos))
+
         return tokens, None
 
     def make_meta(self, is_empty_file: bool, dont_panic_on_errors: bool = False) -> None | Error:
@@ -970,7 +969,7 @@ class Lexer:
                 return None, InvalidSyntaxError(
                     num.pos_start, num.pos_end,
                     "expected int, got float.",
-                    origin_file="src.lexer.lexer.Lexer.make_tokens"
+                    origin_file="src.lexer.lexer.Lexer.make_e_infix"
                 )
             list_to_return: list[Token] = []
             list_to_return.append(Token(

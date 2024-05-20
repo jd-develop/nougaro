@@ -72,9 +72,9 @@ class Error:
 
         if self.print_origin_file:
             result = f"(from {self.origin_file})\n" \
-                     f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1}: " + '\n'
+                     f" In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1}: " + '\n'
         else:
-            result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1}: " + '\n'
+            result = f" In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1}: " + '\n'
 
         for i, line in enumerate(string_line):
             result += '\t' + line + '\n '

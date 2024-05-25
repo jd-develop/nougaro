@@ -860,13 +860,11 @@ class Interpreter:
         if result.should_return():  # check for errors
             return result
         assert assertion is not None
-        if node.errmsg is None:
-            errmsg = String("", node.pos_start, node.pos_end).set_context(ctx)
-        else:
-            errmsg = result.register(self.visit(node.errmsg, ctx, methods_instead_of_funcs))  # we get the error message
-            if result.should_return():  # check for errors
-                return result
-            assert errmsg is not None
+        
+        errmsg = result.register(self.visit(node.errmsg, ctx, methods_instead_of_funcs))  # we get the error message
+        if result.should_return():  # check for errors
+            return result
+        assert errmsg is not None
 
         if not isinstance(errmsg, String):  # we check if the error message is a String
             return result.failure(RTTypeError(

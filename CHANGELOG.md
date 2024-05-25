@@ -38,8 +38,9 @@ This version may in some cases improve performance.
   a file, within the context of that file (i.e. with all the variables)
 
 #### Technical and debug
-* Add `RecursionError`, accessible in libs using `RTRecursionError`.
 * Add the `print_time` debug option: add `debug.should_print_time` (0 or 1), `debug.print_time()`, `debug.stop_print_time()`. This option prints the total time different parts of Nougaro took to complete.
+* `[Internal API]` Add `RecursionError`, accessible in libs using `RTRecursionError`.
+* `[Internal API]` Add Library Version, accessible through `src.noug_version.LIB_VERSION`. It is stored in the key `"lib-version"` in `noug_version.json`. It is currently `2`.
 
 ### Changed
 #### Syntax
@@ -48,17 +49,20 @@ This version may in some cases improve performance.
 #### Runtime
 * Loops no longer append `None` to their result if there is a `continue` or `break`. Use `appendNoneOnContinue` and `appendNoneOnBreak` metas if you still want to do that.
 * Rework completely equality and other comparisons to be more consistant
-  * Built-in functions and module functions can now be equal (if they’re the same)
+  * Functions, built-in functions and module functions can now be equal (if they’re the same)
   * Strings can now be less than or equal to others, according to the alphabetical order.
     For instance, `"foo" > "bar"`, and `"hello" < "world"`.
   * `<`, `<=`, `>`, `>=` comparisons now crash when used on lists, modules, constructors, objects, None.
-  * (work in progress)
 
 #### Technical and debug
-* Modules written in Python now need to have a library version. If a module doesn’t have the same
-  library version as the current Nougaro version, an error is thrown. Library version is currently `1`.
 * `debug.enable_all()` and `debug.disable_all()` now also enable or disable the `print_time` debug option.
 * Data version has been increased to `6`.
+* `[Internal API]` It is now possible to compare Nodes and Tokens. Use `node1 == node2` or `node1 != node2`. Does not check `pos_start` and `pos_end`, so it is better than `hash(node1) == hash(node2)`.
+
+#### Writing libraries
+* Modules written in Python now need to have a library version (`__LIBRARY_VERSION__`). If a module doesn’t have the same
+  library version as the current Nougaro version, an error is thrown. Library version is currently `2`.
+* Libraries now need the `is_eq` method as described in documentation (TODO: update doc on release – the method is described but in a “in the future you will have to” box).
 
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.

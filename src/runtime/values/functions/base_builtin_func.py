@@ -32,11 +32,15 @@ class BaseBuiltInFunction(BaseFunction):
     
     def to_python_str(self):
         return self.__repr__()
+
+    def is_eq(self, other: Value):
+        return isinstance(other, BaseBuiltInFunction) and self.name == other.name
     
     def get_comparison_eq(self, other: Value):
-        if isinstance(other, BaseBuiltInFunction):
-            return Number(self.name == other.name, self.pos_start, other.pos_end).set_context(self.context), None
-        return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
+        return Number(self.is_eq(other), self.pos_start, other.pos_end).set_context(self.context), None
+    
+    def get_comparison_ne(self, other: Value):
+        return Number(not self.is_eq(other), self.pos_start, other.pos_end).set_context(self.context), None
 
     def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
                 lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>", use_context: Context | None = None,

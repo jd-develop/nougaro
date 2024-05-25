@@ -124,10 +124,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         raise Exception(f'No execute_{self.name} method defined in '
                         f'src.runtime.values.functions.builtin_function.BuiltInFunction.')
 
-    def get_comparison_eq(self, other: Value):
-        if isinstance(other, BuiltInFunction):
-            return Number(self.name == other.name, self.pos_start, other.pos_end).set_context(self.context), None
-        return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
+    def is_eq(self, other: Value):
+        return isinstance(other, BuiltInFunction) and self.name == other.name
 
     def copy(self):
         """Return a copy of self"""

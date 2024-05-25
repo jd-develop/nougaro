@@ -42,6 +42,11 @@ class Token:
 
     def __str__(self):
         return repr(self)
+    
+    def __eq__(self, other: object):
+        if not isinstance(other, Token):
+            return False
+        return self.type == other.type and self.value == other.value
 
     def matches(self, type_: str, value: str):
         """Check if the token have the given type and the given value"""

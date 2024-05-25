@@ -19,7 +19,7 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import unicodedata
 
-__LIB_VERSION__ = 1
+__LIB_VERSION__ = 2
 UNICODEDATA_VERSION = unicodedata.unidata_version
 
 
@@ -35,10 +35,8 @@ class UnicodeData(ModuleFunction):
         copy = UnicodeData(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
     
-    def get_comparison_eq(self, other: Value):
-        if isinstance(other, UnicodeData):
-            return Number(self.name == other.name, self.pos_start, other.pos_end).set_context(self.context), None
-        return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
+    def is_eq(self, other: Value):
+        return isinstance(other, UnicodeData) and self.name == other.name
 
     @staticmethod
     def is_unicode_char(char: Value, exec_ctx: Context, function: str) -> RTResult | None:

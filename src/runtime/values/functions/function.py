@@ -15,7 +15,7 @@ from src.lexer.position import Position, DEFAULT_POSITION
 from src.parser.nodes import Node
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.values.basevalues.value import Value
-from src.runtime.values.basevalues.basevalues import NoneValue, String, List
+from src.runtime.values.basevalues.basevalues import NoneValue, String, List, Number
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
 from src.misc import nice_str_from_idk, RunFunction
@@ -38,6 +38,19 @@ class Function(BaseFunction):
 
     def __repr__(self):
         return f'<function {self.name}>'
+
+    def is_eq(self, other: Value):
+        if not isinstance(other, Function):
+            return False
+        is_eq = self.param_names == other.param_names and self.should_auto_return == other.should_auto_return
+        are_nodes_eq = self.body_node == other.body_node
+        return is_eq and are_nodes_eq
+    
+    def get_comparison_eq(self, other: Value):
+        return Number(self.is_eq(other), self.pos_start, other.pos_end), None
+    
+    def get_comparison_ne(self, other: Value):
+        return Number(not self.is_eq(other), self.pos_start, other.pos_end), None
     
     def to_python_str(self):
         return self.__repr__()
@@ -137,3 +150,18 @@ class Method(Function):
         copy.set_context(self.context)
         copy.attributes = self.attributes.copy()
         return copy
+    
+    def is_eq(self, other: Value):
+        if not isinstance(other, Method):
+            return False
+        is_eq = self.param_names == other.param_names and self.should_auto_return == other.should_auto_return
+        are_nodes_eq = self.body_node == other.body_node
+        if self.object_ is None:
+            are_object_eq = other.object_ is None
+        else:
+            are_object_eq, error = self.object_.get_comparison_eq(other)
+            if error is not None or are_object_eq is None:
+                are_object_eq = False
+            else:
+                are_object_eq = bool(are_object_eq.value)
+        return is_eq and are_nodes_eq and are_object_eq

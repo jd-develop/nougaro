@@ -50,3 +50,9 @@ Two objects, as of 0.20.0, SHOULD NOT be equal. GT, GTE, LT, LTE comparisons SHO
 
 ## NoneValue
 Two NoneValues SHOULD be equal. GT, GTE, LT, LTE comparisons SHOULD fail.
+
+## Functions (user-written)
+Two Functions SHOULD be equal when their body node is equal. GT, GTE, LT, LTE comparisons SHOULD fail.
+
+## BuiltinFunctions and ModuleFunctions
+Two Builtin/Module functions SHOULD be equal when their name and their type is equal. Their type is defined as their module name or `BuiltinFunction` if not in a module. GT, GTE, LT, LTE comparisons SHOULD fail.

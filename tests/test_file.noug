@@ -193,6 +193,18 @@ def test_nougaro(print_OK)
     var a = "str"
     assert not (is_int(a) and round(a))
     del a
+    assert void == void
+    assert not void != void
+    assert void != print
+    assert not void == print
+    assert debug.enable == debug.enable
+    assert not debug.enable != debug.enable
+    assert debug.disable != debug.enable
+    assert not debug.disable == debug.enable
+    assert debug.disable != debug
+    assert not debug.disable == debug
+    assert debug.disable != is_int
+    assert not debug.disable == is_int
 
     if print_OK then print("OK tests")
 
@@ -382,16 +394,34 @@ def test_nougaro(print_OK)
         ## return
         return "str"
     end
+    assert func == func
+    assert not func != func
+    assert func != 12
+    assert not func == 12
 
     def this_is_a_function(x); if x then; return; elif x == None then; return 3; else; return; end; end
+    def another_func(x)
+        if x then
+            return
+        elif x == None then
+            return 3
+        else
+            return
+        end
+    end
+    assert this_is_a_function == another_func
+    assert not this_is_a_function != another_func
+    assert not this_is_a_function == func
+    assert this_is_a_function != func
+    assert this_is_a_function == another_func != None
 
     if print_OK then print("OK func")
 
     ## call
     assert (def()->"str")() == func()
-    assert this_is_a_function(12) == None
-    assert this_is_a_function(False) == None
-    assert this_is_a_function(None) == 3
+    assert this_is_a_function(12) == None == another_func(12)
+    assert this_is_a_function(False) == None == another_func(False)
+    assert this_is_a_function(None) == 3 == another_func(None)
 
     if print_OK then print("OK call")
 
@@ -852,6 +882,15 @@ def test_nougaro(print_OK)
 end
 
 
+def im_a_function(print_OK)
+    print("yes")
+end
+
+
 var _should_print_ok = cf.access_data("SHOULD_TEST_PRINT_OK", 1)
 if _should_print_ok == None then var _should_print_ok = "0"
 test_nougaro(int(_should_print_ok))
+assert test_nougaro == test_nougaro
+assert test_nougaro != im_a_function
+assert not test_nougaro == im_a_function
+assert not test_nougaro != test_nougaro

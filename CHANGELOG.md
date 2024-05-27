@@ -52,7 +52,7 @@ This version may in some cases improve performance.
   * Functions, built-in functions and module functions can now be equal (if they’re the same)
   * Strings can now be less than or equal to others, according to the alphabetical order.
     For instance, `"foo" > "bar"`, and `"hello" < "world"`.
-  * `<`, `<=`, `>`, `>=` comparisons now crash when used on lists, modules, constructors, objects, None.
+  * `<`, `<=`, `>`, `>=` comparisons now crash when used on lists, modules, constructors, objects, any function, None.
 
 #### Technical and debug
 * `debug.enable_all()` and `debug.disable_all()` now also enable or disable the `print_time` debug option.

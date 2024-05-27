@@ -48,6 +48,9 @@ class Token:
             return False
         return self.type == other.type and self.value == other.value
 
+    def __ne__(self, other: object):
+        return not self == other
+
     def matches(self, type_: str, value: str):
         """Check if the token have the given type and the given value"""
         return self.type == type_ and self.value == value

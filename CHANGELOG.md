@@ -71,6 +71,7 @@ This version may in some cases improve performance.
 * Fix position start of constructors in error messages.
 * `10eanystringofcharacters-10` is no longer parsed to `10e-10`, and throws an error instead.
 * Fix a crash on maximum recursion depth exceeded.
+* Fix a bug where you could have two parameters with the same name in a function definition.
 
 ## 0.19.0-beta (2024-05-08)
 

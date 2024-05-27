@@ -55,9 +55,10 @@ class Function(BaseFunction):
     def to_python_str(self):
         return self.__repr__()
 
-    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
-                lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>", use_context: Context | None = None,
-                cli_args: list[String] | None = None, work_dir: str | None = None):
+    def execute(self, args: list[Value | tuple[String, Value]], interpreter_: type[Interpreter], run: RunFunction,
+                noug_dir: str, lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>",
+                use_context: Context | None = None, cli_args: list[String] | None = None,
+                work_dir: str | None = None):
         if work_dir is None:
             work_dir = noug_dir
         # execute the function

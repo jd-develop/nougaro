@@ -58,7 +58,7 @@
 
 ## 0.20.0 beta (goal: June 2024)
 
-* [X] add `continue and append (value)` (completed as no longer planned on 14/05/2024)
+* [X] ~~add `continue and append (value)`~~ (completed as no longer planned on 14/05/2024)
 * [X] add `-i` cli arg to execute a file then run a shell within it (finished 08/05/2024)
 * [ ] add optional arguments in functions
   * [ ] Parser:
@@ -66,6 +66,8 @@
     * [X] Update nodes (call + def) (finished 24/02/2024)
   * [ ] Runtime:
     * [ ] Update Function value and methods
+      * [X] Check args (finished 27/05/2024)
+      * [ ] Populate args
     * [ ] Update Interpreter visit methods
 
 ## 1.0.0 release candidate (goal: September 2024)

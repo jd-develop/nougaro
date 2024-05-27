@@ -11,7 +11,7 @@
 # nougaro modules imports
 from src.lexer.position import Position
 from src.runtime.values.basevalues.value import Value
-from src.runtime.values.basevalues.basevalues import NoneValue
+from src.runtime.values.basevalues.basevalues import NoneValue, String
 from src.runtime.values.number_constants import TRUE, FALSE
 from src.runtime.runtime_result import RTResult
 from src.errors.errors import RunTimeError
@@ -47,8 +47,9 @@ class BaseFunction(Value):
             new_context.symbol_table = SymbolTable(new_context.parent.symbol_table)
         return new_context
 
-    def check_args(self, param_names: list[str], args: list[Value], optional_params: list[str] | None = None,
+    def check_args(self, param_names: list[str], args: list[Value | tuple[String, Value]], optional_params: list[str] | None = None,
                    should_respect_args_number: bool = True):
+        # this function is not overwritten
         """Check if the number of args match with the number of params/optional params"""
         # create a result
         result = RTResult()
@@ -59,11 +60,15 @@ class BaseFunction(Value):
         if (len(args) > len(param_names + optional_params)) and should_respect_args_number:
             first_arg = args[len(param_names + optional_params)]
             last_arg = args[-1]
+            if isinstance(first_arg, tuple):
+                first_arg = first_arg[1]
+            if isinstance(last_arg, tuple):
+                last_arg = last_arg[1]
             assert self.context is not None
             return result.failure(RunTimeError(
                 first_arg.pos_start, last_arg.pos_end,
                 f"{len(args) - len(param_names + optional_params)} too many args passed into '{self.name}'.",
-                self.context, origin_file="src.values.functions.base_function.BaseFunction.check_args()"
+                self.context, origin_file="src.values.functions.base_function.BaseFunction.check_args"
             ))
 
         # check if there is too few params
@@ -72,14 +77,67 @@ class BaseFunction(Value):
             return result.failure(RunTimeError(
                 self.pos_start, self.pos_end,
                 f"{len(param_names) - len(args)} too few args passed into '{self.name}'.",
-                self.context, origin_file="src.values.functions.base_function.BaseFunction.check_args()"
+                self.context, origin_file="src.values.functions.base_function.BaseFunction.check_args"
+            ))
+        
+        # check names
+        found_keyword_arg = False
+        populated_params: list[str] = []
+        populated_optional_params: list[str] = []
+        for i, argument in enumerate(args):
+            if found_keyword_arg and isinstance(argument, Value):
+                assert self.context is not None
+                return result.failure(RunTimeError(
+                    argument.pos_start, argument.pos_end,
+                    "positional arguments should not be placed after keyword arguments.",
+                    self.context, origin_file="src.values.functions.base_funcntion.BaseFunction.check_args"
+                ))
+            if isinstance(argument, tuple):
+                argument_name, argument_value = argument
+                if argument_name.value in param_names:
+                    if argument_name.value in populated_params:
+                        assert self.context is not None
+                        return result.failure(RunTimeError(
+                            argument_name.pos_start, argument_value.pos_end,
+                            f"parameter '{argument_name.value}' is already populated.",
+                            self.context, origin_file="src.values.functions.base_funcntion.BaseFunction.check_args"
+                        ))
+                    populated_params.append(argument_name.value)
+                elif argument_name.value in optional_params:
+                    if argument_name.value in populated_optional_params:
+                        assert self.context is not None
+                        return result.failure(RunTimeError(
+                            argument_name.pos_start, argument_value.pos_end,
+                            f"optional parameter '{argument_name.value}' is already populated.",
+                            self.context, origin_file="src.values.functions.base_funcntion.BaseFunction.check_args"
+                        ))
+                    populated_optional_params.append(argument_name.value)
+            elif i < len(param_names):
+                populated_params.append(param_names[i])
+            else:
+                populated_optional_params.append(optional_params[i-len(param_names)])
+
+        if sorted(populated_params) != sorted(param_names):
+            first_arg = args[len(param_names + optional_params)]
+            last_arg = args[-1]
+            if isinstance(first_arg, tuple):
+                first_arg = first_arg[1]
+            if isinstance(last_arg, tuple):
+                last_arg = last_arg[1]
+            assert self.context is not None
+            return result.failure(RunTimeError(
+                first_arg.pos_start, last_arg.pos_end,
+                f"too much or too few mendatory arguments were passed into '{self.name}'.",
+                self.context, origin_file="src.values.functions.base_function.BaseFunction.check_args"
             ))
 
         return result.success(NoneValue(self.pos_start, self.pos_end))  # if there is the right number of params
 
     @staticmethod
-    def populate_args(param_names: list[str], args: list[Value], exec_context: Context,
-                      optional_params: list[str] | None = None, should_respect_args_number: bool = True):
+    def populate_args(param_names: list[str], args: list[Value | tuple[String, Value]],
+                      exec_context: Context, optional_params: list[str] | None = None,
+                      should_respect_args_number: bool = True):
+        # this function is not overwritten
         """Make the args match to the param names in the symbol table"""
         # We need the context for the symbol table :)
         if optional_params is None:  # there is no optional params
@@ -91,11 +149,13 @@ class BaseFunction(Value):
                 if i < len(param_names):  # the argument is in the non-optional parameters list
                     arg_name = param_names[i]
                     arg_value = args[i]
+                    assert isinstance(arg_value, Value)  # this is temporary
                     arg_value.set_context(exec_context)
                     exec_context.symbol_table.set(arg_name, arg_value)
                 else:  # the argument is in the optional parameters list
                     arg_name = optional_params[len(param_names) - i]
                     arg_value = args[i]
+                    assert isinstance(arg_value, Value)  # this is temporary
                     arg_value.set_context(exec_context)
                     exec_context.symbol_table.set(arg_name, arg_value)
         else:  # the number of args may not be equal to the number of params
@@ -103,12 +163,14 @@ class BaseFunction(Value):
                 if i < len(param_names):  # the argument is in the non-optional parameters list (when this happens ?)
                     arg_name = param_names[i]
                     arg_value = args[i]
+                    assert isinstance(arg_value, Value)  # this is temporary
                     arg_value.set_context(exec_context)
                     exec_context.symbol_table.set(arg_name, arg_value)
                 elif (i - len(param_names)) < len(optional_params):
                     # the argument is in the optional parameters list
                     arg_name = optional_params[(i - len(param_names))]
                     arg_value = args[i]
+                    assert isinstance(arg_value, Value)  # this is temporary
                     arg_value.set_context(exec_context)
                     exec_context.symbol_table.set(arg_name, arg_value)
                 else:  # the argument is not in the non-optional parameters list, nor in the optional
@@ -117,11 +179,11 @@ class BaseFunction(Value):
                     break
 
     def check_and_populate_args(
-            self, param_names: list[str], args: list[Value], exec_context: Context,
+            self, param_names: list[str], args: list[Value | tuple[String, Value]], exec_context: Context,
             optional_params: list[str] | None = None, should_respect_args_number: bool = True
     ) -> RTResult:
         """self.check_args() then self.populate_args()"""
-        # We still need the context for the symbol table ;)
+        # We still need the context for the symbol table
         result = RTResult()
         result.register(self.check_args(param_names, args, optional_params, should_respect_args_number))
         if result.should_return():  # if there is an error
@@ -134,9 +196,3 @@ class BaseFunction(Value):
 
     def get_comparison_ne(self, other: Value):
         return TRUE.copy().set_pos(self.pos_start, self.pos_end).set_context(self.context), None
-
-    def get_comparison_gte(self, other: Value):
-        return FALSE.copy().set_pos(self.pos_start, self.pos_end).set_context(self.context), None
-
-    def get_comparison_lte(self, other: Value):
-        return FALSE.copy().set_pos(self.pos_start, self.pos_end).set_context(self.context), None

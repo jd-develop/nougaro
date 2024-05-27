@@ -39,9 +39,10 @@ class BuiltInFunction(BaseBuiltInFunction):
         super().__init__(name, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy(), call_with_module_context)
         self.cli_args = []
 
-    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
-                lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>", use_context: Context | None = None,
-                cli_args: list[String] | None = None, work_dir: str | None = None):
+    def execute(self, args: list[Value | tuple[String, Value]], interpreter_: type[Interpreter], run: RunFunction,
+                noug_dir: str, lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>",
+                use_context: Context | None = None, cli_args: list[String] | None = None,
+                work_dir: str | None = None):
         # execute a built-in function
         # create the result
         result = RTResult()

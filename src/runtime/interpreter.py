@@ -28,6 +28,7 @@ from src.noug_version import LIB_VERSION
 import src.conffiles
 # built-in python imports
 from inspect import signature
+from collections import Counter
 import os.path
 import importlib
 import pprint
@@ -1188,6 +1189,15 @@ class Interpreter:
             assert isinstance(param_name.value, str)
             param_names.append(param_name.value)
 
+        all_params = param_names  # + optional_params
+        duplicates = [k for k, v in Counter(all_params).items() if v > 1]
+        if len(duplicates) != 0:
+            return result.failure(RunTimeError(
+                node.param_names_tokens[0].pos_start, node.param_names_tokens[0].pos_end,
+                f"duplicate argument '{duplicates[0]}' in function definition.",
+                ctx, origin_file=f"{_ORIGIN_FILE}.visit_FuncDefNode"
+            ))
+
         if not methods_instead_of_funcs:
             func_value = Function(
                 func_name, body_node, param_names, node.should_auto_return, node.pos_start, node.pos_end
@@ -1269,7 +1279,7 @@ class Interpreter:
         value_to_call = value_to_call.copy().set_pos(node.pos_start, node.pos_end)
 
         if isinstance(value_to_call, BaseFunction):  # if the value is a function
-            args: list[Value] = []
+            args: list[Value | tuple[String, Value]] = []
             call_with_module_context: bool = value_to_call.call_with_module_context
             # call the function
             for arg_node, mul in node.arg_nodes:  # we check the arguments

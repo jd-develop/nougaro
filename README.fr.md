@@ -31,7 +31,7 @@ Voici Nougaro bêta `0.19.0`.
 
  Merci de vous référer au [wiki](https://github.com/jd-develop/nougaro/wiki/) pour la documentation.
 
-## Deux mots sur coloration syntaxique
+## Deux mots sur la coloration syntaxique
 
  Le fichier notepad++ n’était plus mis à jour, donc je l’ai supprimé du dépôt. Voici sa [dernière version](https://github.com/jd-develop/nougaro/blob/973303409d2f7a91d1b45e44f57ebdb517abde53/highlight%20theme%20for%20NPP.xml).
 

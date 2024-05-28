@@ -590,7 +590,7 @@ class Interpreter:
                 ))
 
         # we get the value
-        value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(ctx)
+        value = value.set_pos(node.pos_start, node.pos_end).set_context(ctx)
         return result.success(value)
 
     def visit_VarAssignNode(self, node: VarAssignNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:

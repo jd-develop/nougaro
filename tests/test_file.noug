@@ -510,7 +510,7 @@ def test_nougaro(print_OK)
 
     var variable = Test4()
     var variable.test = 20
-    # var e(variable).test = 20  # fixme: there is a .copy() somewhere I think
+    var e(variable).test = 20
     assert variable.test == 20
     assert is_constructor(Test4)
     assert is_constructor(Test3)

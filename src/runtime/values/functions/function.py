@@ -157,12 +157,4 @@ class Method(Function):
             return False
         is_eq = self.param_names == other.param_names and self.should_auto_return == other.should_auto_return
         are_nodes_eq = self.body_node == other.body_node
-        if self.object_ is None:
-            are_object_eq = other.object_ is None
-        else:
-            are_object_eq, error = self.object_.get_comparison_eq(other)
-            if error is not None or are_object_eq is None:
-                are_object_eq = False
-            else:
-                are_object_eq = bool(are_object_eq.value)
-        return is_eq and are_nodes_eq and are_object_eq
+        return is_eq and are_nodes_eq

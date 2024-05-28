@@ -428,6 +428,8 @@ def test_nougaro(print_OK)
     # classes
     var a = (class Test; var b5 = (class; var c = 2; end)(); end)()
     assert a.b5.c == 2
+    assert Test == Test
+    assert a == a
 
     var c = 12
     class Test2
@@ -454,11 +456,27 @@ def test_nougaro(print_OK)
         end
     end
 
+    assert Test2 == Test2
+    assert not Test2 != Test2
+    assert Test2 != Test
+    assert not Test2 == Test
+    assert Test2 != a
+    assert not Test2 == a
     var d = Test2()
+    assert d == d
+    assert not d != d
+    assert d == Test2()
+    assert not d != Test2()
+    assert d != a
+    assert not d == a
     d.method()
     d.method2()
     assert c == 12
     assert type(d.method) == "method"
+    assert d.method == d.method
+    assert not d.method != d.method
+    assert d.method2 != d.method
+    assert not d.method2 == d.method
 
     class Test3(Test2)
         var b = 4

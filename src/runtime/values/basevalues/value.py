@@ -330,6 +330,14 @@ class Value:
     def get_attr(self, attribute: str):
         return self.attributes[attribute]
 
+    def __eq__(self, other: object):
+        if not isinstance(other, Value):
+            return False
+        is_eq, error = self.get_comparison_eq(other)
+        if error is not None or is_eq is None:
+            return False
+        return is_eq.is_true()
+
     def copy(self):
         """Return a copy of self"""
         value = Value(self.pos_start, self.pos_end).set_context(self.context)

@@ -724,12 +724,21 @@ class Constructor(Value):
 
     def is_true(self):
         return False
+    
+    def is_eq(self, other: Value):
+        if not isinstance(other, Constructor):
+            return False
+        names_eq = self.name == other.name
+        symbol_tables_eq = self.symbol_table == other.symbol_table
+        same_attributes = self.attributes == other.attributes
+        same_parent = self.parent == other.parent
+        return names_eq and symbol_tables_eq and same_attributes and same_parent
 
     def get_comparison_eq(self, other: Value):
-        return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+        return Number(self.is_eq(other), self.pos_start, other.pos_end).set_context(self.context), None
 
     def get_comparison_ne(self, other: Value):
-        return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+        return Number(not self.is_eq(other), self.pos_start, other.pos_end).set_context(self.context), None
 
     def get_comparison_gt(self, other: Value):
         return None, self.can_not_compare(other)
@@ -789,12 +798,20 @@ class Object(Value):
     
     def to_python_str(self) -> str:
         return self.__repr__()
+    
+    def is_eq(self, other: Value):
+        if not isinstance(other, Object):
+            return False
+        attributes_eq = self.attributes == other.attributes
+        constructors_eq = self.constructor == other.constructor
+        types_eq = self.type_ == other.type_
+        return attributes_eq and constructors_eq and types_eq
 
     def get_comparison_eq(self, other: Value):
-        return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+        return Number(self.is_eq(other), self.pos_start, other.pos_end).set_context(self.context), None
 
     def get_comparison_ne(self, other: Value):
-        return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+        return Number(not self.is_eq(other), self.pos_start, other.pos_end).set_context(self.context), None
 
     def get_comparison_gt(self, other: Value):
         return None, self.can_not_compare(other)
@@ -854,16 +871,10 @@ class NoneValue(Value):
         return self.__repr__()
 
     def get_comparison_eq(self, other: Value):
-        if isinstance(other, NoneValue):
-            return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-        else:
-            return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+        return Number(isinstance(other, NoneValue), self.pos_start, other.pos_end).set_context(self.context), None
 
     def get_comparison_ne(self, other: Value):
-        if isinstance(other, NoneValue):
-            return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-        else:
-            return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+        return Number(not isinstance(other, NoneValue), self.pos_start, other.pos_end).set_context(self.context), None
 
     def get_comparison_gt(self, other: Value):
         return None, self.can_not_compare(other)

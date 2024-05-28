@@ -49,8 +49,8 @@ This version may in some cases improve performance.
 #### Runtime
 * Loops no longer append `None` to their result if there is a `continue` or `break`. Use `appendNoneOnContinue` and `appendNoneOnBreak` metas if you still want to do that.
 * Rework completely equality and other comparisons to be more consistant
-  * Functions, built-in functions and module functions can now be equal (if they’re the same)
-    * TODO: CLASSES, CONSTRUCTORS, METHODS
+  * Functions, built-in functions, methods and module functions can now be equal (if they’re the same)
+  * Same for objects and constructors
   * Strings can now be less than or equal to others, according to the alphabetical order.
     For instance, `"foo" > "bar"`, and `"hello" < "world"`.
   * `<`, `<=`, `>`, `>=` comparisons now crash when used on lists, modules, constructors, objects, any function, None.

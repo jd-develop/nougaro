@@ -43,16 +43,16 @@ Two lists SHOULD be equal if and only if they have the same length and that ever
 Two modules SHOULD be equal if they have the same name. GT, GTE, LT, LTE comparisons SHOULD fail.
 
 ## Constructors
-Two constructors, as of 0.20.0, SHOULD NOT be equal. GT, GTE, LT, LTE comparisons SHOULD fail.
+Two constructors SHOULD be equal if they have the same name, the same parent, the same attributes and the same symbol table. GT, GTE, LT, LTE comparisons SHOULD fail.
 
 ## Objects
-Two objects, as of 0.20.0, SHOULD NOT be equal. GT, GTE, LT, LTE comparisons SHOULD fail.
+Two objects SHOULD be equal if they have the same attributes, constructors, and types. GT, GTE, LT, LTE comparisons SHOULD fail.
 
 ## NoneValue
 Two NoneValues SHOULD be equal. GT, GTE, LT, LTE comparisons SHOULD fail.
 
-## Functions (user-written)
-Two Functions SHOULD be equal when their body node is equal. GT, GTE, LT, LTE comparisons SHOULD fail.
+## Functions (user-written) and methods
+Two Functions SHOULD be equal when their body node is equal and their parameters are equal. A one-line (arrowed) function SHOULD NOT be equal to a multi-line function. GT, GTE, LT, LTE comparisons SHOULD fail. The fact that two methods are not defined in the same object SHOULD NOT affect their equality.
 
 ## BuiltinFunctions and ModuleFunctions
 Two Builtin/Module functions SHOULD be equal when their name and their type is equal. Their type is defined as their module name or `BuiltinFunction` if not in a module. GT, GTE, LT, LTE comparisons SHOULD fail.

@@ -65,9 +65,9 @@
     * [ ] Allow optional parameters, do not allow positional parameters after them (call + def)
     * [X] Update nodes (call + def) (finished 24/02/2024)
   * [ ] Runtime:
-    * [ ] Update Function value and methods
+    * [X] Update Function value and methods (finished 28/05/2024)
       * [X] Check args (finished 27/05/2024)
-      * [ ] Populate args
+      * [X] Populate args (finished 28/05/2024)
     * [ ] Update Interpreter visit methods
 
 ## 1.0.0 release candidate (goal: September 2024)

@@ -145,32 +145,60 @@ class BaseFunction(Value):
 
         assert exec_context.symbol_table is not None
         if should_respect_args_number:  # the number of args SHOULD be equal to the number of params
+            found_keyword_argument = False
             for i in range(len(args)):
-                if i < len(param_names):  # the argument is in the non-optional parameters list
+                if found_keyword_argument:
+                    argument = args[i]
+                    assert isinstance(argument, tuple)  # this has been properly checked in check_args
+                    arg_name = argument[0].value
+                    arg_value = argument[1]
+                    arg_value.set_context(exec_context)
+                    exec_context.symbol_table.set(arg_name, arg_value)
+                elif i < len(param_names):  # the argument is in the non-optional parameters list
                     arg_name = param_names[i]
                     arg_value = args[i]
-                    assert isinstance(arg_value, Value)  # this is temporary
+                    if not isinstance(arg_value, Value):
+                        arg_name = arg_value[0].value
+                        arg_value = arg_value[1]
+                        found_keyword_argument = True
                     arg_value.set_context(exec_context)
                     exec_context.symbol_table.set(arg_name, arg_value)
                 else:  # the argument is in the optional parameters list
                     arg_name = optional_params[len(param_names) - i]
                     arg_value = args[i]
-                    assert isinstance(arg_value, Value)  # this is temporary
+                    if not isinstance(arg_value, Value):
+                        arg_name = arg_value[0].value
+                        arg_value = arg_value[1]
+                        found_keyword_argument = True
                     arg_value.set_context(exec_context)
                     exec_context.symbol_table.set(arg_name, arg_value)
         else:  # the number of args may not be equal to the number of params
+            found_keyword_argument = False
             for i in range(len(args)):
-                if i < len(param_names):  # the argument is in the non-optional parameters list (when this happens ?)
+                if found_keyword_argument:
+                    argument = args[i]
+                    assert isinstance(argument, tuple)  # this has been properly checked in check_args
+                    arg_name = argument[0].value
+                    arg_value = argument[1]
+                    arg_value.set_context(exec_context)
+                    exec_context.symbol_table.set(arg_name, arg_value)
+                elif i < len(param_names):  # the argument is in the non-optional parameters list (when this happens ?)
                     arg_name = param_names[i]
                     arg_value = args[i]
-                    assert isinstance(arg_value, Value)  # this is temporary
+                    if not isinstance(arg_value, Value):
+                        arg_name = arg_value[0].value
+                        arg_value = arg_value[1]
+                        found_keyword_argument = True
                     arg_value.set_context(exec_context)
                     exec_context.symbol_table.set(arg_name, arg_value)
                 elif (i - len(param_names)) < len(optional_params):
                     # the argument is in the optional parameters list
                     arg_name = optional_params[(i - len(param_names))]
                     arg_value = args[i]
-                    assert isinstance(arg_value, Value)  # this is temporary
+                    if not isinstance(arg_value, Value):
+                        arg_name = arg_value[0].value
+                        arg_value = arg_value[1]
+                        found_keyword_argument = True
                     arg_value.set_context(exec_context)
                     exec_context.symbol_table.set(arg_name, arg_value)
                 else:  # the argument is not in the non-optional parameters list, nor in the optional

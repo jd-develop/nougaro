@@ -197,14 +197,6 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def not_(self) -> tuple[Value, None] | tuple[None, RunTimeError]:
-        """logical operation: not self.value
-        Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
-        Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
-         tuples.
-        """
-        return None, self.illegal_operation()
-
     def xor_(self, other: Value) -> tuple[Value, None] | tuple[None, RunTimeError]:
         """logical operation: self.value xor other.value (exclusive or)
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)

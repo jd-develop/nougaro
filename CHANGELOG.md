@@ -50,9 +50,11 @@ This version may in some cases improve performance.
 * Loops no longer append `None` to their result if there is a `continue` or `break`. Use `appendNoneOnContinue` and `appendNoneOnBreak` metas if you still want to do that.
 * Rework completely equality and other comparisons to be more consistant
   * Functions, built-in functions and module functions can now be equal (if they’re the same)
+    * TODO: CLASSES, CONSTRUCTORS, METHODS
   * Strings can now be less than or equal to others, according to the alphabetical order.
     For instance, `"foo" > "bar"`, and `"hello" < "world"`.
   * `<`, `<=`, `>`, `>=` comparisons now crash when used on lists, modules, constructors, objects, any function, None.
+  * `and`, `or` and `xor` now works properly with functions, methods, built-in functions
 
 #### Technical and debug
 * `debug.enable_all()` and `debug.disable_all()` now also enable or disable the `print_time` debug option.
@@ -72,6 +74,7 @@ This version may in some cases improve performance.
 * `10eanystringofcharacters-10` is no longer parsed to `10e-10`, and throws an error instead.
 * Fix a crash on maximum recursion depth exceeded.
 * Fix a bug where you could have two parameters with the same name in a function definition.
+* Start and end positions of `xor` are now correct.
 
 ## 0.19.0-beta (2024-05-08)
 

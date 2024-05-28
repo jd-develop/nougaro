@@ -150,12 +150,12 @@ class String(Value):
 
     def xor_(self, other: Value):
         """ Exclusive or (xor) """
-        if not self.is_true() and other.is_true():
-            return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-        if self.is_true() and not other.is_true():
-            return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-        else:
-            return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+        xor = (
+            not self.is_true() and other.is_true()
+        ) or (
+            self.is_true() and not other.is_true()
+        )
+        return Number(xor, self.pos_start, other.pos_end).set_context(self.context), None
 
     def is_in(self, other: Value):
         if isinstance(other, List):
@@ -381,15 +381,12 @@ class Number(Value):
 
     def xor_(self, other: Value):
         """ Exclusive or (xor) """
-        if not self.is_true() and other.is_true():
-            return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-        if self.is_true() and not other.is_true():
-            return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-        else:
-            return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-
-    def not_(self):
-        return Number(self.value == 0, self.pos_start, self.pos_end).set_context(self.context), None
+        xor = (
+            not self.is_true() and other.is_true()
+        ) or (
+            self.is_true() and not other.is_true()
+        )
+        return Number(xor, self.pos_start, other.pos_end).set_context(self.context), None
 
     def bitwise_and(self, other: Value):
         if isinstance(other, Number) and isinstance(self.value, int) and isinstance(other.value, int):
@@ -609,12 +606,12 @@ class List(Value):
 
     def xor_(self, other: Value):
         """ Exclusive or (xor) """
-        if not self.is_true() and other.is_true():
-            return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-        if self.is_true() and not other.is_true():
-            return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-        else:
-            return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+        xor = (
+            not self.is_true() and other.is_true()
+        ) or (
+            self.is_true() and not other.is_true()
+        )
+        return Number(xor, self.pos_start, other.pos_end).set_context(self.context), None
 
     def is_in(self, other: Value):
         if isinstance(other, String):
@@ -665,10 +662,7 @@ class Module(Value):
         return False
 
     def is_eq(self, other: Value):
-        if isinstance(other, Module) and other.name == self.name:
-            return True
-        else:
-            return False
+        return isinstance(other, Module) and other.name == self.name
 
     def get_comparison_eq(self, other: Value):
         return Number(self.is_eq(other), self.pos_start, other.pos_end).set_context(self.context), None
@@ -696,12 +690,12 @@ class Module(Value):
 
     def xor_(self, other: Value):
         """ Exclusive or (xor) """
-        if not self.is_true() and other.is_true():
-            return TRUE.copy().set_context(self.context), None
-        if self.is_true() and not other.is_true():
-            return TRUE.copy().set_context(self.context), None
-        else:
-            return FALSE.copy().set_context(self.context), None
+        xor = (
+            not self.is_true() and other.is_true()
+        ) or (
+            self.is_true() and not other.is_true()
+        )
+        return Number(xor, self.pos_start, other.pos_end).set_context(self.context), None
 
     def copy(self):
         """Return a copy of self"""
@@ -763,12 +757,12 @@ class Constructor(Value):
 
     def xor_(self, other: Value):
         """ Exclusive or (xor) """
-        if not self.is_true() and other.is_true():
-            return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-        if self.is_true() and not other.is_true():
-            return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-        else:
-            return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+        xor = (
+            not self.is_true() and other.is_true()
+        ) or (
+            self.is_true() and not other.is_true()
+        )
+        return Number(xor, self.pos_start, other.pos_end).set_context(self.context), None
 
     def copy(self):
         """Return a copy of self"""
@@ -828,12 +822,12 @@ class Object(Value):
 
     def xor_(self, other: Value):
         """ Exclusive or (xor) """
-        if not self.is_true() and other.is_true():
-            return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-        if self.is_true() and not other.is_true():
-            return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-        else:
-            return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+        xor = (
+            not self.is_true() and other.is_true()
+        ) or (
+            self.is_true() and not other.is_true()
+        )
+        return Number(xor, self.pos_start, other.pos_end).set_context(self.context), None
 
     def copy(self):
         """Return a copy of self"""
@@ -897,12 +891,12 @@ class NoneValue(Value):
 
     def xor_(self, other: Value):
         """ Exclusive or (xor) """
-        if not self.is_true() and other.is_true():
-            return TRUE.copy().set_context(self.context), None
-        if self.is_true() and not other.is_true():
-            return TRUE.copy().set_context(self.context), None
-        else:
-            return FALSE.copy().set_context(self.context), None
+        xor = (
+            not self.is_true() and other.is_true()
+        ) or (
+            self.is_true() and not other.is_true()
+        )
+        return Number(xor, self.pos_start, other.pos_end).set_context(self.context), None
 
     def to_str_(self):
         return String('None', self.pos_start, self.pos_end).set_context(self.context), None

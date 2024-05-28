@@ -11,7 +11,7 @@
 # nougaro modules imports
 from src.lexer.position import Position
 from src.runtime.values.basevalues.value import Value
-from src.runtime.values.basevalues.basevalues import NoneValue, String
+from src.runtime.values.basevalues.basevalues import NoneValue, String, Number
 from src.runtime.values.number_constants import TRUE, FALSE
 from src.runtime.runtime_result import RTResult
 from src.errors.errors import RunTimeError
@@ -196,3 +196,24 @@ class BaseFunction(Value):
 
     def get_comparison_ne(self, other: Value):
         return TRUE.copy().set_pos(self.pos_start, self.pos_end).set_context(self.context), None
+
+    def and_(self, other: Value):
+        return Number(
+            self.is_true() and other.is_true(),
+            self.pos_start, other.pos_end
+        ).set_context(self.context), None
+
+    def or_(self, other: Value):
+        return Number(
+            self.is_true() or other.is_true(),
+            self.pos_start, other.pos_end
+        ).set_context(self.context), None
+
+    def xor_(self, other: Value):
+        """ Exclusive or (xor) """
+        xor = (
+            not self.is_true() and other.is_true()
+        ) or (
+            self.is_true() and not other.is_true()
+        )
+        return Number(xor, self.pos_start, other.pos_end).set_context(self.context), None

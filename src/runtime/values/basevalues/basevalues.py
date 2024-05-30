@@ -45,7 +45,15 @@ class String(Value):
 
     def added_to(self, other: Value):
         if isinstance(other, String):
-            return String(self.value + other.value, self.pos_start, other.pos_end).set_context(self.context), None
+            try:
+                return String(self.value + other.value, self.pos_start, other.pos_end).set_context(self.context), None
+            except UnicodeEncodeError as e:
+                assert self.context is not None
+                return None, RunTimeError(
+                    self.pos_start, other.pos_end,
+                    str(e), self.context,
+                    origin_file="src.runtime.values.basevalues.basevalues.String.added_to"
+                )
         else:
             return None, self.illegal_operation(other)
 

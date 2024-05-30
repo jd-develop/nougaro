@@ -997,7 +997,13 @@ class Interpreter:
         if isinstance(iterable_, List):
             python_iterable = iterable_.elements
         elif isinstance(iterable_, String):
-            python_iterable = iterable_.to_python_str()
+            try:
+                python_iterable = iterable_.to_python_str()
+            except UnicodeEncodeError as e:
+                return result.failure(RunTimeError(
+                    iterable_.pos_start, iterable_.pos_end,
+                    str(e), ctx, origin_file=f"{_ORIGIN_FILE}.visit_ForNodeList"
+                ))
         else:  # this is not a list nor a str
             assert iterable_ is not None
             return result.failure(RTTypeError(
@@ -1937,7 +1943,13 @@ class Interpreter:
         elif ctx.symbol_table.exists(node.identifier.value, True):
             value_to_return = ctx.symbol_table.get(node.identifier.value)
             if value_to_return is not None:
-                print(value_to_return.to_python_str())
+                try:
+                    print(value_to_return.to_python_str())
+                except UnicodeEncodeError as e:
+                    return result.failure(RunTimeError(
+                        value_to_return.pos_start, value_to_return.pos_end,
+                        str(e), ctx, origin_file=f"{_ORIGIN_FILE}.visit_ForNodeList"
+                    ))
             else:
                 value_to_return = String(str(value_to_return), node.pos_start, node.pos_end)
                 print(str(value_to_return))

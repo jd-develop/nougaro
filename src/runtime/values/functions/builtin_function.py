@@ -165,6 +165,12 @@ class BuiltInFunction(BaseBuiltInFunction):
         if value is not None:  # if the value is defined
             try:
                 print(value.to_python_str())
+            except UnicodeEncodeError as e:
+                return RTResult().failure(RunTimeError(
+                    value.pos_start, value.pos_end,
+                    str(e), exec_ctx,
+                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_print"
+                ))
             except AttributeError:
                 print(str(value))
         else:  # the value is not defined, we just print a new line like in regular print() python builtin func
@@ -189,6 +195,12 @@ class BuiltInFunction(BaseBuiltInFunction):
         if value is not None:  # if the value is defined
             try:
                 print_in_red(value.to_python_str())
+            except UnicodeEncodeError as e:
+                return RTResult().failure(RunTimeError(
+                    value.pos_start, value.pos_end,
+                    str(e), exec_ctx,
+                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_print_in_red"
+                ))
             except AttributeError:
                 print_in_red(str(value))
         else:  # the value is not defined, we just print a new line like in regular print() python builtin func
@@ -213,6 +225,12 @@ class BuiltInFunction(BaseBuiltInFunction):
         if value is not None:  # if the value is defined
             try:
                 print_in_green(value.to_python_str())
+            except UnicodeEncodeError as e:
+                return RTResult().failure(RunTimeError(
+                    value.pos_start, value.pos_end,
+                    str(e), exec_ctx,
+                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_print_in_green"
+                ))
             except AttributeError:
                 print_in_green(str(value))
         else:  # the value is not defined, we just print a new line like in regular print() python builtin func
@@ -238,6 +256,12 @@ class BuiltInFunction(BaseBuiltInFunction):
             try:
                 print(value.to_python_str())
                 return RTResult().success(String(value.to_python_str(), self.pos_start, self.pos_end))
+            except UnicodeEncodeError as e:
+                return RTResult().failure(RunTimeError(
+                    value.pos_start, value.pos_end,
+                    str(e), exec_ctx,
+                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_print_ret"
+                ))
             except AttributeError:
                 print(str(value))
                 return RTResult().success(String(str(value), self.pos_start, self.pos_end))
@@ -272,6 +296,12 @@ class BuiltInFunction(BaseBuiltInFunction):
                         print("You’re welcome :)")
                     return RTResult().success(String("Here you go!", self.pos_start, self.pos_end))
                 return RTResult().success(String(value.to_python_str(), self.pos_start, self.pos_end))
+            except UnicodeEncodeError as e:
+                return RTResult().failure(RunTimeError(
+                    value.pos_start, value.pos_end,
+                    str(e), exec_ctx,
+                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_print_in_red_ret"
+                ))
             except AttributeError:
                 print_in_red(str(value))
                 return RTResult().success(String(str(value), self.pos_start, self.pos_end))
@@ -300,6 +330,12 @@ class BuiltInFunction(BaseBuiltInFunction):
             try:
                 print_in_green(value.to_python_str())
                 return RTResult().success(String(value.to_python_str(), self.pos_start, self.pos_end))
+            except UnicodeEncodeError as e:
+                return RTResult().failure(RunTimeError(
+                    value.pos_start, value.pos_end,
+                    str(e), exec_ctx,
+                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_print_in_green_ret"
+                ))
             except AttributeError:
                 print_in_green(str(value))
                 return RTResult().success(String(str(value), self.pos_start, self.pos_end))
@@ -324,10 +360,15 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * text_to_display
         assert exec_ctx.symbol_table is not None
         text_to_display = exec_ctx.symbol_table.getf('text_to_display')  # we get the text to display
-        if isinstance(text_to_display, String) or isinstance(text_to_display, Number):
-            text = input(text_to_display.value)
-        elif text_to_display is not None:
-            text = input(text_to_display.to_python_str())
+        if text_to_display is not None:
+            try:
+                text = input(text_to_display.to_python_str())
+            except UnicodeEncodeError as e:
+                return RTResult().failure(RunTimeError(
+                    text_to_display.pos_start, text_to_display.pos_end,
+                    str(e), exec_ctx,
+                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_input"
+                ))
         else:
             text = input()
         return RTResult().success(String(text, self.pos_start, self.pos_end))
@@ -348,10 +389,15 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         text_to_display = exec_ctx.symbol_table.getf('text_to_display')  # we get the text to display
         while True:
-            if isinstance(text_to_display, String) or isinstance(text_to_display, Number):
-                text = input(text_to_display.value)
-            elif text_to_display is not None:
-                text = input(text_to_display.to_python_str())
+            if text_to_display is not None:
+                try:
+                    text = input(text_to_display.to_python_str())
+                except UnicodeEncodeError as e:
+                    return RTResult().failure(RunTimeError(
+                        text_to_display.pos_start, text_to_display.pos_end,
+                        str(e), exec_ctx,
+                        origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_input_int"
+                    ))
             else:
                 text = input()
 
@@ -378,10 +424,15 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         text_to_display = exec_ctx.symbol_table.getf('text_to_display')  # we get the text to display
         while True:
-            if isinstance(text_to_display, String) or isinstance(text_to_display, Number):
-                text = input(text_to_display.value)
-            elif text_to_display is not None:
-                text = input(text_to_display.to_python_str())
+            if text_to_display is not None:
+                try:
+                    text = input(text_to_display.to_python_str())
+                except UnicodeDecodeError as e:
+                    return RTResult().failure(RunTimeError(
+                        text_to_display.pos_start, text_to_display.pos_end,
+                        str(e), exec_ctx,
+                        origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_input_num"
+                    ))
             else:
                 text = input()
             

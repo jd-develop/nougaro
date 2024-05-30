@@ -77,6 +77,7 @@ This version may in some cases improve performance.
 * Start and end positions of `xor` are now correct.
 * Accessing a variable no longer return a copy of the value, but directly the value instead. It allows things such as `def return(object)->object; var return(a).b = 4` (this previously left `a.b` unchanged, it now properly updates it to 4)
 * `input_num` now returns an integer if the entered value is an integer, otherwise it returns a float.
+* Fix a crash when trying to print surrogates unicode characters (within a pair or not)
 
 ## 0.19.0-beta (2024-05-08)
 

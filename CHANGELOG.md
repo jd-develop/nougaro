@@ -76,6 +76,7 @@ This version may in some cases improve performance.
 * Fix a bug where you could have two parameters with the same name in a function definition.
 * Start and end positions of `xor` are now correct.
 * Accessing a variable no longer return a copy of the value, but directly the value instead. It allows things such as `def return(object)->object; var return(a).b = 4` (this previously left `a.b` unchanged, it now properly updates it to 4)
+* `input_num` now returns an integer if the entered value is an integer, otherwise it returns a float.
 
 ## 0.19.0-beta (2024-05-08)
 

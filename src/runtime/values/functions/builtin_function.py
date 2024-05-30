@@ -386,10 +386,14 @@ class BuiltInFunction(BaseBuiltInFunction):
                 text = input()
             
             try:
-                number = float(text)
+                number = int(text)
                 break
             except ValueError:
-                print(f"'{text}' must be a number. Try again: ")
+                try:
+                    number = float(text)
+                    break
+                except ValueError:
+                    print(f"'{text}' must be a number. Try again: ")
         return RTResult().success(Number(number, self.pos_start, self.pos_end))
     
     builtin_functions["input_num"] = {

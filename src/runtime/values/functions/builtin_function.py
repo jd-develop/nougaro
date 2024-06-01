@@ -40,6 +40,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         self.cli_args = []
 
     def __repr__(self):
+        if self.name == "exit":
+            return "Use exit(), CTRL+C (i.e. interrupt) or CTRL+D (i.e. EOF) to exit."
         return f'<built-in function {self.name}>'
 
     def execute(self, args: list[Value | tuple[String, Value]], interpreter_: type[Interpreter], run: RunFunction,

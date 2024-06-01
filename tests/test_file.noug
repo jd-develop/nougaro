@@ -609,6 +609,7 @@ def test_nougaro(print_OK)
     assert float("3.14") == 3.14
     assert list("abc") == ["a", "b", "c"]
     assert str(void) == "<built-in function void>"
+    assert str(exit) == "Use exit(), CTRL+C (i.e. interrupt) or CTRL+D (i.e. EOF) to exit."
 
     if print_OK then print("OK builtin funcs 4")
 

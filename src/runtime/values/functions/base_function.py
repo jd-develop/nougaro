@@ -30,8 +30,14 @@ class BaseFunction(Value):
         self.type_ = 'BaseFunction'
         self.call_with_module_context: bool = call_with_module_context
     
-    def to_python_str(self) -> str:
+    def __repr__(self) -> str:
         return "BaseFunction"
+
+    def to_python_str(self) -> str:
+        return repr(self)
+    
+    def to_str_(self):
+        return String(repr(self), self.pos_start, self.pos_end).set_context(self.context), None
 
     def generate_new_context(self, use_self_context_ctx_table: bool = False):
         """Generates a new context with the right name, the right parent context and the right position"""

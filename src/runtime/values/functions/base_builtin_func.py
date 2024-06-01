@@ -29,9 +29,6 @@ class BaseBuiltInFunction(BaseFunction):
 
     def __repr__(self):
         return f'<built-in function {self.name}>'
-    
-    def to_python_str(self):
-        return self.__repr__()
 
     def is_eq(self, other: Value):
         return isinstance(other, BaseBuiltInFunction) and self.name == other.name

@@ -55,6 +55,7 @@ This version may in some cases improve performance.
     For instance, `"foo" > "bar"`, and `"hello" < "world"`.
   * `<`, `<=`, `>`, `>=` comparisons now crash when used on lists, modules, constructors, objects, any function, None.
   * `and`, `or` and `xor` now works properly with functions, methods, built-in functions
+* Functions can now be converted to strings using `str()`.
 
 #### Technical and debug
 * `debug.enable_all()` and `debug.disable_all()` now also enable or disable the `print_time` debug option.

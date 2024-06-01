@@ -398,6 +398,7 @@ def test_nougaro(print_OK)
     assert not func != func
     assert func != 12
     assert not func == 12
+    assert str(func) == "<function func>"
 
     def this_is_a_function(x); if x then; return; elif x == None then; return 3; else; return; end; end
     def another_func(x)
@@ -607,6 +608,7 @@ def test_nougaro(print_OK)
     assert int("123") == 123
     assert float("3.14") == 3.14
     assert list("abc") == ["a", "b", "c"]
+    assert str(void) == "<built-in function void>"
 
     if print_OK then print("OK builtin funcs 4")
 

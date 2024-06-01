@@ -60,6 +60,7 @@ This version may in some cases improve performance.
 * `debug.enable_all()` and `debug.disable_all()` now also enable or disable the `print_time` debug option.
 * Data version has been increased to `6`.
 * `[Internal API]` It is now possible to compare Nodes and Tokens. Use `node1 == node2` or `node1 != node2`. Does not check `pos_start` and `pos_end`, so it is better than `hash(node1) == hash(node2)`.
+* `[Build scripts]` (Linux) The Nougaro version is now automatically fetched.
 
 #### Writing libraries
 * Modules written in Python now need to have a library version (`__LIBRARY_VERSION__`). If a module doesn’t have the same

@@ -39,8 +39,8 @@ if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
         exit $return_code
     fi
 
-    read -p "Nougaro version: " -r nougversion
-    read -p "Phase (beta for example): " -r nougphase
+    nougversion=$($python shell.py -v)
+    echo "Nougaro version: $nougversion"
 
     $python -m nuitka --standalone --include-package=lib_ --no-deployment-flag=self-execution shell.py
 
@@ -57,12 +57,12 @@ if [[ $c == [Yy] && $d == [Yy] && $e == [Yy] ]]; then
     cp -r example.noug LICENSE README.md README.fr.md shell.py CODE_OF_CONDUCT.md CONTRIBUTING.md how_it_works.md tests/ examples/ lib_/ src/ noug_version.json repo-image/ shell.dist/
 
     echo "Renaming and compressing…"
-    mv shell.dist nougaro-"$nougversion"-"$nougphase"-linux-bin
-    tar -czf nougaro-"$nougversion"-"$nougphase"-linux-bin.tar.gz nougaro-"$nougversion"-"$nougphase"-linux-bin/
+    mv shell.dist nougaro-"$nougversion"-linux-bin
+    tar -czf nougaro-"$nougversion"-linux-bin.tar.gz nougaro-"$nougversion"-linux-bin/
 
     return_code=$?
     if [ $return_code != 0 ]; then
-        echo "tar returned with error (you can compress the folder nougaro-$nougversion-$nougphase-linux-bin yourself if you want)"
+        echo "tar returned with error (you can compress the folder nougaro-$nougversion-linux-bin yourself if you want)"
         echo "Return code: $return_code"
         exit $return_code
     fi

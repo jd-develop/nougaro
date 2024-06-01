@@ -61,6 +61,7 @@ This version may in some cases improve performance.
 #### Technical and debug
 * `debug.enable_all()` and `debug.disable_all()` now also enable or disable the `print_time` debug option.
 * Data version has been increased to `6`.
+* Version ID has been increased to `5`.
 * `[Internal API]` It is now possible to compare Nodes and Tokens. Use `node1 == node2` or `node1 != node2`. Does not check `pos_start` and `pos_end`, so it is better than `hash(node1) == hash(node2)`.
 * `[Build scripts]` (Linux) The Nougaro version is now automatically fetched.
 

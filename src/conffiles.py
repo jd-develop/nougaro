@@ -20,7 +20,7 @@ $HOME/Library/Preferences/org.jd-develop.nougaro/
 %APPDATA%\\jd-develop\\nougaro\\
 
 If config files in ./config/ (where . is the nougaro repository root directory) are found and if no files exist in
-the aforementionned directories, they are copied (with data-version=1) and eventually updated.
+the aforementionned directories, they are copied and eventually updated.
 """
 
 # IMPORTS
@@ -184,7 +184,7 @@ def create_config_files():
     # checks if the config path is empty (create or copy config files)
     if len(os.listdir(CONFIG_DIRECTORY)) == 0:
         _create_or_copy_files()
-    
+
 
 def access_data(config_file: str):
     """Return None if the file does not exist."""
@@ -194,7 +194,7 @@ def access_data(config_file: str):
         return None
     with open(CONFIG_DIRECTORY + config_file + ".nconf", "r+") as file:
         return file.read()
-    
+
 
 def write_data(config_file: str, data: str, silent: bool = False, return_error_messages: bool = False):
     if config_file == "DATA_VERSION":

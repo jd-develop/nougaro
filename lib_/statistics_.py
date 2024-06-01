@@ -28,7 +28,6 @@ class RTStatisticsError(RunTimeError):
                  origin_file: str = "lib_.statistics_"):
         super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="StatisticsError",
                          origin_file=origin_file)
-        self.context = context
 
 
 class Statistics(ModuleFunction):

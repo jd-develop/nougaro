@@ -24,9 +24,14 @@ __LIB_VERSION__ = 2
 
 class WebBrowserError(RunTimeError):
     """WebBrowserError is an error that can be triggered ONLY via functions in this module."""
-    def __init__(self, pos_start: Position, pos_end: Position, details: str, context: Context, origin_file: str = "lib_.webbrowser_"):
-        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="WebBrowserError", origin_file=origin_file)
-        self.context = context
+    def __init__(
+            self, pos_start: Position, pos_end: Position, details: str, context: Context,
+            origin_file: str = "lib_.webbrowser_"
+        ):
+        super().__init__(
+            pos_start, pos_end, details, context, rt_error=False, error_name="WebBrowserError",
+            origin_file=origin_file
+        )
 
 
 class WebBrowser(ModuleFunction):

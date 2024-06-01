@@ -10,6 +10,9 @@
 """ _Conffiles module
 
     _Conffiles is a module that give access to the `src.conffiles` internal API module.
+
+    This module is undocumented because only meant to be used internally. It is not recommended to
+    use this module in Nougaro projects.
 """
 
 # IMPORTS

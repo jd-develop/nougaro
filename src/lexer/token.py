@@ -6,12 +6,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""File for Token class. For token types list, please refer to src.lexer.token_types.py"""
 
 # IMPORTS
 # nougaro modules imports
 from src.lexer.position import Position
-
-"""File for Token class. For token types list, please refer to src.lexer.token_types.py"""
+from src.lexer.token_types import TT
 
 
 # ##########
@@ -35,7 +35,7 @@ class Token:
 
     def __repr__(self) -> str:
         if self.value is not None:
-            if isinstance(self.value, str):
+            if self.type == TT["STRING"]:
                 return f'{self.type}:"{self.value}"'
             return f'{self.type}:{self.value}'
         return f'{self.type}'

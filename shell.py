@@ -207,7 +207,7 @@ def main():
     # for i, arg in enumerate(sys.argv):
     #     print(f"Argument {i:>6}: {arg}")
 
-    # Uncomment 3 last lines to understand the following code.
+    # Uncomment 3 last lines to understand the following line.
     # Tested on Windows and Linux. Tested after compiling with Nuitka on Windows and Linux.
     del args[0]
 
@@ -254,10 +254,10 @@ def main():
                 print(f"\nHappy new year {now.year}!")
             if debug_on:
                 print()
-                print(f"Current working directory is {work_dir} ({type(work_dir)})")
-                print(f"Current config files directory is {src.conffiles.CONFIG_DIRECTORY} ({type(src.conffiles.CONFIG_DIRECTORY)})")
-                print(f"Current data version is {DATA_VERSION} ({type(DATA_VERSION)})")
-                print(f"Current lib version is {LIB_VERSION} ({type(LIB_VERSION)})")
+                print(f"Current working directory is {work_dir} (type: {type(work_dir)})")
+                print(f"Current config files directory is {src.conffiles.CONFIG_DIRECTORY} (type: {type(src.conffiles.CONFIG_DIRECTORY)})")
+                print(f"Current data version is {DATA_VERSION} (type: {type(DATA_VERSION)})")
+                print(f"Current lib version is {LIB_VERSION} (type: {type(LIB_VERSION)})")
                 print(f"Python version is {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]} "
                       f"({list(sys.version_info)})")
                 print("DEBUG mode is ENABLED")
@@ -320,5 +320,5 @@ def main():
             sys.exit(1)
 
 
-if __name__ == '__main__':  # SOMEBODY ONCE TOLD ME it was good to do that
+if __name__ == '__main__':
     main()

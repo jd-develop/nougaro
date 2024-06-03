@@ -66,6 +66,7 @@
 * [X] if possible, implement `break (name)` and `continue (name)` where (name) is `if`, `for`, … (finished 09/05/2024)
 * [X] completely switch to [semver](https://semver.org) (finished 7/11/2023)
 
+* [ ] Add expected type in data Nougaro stores (conffiles)
 * [ ] create highlight extension for VSCode
 * [ ] add optional arguments in functions
   * [ ] Parser:

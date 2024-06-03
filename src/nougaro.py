@@ -182,10 +182,10 @@ def run(
     if print_time:
         print("=== PRINT TIME DEBUG OPTION ===")
         print(f"({file_name=}, {exec_from=})")
-        print(f" Lexer took {parser_start_time-lexer_start_time}")
-        print(f" Parser took {interpreter_start_time-parser_start_time}")
-        print(f" Runtime took {end_time-interpreter_start_time}")
-        print(f" Total time: {end_time-lexer_start_time}")
+        print(f" Lexer took {parser_start_time-lexer_start_time}s")
+        print(f" Parser took {interpreter_start_time-parser_start_time}s")
+        print(f" Runtime took {end_time-interpreter_start_time}s")
+        print(f" Total time: {end_time-lexer_start_time}s")
         print("===============================")
 
     # finally, return the value and the error given by the interpreter

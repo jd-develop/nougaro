@@ -19,12 +19,19 @@ from lib_.lib_to_make_libs import *  # useful stuff to make libs.
 # built-in python imports
 import webbrowser
 
+__LIB_VERSION__ = 2
+
 
 class WebBrowserError(RunTimeError):
     """WebBrowserError is an error that can be triggered ONLY via functions in this module."""
-    def __init__(self, pos_start: Position, pos_end: Position, details: str, context: Context, origin_file: str = "lib_.webbrowser_"):
-        super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="WebBrowserError", origin_file=origin_file)
-        self.context = context
+    def __init__(
+            self, pos_start: Position, pos_end: Position, details: str, context: Context,
+            origin_file: str = "lib_.webbrowser_"
+        ):
+        super().__init__(
+            pos_start, pos_end, details, context, rt_error=False, error_name="WebBrowserError",
+            origin_file=origin_file
+        )
 
 
 class WebBrowser(ModuleFunction):
@@ -38,6 +45,9 @@ class WebBrowser(ModuleFunction):
         """Return a copy of self"""
         copy = WebBrowser(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
+    
+    def is_eq(self, other: Value):
+        return isinstance(other, WebBrowser) and self.name == other.name
     
     # functions
     def open(self, context: Context):

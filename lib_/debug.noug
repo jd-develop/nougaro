@@ -9,17 +9,20 @@ import _conffiles as cf
 
 var is_debug_enabled = int(cf.access_data("debug"))
 var should_print_context = int(cf.access_data("print_context"))
+var should_print_time = int(cf.access_data("print_time"))
 
 
 def enable_all()
     debug_mode_enable()
     print_context()
+    print_time()
 end
 
 
 def disable_all()
     debug_mode_disable()
     stop_print_context()
+    stop_print_time()
 end
 
 
@@ -46,8 +49,21 @@ def stop_print_context()
     print("PRINT CONTEXT debug option is now DISABLED.")
 end
 
+
+def print_time()
+    cf.write_data("print_time", "1")
+    print("PRINT TIME debug option is now ENABLED.")
+end
+
+
+def stop_print_time()
+    cf.write_data("print_time", "0")
+    print("PRINT TIME debug option is now DISABLED.")
+end
+
 export is_debug_enabled
 export should_print_context
+export should_print_time
 export enable_all
 export disable_all
 export debug_mode_enable
@@ -56,4 +72,6 @@ export debug_mode_disable
 export debug_mode_disable as disable
 export print_context
 export stop_print_context
+export print_time
+export stop_print_time
 export 3.14 as test_pi

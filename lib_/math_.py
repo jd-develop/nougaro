@@ -20,6 +20,8 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import math
 
+__LIB_VERSION__ = 2
+
 # constants
 PI = Number(math.pi, *default_pos())
 TAU = Number(math.tau, *default_pos())
@@ -39,6 +41,9 @@ class Math(ModuleFunction):
         """Return a copy of self"""
         copy = Math(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
+    
+    def is_eq(self, other: Value):
+        return isinstance(other, Math) and self.name == other.name
 
     # =========
     # FUNCTIONS

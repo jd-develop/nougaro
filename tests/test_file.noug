@@ -10,9 +10,9 @@ import _conffiles as cf
 def test_nougaro(print_OK)
     var start_time = time.time()
     
-    assert __noug_version__ == "0.19.0-beta"
+    assert __noug_version__ == "0.20.0-beta"
     import noug_version
-    assert noug_version.version_list == [0, 19, 0, "beta", 0]
+    assert noug_version.version_list == [0, 20, 0, "beta", 0]
 
     print("Config directory is " + cf.CONFIG_DIRECTORY + ".")
 
@@ -59,8 +59,12 @@ def test_nougaro(print_OK)
     assert (3 ^^ 2) == 1
     assert 1e3 == 1000
     assert 1e-3 == 0.001
+    assert 1e+3 == 1000
+    assert 1__0e+1_0 == int("10" + "0"*10)
+    assert 1__0e1_0 == int("10" + "0"*10)
     assert 1.1e1 == 11
-    # assert 1.1e-1 == 0.11  # it crashes because 1.1e-1 = 0.11000000000000001...
+    assert 1.1e+4 == 11000
+    assert round(1.1e-1, 3) == 0.11
 
     if print_OK then print("OK ops")
 
@@ -153,6 +157,16 @@ def test_nougaro(print_OK)
     assert 1 >= 1
     assert 0 < 1
     assert 1 <= 1
+    assert 0.1 < 1 <= 1 <= 2
+    assert not 0.1 > 1 >= 1 >= 2
+    assert "foo" > "bar"
+    assert "foo" >= "bar"
+    assert "hello" < "world"
+    assert "hello" <= "world"
+    assert "hello" <= "hello"
+    assert "hello" >= "hello"
+    assert "hello" == "hello"
+    assert not "hello" != "hello"
     assert True
     assert True and True
     assert True or False
@@ -164,6 +178,14 @@ def test_nougaro(print_OK)
     assert True or 1/0
     import debug
     assert not 10 == debug and 10 != debug and not debug == 10 and debug != 10
+    assert None == None
+    assert None != 10
+    assert 10 != None
+    assert debug == debug
+    assert debug != None
+    assert None != debug
+    assert not debug != debug
+    assert not None != None
     assert not (False and 1/0)
     assert True or 1/0
     var a = 1
@@ -171,6 +193,18 @@ def test_nougaro(print_OK)
     var a = "str"
     assert not (is_int(a) and round(a))
     del a
+    assert void == void
+    assert not void != void
+    assert void != print
+    assert not void == print
+    assert debug.enable == debug.enable
+    assert not debug.enable != debug.enable
+    assert debug.disable != debug.enable
+    assert not debug.disable == debug.enable
+    assert debug.disable != debug
+    assert not debug.disable == debug
+    assert debug.disable != is_int
+    assert not debug.disable == is_int
 
     if print_OK then print("OK tests")
 
@@ -184,7 +218,7 @@ def test_nougaro(print_OK)
 
     # loops
     assert (for i = 1 to 10 then i) == [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    assert (for i in [1, 2, 3, 4, 5, 6, 7, 8, 9] then if i%2 == 0 then i else continue) == [None, 2, None, 4, None, 6, None, 8, None]
+    assert (for i in [1, 2, 3, 4, 5, 6, 7, 8, 9] then if i%2 == 0 then i else continue) == [2, 4, 6, 8]
     assert (for i = -1 to -10 step -1 then i%2) == [1, 0, 1, 0, 1, 0, 1, 0, 1]
     for c in "abc" then assert c in "abc"
     var b = 1
@@ -206,7 +240,7 @@ def test_nougaro(print_OK)
             else i
         end \
     )
-    assert b == [[1], [2], [3], [4], None]
+    assert b == [[1], [2], [3], [4]]
     var b = ( \
         for i = 1 to 10 then
             if i%5 == 0 then break and return 12 \
@@ -221,7 +255,7 @@ def test_nougaro(print_OK)
             else i
         end \
     )
-    assert b == [[1], [2], [3], [4], None]
+    assert b == [[1], [2], [3], [4]]
     var b = ( \
         for i in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] then
             if i%5 == 0 then break and return 12 \
@@ -238,7 +272,7 @@ def test_nougaro(print_OK)
             var i++
         end \
     )
-    assert b == [[1, 2], [2, 3], [3, 4], [4, 5], None]
+    assert b == [[1, 2], [2, 3], [3, 4], [4, 5]]
     var b = ( \
         while i <= 10 then
             if i%5 == 0 then break and return 12 \
@@ -256,7 +290,7 @@ def test_nougaro(print_OK)
             var i++
         then loop while i <= 10 \
     )
-    assert b == [[1, 2], [2, 3], [3, 4], [4, 5], None]
+    assert b == [[1, 2], [2, 3], [3, 4], [4, 5]]
     var b = ( \
         do
             if i%5 == 0 then break and return 12 \
@@ -273,7 +307,7 @@ def test_nougaro(print_OK)
             elif j+i == 4 then \
                 break and return i
     end)
-    assert b == [[[]], [[None]], [3], None]
+    assert b == [[[]], [[None]], [3]]
 
     var b = (for:__foo__ i = 1 to 8 then
         for:bar j = 1 to i then \
@@ -291,7 +325,7 @@ def test_nougaro(print_OK)
             elif j+i == 4 then \
                 break and return i
     end)
-    assert b == [[[]], [[None]], [3], None]
+    assert b == [[[]], [[None]], [3]]
 
     var b = (for:__foo__ i in [1, 2, 3, 4, 5] then
         for:bar j in (for _ = 1 to i then _) then \
@@ -311,7 +345,7 @@ def test_nougaro(print_OK)
             elif j+i == 4 then \
                 break and return i
     end)
-    assert b == [[1, []], [2, [None]], [3, 3], None]
+    assert b == [[1, []], [2, [None]], [3, 3]]
 
     var i = 0
     var b = (while:foo i <= 5 then
@@ -333,7 +367,7 @@ def test_nougaro(print_OK)
             elif j+i == 4 then \
                 break and return i
     then loop while i <= 5)
-    assert b == [[1, []], [2, [None]], [3, 3], None]
+    assert b == [[1, []], [2, [None]], [3, 3]]
 
     var i = 0
     var b = (do:foo
@@ -347,7 +381,7 @@ def test_nougaro(print_OK)
     assert b == 6
 
     var b = (for:outer i = 0 to 10 then for:inner j = 0 to i then if i+j==5 then continue:outer elif i+j == 15 then break and return "15!" else i+j)
-    assert b == [[], [1], [2, 3], None, None, None, [6, 7, 8, 9, 10, 11], [7, 8, 9, 10, 11, 12, 13], "15!", "15!"]
+    assert b == [[], [1], [2, 3], [6, 7, 8, 9, 10, 11], [7, 8, 9, 10, 11, 12, 13], "15!", "15!"]
 
     del b
 
@@ -360,22 +394,43 @@ def test_nougaro(print_OK)
         ## return
         return "str"
     end
+    assert func == func
+    assert not func != func
+    assert func != 12
+    assert not func == 12
+    assert str(func) == "<function func>"
 
     def this_is_a_function(x); if x then; return; elif x == None then; return 3; else; return; end; end
+    def another_func(x)
+        if x then
+            return
+        elif x == None then
+            return 3
+        else
+            return
+        end
+    end
+    assert this_is_a_function == another_func
+    assert not this_is_a_function != another_func
+    assert not this_is_a_function == func
+    assert this_is_a_function != func
+    assert this_is_a_function == another_func != None
 
     if print_OK then print("OK func")
 
     ## call
     assert (def()->"str")() == func()
-    assert this_is_a_function(12) == None
-    assert this_is_a_function(False) == None
-    assert this_is_a_function(None) == 3
+    assert this_is_a_function(12) == None == another_func(12)
+    assert this_is_a_function(False) == None == another_func(False)
+    assert this_is_a_function(None) == 3 == another_func(None)
 
     if print_OK then print("OK call")
 
     # classes
     var a = (class Test; var b5 = (class; var c = 2; end)(); end)()
     assert a.b5.c == 2
+    assert Test == Test
+    assert a == a
 
     var c = 12
     class Test2
@@ -402,11 +457,27 @@ def test_nougaro(print_OK)
         end
     end
 
+    assert Test2 == Test2
+    assert not Test2 != Test2
+    assert Test2 != Test
+    assert not Test2 == Test
+    assert Test2 != a
+    assert not Test2 == a
     var d = Test2()
+    assert d == d
+    assert not d != d
+    assert d == Test2()
+    assert not d != Test2()
+    assert d != a
+    assert not d == a
     d.method()
     d.method2()
     assert c == 12
     assert type(d.method) == "method"
+    assert d.method == d.method
+    assert not d.method != d.method
+    assert d.method2 != d.method
+    assert not d.method2 == d.method
 
     class Test3(Test2)
         var b = 4
@@ -440,7 +511,7 @@ def test_nougaro(print_OK)
 
     var variable = Test4()
     var variable.test = 20
-    # var e(variable).test = 20  # fixme: there is a .copy() somewhere I think
+    var e(variable).test = 20
     assert variable.test == 20
     assert is_constructor(Test4)
     assert is_constructor(Test3)
@@ -466,6 +537,15 @@ def test_nougaro(print_OK)
     print("* run")
     print("* example")
     print("* __test__")
+
+    assert print != void
+    assert void != 3
+    assert system_call != __python__
+    assert print == print
+    var sort_alias = sort
+    assert sort_alias == sort
+    assert sort_alias != 0.2
+    assert sort_alias != time
 
     assert print(hello) == None
     assert print(1) == None
@@ -528,6 +608,8 @@ def test_nougaro(print_OK)
     assert int("123") == 123
     assert float("3.14") == 3.14
     assert list("abc") == ["a", "b", "c"]
+    assert str(void) == "<built-in function void>"
+    assert str(exit) == "Use exit(), CTRL+C (i.e. interrupt) or CTRL+D (i.e. EOF) to exit."
 
     if print_OK then print("OK builtin funcs 4")
 
@@ -658,7 +740,7 @@ def test_nougaro(print_OK)
     if print_OK then print("OK lists")
 
     # Loops
-    assert (while (assert True) == None then break) == [None]
+    assert (while (assert True) == None then break) == []
     assert (for i in [1, 2, 3] then i) == [1, 2, 3]
     assert (for i = 0 to 9 step 2 then assert i%2 == 0) == [None]*5
     assert (for j in for i = 1 to 100 then i then if j%25 == 0 then j) == ([None]*24) * [25] * ([None]*24) * [50] * ([None]*24) * [75] * ([None]*24)
@@ -801,6 +883,9 @@ def test_nougaro(print_OK)
     # metas
     import metas.legacyAbs
     import metas.nbspBetweenFrenchGuillemets
+    import metas.appendNoneOnBreak
+    import metas.appendNoneOnContinue
+    import metas.appendNoneOnBreakAndContinue
     import metas.syntax.at
     import metas.syntax.comment
     import metas.syntax.dollar
@@ -818,6 +903,15 @@ def test_nougaro(print_OK)
 end
 
 
+def im_a_function(print_OK)
+    print("yes")
+end
+
+
 var _should_print_ok = cf.access_data("SHOULD_TEST_PRINT_OK", 1)
 if _should_print_ok == None then var _should_print_ok = "0"
 test_nougaro(int(_should_print_ok))
+assert test_nougaro == test_nougaro
+assert test_nougaro != im_a_function
+assert not test_nougaro == im_a_function
+assert not test_nougaro != test_nougaro

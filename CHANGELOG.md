@@ -8,7 +8,13 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 
 ## 0.20.0-beta (unreleased)
 
+This version may in some cases improve performance.
+
 ### Added
+
+#### Syntax
+* Allow the `+` sign in a e-infix expression (such as `10e+3`)
+
 #### Flow control
 * Add the `break and return (value)` syntax, which allows to return a certain value when breaking a loop.
 * Add loop labels:
@@ -19,12 +25,63 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 * Add the `is_object` builtin function
 * Add the `is_constructor` builtin function
 
+#### Metas
+* Add the `appendNoneOnContinue` meta
+  * Takes no argument
+  * If enabled, loops will append `None` to  their result if there is a `continue` (see the Changed section)
+* Add the `appendNoneOnBreak` meta
+  * Takes no argument
+  * If enabled, loops will append `None` to  their result if there is a `break` (see the Changed section)
+
 #### Command line interface
 * Add the `-i` (or `--interactive`) CLI argument. Allows to run an interactive shell after executing
   a file, within the context of that file (i.e. with all the variables)
 
+#### Technical and debug
+* Add the `print_time` debug option: add `debug.should_print_time` (0 or 1), `debug.print_time()`, `debug.stop_print_time()`. This option prints the total time different parts of Nougaro took to complete.
+* `[Internal API]` Add `RecursionError`, accessible in libs using `RTRecursionError`.
+* `[Internal API]` Add Library Version, accessible through `src.noug_version.LIB_VERSION`. It is stored in the key `"lib-version"` in `noug_version.json`. It is currently `2`.
+
+### Changed
+#### Syntax
+* Numbers can no longer have trailing underscore at the beginning or at the end.
+
+#### Runtime
+* Loops no longer append `None` to their result if there is a `continue` or `break`. Use `appendNoneOnContinue` and `appendNoneOnBreak` metas if you still want to do that.
+* Rework completely equality and other comparisons to be more consistant
+  * Functions, built-in functions, methods and module functions can now be equal (if they’re the same)
+  * Same for objects and constructors
+  * Strings can now be less than or equal to others, according to the alphabetical order.
+    For instance, `"foo" > "bar"`, and `"hello" < "world"`.
+  * `<`, `<=`, `>`, `>=` comparisons now crash when used on lists, modules, constructors, objects, any function, None.
+  * `and`, `or` and `xor` now works properly with functions, methods, built-in functions
+* Functions can now be converted to strings using `str()`.
+* Representation of the `exit` builtin function is now `"Use exit(), CTRL+C (i.e. interrupt) or CTRL+D (i.e. EOF) to exit."` instead of `"<built-in function exit>"`.
+
+#### Technical and debug
+* `debug.enable_all()` and `debug.disable_all()` now also enable or disable the `print_time` debug option.
+* Data version has been increased to `6`.
+* Version ID has been increased to `5`.
+* `[Internal API]` It is now possible to compare Nodes and Tokens. Use `node1 == node2` or `node1 != node2`. Does not check `pos_start` and `pos_end`, so it is better than `hash(node1) == hash(node2)`.
+* `[Build scripts]` (Linux) The Nougaro version is now automatically fetched.
+
+#### Writing libraries
+* Modules written in Python now need to have a library version (`__LIBRARY_VERSION__`). If a module doesn’t have the same
+  library version as the current Nougaro version, an error is thrown. Library version is currently `2`.
+* Libraries now need the `is_eq` method as described in documentation (TODO: update doc on release – the method is described but in a “in the future you will have to” box).
+
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.
+
+### Fixed
+* Fix position start of constructors in error messages.
+* `10eanystringofcharacters-10` is no longer parsed to `10e-10`, and throws an error instead.
+* Fix a crash on maximum recursion depth exceeded.
+* Fix a bug where you could have two parameters with the same name in a function definition.
+* Start and end positions of `xor` are now correct.
+* Accessing a variable no longer return a copy of the value, but directly the value instead. It allows things such as `def return(object)->object; var return(a).b = 4` (this previously left `a.b` unchanged, it now properly updates it to 4)
+* `input_num` now returns an integer if the entered value is an integer, otherwise it returns a float.
+* Fix a crash when trying to print surrogates unicode characters (within a pair or not)
 
 ## 0.19.0-beta (2024-05-08)
 
@@ -41,8 +98,7 @@ This version comes with a lot of new features, and one single deprecation (see �
         If `new` is 0, the `url` is opened in the same browser window if possible.
         If `new` is 1, a new browser window is opened if possible.
         If `new` is 2, a new tab is opened if possible.
-        If `autoraise` is True, the window is raised if possible (note that under many window managers this will occur
-        regardless of the setting of this variable).
+        If `autoraise` is True, the window is raised if possible (note that under many window managers this will occur regardless of the setting of this variable).
 
 #### Metas
 * Add a “meta” system

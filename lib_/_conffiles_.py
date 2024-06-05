@@ -10,6 +10,9 @@
 """ _Conffiles module
 
     _Conffiles is a module that give access to the `src.conffiles` internal API module.
+
+    This module is undocumented because only meant to be used internally. It is not recommended to
+    use this module in Nougaro projects.
 """
 
 # IMPORTS
@@ -19,6 +22,8 @@ import src.conffiles
 # Above line : Context, RTResult, errors and values are imported in lib_to_make_libs.py
 # built-in python imports
 # no imports
+
+__LIB_VERSION__ = 2
 
 # constants
 CONFIG_DIRECTORY = String(src.conffiles.CONFIG_DIRECTORY, *default_pos())
@@ -35,6 +40,9 @@ class Conffiles(ModuleFunction):
         """Return a copy of self"""
         copy = Conffiles(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
+    
+    def is_eq(self, other: Value):
+        return isinstance(other, Conffiles) and self.name == other.name
     
     # functions
     def execute__conffiles_access_data(self, context: Context):

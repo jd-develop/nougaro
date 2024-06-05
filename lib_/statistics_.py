@@ -19,6 +19,8 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import statistics
 
+__LIB_VERSION__ = 2
+
 
 class RTStatisticsError(RunTimeError):
     """StatisticsError is an error that can be triggered ONLY via functions in this module."""
@@ -26,7 +28,6 @@ class RTStatisticsError(RunTimeError):
                  origin_file: str = "lib_.statistics_"):
         super().__init__(pos_start, pos_end, details, context, rt_error=False, error_name="StatisticsError",
                          origin_file=origin_file)
-        self.context = context
 
 
 class Statistics(ModuleFunction):
@@ -40,6 +41,9 @@ class Statistics(ModuleFunction):
         """Return a copy of self"""
         copy = Statistics(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
+    
+    def is_eq(self, other: Value):
+        return isinstance(other, Statistics) and self.name == other.name
 
     # =========
     # FUNCTIONS

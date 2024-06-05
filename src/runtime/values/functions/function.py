@@ -15,7 +15,7 @@ from src.lexer.position import Position, DEFAULT_POSITION
 from src.parser.nodes import Node
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.values.basevalues.value import Value
-from src.runtime.values.basevalues.basevalues import NoneValue, String, List
+from src.runtime.values.basevalues.basevalues import NoneValue, String, List, Number
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
 from src.misc import nice_str_from_idk, RunFunction
@@ -38,12 +38,26 @@ class Function(BaseFunction):
 
     def __repr__(self):
         return f'<function {self.name}>'
+
+    def is_eq(self, other: Value):
+        if not isinstance(other, Function):
+            return False
+        is_eq = self.param_names == other.param_names and self.should_auto_return == other.should_auto_return
+        are_nodes_eq = self.body_node == other.body_node
+        return is_eq and are_nodes_eq
+    
+    def get_comparison_eq(self, other: Value):
+        return Number(self.is_eq(other), self.pos_start, other.pos_end), None
+    
+    def get_comparison_ne(self, other: Value):
+        return Number(not self.is_eq(other), self.pos_start, other.pos_end), None
     
     def to_python_str(self):
         return self.__repr__()
 
-    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
-                exec_from: str = "<invalid>", use_context: Context | None = None, cli_args: list[String] | None = None,
+    def execute(self, args: list[Value | tuple[String, Value]], interpreter_: type[Interpreter], run: RunFunction,
+                noug_dir: str, lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>",
+                use_context: Context | None = None, cli_args: list[String] | None = None,
                 work_dir: str | None = None):
         if work_dir is None:
             work_dir = noug_dir
@@ -54,7 +68,7 @@ class Function(BaseFunction):
             cli_args = []
 
         # create an interpreter to run the code inside the function
-        interpreter = interpreter_(run, noug_dir, cli_args, work_dir)
+        interpreter = interpreter_(run, noug_dir, cli_args, work_dir, lexer_metas)
 
         if use_context is not None:
             self.context = use_context
@@ -137,3 +151,10 @@ class Method(Function):
         copy.set_context(self.context)
         copy.attributes = self.attributes.copy()
         return copy
+    
+    def is_eq(self, other: Value):
+        if not isinstance(other, Method):
+            return False
+        is_eq = self.param_names == other.param_names and self.should_auto_return == other.should_auto_return
+        are_nodes_eq = self.body_node == other.body_node
+        return is_eq and are_nodes_eq

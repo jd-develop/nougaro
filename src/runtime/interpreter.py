@@ -10,7 +10,7 @@
 # IMPORTS
 # nougaro modules imports
 from src.errors.errors import RunTimeError, RTNotDefinedError, RTTypeError, RTAttributeError, InvalidSyntaxError
-from src.errors.errors import RTAssertionError, RTIndexError, RTFileNotFoundError
+from src.errors.errors import RTAssertionError, RTIndexError, RTFileNotFoundError, RTRecursionError
 from src.lexer.token_types import TT, TOKENS_NOT_TO_QUOTE
 from src.lexer.token import Token
 from src.lexer.position import Position, DEFAULT_POSITION
@@ -24,9 +24,11 @@ from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
 from src.runtime.symbol_table import SymbolTable
 from src.misc import clear_screen, RunFunction
+from src.noug_version import LIB_VERSION
 import src.conffiles
 # built-in python imports
 from inspect import signature
+from collections import Counter
 import os.path
 import importlib
 import pprint
@@ -39,7 +41,8 @@ _ORIGIN_FILE = "src.runtime.interpreter.Interpreter"
 # ##########
 # noinspection PyPep8Naming
 class Interpreter:
-    def __init__(self, run: RunFunction, noug_dir_: str, args: list[String], work_dir: str, file_name: str = ""):
+    def __init__(self, run: RunFunction, noug_dir_: str, args: list[String], work_dir: str,
+                 lexer_metas: dict[str, str | bool], file_name: str = ""):
         debug = src.conffiles.access_data("debug")
         if debug is None:
             debug = 0
@@ -49,6 +52,7 @@ class Interpreter:
         self.args = args
         self.work_dir = work_dir
         self.file_name = file_name
+        self.lexer_metas = lexer_metas
         self._methods = None
         self.init_methods()
         assert self._methods is not None
@@ -586,7 +590,7 @@ class Interpreter:
                 ))
 
         # we get the value
-        value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(ctx)
+        value = value.set_pos(node.pos_start, node.pos_end).set_context(ctx)
         return result.success(value)
 
     def visit_VarAssignNode(self, node: VarAssignNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
@@ -857,13 +861,11 @@ class Interpreter:
         if result.should_return():  # check for errors
             return result
         assert assertion is not None
-        if node.errmsg is None:
-            errmsg = String("", node.pos_start, node.pos_end).set_context(ctx)
-        else:
-            errmsg = result.register(self.visit(node.errmsg, ctx, methods_instead_of_funcs))  # we get the error message
-            if result.should_return():  # check for errors
-                return result
-            assert errmsg is not None
+        
+        errmsg = result.register(self.visit(node.errmsg, ctx, methods_instead_of_funcs))  # we get the error message
+        if result.should_return():  # check for errors
+            return result
+        assert errmsg is not None
 
         if not isinstance(errmsg, String):  # we check if the error message is a String
             return result.failure(RTTypeError(
@@ -947,7 +949,8 @@ class Interpreter:
 
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnContinue") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.continue_label is not None and node.label != result.continue_label:
                     outer_loop_should_continue = True
                     break
@@ -955,7 +958,8 @@ class Interpreter:
 
             if result.loop_should_break:
                 value_to_return = result.break_value  # which is a Value or None
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnBreak") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.break_label is not None and node.label != result.break_label:
                     outer_loop_should_break = True
                 break
@@ -993,7 +997,13 @@ class Interpreter:
         if isinstance(iterable_, List):
             python_iterable = iterable_.elements
         elif isinstance(iterable_, String):
-            python_iterable = iterable_.to_python_str()
+            try:
+                python_iterable = iterable_.to_python_str()
+            except UnicodeEncodeError as e:
+                return result.failure(RunTimeError(
+                    iterable_.pos_start, iterable_.pos_end,
+                    str(e), ctx, origin_file=f"{_ORIGIN_FILE}.visit_ForNodeList"
+                ))
         else:  # this is not a list nor a str
             assert iterable_ is not None
             return result.failure(RTTypeError(
@@ -1016,7 +1026,8 @@ class Interpreter:
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
 
             if result.loop_should_continue:
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnContinue") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.continue_label is not None and node.label != result.continue_label:
                     outer_loop_should_continue = True
                     break
@@ -1024,7 +1035,8 @@ class Interpreter:
 
             if result.loop_should_break:
                 value_to_return = result.break_value  # which is a Value or None
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnBreak") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.break_label is not None and node.label != result.break_label:
                     outer_loop_should_break = True
                 break
@@ -1068,7 +1080,8 @@ class Interpreter:
         while condition.is_true():
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnContinue") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.continue_label is not None and node.label != result.continue_label:
                     outer_loop_should_continue = True
                     break
@@ -1076,7 +1089,8 @@ class Interpreter:
 
             if result.loop_should_break:
                 value_to_return = result.break_value  # which is a Value or None
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnBreak") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.break_label is not None and node.label != result.break_label:
                     outer_loop_should_break = True
                 break
@@ -1120,7 +1134,8 @@ class Interpreter:
         while True:
             value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
             if result.loop_should_continue:
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnContinue") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.continue_label is not None and node.label != result.continue_label:
                     outer_loop_should_continue = True
                     break
@@ -1128,7 +1143,8 @@ class Interpreter:
 
             if result.loop_should_break:
                 value_to_return = result.break_value  # which is a Value or None
-                elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if self.lexer_metas.get("appendNoneOnBreak") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
                 if result.break_label is not None and node.label != result.break_label:
                     outer_loop_should_break = True
                 break
@@ -1178,6 +1194,15 @@ class Interpreter:
         for param_name in node.param_names_tokens:
             assert isinstance(param_name.value, str)
             param_names.append(param_name.value)
+
+        all_params = param_names  # + optional_params
+        duplicates = [k for k, v in Counter(all_params).items() if v > 1]
+        if len(duplicates) != 0:
+            return result.failure(RunTimeError(
+                node.param_names_tokens[0].pos_start, node.param_names_tokens[0].pos_end,
+                f"duplicate argument '{duplicates[0]}' in function definition.",
+                ctx, origin_file=f"{_ORIGIN_FILE}.visit_FuncDefNode"
+            ))
 
         if not methods_instead_of_funcs:
             func_value = Function(
@@ -1260,7 +1285,7 @@ class Interpreter:
         value_to_call = value_to_call.copy().set_pos(node.pos_start, node.pos_end)
 
         if isinstance(value_to_call, BaseFunction):  # if the value is a function
-            args: list[Value] = []
+            args: list[Value | tuple[String, Value]] = []
             call_with_module_context: bool = value_to_call.call_with_module_context
             # call the function
             for arg_node, mul in node.arg_nodes:  # we check the arguments
@@ -1303,13 +1328,19 @@ class Interpreter:
             else:
                 exec_from = f"{outer_context.display_name} from {outer_context.parent.display_name}"
 
-            return_value = result.register(value_to_call.execute(
-                args, Interpreter, self.run, self.noug_dir,
-                exec_from=exec_from,
-                use_context=use_context,
-                cli_args=self.args,
-                work_dir=self.work_dir
-            ))
+            try:
+                return_value = result.register(value_to_call.execute(
+                    args, Interpreter, self.run, self.noug_dir, self.lexer_metas,
+                    exec_from=exec_from,
+                    use_context=use_context,
+                    cli_args=self.args,
+                    work_dir=self.work_dir
+                ))
+            except RecursionError as e:
+                return result.failure(RTRecursionError(
+                    node.pos_start, node.pos_end, str(e), outer_context,
+                    f"{_ORIGIN_FILE}.visit_CallNode"
+                ))
 
             if result.should_return():  # check for errors
                 return result
@@ -1621,7 +1652,6 @@ class Interpreter:
             print(f"path is {path}")
             print(f"name to import is {name_to_import}")
             print(f"{is_nougaro_lib=}, {is_python_lib=}")
-            print("==========")
 
         as_identifier = node.as_identifier
         if as_identifier is None:
@@ -1649,13 +1679,31 @@ class Interpreter:
         elif is_python_lib:
             try:
                 module = importlib.import_module(f"lib_.{name_to_import}_")
-                what_to_import = module.WHAT_TO_IMPORT
+                try:
+                    what_to_import = module.WHAT_TO_IMPORT
+                    lib_version = module.__LIB_VERSION__
+                except AttributeError:
+                    return result.failure(RunTimeError(
+                        identifier.pos_start, identifier.pos_end,
+                        f"module '{name_to_import}' doesn’t seem to be a valid module.",
+                        ctx, origin_file=f"{_ORIGIN_FILE}.visit_ImportNode"
+                    ))
             except ImportError:
                 return result.failure(RTNotDefinedError(
                     identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
                     origin_file=f"{_ORIGIN_FILE}.visit_ImportNode\n"
                     "(troubleshooting: is python importlib working?)"
                 ))
+            if lib_version != LIB_VERSION:
+                return result.failure(RunTimeError(
+                    identifier.pos_start, identifier.pos_end,
+                    f"module '{name_to_import}' is not compatible with the current version of Nougaro. "
+                    f"Its library version is {lib_version}, while this version of Nougaro only "
+                    f"supports library version {LIB_VERSION}.",
+                    ctx, origin_file=f"{_ORIGIN_FILE}.visit_ImportNode"
+                ))
+            if self.debug:
+                print(f"Lib version is {lib_version}, wich is supported.")
         else:
             return result.failure(RTNotDefinedError(
                 identifier.pos_start, identifier.pos_end, f"name '{name_to_import}' is not a module.", ctx,
@@ -1671,6 +1719,9 @@ class Interpreter:
         )
         ctx.symbol_table.set(import_as_name, module_value)
         self.update_symbol_table(ctx)
+
+        if self.debug:
+            print("==========")
 
         return result.success(module_value.set_context(ctx))
 
@@ -1892,7 +1943,13 @@ class Interpreter:
         elif ctx.symbol_table.exists(node.identifier.value, True):
             value_to_return = ctx.symbol_table.get(node.identifier.value)
             if value_to_return is not None:
-                print(value_to_return.to_python_str())
+                try:
+                    print(value_to_return.to_python_str())
+                except UnicodeEncodeError as e:
+                    return result.failure(RunTimeError(
+                        value_to_return.pos_start, value_to_return.pos_end,
+                        str(e), ctx, origin_file=f"{_ORIGIN_FILE}.visit_ForNodeList"
+                    ))
             else:
                 value_to_return = String(str(value_to_return), node.pos_start, node.pos_end)
                 print(str(value_to_return))

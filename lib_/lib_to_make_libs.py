@@ -43,11 +43,15 @@ class ModuleFunction(BaseBuiltInFunction):
     def add_function(self, name: str, func_dict: BuiltinFunctionDict):
         self.functions[name] = func_dict
 
+    def is_eq(self, other: Value):
+        return isinstance(other, ModuleFunction) and self.name == other.name
+
     def __repr__(self):
         return f'<built-in lib function {self.module_name}.{self.name}>'
 
-    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
-                exec_from: str = "<invalid>", use_context: Context | None = None, cli_args: list[String] | None = None,
+    def execute(self, args: list[Value | tuple[String, Value]], interpreter_: type[Interpreter], run: RunFunction,
+                noug_dir: str, lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>",
+                use_context: Context | None = None, cli_args: list[String] | None = None,
                 work_dir: str | None = None):
         # execute a function of the 'math' module
         # create the result

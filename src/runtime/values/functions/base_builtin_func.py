@@ -11,7 +11,7 @@
 # nougaro modules imports
 from src.lexer.position import Position
 from src.runtime.values.basevalues.value import Value
-from src.runtime.values.basevalues.basevalues import NoneValue, String
+from src.runtime.values.basevalues.basevalues import NoneValue, String, Number
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.context import Context
 from src.runtime.runtime_result import RTResult
@@ -29,12 +29,19 @@ class BaseBuiltInFunction(BaseFunction):
 
     def __repr__(self):
         return f'<built-in function {self.name}>'
-    
-    def to_python_str(self):
-        return self.__repr__()
 
-    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
-                exec_from: str = "<invalid>", use_context: Context | None = None, cli_args: list[String] | None = None,
+    def is_eq(self, other: Value):
+        return isinstance(other, BaseBuiltInFunction) and self.name == other.name
+    
+    def get_comparison_eq(self, other: Value):
+        return Number(self.is_eq(other), self.pos_start, other.pos_end).set_context(self.context), None
+    
+    def get_comparison_ne(self, other: Value):
+        return Number(not self.is_eq(other), self.pos_start, other.pos_end).set_context(self.context), None
+
+    def execute(self, args: list[Value | tuple[String, Value]], interpreter_: type[Interpreter], run: RunFunction,
+                noug_dir: str, lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>",
+                use_context: Context | None = None, cli_args: list[String] | None = None,
                 work_dir: str | None = None):
         return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 

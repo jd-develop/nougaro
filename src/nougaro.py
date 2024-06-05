@@ -34,6 +34,7 @@ import src.noug_version
 import src.conffiles
 # built-in python imports
 from typing import Sequence
+import time
 
 # ##########
 # SYMBOL TABLE
@@ -72,6 +73,11 @@ def run(
         print_context = 0
     print_context = bool(int(print_context))
 
+    print_time = src.conffiles.access_data("print_time")
+    if print_time is None:
+        print_time = 0
+    print_time = bool(int(print_time))
+
     if version is None:
         version = src.noug_version.VERSION
 
@@ -90,6 +96,8 @@ def run(
     )
     global_symbol_table.set("__noug_dir__", String(noug_dir, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
 
+    lexer_start_time = time.time()
+
     # we make tokens with the Lexer
     if text is None:
         return NoneValue(DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy(), False), None, lexer_metas
@@ -102,6 +110,8 @@ def run(
     if debug_on:
         print(tokens)
 
+    parser_start_time = time.time()
+
     # make the abstract syntax tree (AST) with the parser
     parser = Parser(tokens)
     ast = parser.parse()
@@ -111,10 +121,14 @@ def run(
     if debug_on:
         print(ast)
 
+    interpreter_start_time = time.time()
+
     # run the code (interpreter)
     if work_dir is None:
         work_dir = noug_dir
-    interpreter = src.runtime.interpreter.Interpreter(run, noug_dir, new_args_strings, work_dir, file_name)
+    interpreter = src.runtime.interpreter.Interpreter(
+        run, noug_dir, new_args_strings, work_dir, lexer_metas, file_name
+    )
     if use_context is None:
         context = Context('<program>', tokens[0].pos_start, None)  # create the context of the interpreter
         # don't forget to change the context symbol table to the global symbol table
@@ -162,6 +176,17 @@ def run(
     if result.error is not None:
         return None, result.error, lexer_metas
     assert result.value is not None
+
+    end_time = time.time()
+
+    if print_time:
+        print("=== PRINT TIME DEBUG OPTION ===")
+        print(f"({file_name=}, {exec_from=})")
+        print(f" Lexer took {parser_start_time-lexer_start_time}s")
+        print(f" Parser took {interpreter_start_time-parser_start_time}s")
+        print(f" Runtime took {end_time-interpreter_start_time}s")
+        print(f" Total time: {end_time-lexer_start_time}s")
+        print("===============================")
 
     # finally, return the value and the error given by the interpreter
     # errors are managed by the shell.py file that calls this `run` function

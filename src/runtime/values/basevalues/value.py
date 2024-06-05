@@ -197,14 +197,6 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def not_(self) -> tuple[Value, None] | tuple[None, RunTimeError]:
-        """logical operation: not self.value
-        Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
-        Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
-         tuples.
-        """
-        return None, self.illegal_operation()
-
     def xor_(self, other: Value) -> tuple[Value, None] | tuple[None, RunTimeError]:
         """logical operation: self.value xor other.value (exclusive or)
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
@@ -245,8 +237,9 @@ class Value:
         """
         return None, self.illegal_operation()
 
-    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction, noug_dir: str,
-                exec_from: str = "<invalid>", use_context: Context | None = None, cli_args: list[String] | None = None,
+    def execute(self, args: list[Value | tuple[String, Value]], interpreter_: type[Interpreter], run: RunFunction,
+                noug_dir: str, lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>",
+                use_context: Context | None = None, cli_args: list[String] | None = None,
                 work_dir: str | None = None):
         """Execute the function.
         Returns a result"""
@@ -336,6 +329,14 @@ class Value:
 
     def get_attr(self, attribute: str):
         return self.attributes[attribute]
+
+    def __eq__(self, other: object):
+        if not isinstance(other, Value):
+            return False
+        is_eq, error = self.get_comparison_eq(other)
+        if error is not None or is_eq is None:
+            return False
+        return is_eq.is_true()
 
     def copy(self):
         """Return a copy of self"""

@@ -72,9 +72,9 @@ class Error:
 
         if self.print_origin_file:
             result = f"(from {self.origin_file})\n" \
-                     f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1}: " + '\n'
+                     f" In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1}: " + '\n'
         else:
-            result = f"In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1}: " + '\n'
+            result = f" In file {self.pos_start.file_name}, line {self.pos_start.line_number + 1}: " + '\n'
 
         for i, line in enumerate(string_line):
             result += '\t' + line + '\n '
@@ -154,10 +154,27 @@ class RunTimeError(Error):
         pos = self.pos_start
         ctx = self.context
 
+        lines_to_append: list[tuple[str, int]] = []
+
         while ctx is not None:
-            result = f' In file {pos.file_name}, line {pos.line_number + 1}, in {ctx.display_name}:\n' + result
+            line_to_append = f' In file {pos.file_name}, line {pos.line_number + 1}, in {ctx.display_name}:\n'
+            if len(lines_to_append) == 0:
+                lines_to_append.append((line_to_append, 1))
+            elif lines_to_append[-1][0] == line_to_append:
+                line, count = lines_to_append.pop(-1)
+                count += 1
+                lines_to_append.append((line, count))
+            else:
+                lines_to_append.append((line_to_append, 1))
             pos = ctx.entry_pos
             ctx = ctx.parent
+        
+        for line, count in lines_to_append:
+            if count <= 5:
+                for _ in range(count):
+                    result = line + result
+            else:
+                result = line + f"    (previous line repeated {count-1} more times)\n" + result
 
         if self.print_origin_file:
             return f"(from {self.origin_file})\nTraceback (most recent call last):\n" + result
@@ -246,6 +263,14 @@ class RTOverflowError(RunTimeError):
     def __init__(self, pos_start: Position, pos_end: Position, errmsg: str, context: Context,
                  origin_file: str = "(undetermined)"):
         super().__init__(pos_start, pos_end, errmsg, context, rt_error=False, error_name="OverflowError",
+                         origin_file=origin_file)
+
+
+class RTRecursionError(RunTimeError):
+    """RecursionError"""
+    def __init__(self, pos_start: Position, pos_end: Position, errmsg: str, context: Context,
+                 origin_file: str = "(undetermined)"):
+        super().__init__(pos_start, pos_end, errmsg, context, rt_error=False, error_name="RecursionError",
                          origin_file=origin_file)
 
 

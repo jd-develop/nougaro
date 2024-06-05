@@ -19,6 +19,8 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import time
 
+__LIB_VERSION__ = 2
+
 # CONSTANTS
 TIMEZONE = Number(time.timezone, *default_pos())
 
@@ -34,6 +36,9 @@ class Time(ModuleFunction):
         """Return a copy of self"""
         copy = Time(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
+    
+    def is_eq(self, other: Value):
+        return isinstance(other, Time) and self.name == other.name
 
     # =========
     # FUNCTIONS

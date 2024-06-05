@@ -1,9 +1,10 @@
 {
     "major": 0,
-    "minor": 19,
+    "minor": 20,
     "patch": 0,
     "phase": "beta",
     "release-serial": 0,
-    "version-id": 4,
-    "data-version": 5
+    "version-id": 5,
+    "data-version": 6,
+    "lib-version": 2
 }

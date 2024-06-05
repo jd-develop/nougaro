@@ -68,6 +68,7 @@ This version comes with a lot of new features, and one single deprecation (see �
 
 ### Changed
 * Renamed “phase minor” to “release serial”. In `noug_version.json`, the key is renamed from `phase-minor` to `release-serial`. The different “phase minor” references are now deprecated (see the Deprecated section), and will be removed in 0.20.0
+* panicsort (`sort(list, "panic")`) now crashes with `illegal hardware instruction` instead of `segmentation fault` when the list is not sorted.
 
 #### Technical
 * Moved `./config/noug_version.json` to `./noug_version.json`

@@ -340,8 +340,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     }
 
     def execute_input_int(self, exec_ctx: Context):
-        """Basic input (int). Repeat while entered from ctypes import CFUNCTYPE, addressof
-from mmap import mmap, PAGESIZE, PROT_READ, PROT_WRITE, PROT_EXECvalue is not an int."""
+        """Basic input (int). Repeat while entered value is not an int."""
         # Optional params:
         # * text_to_display
         assert exec_ctx.symbol_table is not None

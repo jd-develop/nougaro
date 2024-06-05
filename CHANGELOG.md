@@ -57,7 +57,7 @@ This version may in some cases improve performance.
   * `and`, `or` and `xor` now works properly with functions, methods, built-in functions
 * Functions can now be converted to strings using `str()`.
 * Representation of the `exit` builtin function is now `"Use exit(), CTRL+C (i.e. interrupt) or CTRL+D (i.e. EOF) to exit."` instead of `"<built-in function exit>"`.
-* panicsort (`sort(list, "panic")`) now crashes with `illegal hardware instruction` instead of `segmentation fault` when the list is not sorted.
+* Under GNU/Linux and Unix, panicsort (`sort(list, "panic")`) now crashes with `illegal hardware instruction` instead of `segmentation fault` when the list is not sorted.
 
 #### Technical and debug
 * `debug.enable_all()` and `debug.disable_all()` now also enable or disable the `print_time` debug option.

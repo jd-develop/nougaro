@@ -2051,12 +2051,19 @@ class BuiltInFunction(BaseBuiltInFunction):
             if error is not None:
                 return result.failure(error)
             if not is_sorted_:
-                # this causes an illegal hardware instruction
-                from ctypes import CFUNCTYPE, addressof, c_void_p
-                from mmap import mmap, PAGESIZE, PROT_READ, PROT_WRITE, PROT_EXEC
-                buf = mmap(-1, PAGESIZE, prot=PROT_READ | PROT_WRITE | PROT_EXEC)
-                buf.write(b'\x0f\x04')
-                CFUNCTYPE(c_void_p)(addressof(c_void_p.from_buffer(buf)))()
+                if sys.platform == "win32":  # Windows does not support illegal hardware instructions
+                    # this causes a segfault
+                    a = map(str, sorted_)
+                    for i in range(1000000):
+                        a = map(str, a)
+                    a = list(a)
+                else:
+                    # this causes an illegal hardware instruction
+                    from ctypes import CFUNCTYPE, addressof, c_void_p
+                    from mmap import mmap, PAGESIZE, PROT_READ, PROT_WRITE, PROT_EXEC
+                    buf = mmap(-1, PAGESIZE, prot=PROT_READ | PROT_WRITE | PROT_EXEC)
+                    buf.write(b'\x0f\x04')
+                    CFUNCTYPE(c_void_p)(addressof(c_void_p.from_buffer(buf)))()
         else:  # mode is none of the above
             return result.failure(RunTimeError(
                 mode_noug.pos_start, mode_noug.pos_end,

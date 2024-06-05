@@ -29,8 +29,6 @@ import os
 import random
 import sys
 import subprocess
-from ctypes import CFUNCTYPE, addressof, c_void_p
-from mmap import mmap, PAGESIZE, PROT_READ, PROT_WRITE, PROT_EXEC
 from typing import TYPE_CHECKING, Coroutine, Any
 if TYPE_CHECKING:
     from src.runtime.interpreter import Interpreter
@@ -1990,6 +1988,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                 return result.failure(error)
             if not is_sorted_:
                 # this causes an illegal hardware instruction
+                from ctypes import CFUNCTYPE, addressof, c_void_p
+                from mmap import mmap, PAGESIZE, PROT_READ, PROT_WRITE, PROT_EXEC
                 buf = mmap(-1, PAGESIZE, prot=PROT_READ | PROT_WRITE | PROT_EXEC)
                 buf.write(b'\x0f\x04')
                 CFUNCTYPE(c_void_p)(addressof(c_void_p.from_buffer(buf)))()

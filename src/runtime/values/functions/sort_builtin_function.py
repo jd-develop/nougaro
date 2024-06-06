@@ -9,12 +9,11 @@
 
 # IMPORTS
 # nougaro modules imports
-from src.lexer.position import Position
+from src.lexer.position import Position, DEFAULT_POSITION
 from src.runtime.context import Context
 from src.runtime.values.basevalues.value import Value
 from src.runtime.runtime_result import RTResult
 from src.runtime.values.basevalues.basevalues import List, Number, String
-from src.runtime.values.number_constants import FALSE
 from src.errors.errors import RTTypeError, RunTimeError
 from src.runtime.values.tools.py2noug import noug2py
 # built-in python imports
@@ -29,7 +28,7 @@ def _get_comparison_gt(list_to_sort_: list[Value], index_: int) -> tuple[Number,
         else:
             assert isinstance(comp, Number)
     else:
-        comp = FALSE.copy()
+        comp = Number(False, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
     return comp, None
 
 

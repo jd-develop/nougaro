@@ -16,7 +16,7 @@ from src.runtime.runtime_result import RTResult
 from src.runtime.symbol_table import SymbolTable
 from src.runtime.context import Context
 from src.errors.errors import RunTimeError, RTArithmeticError, RTIndexError, RTOverflowError
-from src.lexer.position import Position as _Position, DEFAULT_POSITION
+from src.lexer.position import Position as _Position
 # built-in python imports
 # no imports
 
@@ -117,7 +117,7 @@ class String(Value):
         if isinstance(other, String):
             return Number(self.value == other.value, self.pos_start, other.pos_end).set_context(self.context), None
         else:
-            return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+            return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
 
     def get_comparison_ne(self, other: Value):
         is_eq = bool(self.get_comparison_eq(other)[0].value)
@@ -127,7 +127,7 @@ class String(Value):
     def get_comparison_gt(self, other: Value):
         if isinstance(other, String):
             return Number(self.value > other.value, self.pos_start, other.pos_end).set_context(self.context), None
-        return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+        return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
 
     def get_comparison_gte(self, other: Value):
         is_eq = bool(self.get_comparison_eq(other)[0].value)
@@ -137,7 +137,7 @@ class String(Value):
     def get_comparison_lt(self, other: Value):
         if isinstance(other, String):
             return Number(self.value < other.value, self.pos_start, other.pos_end).set_context(self.context), None
-        return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+        return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
 
     def get_comparison_lte(self, other: Value):
         is_eq = bool(self.get_comparison_eq(other)[0].value)
@@ -146,13 +146,13 @@ class String(Value):
 
     def and_(self, other: Value):
         return Number(
-            int(self.is_true() and other.is_true()),
+            self.is_true() and other.is_true(),
             self.pos_start, self.pos_end
         ).set_context(self.context), None
 
     def or_(self, other: Value):
         return Number(
-            int(self.is_true() or other.is_true()),
+            self.is_true() or other.is_true(),
             self.pos_start, self.pos_end
         ).set_context(self.context), None
 
@@ -169,11 +169,11 @@ class String(Value):
         if isinstance(other, List):
             for x in other.elements:
                 if self.get_comparison_eq(x)[0].is_true():
-                    return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-            return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+                    return Number(True, self.pos_start, other.pos_end).set_context(self.context), None
+            return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
         elif isinstance(other, String):
             return Number(
-                int(self.value in other.value),
+                self.value in other.value,
                 self.pos_start, self.pos_end
             ).set_context(self.context), None
         else:
@@ -354,7 +354,7 @@ class Number(Value):
         if isinstance(other, Number):
             return Number(self.value == other.value, self.pos_start, other.pos_end).set_context(self.context), None
         else:
-            return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+            return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
 
     def get_comparison_ne(self, other: Value):
         is_eq = bool(self.get_comparison_eq(other)[0].value)
@@ -447,8 +447,8 @@ class Number(Value):
         if isinstance(other, List):
             for x in other.elements:
                 if self.get_comparison_eq(x)[0].is_true():
-                    return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-            return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+                    return Number(True, self.pos_start, other.pos_end).set_context(self.context), None
+            return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
         elif isinstance(other, String):
             return Number(
                 str(self.value) in other.value,
@@ -470,11 +470,6 @@ class Number(Value):
         copy.module_context = self.module_context
         copy.attributes = self.attributes.copy()
         return copy
-
-
-NULL = Number(0, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
-FALSE = Number(0, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
-TRUE = Number(1, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy())
 
 
 class List(Value):
@@ -933,8 +928,8 @@ class NoneValue(Value):
         if isinstance(other, List):
             for element in other.elements:
                 if isinstance(element, NoneValue):
-                    return TRUE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
-            return FALSE.copy().set_pos(self.pos_start, other.pos_end).set_context(self.context), None
+                    return Number(True, self.pos_start, other.pos_end).set_context(self.context), None
+            return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
         elif isinstance(other, String):
             return Number('none' in other.value.lower(), self.pos_start, other.pos_end).set_context(self.context), None
         else:

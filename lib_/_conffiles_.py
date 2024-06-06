@@ -61,7 +61,7 @@ class Conffiles(ModuleFunction):
             eval("1 is 1")  # easter egg lol
 
         if not_found_ok is None:
-            not_found_ok = FALSE.copy()
+            not_found_ok = Number(False, self.pos_start, self.pos_end)
         if not (isinstance(not_found_ok, Number) and isinstance(not_found_ok.value, int)):
             return RTResult().failure(RTTypeErrorF(
                 not_found_ok.pos_start, not_found_ok.pos_end, "second", "_conffiles.access_data", "int", not_found_ok,
@@ -105,9 +105,9 @@ class Conffiles(ModuleFunction):
         data_to_write = nice_str_from_idk(data).value
 
         if name_reserved_ok is None:
-            name_reserved_ok = FALSE.copy()
+            name_reserved_ok = Number(False, self.pos_start, self.pos_end)
         if incorrect_type_ok is None:
-            incorrect_type_ok = FALSE.copy()
+            incorrect_type_ok = Number(False, self.pos_start, self.pos_end)
         if not (isinstance(name_reserved_ok, Number) and isinstance(name_reserved_ok.value, int)):
             return RTResult().failure(RTTypeErrorF(
                 name_reserved_ok.pos_start, name_reserved_ok.pos_end, "second", "_conffiles.write_data", "int", name_reserved_ok,

@@ -18,7 +18,6 @@ from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.context import Context
 from src.runtime.runtime_result import RTResult
 from src.runtime.values.basevalues.basevalues import String, List, NoneValue, Module, Number, Object, Constructor
-from src.runtime.values.number_constants import FALSE, TRUE
 from src.misc import RunFunction, nice_str_from_idk, BuiltinFunctionDict, print_in_green, print_in_red, clear_screen
 from src.misc import is_keyword, is_tok_type
 from src.errors.errors import RTTypeErrorF, RTTypeError, RTIndexError, RTFileNotFoundError, RunTimeError, PythonError
@@ -484,7 +483,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         value = exec_ctx.symbol_table.getf('value')  # we get the value
         is_int = isinstance(value, Number) and  value.type_ == 'int'
-        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(Number(is_int, self.pos_start, self.pos_end))
 
     builtin_functions["is_int"] = {
@@ -503,7 +501,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         value = exec_ctx.symbol_table.getf('value')  # we get the value
         is_float = isinstance(value, Number) and value.type_ == "float"
-        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(Number(is_float, self.pos_start, self.pos_end))
 
     builtin_functions["is_float"] = {
@@ -522,7 +519,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         value = exec_ctx.symbol_table.getf('value')  # we get the value
         is_number = isinstance(value, Number)  # we check if the value is a number
-        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(Number(is_number, self.pos_start, self.pos_end))
 
     builtin_functions["is_num"] = {
@@ -541,7 +537,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we get the value and check if it is a list
         assert exec_ctx.symbol_table is not None
         is_list = isinstance(exec_ctx.symbol_table.getf('value'), List)
-        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(Number(is_list, self.pos_start, self.pos_end))
 
     builtin_functions["is_list"] = {
@@ -560,7 +555,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we get the value and check if it is a str
         assert exec_ctx.symbol_table is not None
         is_str = isinstance(exec_ctx.symbol_table.getf('value'), String)
-        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(Number(is_str, self.pos_start, self.pos_end))
 
     builtin_functions["is_str"] = {
@@ -578,8 +572,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         assert exec_ctx.symbol_table is not None
         is_func = isinstance(exec_ctx.symbol_table.getf('value'), BaseFunction)  # we get the value and check if it
-        #                                                                             is a function
-        # TRUE and FALSE are defined in src/values/number_constants.py
+        #                                                                          is a function
         return RTResult().success(Number(is_func, self.pos_start, self.pos_end))
 
     builtin_functions["is_func"] = {
@@ -598,7 +591,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we get the value and check if it is None
         assert exec_ctx.symbol_table is not None
         is_none = isinstance(exec_ctx.symbol_table.getf('value'), NoneValue)
-        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(Number(is_none, self.pos_start, self.pos_end))
 
     builtin_functions["is_none"] = {
@@ -617,7 +609,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we get the value and check if it is a module
         assert exec_ctx.symbol_table is not None
         is_module = isinstance(exec_ctx.symbol_table.getf('value'), Module)
-        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(Number(is_module, self.pos_start, self.pos_end))
 
     builtin_functions["is_module"] = {
@@ -636,7 +627,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we get the value and check if it is an object
         assert exec_ctx.symbol_table is not None
         is_object = isinstance(exec_ctx.symbol_table.getf('value'), Object)
-        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(Number(is_object, self.pos_start, self.pos_end))
 
     builtin_functions["is_object"] = {
@@ -655,7 +645,6 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we get the value and check if it is a constructor
         assert exec_ctx.symbol_table is not None
         is_constructor = isinstance(exec_ctx.symbol_table.getf('value'), Constructor)
-        # TRUE and FALSE are defined in src/values/number_constants.py
         return RTResult().success(Number(is_constructor, self.pos_start, self.pos_end))
 
     builtin_functions["is_constructor"] = {
@@ -838,9 +827,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                         equal, error = e.get_comparison_eq(e1)
                         if error is not None:  # there is an error, there are not the same
                             continue
-                        if equal is not None:  # there is no error
-                            if equal.value == TRUE.value:  # there are equals, so duplicates
-                                can_append = False
+                        if equal is not None and equal.is_true():  # there is no error and they’re equal and duplicates
+                            can_append = False
                     if can_append:  # if not duplicate, we append the element to the final list
                         final_list.append(e)
                 return RTResult().success(List(final_list, self.pos_start, self.pos_end))
@@ -969,7 +957,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # then we get "ignore_not_num"
         ignore_not_num = exec_ctx.symbol_table.getf('ignore_not_num')
         if ignore_not_num is None:
-            ignore_not_num = FALSE.copy()
+            ignore_not_num = Number(False, self.pos_start, self.pos_end)
         if not isinstance(ignore_not_num, Number):
             assert ignore_not_num is not None
             return RTResult().failure(RTTypeErrorF(
@@ -1026,7 +1014,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # then we get "ignore_not_num"
         ignore_not_num = exec_ctx.symbol_table.getf('ignore_not_num')
         if ignore_not_num is None:
-            ignore_not_num = FALSE.copy()
+            ignore_not_num = Number(False, self.pos_start, self.pos_end)
         if not isinstance(ignore_not_num, Number):
             assert ignore_not_num is not None
             return RTResult().failure(RTTypeErrorF(
@@ -1398,7 +1386,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         return_example_value = exec_ctx.symbol_table.getf("return_example_value")
         if return_example_value is None:
-            return_example_value = FALSE.copy()
+            return_example_value = Number(False, self.pos_start, self.pos_end)
 
         if not isinstance(return_example_value, Number):
             return RTResult().failure(RTTypeErrorF(
@@ -1590,7 +1578,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         print_in_term = exec_ctx.symbol_table.getf("print_in_term")  # we get 'print_in_term' value
         if print_in_term is None:  # if print_in_term is None, we put it false
-            print_in_term = FALSE.copy()
+            print_in_term = Number(False, self.pos_start, self.pos_end)
 
         if not isinstance(print_in_term, Number):  # we check if it is a number
             return RTResult().failure(RTTypeErrorF(
@@ -1664,7 +1652,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
         result = RTResult()
         # then we return if this is a keyword or not.
-        return result.success(TRUE.copy()) if is_keyword(word.value) else result.success(FALSE.copy())
+        return result.success(Number(is_keyword(word.value), self.pos_start, self.pos_end))
 
     builtin_functions["__is_keyword__"] = {
         "function": execute___is_keyword__,
@@ -1692,7 +1680,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
         result = RTResult()
         # then we return if this is a valid tok type or not.
-        return result.success(TRUE) if is_tok_type(type_.value) else result.success(FALSE)
+        return result.success(Number(is_tok_type(type_.value), self.pos_start, self.pos_end))
 
     builtin_functions["__is_valid_token_type__"] = {
         "function": execute___is_valid_token_type__,
@@ -1711,9 +1699,9 @@ class BuiltInFunction(BaseBuiltInFunction):
         should_i_print_ok = exec_ctx.symbol_table.getf("print_OK")
         should_i_return = exec_ctx.symbol_table.getf("return")
         if should_i_print_ok is None:
-            should_i_print_ok = FALSE.copy()
+            should_i_print_ok = Number(False, self.pos_start, self.pos_end)
         if should_i_return is None:
-            should_i_return = FALSE.copy()
+            should_i_return = Number(False, self.pos_start, self.pos_end)
         exec_ctx.symbol_table.set(
             "file_name", String(os.path.abspath(noug_dir + "/tests/test_file.noug"), self.pos_start, self.pos_end)
         )
@@ -1824,11 +1812,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         all_files: dict[str, int] = {}
 
         print_values = exec_ctx.symbol_table.getf("print_values")
-        print_ = True
-        if print_values:
-            if isinstance(print_values, Number):
-                if print_values.value == FALSE.value:
-                    print_ = False
+        print_ = not (print_values and isinstance(print_values, Number) and print_values.is_false())
         if print_:
             print("Computing...")
 

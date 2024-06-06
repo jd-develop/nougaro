@@ -85,7 +85,7 @@ class WebBrowser(ModuleFunction):
             ))
         
         if autoraise is None:
-            autoraise = TRUE.copy().set_context(context)
+            autoraise = Number(True, self.pos_start, self.pos_end).set_context(context)
         
         try:
             webbrowser.open(url.value, new.value, autoraise.is_true())

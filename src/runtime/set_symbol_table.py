@@ -11,7 +11,6 @@
 # nougaro modules imports
 from src.lexer.position import DEFAULT_POSITION
 from src.runtime.symbol_table import SymbolTable
-from src.runtime.values.number_constants import NULL, TRUE, FALSE
 from src.runtime.values.basevalues.basevalues import String, Value, NoneValue, Number
 from src.runtime.values.functions.builtin_function import BuiltInFunction
 import src.noug_version
@@ -26,9 +25,9 @@ def set_symbol_table(symbol_table: SymbolTable):
     :param symbol_table: src.symbol_table.SymbolTable
     """
     # Constants
-    symbol_table.set("null", NULL.copy())
-    symbol_table.set("True", TRUE.copy())
-    symbol_table.set("False", FALSE.copy())
+    symbol_table.set("null", Number(0, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
+    symbol_table.set("True", Number(1, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
+    symbol_table.set("False", Number(0, DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy()))
     symbol_table.set("None", NoneValue(DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy(), True))
 
     # Built-in functions

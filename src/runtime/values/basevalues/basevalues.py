@@ -74,10 +74,10 @@ class String(Value):
     def is_true(self):
         return len(self.value) > 0
 
-    def to_str_(self) -> tuple[String, None]:
+    def to_str(self) -> tuple[String, None]:
         return self.copy(), None
 
-    def to_int_(self):
+    def to_int(self):
         """Returns a nougaro int"""
         value_to_convert = self.value
         if value_to_convert in ["null", "False"]:
@@ -96,7 +96,7 @@ class String(Value):
                 origin_file="src.values.basevalues.String.to_int"
             ))
 
-    def to_float_(self):
+    def to_float(self):
         try:
             return Number(float(self.value), self.pos_start, self.pos_end).set_context(self.context), None
         except ValueError:
@@ -107,7 +107,7 @@ class String(Value):
                 self.context,
                 origin_file="src.values.basevalues.String.to_float"))
 
-    def to_list_(self):
+    def to_list(self):
         list_: list[Value] = []
         for char in self.value:
             list_.append(String(char, self.pos_start, self.pos_end))
@@ -425,16 +425,16 @@ class Number(Value):
     def abs_(self):
         return Number(abs(self.value), self.pos_start, self.pos_end), None
 
-    def to_str_(self):
+    def to_str(self):
         return String(self.__repr__(), self.pos_start, self.pos_end).set_context(self.context), None
 
-    def to_int_(self):
+    def to_int(self):
         return Number(int(self.value), self.pos_start, self.pos_end).set_context(self.context), None
 
-    def to_float_(self):
+    def to_float(self):
         return Number(float(self.value), self.pos_start, self.pos_end).set_context(self.context), None
 
-    def to_list_(self):
+    def to_list(self):
         list_: list[Value] = []
         for element in str(self.value):
             if element.isnumeric():
@@ -558,10 +558,10 @@ class List(Value):
         else:
             return None, self.illegal_operation(other)
 
-    def to_str_(self):
+    def to_str(self):
         return String(str(self.elements), self.pos_start, self.pos_end).set_context(self.context), None
 
-    def to_list_(self):
+    def to_list(self):
         return self.copy(), None
 
     def is_eq(self, other: Value):
@@ -619,7 +619,7 @@ class List(Value):
     def is_in(self, other: Value):
         if isinstance(other, String):
             return Number(
-                self.to_str_()[0].value in other.value,
+                self.to_str()[0].value in other.value,
                 self.pos_start, other.pos_end
             ).set_context(self.context), None
         else:
@@ -912,16 +912,16 @@ class NoneValue(Value):
         )
         return Number(xor, self.pos_start, other.pos_end).set_context(self.context), None
 
-    def to_str_(self):
+    def to_str(self):
         return String('None', self.pos_start, self.pos_end).set_context(self.context), None
 
-    def to_list_(self):
-        return String('None', self.pos_start, self.pos_end).to_list_()[0].set_context(self.context), None
+    def to_list(self):
+        return String('None', self.pos_start, self.pos_end).to_list()[0].set_context(self.context), None
 
-    def to_int_(self):
+    def to_int(self):
         return Number(0, self.pos_start, self.pos_end).set_context(self.context), None
 
-    def to_float_(self):
+    def to_float(self):
         return Number(0.0, self.pos_start, self.pos_end).set_context(self.context), None
 
     def is_in(self, other: Value):

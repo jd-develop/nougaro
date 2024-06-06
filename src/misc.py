@@ -84,7 +84,7 @@ def nice_str_from_idk(idk: Any) -> String:
     if isinstance(idk, String):
         return idk
     elif isinstance(idk, Value):
-        string, error = idk.to_str_()
+        string, error = idk.to_str()
         if error is None:
             assert string is not None
             return string

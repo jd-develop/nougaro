@@ -1157,7 +1157,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         value = exec_ctx.symbol_table.getf('value')  # we get the value
         assert value is not None
-        str_value, error = value.to_str_()  # we convert
+        str_value, error = value.to_str()  # we convert
         if error is not None:
             return error  # error is already an RTResult in convert methods in all Value classes
         assert str_value is not None
@@ -1180,7 +1180,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         value = exec_ctx.symbol_table.getf('value')  # we get the value
         assert value is not None
-        int_value, error = value.to_int_()  # we convert
+        int_value, error = value.to_int()  # we convert
         if error is not None:
             return error  # error is already an RTResult in convert methods in all Value classes
         assert int_value is not None
@@ -1203,7 +1203,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         value = exec_ctx.symbol_table.getf('value')  # we get the value
         assert value is not None
-        float_value, error = value.to_float_()  # we convert
+        float_value, error = value.to_float()  # we convert
         if error is not None:
             return error  # error is already an RTResult in convert methods in all Value classes
         assert float_value is not None
@@ -1228,7 +1228,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert value is not None
         if isinstance(value, List):
             return RTResult().success(value.true_copy())
-        list_value, error = value.to_list_()  # we convert
+        list_value, error = value.to_list()  # we convert
         if error is not None:
             return error  # error is already an RTResult in convert methods in all Value classes
         assert list_value is not None

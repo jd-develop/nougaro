@@ -35,7 +35,7 @@ class BaseFunction(Value):
     def to_python_str(self) -> str:
         return repr(self)
     
-    def to_str_(self):
+    def to_str(self):
         return String(repr(self), self.pos_start, self.pos_end).set_context(self.context), None
 
     def generate_new_context(self, use_self_context_ctx_table: bool = False):

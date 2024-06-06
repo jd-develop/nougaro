@@ -19,7 +19,7 @@ from lib_.lib_to_make_libs import *  # useful stuff to make libs.
 # built-in python imports
 import webbrowser
 
-__LIB_VERSION__ = 2
+__LIB_VERSION__ = 3
 
 
 class WebBrowserError(RunTimeError):

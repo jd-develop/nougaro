@@ -23,7 +23,7 @@ import src.conffiles
 # built-in python imports
 # no imports
 
-__LIB_VERSION__ = 2
+__LIB_VERSION__ = 3
 
 # constants
 CONFIG_DIRECTORY = String(src.conffiles.CONFIG_DIRECTORY, *default_pos())

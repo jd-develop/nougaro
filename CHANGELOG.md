@@ -10,6 +10,7 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 
 ### Changed
 * Data version has been increased to `7`.
+* Lib version has been increased to `3`.
 * Data in the config files can now be typed, meaning that only a certain type of data can be written.
 
 ### Removed

@@ -12,6 +12,7 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 * Data version has been increased to `7`.
 * Lib version has been increased to `3`.
 * Data in the config files can now be typed, meaning that only a certain type of data can be written.
+* Under GNU/Linux and Unix, panicsort (`sort(list, "panic")`) now crashes with `illegal hardware instruction` instead of `segmentation fault` when the list is not sorted.
 
 ### Removed
 * `(Internal API/Writing libs)` Removed `TRUE` and `FALSE` values, please use `Number(True)` and `Number(False)` instead.
@@ -67,7 +68,6 @@ This version may in some cases improve performance.
   * `and`, `or` and `xor` now works properly with functions, methods, built-in functions
 * Functions can now be converted to strings using `str()`.
 * Representation of the `exit` builtin function is now `"Use exit(), CTRL+C (i.e. interrupt) or CTRL+D (i.e. EOF) to exit."` instead of `"<built-in function exit>"`.
-* Under GNU/Linux and Unix, panicsort (`sort(list, "panic")`) now crashes with `illegal hardware instruction` instead of `segmentation fault` when the list is not sorted.
 
 #### Technical and debug
 * `debug.enable_all()` and `debug.disable_all()` now also enable or disable the `print_time` debug option.

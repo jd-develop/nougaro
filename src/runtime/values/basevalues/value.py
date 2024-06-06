@@ -275,7 +275,7 @@ class Value:
         """
         return None, RTResult().failure(self.illegal_operation())
     
-    # these aliases are deprecated and well be deleted in 0.22.0-beta
+    # these aliases are deprecated and well be deleted in 0.22.0-beta (todo)
     to_str_ = to_str
     to_int_ = to_int
     to_float_ = to_float

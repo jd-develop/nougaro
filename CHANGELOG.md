@@ -12,7 +12,7 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 * Data version has been increased to `7`.
 * Data in the config files can now be typed, meaning that only a certain type of data can be written.
 
-## 0.20.0-beta (unreleased)
+## 0.20.0-beta (2024-06-06)
 
 This version may in some cases improve performance.
 

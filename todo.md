@@ -56,7 +56,9 @@
 * [X] move config files to `~/.config` under Linux and BSD, `~/Library/Preferences` under macOS, and `%appdata%` under Windaube. [QT documentation about where config files should be stored.](https://doc.qt.io/qt-6/qsettings.html#platform-specific-notes) (finished 10/03/2024, testing completed 11/03/2024)
 * [X] rewrite parser to make it faster and easier to read (finished 30/04/2024)
 
-## 0.20.0 beta (goal: June 8th, 2024)
+## ✅ 0.20.0 beta (goal: June 8th, 2024)
+
+### Release date: June 6th, 2024
 
 * [X] ~~add `continue and append (value)`~~ (completed as no longer planned on 14/05/2024)
 * [X] add `-i` cli arg to execute a file then run a shell within it (finished 08/05/2024)

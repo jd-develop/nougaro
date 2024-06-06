@@ -93,7 +93,8 @@ class Conffiles(ModuleFunction):
         assert context.symbol_table is not None
         file_name = context.symbol_table.getf("file_name")
         data = context.symbol_table.getf("data")
-        name_reserved_ok = context.symbol_table.getf("name_reserved_ok")
+        name_reserved_ok = context.symbol_table.getf("read_only_ok")
+        incorrect_type_ok = context.symbol_table.getf("incorrect_type_ok")
         if not isinstance(file_name, String):
             assert file_name is not None
             return RTResult().failure(RTTypeErrorF(
@@ -105,6 +106,8 @@ class Conffiles(ModuleFunction):
 
         if name_reserved_ok is None:
             name_reserved_ok = FALSE.copy()
+        if incorrect_type_ok is None:
+            incorrect_type_ok = FALSE.copy()
         if not (isinstance(name_reserved_ok, Number) and isinstance(name_reserved_ok.value, int)):
             return RTResult().failure(RTTypeErrorF(
                 name_reserved_ok.pos_start, name_reserved_ok.pos_end, "second", "_conffiles.write_data", "int", name_reserved_ok,
@@ -114,19 +117,28 @@ class Conffiles(ModuleFunction):
         errmsg = src.conffiles.write_data(file_name.value, data_to_write, silent=True, return_error_messages=True)
 
         if errmsg is not None:
-            if name_reserved_ok.is_true():
-                return RTResult().success(NoneValue(self.pos_start, self.pos_end, False).set_context(context))
-            return RTResult().failure(RTFileNotFoundError(
-                file_name.pos_start, file_name.pos_end, f"config file name {file_name} is reserved.", context,
-                origin_file="lib_._conffiles_.Conffiles.execute__conffiles_write_data", custom=True
-            ))
+            if "name is reserved" in errmsg:
+                if name_reserved_ok.is_true():
+                    return RTResult().success(NoneValue(self.pos_start, self.pos_end, False).set_context(context))
+                return RTResult().failure(RTFileNotFoundError(
+                    file_name.pos_start, file_name.pos_end, f"config file name {file_name} is reserved.", context,
+                    origin_file="lib_._conffiles_.Conffiles.execute__conffiles_write_data", custom=True
+                ))
+            if "incorrect data type" in errmsg:
+                if incorrect_type_ok.is_true():
+                    return RTResult().success(NoneValue(self.pos_start, self.pos_end, False).set_context(context))
+                return RTResult().failure(RunTimeError(
+                    file_name.pos_start, file_name.pos_end,
+                    errmsg, context,
+                    origin_file="lib_._conffiles_.Conffiles.execute__conffiles_write_data"
+                ))
         
         return RTResult().success(NoneValue(self.pos_start, self.pos_end, False).set_context(context))
 
     functions["write_data"] = {
         "function": execute__conffiles_write_data,
         "param_names": ["file_name", "data"],
-        "optional_params": ["read_only_ok"],
+        "optional_params": ["read_only_ok", "incorrect_type_ok"],
         "should_respect_args_number": True,
         "run_noug_dir_work_dir": False,
         "noug_dir": False

@@ -30,6 +30,7 @@ import src.noug_version
 import os
 import platform
 import pathlib
+import json
 
 DATA_VERSION = src.noug_version.DATA_VERSION
 
@@ -184,6 +185,10 @@ def create_config_files():
     # checks if the config path is empty (create or copy config files)
     if len(os.listdir(CONFIG_DIRECTORY)) == 0:
         _create_or_copy_files()
+    
+    define_expected_type("debug", "int")
+    define_expected_type("print_context", "int")
+    define_expected_type("print_time", "int")
 
 
 def access_data(config_file: str):
@@ -204,5 +209,31 @@ def write_data(config_file: str, data: str, silent: bool = False, return_error_m
         if return_error_messages:
             return errmsg
         return
+    if get_expected_type(config_file) == "int":
+        if not data.isnumeric():
+            errmsg = f"[CONFFILES] Can not write this data in {config_file}: incorrect data type: " \
+                     f"expected data type is int, not str."
+            if not silent:
+                print(errmsg)
+            if return_error_messages:
+                return errmsg
+            return
     with open(CONFIG_DIRECTORY + config_file + ".nconf", "w+") as file:
         file.write(data)
+
+
+def define_expected_type(config_file: str, data_type: str):
+    if not os.path.exists(CONFIG_DIRECTORY + "expected_types.nconf.json"):
+        with open(CONFIG_DIRECTORY + "expected_types.nconf.json", "w+") as file:
+            file.write("{}\n")
+    with open(CONFIG_DIRECTORY + "expected_types.nconf.json", "r+") as file:
+        json_loaded = json.load(file)
+    json_loaded[config_file] = data_type
+    with open(CONFIG_DIRECTORY + "expected_types.nconf.json", "w+") as file:
+        json.dump(json_loaded, file)
+
+
+def get_expected_type(config_file: str):
+    with open(CONFIG_DIRECTORY + "expected_types.nconf.json", "r+") as file:
+        json_loaded = json.load(file)
+    return json_loaded.get(config_file)

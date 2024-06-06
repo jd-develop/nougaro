@@ -6,6 +6,12 @@ This file is updated nearly every commit and copied to GH release changelog.
 
 Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. The Nougaro changelog has another section, `Calculator`, keeping track of the changes relative to the Nougaro Calculator under the same 6-sections format.
 
+## Next version (unreleased)
+
+### Changed
+* Data version has been increased to `7`.
+* Data in the config files can now be typed, meaning that only a certain type of data can be written.
+
 ## 0.20.0-beta (unreleased)
 
 This version may in some cases improve performance.

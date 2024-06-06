@@ -56,7 +56,9 @@
 * [X] move config files to `~/.config` under Linux and BSD, `~/Library/Preferences` under macOS, and `%appdata%` under Windaube. [QT documentation about where config files should be stored.](https://doc.qt.io/qt-6/qsettings.html#platform-specific-notes) (finished 10/03/2024, testing completed 11/03/2024)
 * [X] rewrite parser to make it faster and easier to read (finished 30/04/2024)
 
-## 0.20.0 beta (goal: June 8th, 2024)
+## ✅ 0.20.0 beta (goal: June 8th, 2024)
+
+### Release date: June 6th, 2024
 
 * [X] ~~add `continue and append (value)`~~ (completed as no longer planned on 14/05/2024)
 * [X] add `-i` cli arg to execute a file then run a shell within it (finished 08/05/2024)
@@ -66,7 +68,7 @@
 * [X] if possible, implement `break (name)` and `continue (name)` where (name) is `if`, `for`, … (finished 09/05/2024)
 * [X] completely switch to [semver](https://semver.org) (finished 7/11/2023)
 
-* [ ] Add expected type in data Nougaro stores (conffiles)
+* [X] Add expected type in data Nougaro stores (conffiles) (finished 6/6/2024)
 * [ ] create highlight extension for VSCode
 * [ ] add optional arguments in functions
   * [ ] Parser:

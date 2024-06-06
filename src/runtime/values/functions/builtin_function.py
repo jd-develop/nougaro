@@ -18,18 +18,18 @@ from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.context import Context
 from src.runtime.runtime_result import RTResult
 from src.runtime.values.basevalues.basevalues import String, List, NoneValue, Module, Number, Object, Constructor
-from src.runtime.values.number_constants import FALSE, TRUE
 from src.misc import RunFunction, nice_str_from_idk, BuiltinFunctionDict, print_in_green, print_in_red, clear_screen
 from src.misc import is_keyword, is_tok_type
 from src.errors.errors import RTTypeErrorF, RTTypeError, RTIndexError, RTFileNotFoundError, RunTimeError, PythonError
-from src.runtime.values.tools.py2noug import py2noug, noug2py
+from src.runtime.values.tools.py2noug import py2noug
+from src.runtime.values.functions.sort_builtin_function import sort as _sort_a_nougaro_list
 import src.conffiles
 # built-in python imports
 import os
 import random
 import sys
 import subprocess
-from typing import TYPE_CHECKING, Coroutine, Any
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.runtime.interpreter import Interpreter
 
@@ -482,16 +482,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         assert exec_ctx.symbol_table is not None
         value = exec_ctx.symbol_table.getf('value')  # we get the value
-        is_number = isinstance(value, Number)  # we check if the value is a number
-        if is_number:
-            if value.type_ == 'int':  # then we check if the number is an integer
-                is_int = True
-            else:
-                is_int = False
-        else:
-            is_int = False
-        # TRUE and FALSE are defined in src/values/number_constants.py
-        return RTResult().success(TRUE.copy() if is_int else FALSE.copy())
+        is_int = isinstance(value, Number) and  value.type_ == 'int'
+        return RTResult().success(Number(is_int, self.pos_start, self.pos_end))
 
     builtin_functions["is_int"] = {
         "function": execute_is_int,
@@ -508,16 +500,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         assert exec_ctx.symbol_table is not None
         value = exec_ctx.symbol_table.getf('value')  # we get the value
-        is_number = isinstance(value, Number)  # we check if the value is a number
-        if is_number:
-            if value.type_ == 'float':  # then we check if the number is a float
-                is_float = True
-            else:
-                is_float = False
-        else:
-            is_float = False
-        # TRUE and FALSE are defined in src/values/number_constants.py
-        return RTResult().success(TRUE.copy() if is_float else FALSE.copy())
+        is_float = isinstance(value, Number) and value.type_ == "float"
+        return RTResult().success(Number(is_float, self.pos_start, self.pos_end))
 
     builtin_functions["is_float"] = {
         "function": execute_is_float,
@@ -535,8 +519,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         value = exec_ctx.symbol_table.getf('value')  # we get the value
         is_number = isinstance(value, Number)  # we check if the value is a number
-        # TRUE and FALSE are defined in src/values/number_constants.py
-        return RTResult().success(TRUE.copy() if is_number else FALSE.copy())
+        return RTResult().success(Number(is_number, self.pos_start, self.pos_end))
 
     builtin_functions["is_num"] = {
         "function": execute_is_num,
@@ -554,8 +537,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we get the value and check if it is a list
         assert exec_ctx.symbol_table is not None
         is_list = isinstance(exec_ctx.symbol_table.getf('value'), List)
-        # TRUE and FALSE are defined in src/values/number_constants.py
-        return RTResult().success(TRUE.copy() if is_list else FALSE.copy())
+        return RTResult().success(Number(is_list, self.pos_start, self.pos_end))
 
     builtin_functions["is_list"] = {
         "function": execute_is_list,
@@ -573,8 +555,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we get the value and check if it is a str
         assert exec_ctx.symbol_table is not None
         is_str = isinstance(exec_ctx.symbol_table.getf('value'), String)
-        # TRUE and FALSE are defined in src/values/number_constants.py
-        return RTResult().success(TRUE.copy() if is_str else FALSE.copy())
+        return RTResult().success(Number(is_str, self.pos_start, self.pos_end))
 
     builtin_functions["is_str"] = {
         "function": execute_is_str,
@@ -591,9 +572,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         assert exec_ctx.symbol_table is not None
         is_func = isinstance(exec_ctx.symbol_table.getf('value'), BaseFunction)  # we get the value and check if it
-        #                                                                             is a function
-        # TRUE and FALSE are defined in src/values/number_constants.py
-        return RTResult().success(TRUE.copy() if is_func else FALSE.copy())
+        #                                                                          is a function
+        return RTResult().success(Number(is_func, self.pos_start, self.pos_end))
 
     builtin_functions["is_func"] = {
         "function": execute_is_func,
@@ -611,8 +591,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we get the value and check if it is None
         assert exec_ctx.symbol_table is not None
         is_none = isinstance(exec_ctx.symbol_table.getf('value'), NoneValue)
-        # TRUE and FALSE are defined in src/values/number_constants.py
-        return RTResult().success(TRUE.copy() if is_none else FALSE.copy())
+        return RTResult().success(Number(is_none, self.pos_start, self.pos_end))
 
     builtin_functions["is_none"] = {
         "function": execute_is_none,
@@ -630,8 +609,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we get the value and check if it is a module
         assert exec_ctx.symbol_table is not None
         is_module = isinstance(exec_ctx.symbol_table.getf('value'), Module)
-        # TRUE and FALSE are defined in src/values/number_constants.py
-        return RTResult().success(TRUE.copy() if is_module else FALSE.copy())
+        return RTResult().success(Number(is_module, self.pos_start, self.pos_end))
 
     builtin_functions["is_module"] = {
         "function": execute_is_module,
@@ -649,8 +627,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we get the value and check if it is an object
         assert exec_ctx.symbol_table is not None
         is_object = isinstance(exec_ctx.symbol_table.getf('value'), Object)
-        # TRUE and FALSE are defined in src/values/number_constants.py
-        return RTResult().success(TRUE.copy() if is_object else FALSE.copy())
+        return RTResult().success(Number(is_object, self.pos_start, self.pos_end))
 
     builtin_functions["is_object"] = {
         "function": execute_is_object,
@@ -668,8 +645,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # we get the value and check if it is a constructor
         assert exec_ctx.symbol_table is not None
         is_constructor = isinstance(exec_ctx.symbol_table.getf('value'), Constructor)
-        # TRUE and FALSE are defined in src/values/number_constants.py
-        return RTResult().success(TRUE.copy() if is_constructor else FALSE.copy())
+        return RTResult().success(Number(is_constructor, self.pos_start, self.pos_end))
 
     builtin_functions["is_constructor"] = {
         "function": execute_is_constructor,
@@ -851,9 +827,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                         equal, error = e.get_comparison_eq(e1)
                         if error is not None:  # there is an error, there are not the same
                             continue
-                        if equal is not None:  # there is no error
-                            if equal.value == TRUE.value:  # there are equals, so duplicates
-                                can_append = False
+                        if equal is not None and equal.is_true():  # there is no error and they’re equal and duplicates
+                            can_append = False
                     if can_append:  # if not duplicate, we append the element to the final list
                         final_list.append(e)
                 return RTResult().success(List(final_list, self.pos_start, self.pos_end))
@@ -982,7 +957,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # then we get "ignore_not_num"
         ignore_not_num = exec_ctx.symbol_table.getf('ignore_not_num')
         if ignore_not_num is None:
-            ignore_not_num = FALSE.copy()
+            ignore_not_num = Number(False, self.pos_start, self.pos_end)
         if not isinstance(ignore_not_num, Number):
             assert ignore_not_num is not None
             return RTResult().failure(RTTypeErrorF(
@@ -1039,7 +1014,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         # then we get "ignore_not_num"
         ignore_not_num = exec_ctx.symbol_table.getf('ignore_not_num')
         if ignore_not_num is None:
-            ignore_not_num = FALSE.copy()
+            ignore_not_num = Number(False, self.pos_start, self.pos_end)
         if not isinstance(ignore_not_num, Number):
             assert ignore_not_num is not None
             return RTResult().failure(RTTypeErrorF(
@@ -1411,7 +1386,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         return_example_value = exec_ctx.symbol_table.getf("return_example_value")
         if return_example_value is None:
-            return_example_value = FALSE.copy()
+            return_example_value = Number(False, self.pos_start, self.pos_end)
 
         if not isinstance(return_example_value, Number):
             return RTResult().failure(RTTypeErrorF(
@@ -1603,7 +1578,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         assert exec_ctx.symbol_table is not None
         print_in_term = exec_ctx.symbol_table.getf("print_in_term")  # we get 'print_in_term' value
         if print_in_term is None:  # if print_in_term is None, we put it false
-            print_in_term = FALSE.copy()
+            print_in_term = Number(False, self.pos_start, self.pos_end)
 
         if not isinstance(print_in_term, Number):  # we check if it is a number
             return RTResult().failure(RTTypeErrorF(
@@ -1677,7 +1652,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
         result = RTResult()
         # then we return if this is a keyword or not.
-        return result.success(TRUE.copy()) if is_keyword(word.value) else result.success(FALSE.copy())
+        return result.success(Number(is_keyword(word.value), self.pos_start, self.pos_end))
 
     builtin_functions["__is_keyword__"] = {
         "function": execute___is_keyword__,
@@ -1705,7 +1680,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
         result = RTResult()
         # then we return if this is a valid tok type or not.
-        return result.success(TRUE) if is_tok_type(type_.value) else result.success(FALSE)
+        return result.success(Number(is_tok_type(type_.value), self.pos_start, self.pos_end))
 
     builtin_functions["__is_valid_token_type__"] = {
         "function": execute___is_valid_token_type__,
@@ -1724,9 +1699,9 @@ class BuiltInFunction(BaseBuiltInFunction):
         should_i_print_ok = exec_ctx.symbol_table.getf("print_OK")
         should_i_return = exec_ctx.symbol_table.getf("return")
         if should_i_print_ok is None:
-            should_i_print_ok = FALSE.copy()
+            should_i_print_ok = Number(False, self.pos_start, self.pos_end)
         if should_i_return is None:
-            should_i_return = FALSE.copy()
+            should_i_return = Number(False, self.pos_start, self.pos_end)
         exec_ctx.symbol_table.set(
             "file_name", String(os.path.abspath(noug_dir + "/tests/test_file.noug"), self.pos_start, self.pos_end)
         )
@@ -1837,11 +1812,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         all_files: dict[str, int] = {}
 
         print_values = exec_ctx.symbol_table.getf("print_values")
-        print_ = True
-        if print_values:
-            if isinstance(print_values, Number):
-                if print_values.value == FALSE.value:
-                    print_ = False
+        print_ = not (print_values and isinstance(print_values, Number) and print_values.is_false())
         if print_:
             print("Computing...")
 
@@ -1943,140 +1914,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                 mode.pos_start, mode.pos_end, "second", "sort", "str", mode,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
             ))
-        
-        def get_comparison_gt(list_to_sort_: list[Value], index_: int) -> tuple[Number, None] | tuple[None, RunTimeError]:
-            if index_ + 1 < len(list_to_sort_):
-                comp, error_ = list_to_sort_[index_].get_comparison_gt(list_to_sort_[index_ + 1])
-                if error_ is not None:
-                    return None, error_
-                else:
-                    assert isinstance(comp, Number)
-            else:
-                comp = FALSE.copy()
-            return comp, None
-        
-        def is_sorted(list_to_sort: list[Value]) -> tuple[bool, None] | tuple[None, RunTimeError]:
-            for i in range(len(list_to_sort)):
-                if i+1 == len(list_to_sort):
-                    continue
-                comp, error = get_comparison_gt(list_to_sort, i)
-                if error is not None:
-                    return None, error
-                assert comp is not None
-                if comp.is_true():
-                    return False, None
-            return True, None
 
-        mode_noug = mode
-        mode = mode_noug.value
-        list_to_sort: list[Value] = list_.elements
-        if mode == "timsort":  # default python sort algorithm
-            try:
-                sorted_ = sorted(list_to_sort, key=lambda val: noug2py(val, False))
-            except TypeError as e:
-                return result.failure(RTTypeError(
-                    list_.pos_start, list_.pos_end,
-                    str(e), exec_ctx,
-                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
-                ))
-        elif mode == "stalin":  # stalin sort
-            for i in range(len(list_to_sort)):
-                if i == len(list_to_sort):
-                    break
-
-                comparison, error = get_comparison_gt(list_to_sort, i)
-                if error is not None:
-                    return result.failure(error)
-                
-                assert comparison is not None
-
-                while i + 1 < len(list_to_sort) and comparison.is_true():
-                    list_to_sort.pop(i + 1)
-                    comparison, error = get_comparison_gt(list_to_sort, i)
-                    if error is not None:
-                        return result.failure(error)
-                    assert comparison is not None
-
-            sorted_ = list_to_sort  
-        elif mode == "sleep" or mode == "sleep-verbose":  # sleep sort
-            # sleep sort was implemented by Mistera. Please refer to him if you have any questions about it, as I
-            # completely don’t have any ideas on how tf asyncio works
-            import asyncio
-
-            sorted_: list[Value] = []
-            list_to_sort_only_nums: list[int] = []
-            for i in list_to_sort:
-                if not isinstance(i, Number) or not isinstance(i.value, int):
-                    return result.failure(RTTypeError(
-                        i.pos_start, i.pos_end, 
-                        f"sleep mode: expected list of int, but found {i.type_} inside the list.",
-                        exec_ctx,
-                        origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
-                    ))
-                if i.value < 0:
-                    return result.failure(RTTypeError(
-                        i.pos_start, i.pos_end,
-                        f"sleep mode: expected list of positive integers, but found negative integer {i.value} inside "
-                        f"the list.",
-                        exec_ctx,
-                        origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
-
-                    ))
-                list_to_sort_only_nums.append(i.value)
-
-            async def execute_coroutine_list(_list: list[Coroutine[Any, Any, None]]):
-                await asyncio.gather(*_list)
-
-            async def wait_and_append(i_: int):
-                nonlocal sorted_
-                await asyncio.sleep(i_)
-                if mode == "sleep-verbose":
-                    print(f"(sleep sort) Currently appending {i_} to the final list.")
-                sorted_.append(Number(i_, self.pos_start, self.pos_end))
-
-            list_of_coroutines = [wait_and_append(i) for i in list_to_sort_only_nums]
-            asyncio.run(execute_coroutine_list(list_of_coroutines))
-        elif mode == "miracle":
-            sorted_ = list_to_sort
-            is_sorted_, error = is_sorted(sorted_)
-            if error is not None:
-                return result.failure(error)
-            while not is_sorted_:
-                is_sorted_, error = is_sorted(sorted_)
-                if error is not None:
-                    return result.failure(error)
-        elif mode == "panic":
-            sorted_ = list_to_sort
-            is_sorted_, error = is_sorted(sorted_)
-            if error is not None:
-                return result.failure(error)
-            if not is_sorted_:
-                if sys.platform == "win32":  # Windows does not support illegal hardware instructions
-                    # this causes a segfault
-                    a = map(str, sorted_)
-                    for i in range(1000000):
-                        a = map(str, a)
-                    a = list(a)
-                else:
-                    # this causes an illegal hardware instruction
-                    from ctypes import CFUNCTYPE, addressof, c_void_p
-                    from mmap import mmap, PAGESIZE, PROT_READ, PROT_WRITE, PROT_EXEC
-                    buf = mmap(-1, PAGESIZE, prot=PROT_READ | PROT_WRITE | PROT_EXEC)
-                    buf.write(b'\x0f\x04')
-                    CFUNCTYPE(c_void_p)(addressof(c_void_p.from_buffer(buf)))()
-        else:  # mode is none of the above
-            return result.failure(RunTimeError(
-                mode_noug.pos_start, mode_noug.pos_end,
-                "this mode does not exist. Available modes:\n"
-                "\t* 'timsort' (default),\n"
-                "\t* 'stalin',\n"
-                "\t* 'sleep',\n"
-                "\t* 'miracle',\n"
-                "\t* 'panic'.",
-                exec_ctx, origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
-            ))
-        
-        return result.success(List(sorted_, self.pos_start, self.pos_end))
+        return _sort_a_nougaro_list(list_, mode, result, exec_ctx, self.pos_start, self.pos_end)
 
     builtin_functions["sort"] = {
         "function": execute_sort,

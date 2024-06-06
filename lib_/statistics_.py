@@ -19,7 +19,7 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import statistics
 
-__LIB_VERSION__ = 2
+__LIB_VERSION__ = 3
 
 
 class RTStatisticsError(RunTimeError):

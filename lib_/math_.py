@@ -20,7 +20,7 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import math
 
-__LIB_VERSION__ = 2
+__LIB_VERSION__ = 3
 
 # constants
 PI = Number(math.pi, *default_pos())

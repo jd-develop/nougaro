@@ -19,7 +19,7 @@ from lib_.lib_to_make_libs import *  # useful stuff to make libs.
 # built-in python imports
 import webbrowser
 
-__LIB_VERSION__ = 2
+__LIB_VERSION__ = 3
 
 
 class WebBrowserError(RunTimeError):
@@ -85,7 +85,7 @@ class WebBrowser(ModuleFunction):
             ))
         
         if autoraise is None:
-            autoraise = TRUE.copy().set_context(context)
+            autoraise = Number(True, self.pos_start, self.pos_end).set_context(context)
         
         try:
             webbrowser.open(url.value, new.value, autoraise.is_true())

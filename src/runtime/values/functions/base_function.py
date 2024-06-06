@@ -12,7 +12,6 @@
 from src.lexer.position import Position
 from src.runtime.values.basevalues.value import Value
 from src.runtime.values.basevalues.basevalues import NoneValue, String, Number
-from src.runtime.values.number_constants import TRUE, FALSE
 from src.runtime.runtime_result import RTResult
 from src.errors.errors import RunTimeError
 from src.runtime.context import Context
@@ -226,10 +225,10 @@ class BaseFunction(Value):
         return result.success(NoneValue(self.pos_start, self.pos_end))
 
     def get_comparison_eq(self, other: Value):
-        return FALSE.copy().set_pos(self.pos_start, self.pos_end).set_context(self.context), None
+        return Number(False, self.pos_start, self.pos_end).set_context(self.context), None
 
     def get_comparison_ne(self, other: Value):
-        return TRUE.copy().set_pos(self.pos_start, self.pos_end).set_context(self.context), None
+        return Number(True, self.pos_start, self.pos_end).set_context(self.context), None
 
     def and_(self, other: Value):
         return Number(

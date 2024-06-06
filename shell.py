@@ -207,7 +207,7 @@ def main():
     # for i, arg in enumerate(sys.argv):
     #     print(f"Argument {i:>6}: {arg}")
 
-    # Uncomment 3 last lines to understand the following line.
+    # Uncomment the last 3 lines to understand the following line.
     # Tested on Windows and Linux. Tested after compiling with Nuitka on Windows and Linux.
     del args[0]
 

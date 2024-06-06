@@ -17,7 +17,6 @@ from src.lexer.position import Position, DEFAULT_POSITION
 from src.parser.nodes import *
 from src.runtime.values.basevalues.basevalues import Number, String, List, NoneValue, Value, Module, Constructor
 from src.runtime.values.basevalues.basevalues import Object
-from src.runtime.values.number_constants import FALSE, TRUE
 from src.runtime.values.functions.function import Function, Method
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.runtime_result import RTResult
@@ -364,11 +363,11 @@ class Interpreter:
 
         if node.op_token.matches(TT["KEYWORD"], 'and') and left.is_false():
             # operator is "and" and the value is false
-            return res.success(FALSE.copy().set_pos(node.pos_start, node.pos_end))
+            return res.success(Number(False, node.pos_start, node.pos_end))
 
         if node.op_token.matches(TT["KEYWORD"], 'or') and left.is_true():
             # operator is "or" and the value is true
-            return res.success(TRUE.copy().set_pos(node.pos_start, node.pos_end))
+            return res.success(Number(True, node.pos_start, node.pos_end))
 
         right = self._visit_value_that_can_have_attributes(node.right_node, res, ctx, methods_instead_of_funcs)
         if res.should_return():
@@ -459,7 +458,7 @@ class Interpreter:
                 assert isinstance(element, Token)
                 visited_nodes_and_tokens_list.append(element)
 
-        test_result = FALSE.copy()  # FALSE is Nougaro False
+        test_result = Number(False, node.pos_start, node.pos_end)
         # let's test!
         for index, element in enumerate(visited_nodes_and_tokens_list):
             if index % 2 != 0:  # we take only nodes and not ops
@@ -534,7 +533,7 @@ class Interpreter:
                 Number(-1, node.op_token.pos_start, node.op_token.pos_end)
             )  # -x is like x*-1
         elif node.op_token.matches(TT["KEYWORD"], 'not'):
-            value = FALSE if value.is_true() else TRUE
+            value = Number(not value.is_true(), node.pos_start, node.pos_end)
         elif node.op_token.type == TT["BITWISENOT"]:
             value, error = value.bitwise_not()
 

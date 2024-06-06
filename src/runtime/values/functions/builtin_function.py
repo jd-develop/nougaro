@@ -1914,7 +1914,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 mode.pos_start, mode.pos_end, "second", "sort", "str", mode,
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
             ))
-        
+
         return _sort_a_nougaro_list(list_, mode, result, exec_ctx, self.pos_start, self.pos_end)
 
     builtin_functions["sort"] = {

@@ -12,6 +12,7 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 * Data version has been increased to `7`.
 * Lib version has been increased to `3`.
 * Data in the config files can now be typed, meaning that only a certain type of data can be written.
+* Under GNU/Linux and Unix, panicsort (`sort(list, "panic")`) now crashes with `illegal hardware instruction` instead of `segmentation fault` when the list is not sorted.
 * `(Internal API)` Changed `to_str_`, `to_int_`, `to_float_`, `to_list_` methods to `to_str`, `to_int`, `to_float` and `to_list` in Values. The old name are now deprecated and will be removed in 0.22.0 (or will be removed in 1.0.0-rc.1 if it releases before 0.22.0)
 
 ### Deprecated

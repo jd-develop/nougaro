@@ -251,29 +251,35 @@ class Value:
         """
         return None, self.illegal_operation()
 
-    def to_str_(self) -> tuple[String, None] | tuple[None, RTResult]:
+    def to_str(self) -> tuple[String, None] | tuple[None, RTResult]:
         """Converts to str.
         Returns (str, None) or (None, Error)
         """
         return None, RTResult().failure(self.illegal_operation())
 
-    def to_int_(self) -> tuple[Number, None] | tuple[None, RTResult]:
+    def to_int(self) -> tuple[Number, None] | tuple[None, RTResult]:
         """Converts to int.
         Returns (int, None) or (None, Error)
         """
         return None, RTResult().failure(self.illegal_operation())
 
-    def to_float_(self) -> tuple[Number, None] | tuple[None, RTResult]:
+    def to_float(self) -> tuple[Number, None] | tuple[None, RTResult]:
         """Converts to float.
         Returns (float, None) or (None, Error)
         """
         return None, RTResult().failure(self.illegal_operation())
 
-    def to_list_(self) -> tuple[List, None] | tuple[None, RTResult]:
+    def to_list(self) -> tuple[List, None] | tuple[None, RTResult]:
         """Converts to list.
         Returns (list, None) or (None, Error)
         """
         return None, RTResult().failure(self.illegal_operation())
+    
+    # these aliases will be deprecated in 0.22.0-beta and deleted in 0.24.0-beta
+    to_str_ = to_str
+    to_int_ = to_int
+    to_float_ = to_float
+    to_list_ = to_list
 
     def is_int(self) -> bool:
         """Return PYTHON BOOLEAN True or False depending on if the value's type is INT or not"""

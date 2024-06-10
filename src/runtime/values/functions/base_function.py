@@ -119,6 +119,30 @@ class BaseFunction(Value):
                     populated_optional_params.append(argument_name.value)
             elif i < len(param_names):
                 populated_params.append(param_names[i])
+            elif len(param_names) + len(optional_params) == 0:
+                if not should_respect_args_number:
+                    break
+                # the following code is not gonna execute… Or is it?
+                assert self.context is not None
+                return result.failure(RunTimeError(
+                    argument.pos_start, argument.pos_end,
+                    f"function '{self.name}' takes no argument. If you see this message, "
+                    f"PLEASE OPEN AN ISSUE on https://github.com/jd-develop/nougaro/issues/new/choose with "
+                    f"all the informations.",
+                    self.context, origin_file="src.values.functions.base_funcntion.BaseFunction.check_args"
+                ))
+            elif i-len(param_names) < len(optional_params):
+                if not should_respect_args_number:
+                    break
+                # the following code is not gonna execute… Or is it?
+                assert self.context is not None
+                return result.failure(RunTimeError(
+                    argument.pos_start, argument.pos_end,
+                    f"too many arguments given to function '{self.name}'. If you see this message, "
+                    f"PLEASE OPEN AN ISSUE on https://github.com/jd-develop/nougaro/issues/new/choose with "
+                    f"all the informations.",
+                    self.context, origin_file="src.values.functions.base_funcntion.BaseFunction.check_args"
+                ))
             else:
                 populated_optional_params.append(optional_params[i-len(param_names)])
 

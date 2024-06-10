@@ -801,9 +801,10 @@ class Parser:
                 mul = False
                 # we check for the closing paren.
                 if self.current_token.type == TT["RPAREN"]:
+                    pos_end = self.current_token.pos_end.copy()
                     result.register_advancement()
                     self.advance()
-                    call_node_node = CallNode(call_node_node, arg_nodes)
+                    call_node_node = CallNode(call_node_node, arg_nodes, pos_end)
                     continue
 
                 # (MUL? expr (COMMA MUL? expr)?*)?
@@ -842,13 +843,14 @@ class Parser:
                     
                     arg_nodes.append((expr_node, mul))
 
+                pos_end = self.current_token.pos_end.copy()
                 result = self.check_for_and_advance(
                     result, "expected ',' or ')'." if comma_expected else "expected ')'.",
                     "RPAREN", None, "assign_identifier"
                 )
                 if result.error is not None:
                     return None, result.error
-                call_node_node = CallNode(call_node_node, arg_nodes)
+                call_node_node = CallNode(call_node_node, arg_nodes, pos_end)
 
             if is_call:
                 call_node = call_node_node
@@ -1032,11 +1034,12 @@ class Parser:
             mul = False
             # we check for the closing paren.
             if self.current_token.type == TT["RPAREN"]:
+                pos_end = self.current_token.pos_end.copy()
                 result.register_advancement()
                 self.advance()
 
                 assert not isinstance(call_node, list)
-                call_node = CallNode(call_node, arg_nodes)
+                call_node = CallNode(call_node, arg_nodes, pos_end)
                 continue
 
             # (MUL? expr (COMMA MUL? expr)?*)?
@@ -1077,6 +1080,7 @@ class Parser:
                 
                 arg_nodes.append(expr_and_mul)
 
+            pos_end = self.current_token.pos_end.copy()
             result = self.check_for_and_advance(
                 result, "expected ',' or ')'." if comma_expected else "expected ')'.",
                 "RPAREN", None, "call"
@@ -1084,8 +1088,8 @@ class Parser:
             if result.error is not None:
                 return result
             assert not isinstance(call_node, list)
-                
-            call_node = CallNode(call_node, arg_nodes)
+            
+            call_node = CallNode(call_node, arg_nodes, pos_end)
 
         return result.success(call_node)
 

@@ -21,6 +21,10 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 ### Removed
 * `(Internal API/Writing libs)` Removed `TRUE`, `FALSE` and `NULL` values, please use `Number(True)`, `Number(False)` and `Number(0)` instead.
 
+## Fixed
+* Fixed a crash when giving too many arguments to a function having the property `should_respect_args_number` set to `False`.
+* Fixed a bug with `position_end` of call nodes (it was just before the closing parenthese)
+
 ## 0.20.0-beta (2024-06-06)
 
 This version may in some cases improve performance.

@@ -643,7 +643,13 @@ class CallNode(Node):
           arg_nodes is [VarAccessNode (identifier: bar), NumberNode (num: 1)]
     If there is no arguments given, arg_nodes is empty.
     """
-    def __init__(self, node_to_call: Node, arg_nodes: list[tuple[Node, bool]], keyword_arg_nodes: list[tuple[_Token, Node, bool]] | None = None):
+    def __init__(
+            self,
+            node_to_call: Node,
+            arg_nodes: list[tuple[Node, bool]],
+            pos_end: _Position,
+            keyword_arg_nodes: list[tuple[_Token, Node, bool]] | None = None
+    ):
         self.node_to_call = node_to_call
         self.arg_nodes = arg_nodes
         if keyword_arg_nodes is None:
@@ -651,14 +657,8 @@ class CallNode(Node):
         self.keyword_arg_nodes = keyword_arg_nodes
 
         self.pos_start = self.node_to_call.pos_start
-
-        if len(keyword_arg_nodes) > 0:
-            self.pos_end = self.keyword_arg_nodes[-1][1].pos_end
-        elif len(self.arg_nodes) > 0:  # if there are arguments, we take the last one's pos_end as our pos_end.
-            self.pos_end = self.arg_nodes[-1][0].pos_end
-        else:  # if there is no parameter, we take the node_to_call's pos_end as our pos_end.
-            self.pos_end = self.node_to_call.pos_end
-
+        self.pos_end = pos_end
+    
     def __repr__(self):
         return f'call:{self.node_to_call}({self.arg_nodes}, {self.keyword_arg_nodes})'
     

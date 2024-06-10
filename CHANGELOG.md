@@ -12,14 +12,14 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 * Data version has been increased to `7`.
 * Lib version has been increased to `3`.
 * Data in the config files can now be typed, meaning that only a certain type of data can be written.
-* Under GNU/Linux and Unix, panicsort (`sort(list, "panic")`) now crashes with `illegal hardware instruction` instead of `segmentation fault` when the list is not sorted.
+* Under GNU/Linux and Unix, panicsort (`sort(list, "panic")`) now crashes with `illegal hardware instruction` instead of `segmentation fault` when the list is not sorted (funnier). Thanks @Mistera91!
 * `(Internal API)` Changed `to_str_`, `to_int_`, `to_float_`, `to_list_` methods to `to_str`, `to_int`, `to_float` and `to_list` in Values. The old name are now deprecated and will be removed in 0.22.0 (or will be removed in 1.0.0-rc.1 if it releases before 0.22.0)
 
 ### Deprecated
-* `(Internal API)` `to_str_`, `to_int_`, `to_float_`, `to_list_` methods in Values are now deprecated and will be removed in 0.22.0.
+* `(Internal API)` `to_str_`, `to_int_`, `to_float_`, `to_list_` methods in Values are now deprecated and will be removed in 0.22.0. Please use `to_str`, `to_int`, `to_float` and `to_list` instead.
 
 ### Removed
-* `(Internal API/Writing libs)` Removed `TRUE` and `FALSE` values, please use `Number(True)` and `Number(False)` instead.
+* `(Internal API/Writing libs)` Removed `TRUE`, `FALSE` and `NULL` values, please use `Number(True)`, `Number(False)` and `Number(0)` instead.
 
 ## 0.20.0-beta (2024-06-06)
 

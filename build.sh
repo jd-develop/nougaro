@@ -20,6 +20,7 @@ if [[ $c == [Yy] ]]; then
     echo "WARNING: a pip command will be executed (see below) and may (in edge cases) break your python installation or your OS (it won't)"
     echo "WARNING: this is the command : '$python -m pip install --upgrade pip wheel colorama nuitka --break-system-packages'"
     echo "WARNING: For information, the python version that will be used is $($python --version). Please check if your python version is supported by Nougaro and by Nuitka!"
+    echo "INFO: For information, you can pass the command to the Python binary you want as an argument of this script. The default command is python3."
     read -p "Continue? [y/N] " -r d
 fi
 

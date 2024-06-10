@@ -131,9 +131,10 @@ class BaseFunction(Value):
                     f"all the informations.",
                     self.context, origin_file="src.values.functions.base_funcntion.BaseFunction.check_args"
                 ))
-            elif i-len(param_names) < len(optional_params):
+            elif i-len(param_names) >= len(optional_params):
                 if not should_respect_args_number:
                     break
+                print(i-len(param_names), len(optional_params))
                 # the following code is not gonna execute… Or is it?
                 assert self.context is not None
                 return result.failure(RunTimeError(

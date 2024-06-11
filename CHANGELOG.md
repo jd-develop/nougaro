@@ -24,7 +24,7 @@ This version is small but contains a rather big crash fix, as well as a deprecat
 ### Removed
 * `(Internal API/Writing libs)` Removed `TRUE`, `FALSE` and `NULL` values, please use `Number(True)`, `Number(False)` and `Number(0)` instead.
 
-## Fixed
+### Fixed
 * Fixed a crash when giving too many arguments to a function having the property `should_respect_args_number` set to `False`.
 * Fixed a bug with `position_end` of call nodes (it was just before the closing parenthese)
 

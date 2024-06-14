@@ -274,12 +274,6 @@ class Value:
         Returns (list, None) or (None, Error)
         """
         return None, RTResult().failure(self.illegal_operation())
-    
-    # these aliases are deprecated and well be deleted in 0.22.0-beta (todo)
-    to_str_ = to_str
-    to_int_ = to_int
-    to_float_ = to_float
-    to_list_ = to_list
 
     def is_int(self) -> bool:
         """Return PYTHON BOOLEAN True or False depending on if the value's type is INT or not"""

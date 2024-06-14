@@ -6,6 +6,11 @@ This file is updated nearly every commit and copied to GH release changelog.
 
 Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. The Nougaro changelog has another section, `Calculator`, keeping track of the changes relative to the Nougaro Calculator under the same 6-sections format.
 
+## Unreleased
+
+### Removed
+* `(Internal API)` `to_str_`, `to_int_`, `to_float_`, `to_list_` methods in Values are now removed. Please use `to_str`, `to_int`, `to_float` and `to_list` instead.
+
 ## 0.21.0-beta (2024-06-11) [YANKED]
 
 This version is small but contains a rather big crash fix, as well as a deprecation.

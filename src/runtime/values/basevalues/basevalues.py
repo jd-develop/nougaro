@@ -263,7 +263,7 @@ class Number(Value):
                 origin_file="src.values.basevalues.Number.multiplied_by"
             )
 
-    def dived_by(self, other: Value):  # DIVISION
+    def divided_by(self, other: Value):  # DIVISION
         if isinstance(other, Number):
             try:
                 val = self.value / other.value
@@ -273,7 +273,7 @@ class Number(Value):
                     other.pos_start, other.pos_end,
                     'division by zero is not possible.',
                     self.context,
-                    "src.values.basevalues.Number.dived_by"
+                    "src.values.basevalues.Number.divided_by"
                 )
             except OverflowError as e:  # I hate python
                 errmsg = str(e)
@@ -282,7 +282,7 @@ class Number(Value):
                     self.pos_start, other.pos_end,
                     errmsg,
                     self.context,
-                    "src.values.basevalues.Number.dived_by"
+                    "src.values.basevalues.Number.divided_by"
                 )
             return Number(val, self.pos_start, other.pos_end).set_context(self.context), None
         else:
@@ -312,7 +312,7 @@ class Number(Value):
         else:
             return None, self.illegal_operation(other)
 
-    def floor_dived_by(self, other: Value):  # FLOOR_DIVISION
+    def floor_divided_by(self, other: Value):  # FLOOR_DIVISION
         if isinstance(other, Number):
             if other.value == 0:
                 assert self.context is not None
@@ -320,7 +320,7 @@ class Number(Value):
                     other.pos_start, other.pos_end,
                     'division by zero is not possible.',
                     self.context,
-                    "src.values.basevalues.Number.floor_dived_by"
+                    "src.values.basevalues.Number.floor_divided_by"
                 )
             try:
                 return Number(self.value // other.value, self.pos_start, other.pos_end).set_context(self.context), None
@@ -331,7 +331,7 @@ class Number(Value):
                     self.pos_start, other.pos_end,
                     errmsg,
                     self.context,
-                    "src.values.basevalues.Number.floor_dived_by"
+                    "src.values.basevalues.Number.floor_divided_by"
                 )
         else:
             return None, self.illegal_operation(other)
@@ -544,7 +544,7 @@ class List(Value):
         else:
             return None, self.illegal_operation(other)
 
-    def dived_by(self, other: Value):
+    def divided_by(self, other: Value):
         if isinstance(other, Number) and isinstance(other.value, int):
             try:
                 return self.elements[other.value], None
@@ -553,7 +553,7 @@ class List(Value):
                 return None, RTIndexError(
                     other.pos_start, other.pos_end,
                     f'list index {other.value} out of range.',
-                    self.context, "src.values.basevalues.List.dived_by"
+                    self.context, "src.values.basevalues.List.divided_by"
                 )
         else:
             return None, self.illegal_operation(other)

@@ -101,7 +101,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def floor_dived_by(self, other: Value) -> tuple[Value, None] | tuple[None, RunTimeError]:
+    def floor_divided_by(self, other: Value) -> tuple[Value, None] | tuple[None, RunTimeError]:
         """Floor division between self.value and other's value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned
@@ -109,7 +109,7 @@ class Value:
         """
         return None, self.illegal_operation(other)
 
-    def dived_by(self, other: Value) -> tuple[Value, None] | tuple[None, RunTimeError]:
+    def divided_by(self, other: Value) -> tuple[Value, None] | tuple[None, RunTimeError]:
         """Division between self.value and other's value.
         Return a tuple with a valid value (or None if there is an error), then an error (or None if there is no error)
         Please refer to documentation of other operations (like self.multiplied_by()) to see examples of returned

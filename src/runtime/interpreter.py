@@ -382,11 +382,11 @@ class Interpreter:
         elif node.op_token.type == TT["MUL"]:
             result, error = left.multiplied_by(right)
         elif node.op_token.type == TT["DIV"]:
-            result, error = left.dived_by(right)
+            result, error = left.divided_by(right)
         elif node.op_token.type == TT["PERC"]:
             result, error = left.modded_by(right)
         elif node.op_token.type == TT["FLOORDIV"]:
-            result, error = left.floor_dived_by(right)
+            result, error = left.floor_divided_by(right)
         elif node.op_token.type == TT["POW"]:
             result, error = left.powered_by(right)
         elif node.op_token.type == TT["EE"]:
@@ -738,11 +738,11 @@ class Interpreter:
                 elif equal == TT["MULTEQ"]:
                     final_value, error = var_actual_value.multiplied_by(values[i])
                 elif equal == TT["DIVEQ"]:
-                    final_value, error = var_actual_value.dived_by(values[i])
+                    final_value, error = var_actual_value.divided_by(values[i])
                 elif equal == TT["POWEQ"]:
                     final_value, error = var_actual_value.powered_by(values[i])
                 elif equal == TT["FLOORDIVEQ"]:
-                    final_value, error = var_actual_value.floor_dived_by(values[i])
+                    final_value, error = var_actual_value.floor_divided_by(values[i])
                 elif equal == TT["PERCEQ"]:
                     final_value, error = var_actual_value.modded_by(values[i])
                 elif equal == TT["OREQ"]:

@@ -8,6 +8,9 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 
 ## Unreleased
 
+### Changed
+* `(Internal API)` `dived_by` and `floor_dived_by` methods in Values are now renamed to `divided_by` and `floor_divided_by`.
+
 ### Removed
 * `(Internal API)` `to_str_`, `to_int_`, `to_float_`, `to_list_` methods in Values are now removed. Please use `to_str`, `to_int`, `to_float` and `to_list` instead.
 

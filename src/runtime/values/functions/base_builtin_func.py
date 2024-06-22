@@ -39,7 +39,7 @@ class BaseBuiltInFunction(BaseFunction):
     def get_comparison_ne(self, other: Value):
         return Number(not self.is_eq(other), self.pos_start, other.pos_end).set_context(self.context), None
 
-    def execute(self, args: list[Value | tuple[String, Value]], interpreter_: type[Interpreter], run: RunFunction,
+    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction,
                 noug_dir: str, lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>",
                 use_context: Context | None = None, cli_args: list[String] | None = None,
                 work_dir: str | None = None):

@@ -29,10 +29,12 @@ if TYPE_CHECKING:
 
 class Function(BaseFunction):
     def __init__(self, name: str | None, body_node: Node, param_names: list[str], should_auto_return: bool,
-                 pos_start: Position, pos_end: Position, call_with_module_context: bool = False):
+                 pos_start: Position, pos_end: Position, call_with_module_context: bool = False,
+                 optional_params: list[tuple[str, Value | None]] | None = None):
         super().__init__(name, pos_start, pos_end, call_with_module_context)
         self.body_node = body_node
         self.param_names = param_names
+        self.optional_params = optional_params
         self.should_auto_return = should_auto_return
         self.type_ = "func"
 
@@ -42,7 +44,8 @@ class Function(BaseFunction):
     def is_eq(self, other: Value):
         if not isinstance(other, Function):
             return False
-        is_eq = self.param_names == other.param_names and self.should_auto_return == other.should_auto_return
+        is_eq = self.param_names == other.param_names and self.should_auto_return == other.should_auto_return and \
+                self.optional_params == other.optional_params
         are_nodes_eq = self.body_node == other.body_node
         return is_eq and are_nodes_eq
     
@@ -55,7 +58,7 @@ class Function(BaseFunction):
     def to_python_str(self):
         return self.__repr__()
 
-    def execute(self, args: list[Value | tuple[String, Value]], interpreter_: type[Interpreter], run: RunFunction,
+    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction,
                 noug_dir: str, lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>",
                 use_context: Context | None = None, cli_args: list[String] | None = None,
                 work_dir: str | None = None):
@@ -87,7 +90,7 @@ class Function(BaseFunction):
         # print(self.context)
 
         # populate argument and check for errors
-        result.register(self.check_and_populate_args(self.param_names, args, exec_context))
+        result.register(self.check_and_populate_args(self.param_names, args, exec_context, self.optional_params))
         if result.should_return():
             return result
 
@@ -120,7 +123,8 @@ class Function(BaseFunction):
             self.should_auto_return,
             self.pos_start,
             self.pos_end,
-            self.call_with_module_context
+            self.call_with_module_context,
+            self.optional_params
         )
         copy.module_context = self.module_context
         copy.set_context(self.context)
@@ -131,9 +135,11 @@ class Function(BaseFunction):
 class Method(Function):
     """Parent class for methods (functions in classes)"""
     def __init__(self, name: str | None, body_node: Node, param_names: list[str], should_auto_return: bool,
-                 pos_start: Position, pos_end: Position, call_with_module_context: bool = False):
+                 pos_start: Position, pos_end: Position, call_with_module_context: bool = False,
+                 optional_params: list[tuple[str, Value | None]] | None = None):
         super().__init__(
-            name, body_node, param_names, should_auto_return, pos_start, pos_end, call_with_module_context
+            name, body_node, param_names, should_auto_return, pos_start, pos_end, call_with_module_context,
+            optional_params=optional_params
         )
         self.type_ = "method"
         self.object_: Value | None = None
@@ -145,7 +151,8 @@ class Method(Function):
         """Return a copy of self"""
         copy = Method(
             self.name, self.body_node, self.param_names, self.should_auto_return,
-            self.pos_start, self.pos_end, self.call_with_module_context)
+            self.pos_start, self.pos_end, self.call_with_module_context,
+            optional_params=self.optional_params)
         copy.object_ = self.object_
         copy.module_context = self.module_context
         copy.set_context(self.context)
@@ -155,6 +162,7 @@ class Method(Function):
     def is_eq(self, other: Value):
         if not isinstance(other, Method):
             return False
-        is_eq = self.param_names == other.param_names and self.should_auto_return == other.should_auto_return
+        is_eq = self.param_names == other.param_names and self.should_auto_return == other.should_auto_return and \
+                self.optional_params == other.optional_params
         are_nodes_eq = self.body_node == other.body_node
         return is_eq and are_nodes_eq

@@ -71,14 +71,17 @@
 * [X] Add expected type in data Nougaro stores (conffiles) (finished 6/6/2024)
 * [ ] create highlight extension for VSCode
 * [ ] add optional arguments in functions
-  * [ ] Parser:
-    * [ ] Allow optional parameters, do not allow positional parameters after them (call + def)
-    * [X] Update nodes (call + def) (finished 24/02/2024)
-  * [ ] Runtime:
-    * [X] Update Function value and methods (finished 28/05/2024)
-      * [X] Check args (finished 27/05/2024)
-      * [X] Populate args (finished 28/05/2024)
-    * [ ] Update Interpreter visit methods
+  * [X] Lexer:
+    * [X] Add the `<default>` token (finished 22/06/2024)
+  * [X] Parser:
+    * [X] Allow optional parameters in a secondary optional parenthesis (finished 22/06/2024)
+    * [X] Update nodes (call + def) (finished 24/02/2024, updated 22/06/2024)
+  * [X] Runtime:
+    * [X] Update Function value and methods (finished 28/05/2024, updated 22/06/2024)
+      * [X] Check args (finished 27/05/2024, updated 22/06/2024)
+      * [X] Populate args (finished 28/05/2024, updated 22/06/2024)
+    * [X] Update Interpreter visit methods (finished 22/06/2024)
+  * [ ] Add tests
 
 ## Future releases
 

@@ -16,7 +16,7 @@ from src.lexer.token import Token
 from src.lexer.position import Position, DEFAULT_POSITION
 from src.parser.nodes import *
 from src.runtime.values.basevalues.basevalues import Number, String, List, NoneValue, Value, Module, Constructor
-from src.runtime.values.basevalues.basevalues import Object
+from src.runtime.values.basevalues.basevalues import Object, DefaultValue
 from src.runtime.values.functions.function import Function, Method
 from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.runtime_result import RTResult
@@ -68,6 +68,7 @@ class Interpreter:
             "CallNode": self.visit_CallNode,
             "ClassNode": self.visit_ClassNode,
             "ContinueNode": self.visit_ContinueNode,
+            "DefaultNode": self.visit_DefaultNode,
             "DoWhileNode": self.visit_DoWhileNode,
             "DollarPrintNode": self.visit_DollarPrintNode,
             "ExportNode": self.visit_ExportNode,
@@ -88,7 +89,7 @@ class Interpreter:
             "VarAssignNode": self.visit_VarAssignNode,
             "VarDeleteNode": self.visit_VarDeleteNode,
             "WhileNode": self.visit_WhileNode,
-            "WriteNode": self.visit_WriteNode,
+            "WriteNode": self.visit_WriteNode
         }
 
     @staticmethod
@@ -1193,23 +1194,38 @@ class Interpreter:
         for param_name in node.param_names_tokens:
             assert isinstance(param_name.value, str)
             param_names.append(param_name.value)
+        optional_param_names: list[str] = []
+        optional_params: list[tuple[str, Value | None]] = []
+        for optional_param_name in node.optional_params:
+            assert isinstance(optional_param_name[0].value, str)
+            optional_param_names.append(optional_param_name[0].value)
+            default_value = result.register(self.visit(optional_param_name[1], ctx, methods_instead_of_funcs))
+            if result.error is not None:
+                return result
+            assert default_value is not None
+            optional_params.append((optional_param_name[0].value, default_value))
 
-        all_params = param_names  # + optional_params
+        all_params = param_names + optional_param_names
         duplicates = [k for k, v in Counter(all_params).items() if v > 1]
         if len(duplicates) != 0:
+            pos_end = node.param_names_tokens[-1].pos_end
+            if len(node.optional_params) != 0:
+                pos_end = node.optional_params[-1][1].pos_end
             return result.failure(RunTimeError(
-                node.param_names_tokens[0].pos_start, node.param_names_tokens[0].pos_end,
+                node.param_names_tokens[0].pos_start, pos_end,
                 f"duplicate argument '{duplicates[0]}' in function definition.",
                 ctx, origin_file=f"{_ORIGIN_FILE}.visit_FuncDefNode"
             ))
 
         if not methods_instead_of_funcs:
             func_value = Function(
-                func_name, body_node, param_names, node.should_auto_return, node.pos_start, node.pos_end
+                func_name, body_node, param_names, node.should_auto_return, node.pos_start, node.pos_end,
+                optional_params=optional_params
             ).set_context(ctx)
         else:
             func_value = Method(
-                func_name, body_node, param_names, node.should_auto_return, node.pos_start, node.pos_end
+                func_name, body_node, param_names, node.should_auto_return, node.pos_start, node.pos_end,
+                optional_params=optional_params
             ).set_context(ctx)
 
         if func_name is not None:
@@ -1284,7 +1300,7 @@ class Interpreter:
         value_to_call = value_to_call.copy().set_pos(node.pos_start, node.pos_end)
 
         if isinstance(value_to_call, BaseFunction):  # if the value is a function
-            args: list[Value | tuple[String, Value]] = []
+            args: list[Value] = []
             call_with_module_context: bool = value_to_call.call_with_module_context
             # call the function
             for arg_node, mul in node.arg_nodes:  # we check the arguments
@@ -1957,6 +1973,12 @@ class Interpreter:
             value_to_return = String(f"${node.identifier.value}", node.pos_start, node.pos_end)
 
         return result.success(value_to_return.set_context(ctx))
+
+    def visit_DefaultNode(self, node: DefaultNode, ctx: Context) -> RTResult:
+        """<default>"""
+        return RTResult().success(
+            DefaultValue(node.pos_start, node.pos_end).set_context(ctx)
+        )
 
     def visit_NoNode(self, node: NoNode, ctx: Context) -> RTResult:
         """There is no node"""

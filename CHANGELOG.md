@@ -8,11 +8,18 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 
 ## Unreleased
 
+### Added
+* Added optional parameters to function definitions. Use `def identifier(mendatory1, mendatory2)(optional1=default_value, optional2=default_value)` to define optional parameters. When you call the function, you can omit the optional arguments. If you want to leave `optional1` to its default value but to change `optional2`, you can use `identifier(mendatory1, mendatory2, <default>, new_value)`.
+* Added the `<default>` token, and the `<default>` value.
+
 ### Changed
 * `(Internal API)` `dived_by` and `floor_dived_by` methods in Values are now renamed to `divided_by` and `floor_divided_by`.
 
 ### Removed
 * `(Internal API)` `to_str_`, `to_int_`, `to_float_`, `to_list_` methods in Values are now removed. Please use `to_str`, `to_int`, `to_float` and `to_list` instead.
+
+### Fixed
+* Fixed position start and end of duplicate arguments error messages.
 
 ## 0.21.0-beta (2024-06-11) [YANKED]
 

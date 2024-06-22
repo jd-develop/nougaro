@@ -942,3 +942,82 @@ class NoneValue(Value):
         copy.module_context = self.module_context
         copy.attributes = self.attributes.copy()
         return copy
+
+
+class DefaultValue(Value):
+    def __init__(self, pos_start: _Position, pos_end: _Position):
+        super().__init__(pos_start, pos_end)
+        self.type_ = 'DefaultValue'
+
+    def __repr__(self):
+        return '<default>'
+
+    def __str__(self):
+        return '<default>'
+    
+    def to_python_str(self) -> str:
+        return self.__repr__()
+
+    def get_comparison_eq(self, other: Value):
+        return Number(isinstance(other, DefaultValue), self.pos_start, other.pos_end).set_context(self.context), None
+
+    def get_comparison_ne(self, other: Value):
+        return Number(not isinstance(other, DefaultValue), self.pos_start, other.pos_end).set_context(self.context), None
+
+    def get_comparison_gt(self, other: Value):
+        return None, self.can_not_compare(other)
+
+    def get_comparison_gte(self, other: Value):
+        return None, self.can_not_compare(other)
+
+    def get_comparison_lt(self, other: Value):
+        return None, self.can_not_compare(other)
+
+    def get_comparison_lte(self, other: Value):
+        return None, self.can_not_compare(other)
+
+    def and_(self, other: Value):
+        return Number(
+            self.is_true() and other.is_true(),
+            self.pos_start, other.pos_end
+        ).set_context(self.context), None
+
+    def or_(self, other: Value):
+        return Number(
+            self.is_true() or other.is_true(),
+            self.pos_start, other.pos_end
+        ).set_context(self.context), None
+
+    def xor_(self, other: Value):
+        """ Exclusive or (xor) """
+        xor = (
+            not self.is_true() and other.is_true()
+        ) or (
+            self.is_true() and not other.is_true()
+        )
+        return Number(xor, self.pos_start, other.pos_end).set_context(self.context), None
+
+    def to_str(self):
+        return String('<default>', self.pos_start, self.pos_end).set_context(self.context), None
+
+    def to_list(self):
+        return String('<default>', self.pos_start, self.pos_end).to_list()[0].set_context(self.context), None
+
+    def is_in(self, other: Value):
+        if isinstance(other, List):
+            for element in other.elements:
+                if isinstance(element, DefaultValue):
+                    return Number(True, self.pos_start, other.pos_end).set_context(self.context), None
+            return Number(False, self.pos_start, other.pos_end).set_context(self.context), None
+        elif isinstance(other, String):
+            return Number('<default>' in other.value.lower(), self.pos_start, other.pos_end).set_context(self.context), None
+        else:
+            return None, self.can_not_be_in(other)
+
+    def copy(self):
+        """Return a copy of self"""
+        copy = DefaultValue(self.pos_start, self.pos_end)
+        copy.set_context(self.context)
+        copy.module_context = self.module_context
+        copy.attributes = self.attributes.copy()
+        return copy

@@ -237,7 +237,7 @@ class Value:
         """
         return None, self.illegal_operation()
 
-    def execute(self, args: list[Value | tuple[String, Value]], interpreter_: type[Interpreter], run: RunFunction,
+    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction,
                 noug_dir: str, lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>",
                 use_context: Context | None = None, cli_args: list[String] | None = None,
                 work_dir: str | None = None):

@@ -648,19 +648,15 @@ class CallNode(Node):
             node_to_call: Node,
             arg_nodes: list[tuple[Node, bool]],
             pos_end: _Position,
-            keyword_arg_nodes: list[tuple[_Token, Node, bool]] | None = None
     ):
         self.node_to_call = node_to_call
         self.arg_nodes = arg_nodes
-        if keyword_arg_nodes is None:
-            keyword_arg_nodes = []
-        self.keyword_arg_nodes = keyword_arg_nodes
 
         self.pos_start = self.node_to_call.pos_start
         self.pos_end = pos_end
     
     def __repr__(self):
-        return f'call:{self.node_to_call}({self.arg_nodes}, {self.keyword_arg_nodes})'
+        return f'call:{self.node_to_call}({self.arg_nodes})'
     
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, CallNode):
@@ -669,8 +665,7 @@ class CallNode(Node):
             return False
         return (
             self.node_to_call == other.node_to_call and
-            self.arg_nodes == other.arg_nodes and
-            self.keyword_arg_nodes == other.keyword_arg_nodes
+            self.arg_nodes == other.arg_nodes
         )
 
 
@@ -859,6 +854,23 @@ class DollarPrintNode(Node):
         if self.attr != other.attr:
             return False
         return self.identifier == other.identifier
+    
+
+class DefaultNode(Node):
+    """<default> node"""
+    def __init__(self, pos_start: _Position, pos_end: _Position):
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+
+    def __repr__(self):
+        return "<default>"
+    
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, DefaultNode):
+            return False
+        if self.attr != other.attr:
+            return False
+        return True
 
 
 # SPECIAL NODES

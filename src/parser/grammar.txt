@@ -53,6 +53,7 @@ atom          : (INT|FLOAT)(E_INFIX INT)?
               : do_expr
               : func_def
               : class_def
+              : <default>
 
 list_expr     : LSQUARE (MUL? expr (COMMA MUL? expr)?*)? RSQUARE
 
@@ -82,12 +83,12 @@ while_expr    : KEYWORD:WHILE (COLON IDENTIFIER)?
 do_expr       : KEYWORD:DO (COLON IDENTIFIER)?
                 (statement | (NEWLINE statements)) KEYWORD:THEN KEYWORD:LOOP KEYWORD:WHILE expr
 
-func_def      : KEYWORD:DEF IDENTIFIER? fund_def_args
+func_def      : KEYWORD:DEF IDENTIFIER? func_def_args optional_func_def_args?
                 (ARROW expr)|(NEWLINE statements KEYWORD:END)
 
-fund_def_args : LPAREN (IDENTIFIER (COMMA IDENTIFIER)*?)? RPAREN
-              | LPAREN ((IDENTIFIER EQ expr) (COMMA IDENTIFIER EQ expr)*?)? RPAREN
-              | LPAREN (IDENTIFIER (COMMA IDENTIFIER)*? (COMMA IDENTIFIER EQ expr)*?)? RPAREN
+func_def_args : LPAREN (IDENTIFIER (COMMA IDENTIFIER)*?)? RPAREN
+
+optional_func_def_args : LPAREN IDENTIFIER EQ expr (COMMA IDENTIFIER EQ expr)*? RPAREN
 
 class_def     : KEYWORD:CLASS IDENTIFIER?
                 (LPAREN IDENTIFIER? RPAREN)?

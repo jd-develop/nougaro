@@ -49,7 +49,7 @@ class ModuleFunction(BaseBuiltInFunction):
     def __repr__(self):
         return f'<built-in lib function {self.module_name}.{self.name}>'
 
-    def execute(self, args: list[Value | tuple[String, Value]], interpreter_: type[Interpreter], run: RunFunction,
+    def execute(self, args: list[Value], interpreter_: type[Interpreter], run: RunFunction,
                 noug_dir: str, lexer_metas: dict[str, str | bool], exec_from: str = "<invalid>",
                 use_context: Context | None = None, cli_args: list[String] | None = None,
                 work_dir: str | None = None):
@@ -77,10 +77,12 @@ class ModuleFunction(BaseBuiltInFunction):
             return result
         method = method_dict["function"]
 
+        optional_params: list[tuple[str, Value | None]] = [(param, None) for param in method_dict["optional_params"]]
+
         # populate arguments
         result.register(self.check_and_populate_args(
             method_dict["param_names"], args, exec_context,
-            optional_params=method_dict["optional_params"],
+            optional_params=optional_params,
             should_respect_args_number=method_dict["should_respect_args_number"]
         ))
 

@@ -868,6 +868,10 @@ class Lexer:
                     f"expected '=' after '<<', got '{self.current_char}'.",
                     "src.lexer.lexer.Lexer.make_less_than"
                 )
+        elif self.current_char == "d" and self.next_char(7) == "efault>":  # <default>
+            for _ in range(8):
+                self.advance()
+            token_type = TT["DEFAULT"]
 
         return Token(token_type, pos_start=pos_start, pos_end=self.pos), None
 

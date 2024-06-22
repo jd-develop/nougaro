@@ -1105,6 +1105,7 @@ class Parser:
               : while_expr
               : do_expr
               : func_def
+              : <default>
         """
         # we create the result
         result = ParseResult()
@@ -1152,6 +1153,10 @@ class Parser:
                 "expected valid expression. Maybe you forgot to close an 'end'?",
                 "src.parser.parser.Parser.atom"
             ))
+        elif self.current_token.type == TT["DEFAULT"]:
+            expr = DefaultNode(self.current_token.pos_start, self.current_token.pos_end)
+            result.register_advancement()
+            self.advance()
         else:
             return result.failure(InvalidSyntaxError(
                 token.pos_start, token.pos_end,
@@ -1825,7 +1830,7 @@ class Parser:
 
     def func_def(self) -> ParseResult:
         """
-            func_def      : KEYWORD:DEF IDENTIFIER? fund_def_args
+            func_def      : KEYWORD:DEF IDENTIFIER? func_def_args optional_func_def_args?
                             (ARROW expr)|(NEWLINE statements KEYWORD:END)
         """
         result = ParseResult()
@@ -1840,12 +1845,12 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            # LPAREN
             errmsg = "expected '('."
         else:
             var_name_token = None
             errmsg = "expeted identifier or '('."
         
+        # LPAREN
         result = self.check_for_and_advance(result, errmsg, "LPAREN", None, "func_def")
 
         param_names_tokens: list[Token] = []
@@ -1858,7 +1863,7 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            # (COMMA IDENTIFIER)?
+            # (COMMA IDENTIFIER)*?
             while self.current_token.type == TT["COMMA"]:
                 result.register_advancement()
                 self.advance()
@@ -1881,6 +1886,66 @@ class Parser:
                 self.advance()
         
         result = self.check_for_and_advance(result, errmsg, "RPAREN", None, "func_def")
+        if result.error is not None:
+            return result
+
+        optional_params: list[tuple[Token, Node]] = []
+        # optional_func_def_args?
+        # LPAREN
+        if self.current_token.type == TT["LPAREN"]:
+            result = self.advance_and_check_for(
+                result, "expected identifier after '('", "IDENTIFIER", origin_file="func_def"
+            )
+            
+            identifier = self.current_token
+            result = self.advance_check_for_and_advance(
+                result, "expected '=' after identifier", "EQ", origin_file="func_def"
+            )
+            if result.error is not None:
+                return result
+            node = result.register(self.expr())
+            if result.error is not None:
+                return result
+            assert node is not None
+            assert not isinstance(node, list)
+            optional_params.append((identifier, node))
+
+            # (COMMA IDENTIFIER EQ expr)*?
+            while self.current_token.type == TT["COMMA"]:
+                result.register_advancement()
+                self.advance()
+
+                # IDENTIFIER
+                if self.current_token.type != TT["IDENTIFIER"]:
+                    if self.current_token.type == TT["KEYWORD"]:
+                        error_msg = "expected identifier after comma. NB: usage of keyword as identifier is illegal."
+                    elif self.current_token.type in TOKENS_NOT_TO_QUOTE:
+                        error_msg = f"expected identifier after comma, but got {self.current_token.type}."
+                    else:
+                        error_msg = f"expected identifier after comma, but got '{self.current_token.type}'."
+                    return result.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end, error_msg,
+                        "src.parser.parser.Parser.func_def"
+                    ))
+                
+                identifier = self.current_token
+                result = self.advance_check_for_and_advance(
+                    result, "expected '=' after identifier", "EQ", origin_file="func_def"
+                )
+                if result.error is not None:
+                    return result
+                node = result.register(self.expr())
+                if result.error is not None:
+                    return result
+                assert node is not None
+                assert not isinstance(node, list)
+                optional_params.append((identifier, node))
+
+            result = self.check_for_and_advance(
+                result, "expected ',' or ')'.", "RPAREN", None, "func_def"
+            )
+            if result.error is not None:
+                return result
 
         # ARROW expr
         if self.current_token.type == TT["ARROW"]:
@@ -1898,7 +1963,8 @@ class Parser:
                 var_name_token,
                 param_names_tokens,
                 body,
-                should_auto_return=True
+                should_auto_return=True,
+                optional_params=optional_params
             ))
 
         result = self.check_for_and_advance(result, "expected '->' or new line.", "NEWLINE", None, "func_def")
@@ -1922,7 +1988,8 @@ class Parser:
             var_name_token,
             param_names_tokens,
             body,
-            False
+            False,
+            optional_params
         ))
 
     def class_def(self) -> ParseResult:

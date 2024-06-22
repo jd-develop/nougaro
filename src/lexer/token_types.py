@@ -21,6 +21,7 @@ TT = {
     "IDENTIFIER": 'identifier',  # Identifier of a var name
     "KEYWORD": 'keyword',        # Keyword, like "var"
     "DOT": ".",                  # .
+    "DEFAULT": "<default>",      # The default value for an optional argument in a function
 
     "E_INFIX": "e",              # e infix in a number (123e12 is 123*10^12)
 

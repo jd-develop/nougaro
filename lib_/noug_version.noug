@@ -12,7 +12,11 @@ var _patch_and_phase_split = split(_noug_version_split(2), "-")
 var major = int(_noug_version_split(0))
 var minor = int(_noug_version_split(1))
 var patch = int(_patch_and_phase_split(0))
-var phase = _patch_and_phase_split(1)
+if len(_patch_and_phase_split) == 1 then
+    var phase = "stable"
+else
+    var phase = _patch_and_phase_split(1)
+end
 
 var release_serial = if len(_noug_version_split) == 4 then int(_noug_version_split(3)) else 0
 
@@ -25,7 +29,7 @@ def clean_version_for_gh()
     var os = __os_name__
     var os_version = __os_release__ + " " + __os_version__
     var nougaro_version = __noug_version__ + " (id: " + __version_id__ +\
-                                         ", data_version: " + __data_version__ + ")"
+                                             ", data_version: " + __data_version__ + ")"
     var final_str = \
         "* OS: " + os +\
         "\n* OS version: " + os_version +\

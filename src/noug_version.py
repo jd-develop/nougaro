@@ -32,9 +32,11 @@ def _read_noug_version_json():
         data_version: int = ver_json_loaded.get("data-version")
         lib_version: int = ver_json_loaded.get("lib-version")
 
-        version: str = f"{major}.{minor}.{patch}-{phase}"
-        if release_serial != 0:
-            version += f".{release_serial}"
+        version: str = f"{major}.{minor}.{patch}"
+        if phase != "stable":
+            version += f"-{phase}"
+            if release_serial != 0:
+                version += f".{release_serial}"
     return major, minor, patch, phase, release_serial, version, version_id, data_version, lib_version
 
 

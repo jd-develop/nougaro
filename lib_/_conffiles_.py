@@ -23,7 +23,7 @@ import src.conffiles
 # built-in python imports
 # no imports
 
-__LIB_VERSION__ = 3
+__LIB_VERSION__ = 4
 
 # constants
 CONFIG_DIRECTORY = String(src.conffiles.CONFIG_DIRECTORY, *default_pos())
@@ -84,7 +84,7 @@ class Conffiles(ModuleFunction):
         "param_names": ["file_name"],
         "optional_params": ["not_found_ok"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -140,7 +140,7 @@ class Conffiles(ModuleFunction):
         "param_names": ["file_name", "data"],
         "optional_params": ["read_only_ok", "incorrect_type_ok"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 

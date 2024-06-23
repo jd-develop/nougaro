@@ -20,7 +20,7 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import math
 
-__LIB_VERSION__ = 3
+__LIB_VERSION__ = 4
 
 # constants
 PI = Number(math.pi, *default_pos())
@@ -77,7 +77,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -110,7 +110,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -156,7 +156,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": ["n"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -202,7 +202,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": ["n"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -226,7 +226,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -250,7 +250,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -274,7 +274,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -298,7 +298,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -322,7 +322,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -353,7 +353,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -384,7 +384,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -408,7 +408,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -436,7 +436,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -487,7 +487,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": ["base"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -513,7 +513,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -551,7 +551,7 @@ class Math(ModuleFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 

@@ -19,7 +19,7 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import time
 
-__LIB_VERSION__ = 3
+__LIB_VERSION__ = 4
 
 # CONSTANTS
 TIMEZONE = Number(time.timezone, *default_pos())
@@ -64,7 +64,7 @@ class Time(ModuleFunction):
         "param_names": ["seconds"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -90,7 +90,7 @@ class Time(ModuleFunction):
         "param_names": ["milliseconds"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -103,7 +103,7 @@ class Time(ModuleFunction):
         "param_names": [],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -122,7 +122,7 @@ class Time(ModuleFunction):
         "param_names": [],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 

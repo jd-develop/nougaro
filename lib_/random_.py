@@ -19,7 +19,7 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import random
 
-__LIB_VERSION__ = 3
+__LIB_VERSION__ = 4
 
 
 class Random(ModuleFunction):
@@ -79,7 +79,7 @@ class Random(ModuleFunction):
         "param_names": ["a", "b"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -93,7 +93,7 @@ class Random(ModuleFunction):
         "param_names": [],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -122,7 +122,7 @@ class Random(ModuleFunction):
         "param_names": ["list_"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -150,7 +150,7 @@ class Random(ModuleFunction):
         "param_names": ["list_"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
     
@@ -174,7 +174,7 @@ class Random(ModuleFunction):
         "param_names": ["seed"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 

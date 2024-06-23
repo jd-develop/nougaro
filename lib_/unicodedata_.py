@@ -19,7 +19,7 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import unicodedata
 
-__LIB_VERSION__ = 3
+__LIB_VERSION__ = 4
 UNICODEDATA_VERSION = unicodedata.unidata_version
 
 
@@ -111,7 +111,7 @@ class UnicodeData(ModuleFunction):
         "param_names": ["name"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -147,7 +147,7 @@ class UnicodeData(ModuleFunction):
         "param_names": ["char"],
         "optional_params": ["default"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -170,7 +170,7 @@ class UnicodeData(ModuleFunction):
         "param_names": ["char"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -193,7 +193,7 @@ class UnicodeData(ModuleFunction):
         "param_names": ["char"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -216,7 +216,7 @@ class UnicodeData(ModuleFunction):
         "param_names": ["char"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -239,7 +239,7 @@ class UnicodeData(ModuleFunction):
         "param_names": ["char"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -262,7 +262,7 @@ class UnicodeData(ModuleFunction):
         "param_names": ["char"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -285,7 +285,7 @@ class UnicodeData(ModuleFunction):
         "param_names": ["char"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -318,7 +318,7 @@ class UnicodeData(ModuleFunction):
         "param_names": ["form", "uni_str"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -352,7 +352,7 @@ class UnicodeData(ModuleFunction):
         "param_names": ["form", "uni_str"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 

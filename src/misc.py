@@ -123,5 +123,5 @@ class BuiltinFunctionDict(TypedDict):
     param_names: list[str]
     optional_params: list[str]
     should_respect_args_number: bool
-    run_noug_dir_work_dir: bool
-    noug_dir: bool  # if run_noug_dir_work_dir is True then this is False
+    run_noug_dir: bool
+    noug_dir: bool  # if run_noug_dir is True then this is False

@@ -19,7 +19,7 @@ from lib_.lib_to_make_libs import *  # useful stuff to make libs.
 # built-in python imports
 import webbrowser
 
-__LIB_VERSION__ = 3
+__LIB_VERSION__ = 4
 
 
 class WebBrowserError(RunTimeError):
@@ -102,7 +102,7 @@ class WebBrowser(ModuleFunction):
         "param_names": ["url"],
         "optional_params": ["new", "autoraise"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 

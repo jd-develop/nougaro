@@ -55,8 +55,6 @@ class Interpreter:
         self._methods = None
         self.init_methods()
         assert self._methods is not None
-        assert self.work_dir is not None, ("please report this bug on "
-                                           "https://github.com/jd-develop/nougaro/issues/new/choose")
         
     def init_methods(self):
         self._methods = {

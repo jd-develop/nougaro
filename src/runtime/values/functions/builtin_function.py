@@ -29,6 +29,7 @@ import os
 import random
 import sys
 import subprocess
+import pathlib
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.runtime.interpreter import Interpreter
@@ -91,8 +92,8 @@ class BuiltInFunction(BaseBuiltInFunction):
             return result
 
         # special built-in functions that needs the 'run' function (in nougaro.py) in their arguments
-        if method_dict["run_noug_dir_work_dir"]:
-            return_value = result.register(method(self, exec_ctx, run, noug_dir, work_dir))
+        if method_dict["run_noug_dir"]:
+            return_value = result.register(method(self, exec_ctx, run, noug_dir))
 
             # if there is any error
             if result.should_return():
@@ -159,7 +160,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": [],
         "should_respect_args_number": False,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
     
@@ -189,7 +190,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["value"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -219,7 +220,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["value"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -249,7 +250,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["value"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -283,7 +284,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["value"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -323,7 +324,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["value", "easteregg?"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -357,7 +358,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["value"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -385,7 +386,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["text_to_display"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -420,7 +421,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["text_to_display"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -459,7 +460,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["text_to_display"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -474,7 +475,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": [],
         "should_respect_args_number": False,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -492,7 +493,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -510,7 +511,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -528,7 +529,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -546,7 +547,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -564,7 +565,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -582,7 +583,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -600,7 +601,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -618,7 +619,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -636,7 +637,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -654,7 +655,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -685,7 +686,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["list", "value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -734,7 +735,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["list"],
         "optional_params": ["index"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -778,7 +779,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["list", "value"],
         "optional_params": ["index"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -844,7 +845,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["list1", "list2"],
         "optional_params": ["delete_duplicates"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -885,7 +886,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["list", "index"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -935,7 +936,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["list", "index", "value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -991,7 +992,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["list"],
         "optional_params": ["ignore_not_num"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1048,7 +1049,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["list"],
         "optional_params": ["ignore_not_num"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1091,7 +1092,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["str"],
         "optional_params": ["char"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1111,7 +1112,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["code"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1129,7 +1130,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1148,7 +1149,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1171,7 +1172,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1194,7 +1195,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1217,7 +1218,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1242,7 +1243,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1271,7 +1272,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1285,6 +1286,11 @@ class BuiltInFunction(BaseBuiltInFunction):
         is_there_a_type = isinstance(type_, String)
         if is_there_a_type and type_.value == "printer":
             link = "jeg_TJvkSjg"
+        elif is_there_a_type and type_.value.lower() in [
+            "medieval", "rīċa ēastlēah", "ēastlēah", "englisċ",
+            "nā ne forġife iċ þē"
+        ]:
+            link = "cErgMJSgpv0"
         else:
             link = "dQw4w9WgXcQ"
         import webbrowser
@@ -1296,11 +1302,11 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["type"],
         "should_respect_args_number": False,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
-    def execute_run(self, exec_ctx: Context, run: RunFunction, noug_dir: str, work_dir: str):
+    def execute_run(self, exec_ctx: Context, run: RunFunction, noug_dir: str):
         """Run code from another file. Param 'run' is the 'run' function in nougaro.py"""
         # Params :
         # * file_name
@@ -1320,11 +1326,13 @@ class BuiltInFunction(BaseBuiltInFunction):
             with open(file_name, 'r+', encoding='UTF-8') as file:
                 script = file.read()
                 file.close()
+            parent_directory = pathlib.Path(os.path.abspath(file_name)).parent
         except FileNotFoundError:
             try:
                 with open(os.path.abspath(noug_dir + '/' + file_name), 'r+', encoding='UTF-8') as file:
                     script = file.read()
                     file.close()
+                parent_directory = pathlib.Path(noug_dir + '/' + file_name).parent
             except FileNotFoundError:
                 return RTResult().failure(RTFileNotFoundError(
                     self.pos_start, self.pos_end,
@@ -1344,6 +1352,8 @@ class BuiltInFunction(BaseBuiltInFunction):
                 f"failed to load script '{file_name}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
                 exec_ctx, origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_run"
             ))
+
+        work_dir = str(parent_directory)
 
         # we run the script
         assert exec_ctx.parent is not None
@@ -1367,11 +1377,11 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["file_name"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": True,
+        "run_noug_dir": True,
         "noug_dir": False
     }
 
-    def execute_example(self, exec_ctx: Context, run: RunFunction, noug_dir: str, work_dir: str):
+    def execute_example(self, exec_ctx: Context, run: RunFunction, noug_dir: str):
         """Run code from an example file. Param 'run' is the 'run' function in nougaro.py"""
         # Params :
         # * example_name
@@ -1389,7 +1399,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         return_example_value = exec_ctx.symbol_table.getf("return_example_value")
         if return_example_value is None:
             return_example_value = Number(False, self.pos_start, self.pos_end)
-
+        
         if not isinstance(return_example_value, Number):
             return RTResult().failure(RTTypeErrorF(
                 return_example_value.pos_start, return_example_value.pos_end,
@@ -1397,43 +1407,18 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_example"
             ))
 
-        return_example_value = return_example_value.is_true()
-
         file_name = os.path.abspath(noug_dir + "/examples/" + example_name.value + ".noug")
-
-        try:  # we try to open the example file
-            with open(file_name, 'r+', encoding='UTF-8') as file:
-                script = file.read()
-                file.close()
-        except FileNotFoundError:
-            return RTResult().failure(RTFileNotFoundError(
-                self.pos_start, self.pos_end,
-                file_name,
-                exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_example"
-            ))
-        except Exception as e:
-            return RTResult().failure(RunTimeError(
-                self.pos_start, self.pos_end,
-                f"failed to load script '{file_name}' due to internal error '{str(e.__class__.__name__)}: {str(e)}'.",
-                exec_ctx, origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_example"
-            ))
-
-        assert exec_ctx.parent is not None
-        # then we execute the file
-        value, error, _ = run(
-            file_name, script, noug_dir,
-            exec_from=f"{exec_ctx.display_name} from {exec_ctx.parent.display_name}",
-            actual_context=f"{exec_ctx.parent.display_name}",
-            args=self.cli_args,
-            work_dir=work_dir
+        
+        exec_ctx.symbol_table.set(
+            "file_name", String(file_name, self.pos_start, self.pos_end)
         )
 
-        if error is not None:  # we check for errors
-            return RTResult().failure(error)
-        assert value is not None
+        if return_example_value.is_true():
+            return self.execute_run(exec_ctx, run, noug_dir)
 
-        if return_example_value:
-            return RTResult().success(value)
+        result = self.execute_run(exec_ctx, run, noug_dir)
+        if result.error is not None:
+            return result
         return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
     builtin_functions["example"] = {
@@ -1441,7 +1426,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["example_name", "return_example_value"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": True,
+        "run_noug_dir": True,
         "noug_dir": False
     }
 
@@ -1473,7 +1458,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["cmd"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1496,7 +1481,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1519,7 +1504,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["value"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1568,7 +1553,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["song"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1634,7 +1619,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["print_in_term"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": True
     }
 
@@ -1661,7 +1646,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["word"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1689,11 +1674,11 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["type"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
-    def execute___test__(self, exec_ctx: Context, run: RunFunction, noug_dir: str, work_dir: str):
+    def execute___test__(self, exec_ctx: Context, run: RunFunction, noug_dir: str):
         """Execute the test file."""
         # optional params:
         # * return
@@ -1713,19 +1698,19 @@ class BuiltInFunction(BaseBuiltInFunction):
         src.conffiles.write_data("SHOULD_TEST_PRINT_OK", str(int(should_i_print_ok.is_true())))
 
         if should_i_return.is_true():
-            return self.execute_run(exec_ctx, run, noug_dir, work_dir)
-        else:
-            result = self.execute_run(exec_ctx, run, noug_dir, work_dir)
-            if result.error is not None:
-                return result
-            return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
+            return self.execute_run(exec_ctx, run, noug_dir)
+        
+        result = self.execute_run(exec_ctx, run, noug_dir)
+        if result.error is not None:
+            return result
+        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
     builtin_functions["__test__"] = {
         "function": execute___test__,
         "param_names": [],
         "optional_params": ["print_OK", "return"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": True,
+        "run_noug_dir": True,
         "noug_dir": False
     }
 
@@ -1764,7 +1749,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["chr"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1803,7 +1788,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["ord"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1858,7 +1843,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": [],
         "optional_params": ["print_values"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": True
     }
 
@@ -1892,7 +1877,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["number"],
         "optional_params": ["n_digits"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
     
@@ -1924,7 +1909,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["list_"],
         "optional_params": ["mode"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1955,7 +1940,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["list_or_str"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -1991,7 +1976,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["str_", "startswith"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -2027,7 +2012,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["str_", "endswith"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -2059,7 +2044,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["source"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -2084,7 +2069,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "param_names": ["path"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 

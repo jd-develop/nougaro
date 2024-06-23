@@ -535,7 +535,6 @@ def test_nougaro(print_OK)
     print("* exit")
     print("* clear")
     print("* run")
-    print("* example")
     print("* __test__")
 
     assert print != void
@@ -553,6 +552,10 @@ def test_nougaro(print_OK)
     assert print_ret(1) == "1"
     assert print_ret(123.456) == "123.456"
     assert print_ret(hello) == hello
+
+    assert example('stack') == None
+    assert is_none(example('stack'))
+    assert example('stack', True) == [Stack, copy_stack, destructive_print, print_stack]
 
     if print_OK then print("OK builtin funcs 1")
 

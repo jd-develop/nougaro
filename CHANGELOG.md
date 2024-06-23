@@ -14,6 +14,8 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 
 ### Changed
 * Version ID has been increased to `7`.
+* Lib version has been increased to `4`.
+* Key `"run_noug_dir_work_dir"` in BuiltinFunction dictionnaries (and in libs too) was renamed to `"run_noug_dir"`.
 * `(Internal API)` `dived_by` and `floor_dived_by` methods in Values are now renamed to `divided_by` and `floor_divided_by`.
 
 ### Removed
@@ -21,6 +23,7 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 
 ### Fixed
 * Fixed position start and end of duplicate arguments error messages.
+* `__test__` and `example` builtin functions now work from every location in the filesystem.
 
 ## 0.21.0-beta (2024-06-11) [YANKED]
 

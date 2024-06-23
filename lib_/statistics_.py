@@ -19,7 +19,7 @@ from lib_.lib_to_make_libs import *
 # built-in python imports
 import statistics
 
-__LIB_VERSION__ = 3
+__LIB_VERSION__ = 4
 
 
 class RTStatisticsError(RunTimeError):
@@ -93,7 +93,7 @@ class Statistics(ModuleFunction):
         "param_names": ["data"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -153,7 +153,7 @@ class Statistics(ModuleFunction):
         "param_names": ["data"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -254,7 +254,7 @@ class Statistics(ModuleFunction):
         "param_names": ["data"],
         "optional_params": ["weights"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -303,7 +303,7 @@ class Statistics(ModuleFunction):
         "param_names": ["data"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -457,7 +457,7 @@ class Statistics(ModuleFunction):
         "param_names": ["data"],
         "optional_params": ["n", "method"],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
     
@@ -499,7 +499,7 @@ class Statistics(ModuleFunction):
         "param_names": ["data"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -541,7 +541,7 @@ class Statistics(ModuleFunction):
         "param_names": ["data"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 
@@ -581,7 +581,7 @@ class Statistics(ModuleFunction):
         "param_names": ["data"],
         "optional_params": [],
         "should_respect_args_number": True,
-        "run_noug_dir_work_dir": False,
+        "run_noug_dir": False,
         "noug_dir": False
     }
 

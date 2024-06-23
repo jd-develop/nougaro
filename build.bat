@@ -14,7 +14,9 @@ pause
 
 echo The following Python version will be used:
 python --version
-echo You can stop this script now if this is not correct.
+echo Please make sure that you use a Python version supported by Nougaro AND Nuitka
+echo Moreover, you will need Windows 10 or any later version to run this script.
+echo You can stop this script now if you want.
 pause
 
 rem We update pip and nuitka
@@ -27,8 +29,7 @@ for %%y in (.\.gitignore, .\.gitattributes, example_file, grammar.txt, tests.nou
 for %%y in (.\.git, .\.github, .\.vscode, .\.idea, .\__pycache__, src\__pycache__, src\errors\__pycache__, src\lexer\__pycache__, src\parser\__pycache__, src\runtime\__pycache__, src\runtime\values\__pycache__, src\runtime\values\basevalues\__pycache__, src\runtime\values\functions\__pycache__, lib_\runtime\values\tools\__pycache__, sandbox) do if exist %%y (rmdir /s /q %%y)
 
 rem Then we ask for the version
-set /p NOUGVERSION="Nougaro version: "
-set /p NOUGPHASE="Phase: "
+set NOUGVERSION=python shell.py --version
 
 rem We build
 python -m nuitka --standalone --windows-company-name=Nougaro --windows-product-name=Nougaro --windows-product-version=%NOUGVERSION% --include-package=lib_ --no-deployment-flag=self-execution shell.py
@@ -39,4 +40,9 @@ for %%y in (example.noug LICENSE README.md README.fr.md shell.py "CODE_OF_CONDUC
 for %%y in (examples lib_ src tests repo-image) do xcopy /s /i %%y shell.dist\%%y
 
 rem Then we rename our directory
-RENAME shell.dist nougaro-"%NOUGVERSION%"-%NOUGPHASE%-windows-exe
+RENAME shell.dist nougaro-"%NOUGVERSION%"-windows-exe
+
+rem Finally, we compress the output directory to a .zip file
+rem Note: Windows 10 cames with tar
+tar -a -c -f nougaro-"%NOUGVERSION%"-windows-exe.zip nougaro-"%NOUGVERSION%"-windows-exe
+

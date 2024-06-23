@@ -4,17 +4,17 @@
 
 ![Nougaro. Un langage de programmation.](repo-image/repo-image.png)
 
-Voici Nougaro bêta `0.21.0`.
+Voici Nougaro bêta `0.22.0`.
 
  Nougaro est un langage de programmation, interprété en Python.
 
 ## Modules tiers (optionnels)
 
- Modules pas toujours fournis avec Python (pourquoi&nbsp;?)&nbsp;:
+ Modules pas toujours fournis avec Python&nbsp;:
 
 * `colorama` (`pip install colorama`)
 
- Sous Linux&nbsp;:
+ Sous GNU/Linux, pour permetter de naviguer dans l’historique des commandes en utilisant les flèches du clavier&nbsp;:
 
 * `readline` (`pip install readline`)
 
@@ -23,7 +23,7 @@ Voici Nougaro bêta `0.21.0`.
  Exécutez le shell avec `python3 shell.py`. Ouvrez des fichiers avec `python3 shell.py nomdufichier.extention`.
  Généralement, on utilise l'extension `.noug` pour les fichiers Nougaro.
 
- Le code est compilé pour Windows et Linux. Disponible dans l'onglet [releases](https://github.com/jd-develop/nougaro/releases/)&nbsp;!
+ Le code est compilé pour Windows et GNU/Linux. Disponible dans l'onglet [releases](https://github.com/jd-develop/nougaro/releases/)&nbsp;!
  
  Prend en charge Python 3.11 et 3.12.
 

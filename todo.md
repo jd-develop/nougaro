@@ -70,7 +70,7 @@
 
 * [X] Add expected type in data Nougaro stores (conffiles) (finished 6/6/2024)
 * [ ] create highlight extension for VSCode
-* [ ] add optional arguments in functions
+* [X] add optional arguments in functions (finished 23/06/2024)
   * [X] Lexer:
     * [X] Add the `<default>` token (finished 22/06/2024)
   * [X] Parser:
@@ -81,7 +81,7 @@
       * [X] Check args (finished 27/05/2024, updated 22/06/2024)
       * [X] Populate args (finished 28/05/2024, updated 22/06/2024)
     * [X] Update Interpreter visit methods (finished 22/06/2024)
-  * [ ] Add tests
+  * [X] Add tests (finished 23/06/2024)
 
 ## Future releases
 

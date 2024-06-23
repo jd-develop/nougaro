@@ -416,6 +416,34 @@ def test_nougaro(print_OK)
     assert this_is_a_function != func
     assert this_is_a_function == another_func != None
 
+    def function_with_optional_params1(a, b)(c = 2) -> (a+b)*c
+    def function_with_optional_params2(a, b)(c = 2, d = 4)
+        var intermediate_var = a+b
+        var intermediate_var2 = c+d
+        return intermediate_var * intermediate_var2
+    end
+
+    assert function_with_optional_params1(1, 2) == 6
+    assert function_with_optional_params1(1, 2, <default>) == 6
+    assert function_with_optional_params1(1, 2, 3) == 9
+    assert function_with_optional_params1("foo_", "bar ") == "foo_bar foo_bar "
+    assert function_with_optional_params1("foo_", "bar", 1) == "foo_bar"
+
+    assert function_with_optional_params2(1, 2) == 18
+    assert function_with_optional_params2(1, 2, <default>) == 18
+    assert function_with_optional_params2(1, 2, <default>, <default>) == 18
+    assert function_with_optional_params2(1, 2, 0, <default>) == 12
+    assert function_with_optional_params2(1, 2, 3) == 21
+    assert function_with_optional_params2(1, 2, 3, <default>) == 21
+    assert function_with_optional_params2(1, 2, <default>, 5) == 21
+    assert function_with_optional_params2("foo_", "bar ") == "foo_bar foo_bar foo_bar foo_bar foo_bar foo_bar "
+    assert function_with_optional_params2("foo_", "bar ", <default>, <default>) == "foo_bar foo_bar foo_bar foo_bar foo_bar foo_bar "
+    assert function_with_optional_params2("foo_", "bar", 1) == "foo_bar"*5
+    assert function_with_optional_params2("foo_", "bar", 1, <default>) == "foo_bar"*5
+    assert function_with_optional_params2("foo_", "bar", 1, 0) == "foo_bar"
+    assert function_with_optional_params2("foo_", "bar", <default>, 0) == "foo_bar"*2
+    assert function_with_optional_params2("foo_", "bar", 0, 0) == ""
+
     if print_OK then print("OK func")
 
     ## call

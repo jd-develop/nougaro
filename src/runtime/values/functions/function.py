@@ -99,19 +99,15 @@ class Function(BaseFunction):
         if result.should_return() and result.function_return_value is None:
             return result
 
-        # I took a moment to understand the following line, so I put a long comment to explain it
-        # * should_auto_return is for the syntax `def foo()->bar`
-        # * function_return_value is the value after the `return` statement.
-        # So, here:
-        # * if this is a one-line function: return_value is the value inside the function
-        # * if this is a multi-line function with a `return` statement, we have `None or (value) or (NoneValue)`: Python
-        #   takes the value
-        # * if this is a multi-line function without a `return` statement, we have `None or None or (NoneValue)`: Python
-        #   takes the NoneValue
-        return_value = \
-            (value if self.should_auto_return else None) or \
-            result.function_return_value or \
-            NoneValue(self.pos_start, self.pos_end, False)
+        if self.should_auto_return:  # syntax `def foo()->bar`
+            return_value = value
+        elif result.function_return_value is not None:  # value after the `return` statement
+            return_value = result.function_return_value
+        else:
+            return_value = NoneValue(self.pos_start, self.pos_end, False)
+        
+        if return_value is None:
+            return_value = NoneValue(self.pos_start, self.pos_end, False)
         return result.success(return_value)
 
     def copy(self):

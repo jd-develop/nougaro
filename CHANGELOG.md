@@ -24,6 +24,7 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 ### Fixed
 * Fixed position start and end of duplicate arguments error messages.
 * `__test__` and `example` builtin functions now work from every location in the filesystem.
+* Fixed functions returning `None` if their return value was interpreted as `False` (empty string, empty list, …)
 
 ## 0.21.0-beta (2024-06-11) [YANKED]
 

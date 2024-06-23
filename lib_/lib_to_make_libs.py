@@ -92,7 +92,7 @@ class ModuleFunction(BaseBuiltInFunction):
 
         # special built-in functions that needs the 'run' function (in nougaro.py) in their arguments
         if method_dict["run_noug_dir"]:
-            return_value = result.register(method(self, exec_context, run, noug_dir, work_dir))
+            return_value = result.register(method(self, exec_context, run, noug_dir))
 
             # if there is any error
             if result.should_return():

@@ -30,6 +30,13 @@ def test_nougaro(print_OK)
      *   */
      *  # comment
      */
+    /* comment 
+    /* comment-inside comment*/
+    /*
+       /* comment-ception */
+    */
+    comment
+    */
 
     assert $ == "$"
     assert $test == "$test"
@@ -39,7 +46,9 @@ def test_nougaro(print_OK)
     assert b?c?2 == 2
     assert b?c?d?a?e?4 == 1
 
-    if print_OK then /* comment */ assert $print("OK print & comments") == None /* comment */ # comment
+    if print_OK then /* comment */ assert $print( /* comment */ "OK print & comments" /*
+    
+    */) == None /* comment */ # comment
 
     # basic syntax
     "a" ; "b"
@@ -563,7 +572,9 @@ def test_nougaro(print_OK)
     print("* exit")
     print("* clear")
     print("* run")
-    print("* __test__")
+    print(/*
+    testing comments
+    */"* __test__")
 
     assert print != void
     assert void != 3

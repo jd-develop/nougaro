@@ -28,7 +28,7 @@ class BaseFunction(Value):
         super().__init__(pos_start, pos_end)
         self.name: str = name if name is not None else '<function>'
         # (if 'name' is None, we have something like `def()->foo`)
-        self.type_ = 'BaseFunction'
+        self.type_ = 'func'
         self.call_with_module_context: bool = call_with_module_context
     
     def __repr__(self) -> str:

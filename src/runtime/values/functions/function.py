@@ -36,7 +36,6 @@ class Function(BaseFunction):
         self.param_names = param_names
         self.optional_params = optional_params
         self.should_auto_return = should_auto_return
-        self.type_ = "func"
 
     def __repr__(self):
         return f'<function {self.name}>'

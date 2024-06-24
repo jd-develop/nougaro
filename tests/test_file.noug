@@ -603,7 +603,8 @@ def test_nougaro(print_OK)
     assert type(3.14) == "float"
     assert type([1, 2, 3]) == "list"
     assert type(def()->null) == "func"
-    assert type(type) == "built-in func"
+    assert type(type) == "func"
+    assert type(time.time) == "func"
     assert "List" in __py_type__([])
     # type(method) is tested in classes
 

@@ -25,7 +25,6 @@ class BaseBuiltInFunction(BaseFunction):
     """Parent class for all the built-in function classes (even in modules)"""
     def __init__(self, name: str, pos_start: Position, pos_end: Position, call_with_module_context: bool = False):
         super().__init__(name, pos_start, pos_end, call_with_module_context)
-        self.type_ = 'built-in func'
 
     def __repr__(self):
         return f'<built-in function {self.name}>'

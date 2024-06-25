@@ -30,6 +30,7 @@ from src.runtime.context import Context
 from src.runtime.values.basevalues.value import Value
 from src.runtime.values.basevalues.basevalues import String, List, NoneValue
 from src.misc import nice_str_from_idk
+from src.constants import NOUGARO_IGNORE
 import src.noug_version
 import src.conffiles
 # built-in python imports
@@ -101,6 +102,26 @@ def run(
     # we make tokens with the Lexer
     if text is None:
         return NoneValue(DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy(), False), None, lexer_metas
+    
+    # Skip the NOUGAROIGNORE comments ###############
+    lines = text.split("\n")
+    new_lines: list[str] = []
+    should_skip_lines = False
+    for line in lines:
+        line_to_check = line
+        while line_to_check.startswith((" ", "\t", "\N{NBSP}", "\N{NNBSP}")):
+            line_to_check = line_to_check[1:]
+        if line_to_check in NOUGARO_IGNORE:
+            should_skip_lines = not should_skip_lines
+            if not should_skip_lines:
+                line = "#"*len(line)
+        if not should_skip_lines:
+            new_lines.append(line)
+        else:
+            new_lines.append("#"*len(line))
+    text = "\n".join(new_lines)
+    # ###############################################
+
     lexer = Lexer(file_name, text, previous_metas=lexer_metas)
     tokens, error = lexer.make_tokens()
     lexer_metas = lexer.metas

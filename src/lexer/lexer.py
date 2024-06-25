@@ -12,7 +12,7 @@
 from src.lexer.position import Position
 from src.lexer.token import Token
 from src.lexer.token_types import TT, KEYWORDS
-from src.constants import LETTERS, DIGITS, LETTERS_DIGITS, IDENTIFIERS_LEGAL_CHARS, LEXER_IGNORE
+from src.constants import LETTERS, DIGITS, LETTERS_DIGITS, IDENTIFIERS_LEGAL_CHARS
 from src.errors.errors import InvalidSyntaxError, IllegalCharError, Error
 import src.conffiles
 # built-in python imports
@@ -26,26 +26,7 @@ class Lexer:
     """Transforms code into a list of tokens (lexical units)"""
     def __init__(self, file_name: str, text: str, previous_metas: dict[str, str | bool] | None = None):
         self.file_name: str = file_name  # name of the file we're executing
-
-        # Skip the NOUGAROIGNORE comments ###############
-        lines = text.split("\n")
-        new_lines: list[str] = []
-        should_skip_lines = False
-        for line in lines:
-            line_to_check = line
-            while line_to_check.startswith((" ", "\t", "\N{NBSP}", "\N{NNBSP}")):
-                line_to_check = line_to_check[1:]
-            if line_to_check in LEXER_IGNORE:
-                should_skip_lines = not should_skip_lines
-                if not should_skip_lines:
-                    line = "#" + line
-            if not should_skip_lines:
-                new_lines.append(line)
-            else:
-                new_lines.append("#" + line)
-        # ###############################################
-
-        self.text = "\n".join(new_lines)  # raw code we have to execute
+        self.text = text  # raw code we have to execute
         self.pos = Position(-1, 0, -1, file_name, text)  # actual position of the lexer
         self.current_char: str | None = None
         if previous_metas is not None:

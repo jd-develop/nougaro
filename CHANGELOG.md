@@ -8,6 +8,8 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 
 ## 0.22.0-beta (unreleased)
 
+This version comes with a new huge functionnality – optional parameters –, rather big bug fixes, as well as smaller tweaks and fixes.
+
 ### Added
 * Added optional parameters to function definitions. Use `def identifier(mendatory1, mendatory2)(optional1=default_value, optional2=default_value)` to define optional parameters. When you call the function, you can omit the optional arguments. If you want to leave `optional1` to its default value but to change `optional2`, you can use `identifier(mendatory1, mendatory2, <default>, new_value)`.
 * Added the `<default>` token, and the `<default>` value.
@@ -18,7 +20,7 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 * Key `"run_noug_dir_work_dir"` in BuiltinFunction dictionnaries (and in libs too) was renamed to `"run_noug_dir"`.
 * Type of functions is now `func`, regardless of if they are functions or built-in functions. However, type of methods is still `method`.
 * Modules and functions are now True in boolean context (i.e. in a condition)
-* `round` built-in function now returns `int` if `n_digits` ⩽ 0.
+* `round` built-in function now returns `int` if `n_digits` ⩽ 0, not only for `n_digits` = 0.
 * `__how_many_lines_of_code__` now accepts any value as argument (it checks if the value is true).
 * `(Internal API)` `dived_by` and `floor_dived_by` methods in Values are now renamed to `divided_by` and `floor_divided_by`.
 * `(Build scripts)` (Windows) The Nougaro version is now automatically fetched.
@@ -51,7 +53,7 @@ This version is small but contains a rather big crash fix, as well as a deprecat
 
 ### Fixed
 * Fixed a crash when giving too many arguments to a function having the property `should_respect_args_number` set to `False`.
-* Fixed a bug with `position_end` of call nodes (it was just before the closing parenthese)
+* Fixed a bug with `position_end` of call nodes (it was just before the closing parentesis)
 
 ## 0.20.0-beta (2024-06-06)
 

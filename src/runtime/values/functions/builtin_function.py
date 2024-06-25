@@ -740,7 +740,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     }
 
     def execute_insert(self, exec_ctx: Context):
-        """Remove element at 'index' from 'list'"""
+        """Insert element at index 'index' in 'list'"""
         # Params:
         # * list
         # * value
@@ -1870,7 +1870,12 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_round"
             ))
 
-        return RTResult().success(Number(round(number_, n_digits.value), self.pos_start, self.pos_end))
+        if n_digits.value <= 0:
+            result = int(round(number_, n_digits.value))
+        else:
+            result = round(number_, n_digits.value)
+        
+        return RTResult().success(Number(result, self.pos_start, self.pos_end))
 
     builtin_functions["round"] = {
         "function": execute_round,

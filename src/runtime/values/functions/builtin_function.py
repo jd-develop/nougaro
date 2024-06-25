@@ -1799,7 +1799,9 @@ class BuiltInFunction(BaseBuiltInFunction):
         all_files: dict[str, int] = {}
 
         print_values = exec_ctx.symbol_table.getf("print_values")
-        print_ = not (print_values and isinstance(print_values, Number) and print_values.is_false())
+        if print_values is None:
+            print_values = Number(True, self.pos_start, self.pos_end)
+        print_ = print_values.is_true()
         if print_:
             print("Computing...")
 

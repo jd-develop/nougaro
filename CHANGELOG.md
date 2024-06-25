@@ -19,6 +19,7 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 * Type of functions is now `func`, regardless of if they are functions or built-in functions. However, type of methods is still `method`.
 * Modules and functions are now True in boolean context (i.e. in a condition)
 * `round` built-in function now returns `int` if `n_digits` ⩽ 0.
+* `__how_many_lines_of_code__` now accepts any value as argument (it checks if the value is true).
 * `(Internal API)` `dived_by` and `floor_dived_by` methods in Values are now renamed to `divided_by` and `floor_divided_by`.
 * `(Build scripts)` (Windows) The Nougaro version is now automatically fetched.
 

@@ -725,6 +725,7 @@ def test_nougaro(print_OK)
     if print_OK then print("OK builtin funcs 10")
 
     assert __how_many_lines_of_code__(False) != 0
+    assert __how_many_lines_of_code__(class->None) != 0  # this is to test 1/ if constructors are false and 2/ if this function accepts every value
     assert __how_many_lines_of_code__(False) > 10000  # yes I know, I write a lot of code ;)
 
     if print_OK then print("OK builtin funcs 11")

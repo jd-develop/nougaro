@@ -496,6 +496,8 @@ def test_nougaro(print_OK)
         end
     end
 
+    assert type(Test2) == "constructor"
+    assert not Test2
     assert Test2 == Test2
     assert not Test2 != Test2
     assert Test2 != Test

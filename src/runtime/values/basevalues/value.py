@@ -284,11 +284,11 @@ class Value:
         return False
 
     def is_true(self) -> bool:
-        """Return PYTHON BOOLEAN True or False depending on if the value is the NOUGARO VALUE for True or not"""
+        """Return PYTHON BOOLEAN True or False depending on if the NOUGARO value is True or not"""
         return False
 
     def is_false(self) -> bool:
-        """Return PYTHON BOOLEAN True or False depending on if the value is the NOUGARO VALUE for False or not"""
+        """Return PYTHON BOOLEAN True or False depending on if the NOUGARO value is False or not"""
         return not self.is_true()
 
     def illegal_operation(self, other: Value | None = None) -> RunTimeError:

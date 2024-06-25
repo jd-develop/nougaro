@@ -16,6 +16,8 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 * Version ID has been increased to `7`.
 * Lib version has been increased to `4`.
 * Key `"run_noug_dir_work_dir"` in BuiltinFunction dictionnaries (and in libs too) was renamed to `"run_noug_dir"`.
+* Type of functions is now `func`, regardless of if they are functions or built-in functions. However, type of methods is still `method`.
+* Modules are now True in boolean context (i.e. in a condition)
 * `(Internal API)` `dived_by` and `floor_dived_by` methods in Values are now renamed to `divided_by` and `floor_divided_by`.
 * `(Build scripts)` (Windows) The Nougaro version is now automatically fetched.
 

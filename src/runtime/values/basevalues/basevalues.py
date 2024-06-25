@@ -662,7 +662,7 @@ class Module(Value):
         return self.__repr__()
 
     def is_true(self):
-        return False
+        return True
 
     def is_eq(self, other: Value):
         return isinstance(other, Module) and other.name == self.name

@@ -809,6 +809,7 @@ def test_nougaro(print_OK)
     if print_OK then print("OK hello lib")
 
     import math
+    assert math
     assert math.sqrt_pi == math.sqrt(math.pi)
     assert math.sqrt_tau == math.sqrt(math.tau)
     assert math.tau == math.pi*2

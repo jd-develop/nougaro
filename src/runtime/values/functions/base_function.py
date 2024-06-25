@@ -40,6 +40,9 @@ class BaseFunction(Value):
     def to_str(self):
         return String(repr(self), self.pos_start, self.pos_end).set_context(self.context), None
 
+    def is_true(self):
+        return True
+
     def generate_new_context(self, use_self_context_ctx_table: bool = False):
         """Generates a new context with the right name, the right parent context and the right position"""
         # print(self.context)

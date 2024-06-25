@@ -453,6 +453,8 @@ def test_nougaro(print_OK)
     assert function_with_optional_params2("foo_", "bar", <default>, 0) == "foo_bar"*2
     assert function_with_optional_params2("foo_", "bar", 0, 0) == ""
 
+    assert function_with_optional_params1
+
     if print_OK then print("OK func")
 
     ## call
@@ -516,6 +518,8 @@ def test_nougaro(print_OK)
     assert d.method2 != d.method
     assert not d.method2 == d.method
 
+    assert d.method
+
     class Test3(Test2)
         var b = 4
 
@@ -563,6 +567,8 @@ def test_nougaro(print_OK)
     assert not is_object(e)
     assert not is_object(Test4().bar)
 
+    if print_OK then print("OK classes and objects")
+
     # builtin funcs
     print("Please test these builtin functions after the execution of the test:")
     print("* input")
@@ -576,6 +582,7 @@ def test_nougaro(print_OK)
     testing comments
     */"* __test__")
 
+    assert print
     assert print != void
     assert void != 3
     assert system_call != __python__
@@ -638,6 +645,7 @@ def test_nougaro(print_OK)
     assert is_func(debug.disable)
     assert is_func(debug.print_context)
     assert is_func(debug.stop_print_context)
+    assert debug.print_context
 
     assert is_func(def()->null)
     assert is_none(None)
@@ -810,6 +818,7 @@ def test_nougaro(print_OK)
 
     import math
     assert math
+    assert math.sqrt
     assert math.sqrt_pi == math.sqrt(math.pi)
     assert math.sqrt_tau == math.sqrt(math.tau)
     assert math.tau == math.pi*2

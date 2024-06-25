@@ -1,6 +1,6 @@
 # /*
-# This file can be executed both in Python, Nougaro and C, using NOUGAROIGNORE and docstrings.
-# Change the extension of this file to allow GCC to recognise a C program
+# This file can be executed in Nougaro, Python, C and C++, using NOUGAROIGNORE and docstrings.
+# Change the extension of this file to allow GCC/G++ to recognise a C/C++ program
 # This is a simple FizzBuzz program.
 # */
 #include <stdio.h>
@@ -9,12 +9,18 @@
 ## NOUGAROIGNORE
 def fizzbuzz(n: int):
     """
-    Fizzbuzz algorithm that both work in Nougaro, Python and C
+    Fizzbuzz algorithm that work in Nougaro, Python, C and C++
     !"""
     """
 */
+# ifdef __cplusplus
+#include <iostream>
+void print(std::string x) {
+    std::cout << x << std::endl;
+# else
 void print(char *x) {
     printf("%s\n", x);
+# endif
 }
 /*
 #! NOUGAROIGNORE

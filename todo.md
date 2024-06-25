@@ -85,10 +85,8 @@
 
 ## Future releases
 
-* [ ] add `turtle`
-* [ ] add `socket`
-* [ ] add `requests`
-* [ ] add `tkinter`
+* [X] eventually remove protected variables (finished 20/01/2024)
+* [ ] add `loop` (infinite loop)
 * [ ] add unit tests
 * [ ] add complex numbers
 * [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
@@ -96,4 +94,8 @@
 * [ ] add `try catch`
 * [ ] add `raise`
 * [ ] add `assert ... crashes (on Error) (with message "...")`
-* [X] eventually remove protected variables (finished 20/01/2024)
+
+* [ ] add `tkinter`
+* [ ] add `turtle`
+* [ ] add `socket`
+* [ ] add `requests`

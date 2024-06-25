@@ -1,0 +1,124 @@
+# /*
+# This file can be executed both in Python, Nougaro and C, using NOUGAROIGNORE and docstrings.
+# Change the extension of this file to allow GCC to recognise a C program
+# This is a simple FizzBuzz program.
+# */
+#include <stdio.h>
+# /*
+
+## NOUGAROIGNORE
+def fizzbuzz(n: int):
+    """
+    Fizzbuzz algorithm that both work in Nougaro, Python and C
+    !"""
+    """
+*/
+void print(char *x) {
+    printf("%s\n", x);
+}
+/*
+#! NOUGAROIGNORE
+def fizzbuzz(n)
+## NOUGAROIGNORE
+# */
+void fizzbuzz(int n) {
+    for (int i = 1; i < n+1; i++) {
+    # /*
+    !"""
+
+    for i in range(1, n+1):
+        """
+    #! NOUGAROIGNORE
+    for i = 1 to n+1 then
+
+    ## NOUGAROIGNORE
+    */
+        if (i%15 == 0)
+    /* 
+        !"""
+        if i%15 == 0:
+            """        
+        #! NOUGAROIGNORE
+        if i%15 == 0 then
+        ## NOUGAROIGNORE
+            !"""
+        #! NOUGAROIGNORE
+        # */
+            print("fizzbuzz");
+        # /*
+        ## NOUGAROIGNORE
+        elif i%3 == 0:
+            """
+        */
+        else if (i%3 == 0)
+        /*
+        #! NOUGAROIGNORE
+        elif i%3 == 0 then
+        ## NOUGAROIGNORE
+            !"""
+            #! NOUGAROIGNORE
+            # */
+            print("fizz");
+            # /*
+        
+        ## NOUGAROIGNORE
+        elif i%5 == 0:
+            """        
+        #! NOUGAROIGNORE
+        elif i%5 == 0 then
+        ## NOUGAROIGNORE
+        */
+        else if (i%5 == 0)
+        /*
+            !"""
+            #! NOUGAROIGNORE
+            # */
+            print("buzz");
+            # /*
+        
+        ## NOUGAROIGNORE
+        else:
+            """        
+        #! NOUGAROIGNORE
+        # */
+        else
+        # /*
+        ## NOUGAROIGNORE
+            */
+            printf("%d\n", i);
+            /*
+            !"""
+            #! NOUGAROIGNORE
+            print(i);
+        ## NOUGAROIGNORE
+        """
+        #! NOUGAROIGNORE
+        end
+    end
+end
+## NOUGAROIGNORE
+
+*/
+    }
+}
+
+
+int main() {
+/*
+!"""
+#! NOUGAROIGNORE
+# */
+
+fizzbuzz(100);
+
+# /*
+## NOUGAROIGNORE
+"""
+# */
+    return 0;
+}
+
+# /*
+!"""
+#! NOUGAROIGNORE
+# */

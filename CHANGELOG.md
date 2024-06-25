@@ -13,6 +13,7 @@ This version comes with a new huge functionnality – optional parameters –, r
 ### Added
 * Added optional parameters to function definitions. Use `def identifier(mendatory1, mendatory2)(optional1=default_value, optional2=default_value)` to define optional parameters. When you call the function, you can omit the optional arguments. If you want to leave `optional1` to its default value but to change `optional2`, you can use `identifier(mendatory1, mendatory2, <default>, new_value)`.
 * Added the `<default>` token, and the `<default>` value.
+* Added a new type of comments (NOUGAROIGNORE). They are opened and closed by `..NOUGAROIGNORE` or `.. NOUGAROIGNORE` where `.` is any character among `#@/%!$;`. There should not be anything else on lines where there are NOUGAROIGNORE opening or closing statements.
 
 ### Changed
 * Version ID has been increased to `7`.
@@ -32,6 +33,7 @@ This version comes with a new huge functionnality – optional parameters –, r
 * Fixed position start and end of duplicate arguments error messages.
 * `__test__` and `example` builtin functions now work from every location in the filesystem.
 * Fixed functions returning `None` if their return value was interpreted as `False` (empty string, empty list, …)
+* Fix a potential crash with errors (when an error occurs in an empty line…)
 
 ## 0.21.0-beta (2024-06-11) [YANKED]
 

@@ -61,7 +61,7 @@ class Error:
             for i in range(len(string_line)):
                 if i % 2 == 1:
                     continue
-                while string_line[i][0] in " ":
+                while len(string_line[i]) != 0 and string_line[i][0] in " ":
                     # delete spaces at the start of the str.
                     # Add chars after the space in the string after the "while string_line[0] in" to delete them.
                     string_line[i] = string_line[i][1:]

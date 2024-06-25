@@ -26,4 +26,8 @@ FRENCH_MODE_UPPERCASE = FRENCH_MODE_LOWERCASE.upper()
 FRENCH_MODE = FRENCH_MODE_LOWERCASE + FRENCH_MODE_UPPERCASE
 # *****************
 
-IDENTIFIERS_LEGAL_CHARS = LETTERS + '_'  # + FRENCH_MODE + GREEK_MODE  # needs more testing
+IDENTIFIERS_LEGAL_CHARS = LETTERS + '_'  # + FRENCH_MODE  # needs more testing
+
+# Strings that tell the Lexer to ignore some content
+
+LEXER_IGNORE = [prefix1 + prefix2 + prefix3 + "NOUGAROIGNORE" for prefix1 in "#@/%!$;" for prefix2 in "#@/%!$;" for prefix3 in ["", " "]]

@@ -38,6 +38,24 @@ def test_nougaro(print_OK)
     comment
     */
 
+@@NOUGAROIGNORE
+    this text is completely ignored
+    ##NOUGAROIGNORE
+
+    /*
+
+  @% NOUGAROIGNORE
+    this will not end the comment: */
+           //NOUGAROIGNORE
+
+    */  # we have to close it here
+
+!/NOUGAROIGNORE
+    /*
+                                          @! NOUGAROIGNORE
+
+    # the following lines are not commented
+
     assert $ == "$"
     assert $test == "$test"
     var a = 1

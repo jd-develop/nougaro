@@ -6,6 +6,18 @@ This file is updated nearly every commit and copied to GH release changelog.
 
 Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. The Nougaro changelog has another section, `Calculator`, keeping track of the changes relative to the Nougaro Calculator under the same 6-sections format.
 
+## 0.23.0-beta (2024-06-26) [YANKED]
+
+### Added
+* Added `noug_version.clean_version_for_nuitka_under_windows()` function, that returns a nice output of the Nougaro version that can be passed into the `--windows-product-version` Nuitka argument. Takes 2 optional parameters: `print_value` (default=False), which, if true, makes the function prints the result; and `return_value` (default=True), which, if true, makes the function returns the result.
+* Added two new optional parameters to the `noug_version.clean_version_for_gh()` function: `print_value` (default=False), which, if true, makes the function prints the result; and `return_value` (default=True), which, if true, makes the function returns the result.
+
+### Changed
+* Version ID has been increased to `8`.
+
+### Fixed
+* `(Build scipts)` (Windows) Fix Nuitka crashing when called
+
 ## 0.22.0-beta (2024-06-26)
 
 This version comes with a new huge functionality – optional parameters –, rather big bug fixes, as well as smaller tweaks and fixes.

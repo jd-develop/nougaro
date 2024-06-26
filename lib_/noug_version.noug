@@ -23,7 +23,7 @@ var release_serial = if len(_noug_version_split) == 4 then int(_noug_version_spl
 var version_list = [major, minor, patch, phase, release_serial]
 
 
-def clean_version_for_gh()
+def clean_version_for_gh()(print_value=False, return_value=True)
     # this function creates a nice output of the OS and Nougaro version that you can put
     # in the GH issues and PRs
     var os = __os_name__
@@ -35,7 +35,23 @@ def clean_version_for_gh()
         "\n* OS version: " + os_version +\
         "\n* Nougaro version: " + nougaro_version
 
-    return final_str
+    if print_value then print(final_str)
+    if return_value then return final_str
+end
+
+
+def clean_version_for_nuitka_under_windows()(print_value=False, return_value=True)
+    # this function creates a nice output of the Nougaro version that can be passed into the
+    # --windows-product-version Nuitka argument
+
+    if release_serial != 0 then
+        var final_str = str(major) + "." + str(minor) + "." + str(patch) + "." + str(release_serial)
+    else
+        var final_str = str(major) + "." + str(minor) + "." + str(patch)
+    end
+
+    if print_value then print(final_str)
+    if return_value then return final_str
 end
 
 
@@ -46,3 +62,4 @@ export phase
 export release_serial
 export version_list
 export clean_version_for_gh
+export clean_version_for_nuitka_under_windows

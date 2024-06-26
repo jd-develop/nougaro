@@ -29,10 +29,13 @@ for %%y in (.\.gitignore, .\.gitattributes, example_file, grammar.txt, tests.nou
 for %%y in (.\.git, .\.github, .\.vscode, .\.idea, .\__pycache__, src\__pycache__, src\errors\__pycache__, src\lexer\__pycache__, src\parser\__pycache__, src\runtime\__pycache__, src\runtime\values\__pycache__, src\runtime\values\basevalues\__pycache__, src\runtime\values\functions\__pycache__, lib_\runtime\values\tools\__pycache__, sandbox) do if exist %%y (rmdir /s /q %%y)
 
 rem Then we ask for the version
-set NOUGVERSION=python shell.py --version
+python shell.py -d "import noug_version; noug_version.clean_version_for_nuitka_under_windows(1, 0)" > tempversionnuitka.txt
+python shell.py -V > tempfullversion.txt
+set /p NOUGVERSIONNUITKA=<tempversionnuitka.txt
+set /p NOUGVERSION=<tempfullversion.txt
 
 rem We build
-python -m nuitka --standalone --windows-company-name=Nougaro --windows-product-name=Nougaro --windows-product-version=%NOUGVERSION% --include-package=lib_ --no-deployment-flag=self-execution shell.py
+python -m nuitka --standalone --windows-company-name=Nougaro --windows-product-name=Nougaro --windows-product-version=%NOUGVERSIONNUITKA% --include-package=lib_ --no-deployment-flag=self-execution shell.py
 
 rem We copy the important files to the created directory
 for %%y in (example.noug LICENSE README.md README.fr.md shell.py "CODE_OF_CONDUCT.md" CONTRIBUTING.md how_it_works.md noug_version.json) do xcopy %%y shell.dist\

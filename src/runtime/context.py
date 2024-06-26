@@ -21,8 +21,21 @@ from typing import Self
 # ##########
 class Context:
     """Class for the interpreter Context"""
-    def __init__(self, display_name: str | None, entry_pos: Position, parent: Self | None = None):
+    def __init__(self, display_name: str | None, entry_pos: Position, parent: Self | None = None,
+                 value_im_attribute_of: str | None = None):
+        """Note on value_im_attribute_of:
+        
+        In commit a17aa2bc was introduced a bug where `(1).b` returned:
+        > `AttributeError: attribute of 1 has no attribute 'b'.`
+
+        This is because `display_name` was "attribute of 1".
+        `value_im_attribute_of` is now therefore used in such case.
+        If value_im_attribute_of is None, it is by default set to `display_name`.
+        """
         self.display_name = display_name  # name of the function we are in
+        if value_im_attribute_of is None:
+            value_im_attribute_of = display_name
+        self.value_im_attribute_of = value_im_attribute_of
         self.parent: Context | None = parent  # parent context
         # self.entry_pos is the pos_start of the current context.
         # It is used in errors tracebacks (class src.errors.errors.RunTimeError.generate_traceback)

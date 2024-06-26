@@ -229,7 +229,10 @@ class Interpreter:
             if len(node_or_list) != 1:
                 for node_ in node_or_list[1:]:
                     new_ctx = Context(
-                        display_name=f"attribute of {value.__repr__()}", entry_pos=node_.pos_start, parent=context
+                        display_name=f"attribute of {repr(value)}",
+                        entry_pos=node_.pos_start,
+                        parent=context,
+                        value_im_attribute_of=repr(value)
                     )
                     new_ctx.symbol_table = SymbolTable()
                     new_ctx.symbol_table.set_whole_table(value.attributes)
@@ -570,7 +573,7 @@ class Interpreter:
                 assert isinstance(var_name, Token)
                 assert isinstance(var_name.value, str)
                 return result.failure(RTAttributeError(
-                    node.pos_start, node.pos_end, ctx.display_name, var_name.value, ctx,
+                    node.pos_start, node.pos_end, ctx.value_im_attribute_of, var_name.value, ctx,
                     f"{_ORIGIN_FILE}.visit_varAccessNode"
                 ))
 
@@ -672,7 +675,10 @@ class Interpreter:
 
                 for node_or_tok in var_name[1:-1]:
                     new_ctx = Context(
-                        display_name=f"attribute of {value.__repr__()}", entry_pos=node_or_tok.pos_start, parent=ctx
+                        display_name=f"attribute of {repr(value)}",
+                        entry_pos=node_or_tok.pos_start,
+                        parent=ctx,
+                        value_im_attribute_of=repr(value)
                     )
                     new_ctx.symbol_table = SymbolTable()
                     new_ctx.symbol_table.set_whole_table(value.attributes)

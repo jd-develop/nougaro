@@ -28,13 +28,14 @@ for %%y in (.\.gitignore, .\.gitattributes, example_file, grammar.txt, tests.nou
 
 for %%y in (.\.git, .\.github, .\.vscode, .\.idea, .\__pycache__, src\__pycache__, src\errors\__pycache__, src\lexer\__pycache__, src\parser\__pycache__, src\runtime\__pycache__, src\runtime\values\__pycache__, src\runtime\values\basevalues\__pycache__, src\runtime\values\functions\__pycache__, lib_\runtime\values\tools\__pycache__, sandbox) do if exist %%y (rmdir /s /q %%y)
 
-rem Then we ask for the version
+rem Then we fetch the version
 python shell.py -d "import noug_version; noug_version.clean_version_for_nuitka_under_windows(1, 0)" > tempversionnuitka.txt
 python shell.py -V > tempfullversion.txt
 set /p NOUGVERSIONNUITKA=<tempversionnuitka.txt
 set /p NOUGVERSION=<tempfullversion.txt
 
 echo Nougaro version: %NOUGVERSION%
+echo Nougaro version for Nuitka: %NOUGVERSIONNUITKA%
 
 rem We build
 python -m nuitka --standalone --windows-company-name=Nougaro --windows-product-name=Nougaro --windows-product-version=%NOUGVERSIONNUITKA% --include-package=lib_ --no-deployment-flag=self-execution shell.py

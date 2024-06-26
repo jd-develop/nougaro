@@ -34,6 +34,8 @@ python shell.py -V > tempfullversion.txt
 set /p NOUGVERSIONNUITKA=<tempversionnuitka.txt
 set /p NOUGVERSION=<tempfullversion.txt
 
+echo Nougaro version: %NOUGVERSION%
+
 rem We build
 python -m nuitka --standalone --windows-company-name=Nougaro --windows-product-name=Nougaro --windows-product-version=%NOUGVERSIONNUITKA% --include-package=lib_ --no-deployment-flag=self-execution shell.py
 

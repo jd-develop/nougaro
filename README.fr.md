@@ -29,7 +29,7 @@ Voici Nougaro bêta `0.22.0`.
 
 ## Documentation
 
- Merci de vous référer au [wiki](https://github.com/jd-develop/nougaro/wiki/) pour la documentation.
+ La documentation est disponible [ici](https://nougaro.github.io/documentation) (en anglais uniquement).
 
 ## Deux mots sur la coloration syntaxique
 

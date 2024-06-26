@@ -29,7 +29,7 @@ Nougaro is a programming language interpreted in Python.
 
 ## Documentation
 
- Please refer to the [wiki](https://github.com/jd-develop/nougaro/wiki/) for documentation.
+ The documentation is available [here](https://nougaro.github.io/documentation).
 
 ## About syntax highlighting
 

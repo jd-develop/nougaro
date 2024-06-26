@@ -175,6 +175,7 @@ def test_nougaro(print_OK)
     ## operations
     assert ("a" + "b") == 'ab'
     assert "a" * 3 == "aaa"
+    assert 3 * "a" * 3 == 3 * "aaa"
 
     if print_OK then print("OK str ops")
 
@@ -185,6 +186,8 @@ def test_nougaro(print_OK)
     assert False!=True
     assert "a" in "this is an example string"
     assert 1 in "123"
+    assert None in "foo bar none foo"
+    assert <default> in "foo bar <default>"
     assert "bépo" in ["azerty", "qwerty", "bépo"]
     assert 1 > 0
     assert 1 >= 1

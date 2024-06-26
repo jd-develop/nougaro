@@ -8,7 +8,7 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 
 ## 0.22.0-beta (2024-06-26)
 
-This version comes with a new huge functionnality – optional parameters –, rather big bug fixes, as well as smaller tweaks and fixes.
+This version comes with a new huge functionality – optional parameters –, rather big bug fixes, as well as smaller tweaks and fixes.
 
 ### Added
 * Added optional parameters to function definitions. Use `def identifier(mendatory1, mendatory2)(optional1=default_value, optional2=default_value)` to define optional parameters. When you call the function, you can omit the optional arguments. If you want to leave `optional1` to its default value but to change `optional2`, you can use `identifier(mendatory1, mendatory2, <default>, new_value)`.
@@ -18,7 +18,7 @@ This version comes with a new huge functionnality – optional parameters –, r
 ### Changed
 * Version ID has been increased to `7`.
 * Lib version has been increased to `4`.
-* Key `"run_noug_dir_work_dir"` in BuiltinFunction dictionnaries (and in libs too) was renamed to `"run_noug_dir"`.
+* Key `"run_noug_dir_work_dir"` in BuiltinFunction dictionaries (and in libs too) was renamed to `"run_noug_dir"`.
 * Type of functions is now `func`, regardless of if they are functions or built-in functions. However, type of methods is still `method`.
 * Modules and functions are now True in boolean context (i.e. in a condition)
 * `round` built-in function now returns `int` if `n_digits` ⩽ 0, not only for `n_digits` = 0.

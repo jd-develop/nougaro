@@ -106,7 +106,7 @@ def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: l
     if debug_on:
         print(f"Nougaro working directory is {work_dir} ({type(work_dir)})")
 
-    with open(path, encoding="UTF-8") as file:
+    with open(path, "r+", encoding="UTF-8") as file:
         file_content = str(file.read())
 
     if file_content == "":  # no need to run this empty file
@@ -192,7 +192,7 @@ def main():
             if not os.path.exists(HISTORY_FILE):
                 if debug_on:
                     print(f"[history] creating {HISTORY_FILE}")
-                with open(HISTORY_FILE, "w+") as histf:
+                with open(HISTORY_FILE, "w+", encoding="UTF-8") as histf:
                     histf.write("")
             readline.read_history_file(HISTORY_FILE)
             atexit.register(readline.write_history_file, HISTORY_FILE)

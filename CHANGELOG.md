@@ -6,7 +6,12 @@ This file is updated nearly every commit and copied to GH release changelog.
 
 Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. The Nougaro changelog has another section, `Calculator`, keeping track of the changes relative to the Nougaro Calculator under the same 6-sections format.
 
-## Unreleased
+## 1.0.0-rc.1 (2024-06-28)
+
+*Note: rc stands for release candidate.*
+
+### Changed
+* Version id has been increased to `9`.
 
 ### Fixed
 * Fixed attribute error messages (previously, `(1).b` was giving the message `AttributeError: attribute of 1 has no attribute 'b'.`, which was erroneous)

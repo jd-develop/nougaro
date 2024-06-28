@@ -1581,7 +1581,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
 
         if print_in_term.is_true():  # we print the GPL3 in the terminal
-            with open(os.path.abspath(noug_dir + "/LICENSE"), 'r+') as license_file:
+            with open(os.path.abspath(noug_dir + "/LICENSE"), 'r', encoding="UTF-8") as license_file:
                 print(license_file.read())
                 license_file.close()
                 return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))

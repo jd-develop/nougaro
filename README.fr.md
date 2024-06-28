@@ -4,7 +4,7 @@
 
 ![Nougaro. Un langage de programmation.](repo-image/repo-image.png)
 
-Voici Nougaro version `1.0.0-rc.1`.
+Voici Nougaro version `1.0.0-rc.2`.
 
  Nougaro est un langage de programmation, interprété en Python.
 

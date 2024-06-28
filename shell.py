@@ -72,7 +72,7 @@ def check_arguments(args: list[str], noug_dir: str, version: str) -> tuple[str, 
         print(version)
         sys.exit()
     elif args[0] in ["-h", "-H", "--help"]:
-        with open(f"{noug_dir}/src/cli_help.txt") as help_file:
+        with open(f"{noug_dir}/src/cli_help.txt", "r", encoding="UTF-8") as help_file:
             help_text = help_file.readlines()
         for line in help_text[1:]:
             print(line, end="")
@@ -106,7 +106,7 @@ def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: l
     if debug_on:
         print(f"Nougaro working directory is {work_dir} ({type(work_dir)})")
 
-    with open(path, "r+", encoding="UTF-8") as file:
+    with open(path, "r", encoding="UTF-8") as file:
         file_content = str(file.read())
 
     if file_content == "":  # no need to run this empty file

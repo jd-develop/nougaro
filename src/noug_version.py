@@ -19,7 +19,7 @@ import pathlib
 def _read_noug_version_json():
     noug_dir = os.path.abspath(pathlib.Path(__file__).parent.parent.absolute())
 
-    with open(os.path.abspath(noug_dir + "/noug_version.json")) as ver_json:
+    with open(os.path.abspath(noug_dir + "/noug_version.json"), "r", encoding="UTF-8") as ver_json:
         # we load the nougaro version stored in noug_version.json
         ver_json_loaded = json.load(ver_json)
         major: int = ver_json_loaded.get("major")

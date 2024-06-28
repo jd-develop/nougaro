@@ -1679,7 +1679,7 @@ class Interpreter:
             import_as_name = as_identifier.value
 
         if is_nougaro_lib:
-            with open(path, "r+") as lib_:
+            with open(path, "r+", encoding="UTF-8") as lib_:
                 text = lib_.read()
 
             value, error, _ = self.run(

@@ -45,22 +45,22 @@ README_TEXT = [
 def _write_readme(readme_file: str, version_guide_file: str, version: str, version_id: str):
     """Writes the README and the version guide"""
     if not os.path.isfile(readme_file):
-        with open(readme_file, "w+") as readme:
+        with open(readme_file, "w+", encoding="UTF-8") as readme:
             readme.writelines(README_TEXT)
 
-    with open(readme_file, "w+") as readme:
+    with open(readme_file, "w+", encoding="UTF-8") as readme:
         if readme.readlines() != README_TEXT:
             readme.writelines(README_TEXT)
     
     
     if os.path.isfile(version_guide_file):
-        with open(version_guide_file, "r+") as versions_f:
+        with open(version_guide_file, "r+", encoding="UTF-8") as versions_f:
             versions = versions_f.readlines()
     else:
         versions = []
     
     if f"Version {version} has an id of {version_id}.\n" not in versions:
-        with open(version_guide_file, "a+") as versions_f_ap:
+        with open(version_guide_file, "a+", encoding="UTF-8") as versions_f_ap:
             versions_f_ap.write(f"Version {version} has an id of {version_id}.\n")
 
 
@@ -128,25 +128,25 @@ def _find_files_in_legacy_directories():
         return "0", "0"
 
     if os.path.exists(abspaths["debug_root_dir"]):
-        with open(abspaths["debug_root_dir"], "r+") as debug_f:
+        with open(abspaths["debug_root_dir"], "r", encoding="UTF-8") as debug_f:
             debug = debug_f.read()
     elif os.path.exists(abspaths["debug"]):
-        with open(abspaths["debug"], "r+") as debug_f:
+        with open(abspaths["debug"], "r", encoding="UTF-8") as debug_f:
             debug = debug_f.read()
     elif os.path.exists(abspaths["debug_old"]):
-        with open(abspaths["debug_old"], "r+") as debug_f:
+        with open(abspaths["debug_old"], "r", encoding="UTF-8") as debug_f:
             debug = debug_f.read()
     else:
         debug = "0"
 
     if os.path.exists(abspaths["print_context_root_dir"]):
-        with open(abspaths["print_context_root_dir"], "r+") as print_context_f:
+        with open(abspaths["print_context_root_dir"], "r", encoding="UTF-8") as print_context_f:
             print_context = print_context_f.read()
     elif os.path.exists(abspaths["print_context"]):
-        with open(abspaths["print_context"], "r+") as print_context_f:
+        with open(abspaths["print_context"], "r", encoding="UTF-8") as print_context_f:
             print_context = print_context_f.read()
     elif os.path.exists(abspaths["print_context_old"]):
-        with open(abspaths["print_context_old"], "r+") as print_context_f:
+        with open(abspaths["print_context_old"], "r", encoding="UTF-8") as print_context_f:
             print_context = print_context_f.read()
     else:
         print_context = "0"
@@ -163,7 +163,7 @@ def _find_files_in_legacy_directories():
         print("[CONFFILES] Warning: 'print_context' was not set to 0 or 1, resetting to 0.")
         print_context = "0"
 
-    with open(abspaths["were_copied"], "w+") as wcf:
+    with open(abspaths["were_copied"], "w+", encoding="UTF-8") as wcf:
         wcf.write("Legacy files no longer need to be copied.")
 
     return debug, print_context
@@ -173,11 +173,11 @@ def _create_or_copy_files():
     """Returns data version as an integer"""
     debug, print_context = _find_files_in_legacy_directories()
 
-    with open(CONFIG_DIRECTORY + "debug.nconf", "w+") as debug_nnf:
+    with open(CONFIG_DIRECTORY + "debug.nconf", "w+", encoding="UTF-8") as debug_nnf:
         debug_nnf.write(debug)
-    with open(CONFIG_DIRECTORY + "print_context.nconf", "w+") as print_context_nnf:
+    with open(CONFIG_DIRECTORY + "print_context.nconf", "w+", encoding="UTF-8") as print_context_nnf:
         print_context_nnf.write(print_context)
-    with open(CONFIG_DIRECTORY + "print_time.nconf", "w+") as print_context_nnf:
+    with open(CONFIG_DIRECTORY + "print_time.nconf", "w+", encoding="UTF-8") as print_context_nnf:
         print_context_nnf.write("0")
 
 
@@ -197,7 +197,7 @@ def access_data(config_file: str):
         return str(DATA_VERSION)
     if not os.path.exists(CONFIG_DIRECTORY + config_file + ".nconf"):
         return None
-    with open(CONFIG_DIRECTORY + config_file + ".nconf", "r+") as file:
+    with open(CONFIG_DIRECTORY + config_file + ".nconf", "r", encoding="UTF-8") as file:
         return file.read()
 
 
@@ -218,22 +218,22 @@ def write_data(config_file: str, data: str, silent: bool = False, return_error_m
             if return_error_messages:
                 return errmsg
             return
-    with open(CONFIG_DIRECTORY + config_file + ".nconf", "w+") as file:
+    with open(CONFIG_DIRECTORY + config_file + ".nconf", "w+", encoding="UTF-8") as file:
         file.write(data)
 
 
 def define_expected_type(config_file: str, data_type: str):
     if not os.path.exists(CONFIG_DIRECTORY + "expected_types.nconf.json"):
-        with open(CONFIG_DIRECTORY + "expected_types.nconf.json", "w+") as file:
+        with open(CONFIG_DIRECTORY + "expected_types.nconf.json", "w+", encoding="UTF-8") as file:
             file.write("{}\n")
-    with open(CONFIG_DIRECTORY + "expected_types.nconf.json", "r+") as file:
+    with open(CONFIG_DIRECTORY + "expected_types.nconf.json", "r+", encoding="UTF-8") as file:
         json_loaded = json.load(file)
     json_loaded[config_file] = data_type
-    with open(CONFIG_DIRECTORY + "expected_types.nconf.json", "w+") as file:
+    with open(CONFIG_DIRECTORY + "expected_types.nconf.json", "w+", encoding="UTF-8") as file:
         json.dump(json_loaded, file)
 
 
 def get_expected_type(config_file: str):
-    with open(CONFIG_DIRECTORY + "expected_types.nconf.json", "r+") as file:
+    with open(CONFIG_DIRECTORY + "expected_types.nconf.json", "r+", encoding="UTF-8") as file:
         json_loaded = json.load(file)
     return json_loaded.get(config_file)

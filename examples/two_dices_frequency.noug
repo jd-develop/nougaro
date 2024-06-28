@@ -3,17 +3,17 @@ import random
 print("This program prints the frequencies of the sums of two dices launched 1000 times.")
 
 def tdf(l)
-	var list_ = [0]*12
-	for i = 0 to l-1 then
-		var dice_sum = random.randint(1, 6) + random.randint(1, 6)
-		var actual_sum_in_list = list_(dice_sum-1)
-		replace(list_, dice_sum-1, actual_sum_in_list+1)
-	end
-	var new_list = []
-	for i in list_ then
-		var new_list += i/l
-	end
-	return new_list
+    var list_ = [0]*12
+    for i = 0 to l-1 then
+        var dice_sum = random.randint(1, 6) + random.randint(1, 6)
+        var actual_sum_in_list = list_(dice_sum-1)
+        replace(list_, dice_sum-1, actual_sum_in_list+1)
+    end
+    var new_list = []
+    for i in list_ then
+        var new_list += i/l
+    end
+    return new_list
 end
 
 var idx = 1
@@ -21,10 +21,10 @@ var sum = 0
 var best = 0
 var best_idx = 1
 for x in tdf(1000) then
-	print(str(idx) + ' : ' + str(x))
-	if x > best then var best, best_idx = x, idx
-	var idx += 1
-	var sum += x
+    print(str(idx) + ' : ' + str(x))
+    if x > best then var best, best_idx = x, idx
+    var idx += 1
+    var sum += x
 end
 
 print("Sum of the frequencies: " + str(sum))

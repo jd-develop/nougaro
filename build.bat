@@ -45,6 +45,11 @@ for %%y in (example.noug LICENSE README.md README.fr.md shell.py "CODE_OF_CONDUC
 
 for %%y in (examples lib_ src tests repo-image) do xcopy /s /i %%y shell.dist\%%y
 
+rem We delete __pycache__
+cd "shell.dist"
+for %%y in (.\__pycache__, src\__pycache__, src\errors\__pycache__, src\lexer\__pycache__, src\parser\__pycache__, src\runtime\__pycache__, src\runtime\values\__pycache__, src\runtime\values\basevalues\__pycache__, src\runtime\values\functions\__pycache__, lib_\runtime\values\tools\__pycache__) do if exist %%y (rmdir /s /q %%y)
+cd ..
+
 rem Then we rename our directory
 RENAME shell.dist nougaro-"%NOUGVERSION%"-windows-exe
 

@@ -6,7 +6,7 @@ This file is updated nearly every commit and copied to GH release changelog.
 
 Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. The Nougaro changelog has another section, `Calculator`, keeping track of the changes relative to the Nougaro Calculator under the same 6-sections format.
 
-## 1.0.0 (unreleased)
+## 1.0.0 (2024-07-08)
 *As this change does not affect public API, this is reseased as 1.0.0*
 
 ### Fixed

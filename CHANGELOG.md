@@ -7,10 +7,10 @@ This file is updated nearly every commit and copied to GH release changelog.
 Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. The Nougaro changelog has another section, `Calculator`, keeping track of the changes relative to the Nougaro Calculator under the same 6-sections format.
 
 ## 1.0.0 (2024-07-08)
-*As this change does not affect public API, this is reseased as 1.0.0*
+*As this change does not affect public API, this is released as 1.0.0*
 
 ### Fixed
-* `(Build scipts)` (Windows) The build script now properly removes `__pycache__`.
+* `(Build scripts)` (Windows) The build script now properly removes `__pycache__`.
 
 ## 1.0.0-rc.2 (2024-07-02)
 
@@ -37,7 +37,7 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 * Version ID has been increased to `8`.
 
 ### Fixed
-* `(Build scipts)` (Windows) Fix Nuitka crashing when called
+* `(Build scripts)` (Windows) Fix Nuitka crashing when called
 
 ## 0.22.0-beta (2024-06-26)
 
@@ -64,7 +64,7 @@ This version comes with a new huge functionality – optional parameters –, ra
 
 ### Fixed
 * Fixed position start and end of duplicate arguments error messages.
-* `__test__` and `example` builtin functions now work from every location in the filesystem.
+* `__test__` and `example` builtin functions now work from every location in the file system.
 * Fixed functions returning `None` if their return value was interpreted as `False` (empty string, empty list, …)
 * Fix a potential crash with errors (when an error occurs in an empty line…)
 
@@ -88,7 +88,7 @@ This version is small but contains a rather big crash fix, as well as a deprecat
 
 ### Fixed
 * Fixed a crash when giving too many arguments to a function having the property `should_respect_args_number` set to `False`.
-* Fixed a bug with `position_end` of call nodes (it was just before the closing parentesis)
+* Fixed a bug with `position_end` of call nodes (it was just before the closing parenthesis)
 
 ## 0.20.0-beta (2024-06-06)
 
@@ -132,7 +132,7 @@ This version may in some cases improve performance.
 
 #### Runtime
 * Loops no longer append `None` to their result if there is a `continue` or `break`. Use `appendNoneOnContinue` and `appendNoneOnBreak` metas if you still want to do that.
-* Rework completely equality and other comparisons to be more consistant
+* Rework completely equality and other comparisons to be more consistent
   * Functions, built-in functions, methods and module functions can now be equal (if they’re the same)
   * Same for objects and constructors
   * Strings can now be less than or equal to others, according to the alphabetical order.
@@ -152,7 +152,7 @@ This version may in some cases improve performance.
 #### Writing libraries
 * Modules written in Python now need to have a library version (`__LIBRARY_VERSION__`). If a module doesn’t have the same
   library version as the current Nougaro version, an error is thrown. Library version is currently `2`.
-* Libraries now need the `is_eq` method as described in documentation (TODO: update doc on release – the method is described but in a “in the future you will have to” box).
+* Libraries now need the `is_eq` method as described in documentation.
 
 ### Removed
 * Removed `noug_version.phase_minor`. Use `noug_version.release_serial` instead.
@@ -165,7 +165,7 @@ This version may in some cases improve performance.
 * Start and end positions of `xor` are now correct.
 * Accessing a variable no longer return a copy of the value, but directly the value instead. It allows things such as `def return(object)->object; var return(a).b = 4` (this previously left `a.b` unchanged, it now properly updates it to 4)
 * `input_num` now returns an integer if the entered value is an integer, otherwise it returns a float.
-* Fix a crash when trying to print surrogates unicode characters (within a pair or not)
+* Fix a crash when trying to print surrogates Unicode characters (within a pair or not)
 
 ## 0.19.0-beta (2024-05-08)
 
@@ -186,12 +186,12 @@ This version comes with a lot of new features, and one single deprecation (see �
 
 #### Metas
 * Add a “meta” system
-  * Using the syntax `@meta metaName` or `@meta metaName metaValue` at the beginnig of a file, you can now enable special features
+  * Using the syntax `@meta metaName` or `@meta metaName metaValue` at the beginning of a file, you can now enable special features
   * As predicate, you can use `@`, `#@`, `%@`, `@@`, `-@` or `$@`.
 * Add `legacyAbs` meta
   * No value required
   * It makes the legacy absolute value possible: `|-1|`=`1`
-  * However, it makes bitwise or not accessible.
+  * However, it makes bit-wise or not accessible.
 * Add `nbspBetweenFrenchGuillemets` meta
   * No value required
   * Experience the true french pain! (and I don’t talk about baguettes…) If you want to use the french string quotes (`«»`), you will have to put a no-break space (or a narrow no-break space) after the `«` and before the other `»`. Those (N)NBSP will not be counted in the string.
@@ -287,7 +287,7 @@ This version comes with a lot of new features, and one single deprecation (see �
 * (internal API) py2noug can now properly convert dicts, under a list of [key, value] lists
 * (internal API) add an alias `is_noug_num` to `is_n_num` function
 * (internal API) add an alias `is_tok_type` to `does_tok_type_exist` function
-* Moved config files to the right directory depending on the OS (such as `~/.config`). More infos in the docstring of the src.conffiles file.
+* Moved config files to the right directory depending on the OS (such as `~/.config`). More infos in the docstring of the `src.conffiles` file.
 * Add a `version_id`. Incremented at least each new version. The current `version_id` is 3.
 
 ### Calculator
@@ -329,7 +329,7 @@ This version comes with a lot of new features, and one single deprecation (see �
 #### Import and export
 
 * Add `import ... as ...`
-* You can now import nougaro files from current folder and sub-folders.
+* You can now import Nougaro files from current folder and sub-folders.
 * Add `export (node) as ...`
 * `export` now returns the value to export
 
@@ -401,18 +401,18 @@ This version comes with a lot of new features, and one single deprecation (see �
 * Fix various bugs, crashes, typos, error messages, …
 * Rewrite some files
 * Add best match in error messages (`... is not defined, did you mean ...?`)
-* Delete highlight theme for notepad++ (I’m currently working on a VScode one)
+* Delete highlight theme for notepad++ (I’m currently working on a VSCode one)
 
 ## 0.14-beta (2023-08-20)
 
 * Add `-c` option to run a line, and `-cd` to do that silently
 * Add `--help` option
 * Add Tic Tac Toe example
-* Make `colorama` optional to run nougaro.
+* Make `colorama` optional to run Nougaro.
 * Results of loops no longer contain `None`
 * Better error messages
 * Better intro text
-* A lot of bugfixes, including #10 and interpreter crashes
+* A lot of bug fixes, including #10 and interpreter crashes
 * Fix typos
 
 ### Calculator
@@ -442,14 +442,14 @@ This release fixes a little bug, updates the repo structure and makes Nougaro mo
 * Now, for Nougaro modules too you need to write `module.value` instead of `module_value`
 * Better error messages
 * Fix some typo
-* Reorganize the repo
+* Reorganise the repo
 
 ## 0.12-beta (2023-01-18)
 * Update way to call module functions/constants (only with python-written ones)
   * Now, if you want to access to function `asin` of module `math`, **you have to type `math.asin`** instead of `math_asin`.
-* `shell.py` or builded `shell.exe` or `shell` is now launchable from everywhere in the system, wihtout any error
+* `shell.py` or built `shell.exe` or `shell` is now launchable from everywhere in the system, without any error
 * You can now, if you are under Linux and that you install the `readline` module, browse in the command history using arrow keys in the shell
-* Several bugfixes
+* Several bug fixes
 * [TECHNICAL] Added attributes to values
 
 ## 0.11-alpha (2023-01-06)
@@ -459,7 +459,7 @@ This release fixes a little bug, updates the repo structure and makes Nougaro mo
 * Add [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
 > [!Important]
-> Nougaro now requires PYTHON 3.10 (or 3.11)! Consider download it from your favorite package manager or from [the official Python website](https://python.org/downloads)
+> Nougaro now requires PYTHON 3.10 (or 3.11)! Consider download it from your favourite package manager or from [the official Python website](https://python.org/downloads)
 
 ## 0.10-alpha (2022-11-28)
 ### Syntax
@@ -492,7 +492,7 @@ This release fixes a little bug, updates the repo structure and makes Nougaro mo
 * Some features added
   * `int("null")` now returns 0
   * add `__python_version__`
-  * `len` now calculates the len of a string
+  * `len` now calculates the length of a string
   * add `__is_keyword__` builtin function
   * add `__is_valid_token_type__` builtin function
   * add `math_log` and `math_log2` functions in `math` module
@@ -505,7 +505,7 @@ This release fixes a little bug, updates the repo structure and makes Nougaro mo
 * add `assert`
 * add `example` builtin function
 * add `ppap` example
-* increase speed of `max` and `min` buitlin functions
+* increase speed of `max` and `min` builtin functions
 * fix bugs (like #5)
 
 ## 0.8-alpha (2022-05-17)
@@ -536,7 +536,7 @@ This release fixes a little bug, updates the repo structure and makes Nougaro mo
 * Add `split` builtin function
 
 ### Technical
-* Add `is_int` and `is_float` methods in src.values.basevalues.Number
+* Add `is_int` and `is_float` methods in `src.values.basevalues.Number`
 * Better import system
 * add `__actual_context__` and `__exec_from__`.
 
@@ -549,7 +549,7 @@ Better error messages, usage of `_` as identifier now legal, new `input_num` bui
   * Add `math` module with builtin math functions and constants
   * Add `random` module with some awesome random functions like `randint`, `random`, or `choice` !!
 * Better error message
-* Huge bugfixes
+* Huge bug fixes
 * Random tweaks and fixes
 
 ## 0.3-alpha (2022-03-31)
@@ -560,15 +560,15 @@ Better error messages, usage of `_` as identifier now legal, new `input_num` bui
 * first argument of `print` and `print_ret` builtin functions is no longer required (e.g. `print()` is like `print('')`)
 * Add special `*[...]` syntax. More infos in the Wiki, in [functions](https://github.com/jd-develop/nougaro/wiki/Functions) and [lists](https://github.com/jd-develop/nougaro/wiki/Lists).
 * Better error messages
-* Bugfixes
+* Bug fixes
 
 ## 0.2-alpha (2022-03-23)
 
-Bugfixes, better error messages, new `id ? id` syntax, `upper` and `lower` builtin functions and system calls (`system_call` builtin function).
+Bug fixes, better error messages, new `id ? id` syntax, `upper` and `lower` builtin functions and system calls (`system_call` builtin function).
 
 ## 0.1-alpha (2022-03-21)
 
-Bugfixes.
+Bug fixes.
 
 ## prototype-2 (2022-03-19)
 

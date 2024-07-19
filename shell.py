@@ -165,6 +165,92 @@ def print_result_and_error(result: Value | None, error: Error | None, dont_verbo
             print(result)
 
 
+def interactive_shell(
+        should_print_stuff: bool,
+        interactive: bool,
+        debug_on: bool,
+        noug_dir: str,
+        work_dir: str,
+        print_context: bool,
+        print_time: bool,
+        args: list[str],
+        dont_verbose: bool
+):
+    """Runs the Interactive shell"""
+    if should_print_stuff and not interactive:
+        # this text is always printed when we start the shell
+        if debug_on:
+            print(f"Welcome to Nougaro {VERSION} (id {VERSION_ID}) on {platform.system()}!")
+        else:
+            print(f"Welcome to Nougaro {VERSION} on {platform.system()}!")
+        print(f"Contribute: https://github.com/jd-develop/nougaro/")
+        print(f"Changelog: see {noug_dir}/CHANGELOG.md")
+        print()
+        print("This program is under GPL license. For more details, type __gpl__()")
+        print("or __gpl__(1) to stay in terminal.")
+        print("This program comes with ABSOLUTELY NO WARRANTY; for details type")
+        print("`__disclaimer_of_warranty__'.")
+        print()
+        print("Found a bug? Feel free to report it at")
+        print("https://jd-develop.github.io/nougaro/bugreport.html")
+        # idea: cowsay?
+        now = datetime.now()
+        if now.month == 12 and 24 <= now.day <= 26:
+            print("\nMerry Christmas!")
+        elif now.month == now.day == 1:
+            print(f"\nHappy new year {now.year}!")
+        if debug_on:
+            print()
+            print(f"Current working directory is {work_dir} (type: {type(work_dir)})")
+            print(f"Current config files directory is {src.conffiles.CONFIG_DIRECTORY} (type: {type(src.conffiles.CONFIG_DIRECTORY)})")
+            print(f"Current data version is {DATA_VERSION} (type: {type(DATA_VERSION)})")
+            print(f"Current lib version is {LIB_VERSION} (type: {type(LIB_VERSION)})")
+            print(f"Python version is {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]} "
+                  f"({list(sys.version_info)})")
+            print("DEBUG mode is ENABLED")
+        if print_context:
+            if not debug_on:
+                print()
+            print("PRINT CONTEXT debug option is ENABLED")
+        if print_time:
+            if not (debug_on or print_context):
+                print()
+            print("PRINT TIME debug option is ENABLED")
+        print()  # blank line
+
+    previous_metas = None
+    while True:  # the shell loop (like game loop in a video game but, obviously, Nougaro isn't a video game)
+        try:  # we ask for an input to be interpreted
+            if should_print_stuff:
+                text = input("nougaro> ")
+            else:
+                text = input()
+        except KeyboardInterrupt:  # if CTRL+C, exit the shell
+            print_in_red("\nKeyboardInterrupt")
+            break  # breaks the `while True` loop to the end of the file
+        except EOFError:
+            if should_print_stuff:
+                print_in_red("\nEOF")
+            break  # breaks the `while True` loop to the end of the file
+
+        if str(text) == "":  # nothing was entered: we don't do anything
+            result, error = None, None
+            continue
+        try:  # we try to run it
+            result, error, previous_metas = nougaro.run(
+                '<stdin>', text, noug_dir, VERSION, args=args,
+                work_dir=work_dir, lexer_metas=previous_metas
+            )
+        except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
+            print_in_red("\nKeyboardInterrupt")
+            continue  # continue the `while True` loop
+        except EOFError:
+            print_in_red("\nEOF")
+            break  # breaks the `while True` loop to the end of the file
+
+        print_result_and_error(result, error, dont_verbose, should_print_stuff=should_print_stuff)
+
+
 def main():
     noug_dir = os.path.abspath(pathlib.Path(__file__).parent.absolute())
 
@@ -230,78 +316,17 @@ def main():
     should_print_stuff = sys.stdin.isatty()
 
     if path == "<stdin>":  # we open the shell
-        if should_print_stuff and not interactive:
-            # this text is always printed when we start the shell
-            if debug_on:
-                print(f"Welcome to Nougaro {VERSION} (id {VERSION_ID}) on {platform.system()}!")
-            else:
-                print(f"Welcome to Nougaro {VERSION} on {platform.system()}!")
-            print(f"Contribute: https://github.com/jd-develop/nougaro/")
-            print(f"Changelog: see {noug_dir}/CHANGELOG.md")
-            print()
-            print("This program is under GPL license. For more details, type __gpl__()")
-            print("or __gpl__(1) to stay in terminal.")
-            print("This program comes with ABSOLUTELY NO WARRANTY; for details type")
-            print("`__disclaimer_of_warranty__'.")
-            print()
-            print("Found a bug? Feel free to report it at")
-            print("https://jd-develop.github.io/nougaro/bugreport.html")
-            # idea: cowsay?
-            now = datetime.now()
-            if now.month == 12 and 24 <= now.day <= 26:
-                print("\nMerry Christmas!")
-            elif now.month == now.day == 1:
-                print(f"\nHappy new year {now.year}!")
-            if debug_on:
-                print()
-                print(f"Current working directory is {work_dir} (type: {type(work_dir)})")
-                print(f"Current config files directory is {src.conffiles.CONFIG_DIRECTORY} (type: {type(src.conffiles.CONFIG_DIRECTORY)})")
-                print(f"Current data version is {DATA_VERSION} (type: {type(DATA_VERSION)})")
-                print(f"Current lib version is {LIB_VERSION} (type: {type(LIB_VERSION)})")
-                print(f"Python version is {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]} "
-                      f"({list(sys.version_info)})")
-                print("DEBUG mode is ENABLED")
-            if print_context:
-                if not debug_on:
-                    print()
-                print("PRINT CONTEXT debug option is ENABLED")
-            if print_time:
-                if not (debug_on or print_context):
-                    print()
-                print("PRINT TIME debug option is ENABLED")
-            print()  # blank line
-
-        previous_metas = None
-        while True:  # the shell loop (like game loop in a video game but, obviously, Nougaro isn't a video game)
-            try:  # we ask for an input to be interpreted
-                if should_print_stuff:
-                    text = input("nougaro> ")
-                else:
-                    text = input()
-            except KeyboardInterrupt:  # if CTRL+C, exit the shell
-                print_in_red("\nKeyboardInterrupt")
-                break  # breaks the `while True` loop to the end of the file
-            except EOFError:
-                if should_print_stuff:
-                    print_in_red("\nEOF")
-                break  # breaks the `while True` loop to the end of the file
-
-            if str(text) == "":  # nothing was entered: we don't do anything
-                result, error = None, None
-                continue
-            try:  # we try to run it
-                result, error, previous_metas = nougaro.run(
-                    '<stdin>', text, noug_dir, VERSION, args=args,
-                    work_dir=work_dir, lexer_metas=previous_metas
-                )
-            except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
-                print_in_red("\nKeyboardInterrupt")
-                continue  # continue the `while True` loop
-            except EOFError:
-                print_in_red("\nEOF")
-                break  # breaks the `while True` loop to the end of the file
-
-            print_result_and_error(result, error, dont_verbose, should_print_stuff=should_print_stuff)
+        interactive_shell(
+            should_print_stuff,
+            interactive,
+            debug_on,
+            noug_dir,
+            work_dir,
+            print_context,
+            print_time,
+            args,
+            dont_verbose
+        )
     elif path == "<commandline>":
         if line_to_exec == "":
             sys.exit()

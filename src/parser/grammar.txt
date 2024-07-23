@@ -51,6 +51,7 @@ atom          : (INT|FLOAT)(E_INFIX INT)?
               : for_expr
               : while_expr
               : do_expr
+              : loop_expr
               : func_def
               : class_def
               : <default>
@@ -82,6 +83,9 @@ while_expr    : KEYWORD:WHILE (COLON IDENTIFIER)?
 
 do_expr       : KEYWORD:DO (COLON IDENTIFIER)?
                 (statement | (NEWLINE statements)) KEYWORD:THEN KEYWORD:LOOP KEYWORD:WHILE expr
+
+loop_expr     : KEYWORD:LOOP (COLON IDENTIFIER)?
+                statement | (NEWLINE statements KEYWORD:END)
 
 func_def      : KEYWORD:DEF IDENTIFIER? func_def_args optional_func_def_args?
                 (ARROW expr)|(NEWLINE statements KEYWORD:END)

@@ -1104,6 +1104,7 @@ class Parser:
               : for_expr
               : while_expr
               : do_expr
+              : loop_expr
               : func_def
               : <default>
         """
@@ -1141,6 +1142,8 @@ class Parser:
         # do_expr
         elif token.matches(TT["KEYWORD"], 'do'):
             expr = result.register(self.do_expr())
+        elif token.matches(TT["KEYWORD"], 'loop'):
+            expr = result.register(self.loop_expr())
         # func_def
         elif token.matches(TT["KEYWORD"], 'def'):
             expr = result.register(self.func_def())
@@ -1827,6 +1830,58 @@ class Parser:
         assert not isinstance(condition, list)
 
         return result.success(DoWhileNode(body, condition, label))
+
+    def loop_expr(self) -> ParseResult:
+        """
+            loop_expr     : KEYWORD:LOOP (COLON IDENTIFIER)?
+                            statement | (NEWLINE statements KEYWORD:END)
+        """
+        result = ParseResult()
+        assert self.current_token is not None
+
+        loop_tok = self.current_token
+        result = self.check_for_and_advance(result, "expected 'loop'.", "KEYWORD", "loop", "loop_expr")
+        if result.error is not None:
+            return result
+
+        label = None
+        if self.current_token.type == TT["COLON"]:
+            result = self.advance_and_check_for(
+                result, "expected label identifier after ':'.", "IDENTIFIER",
+                origin_file="loop_expr"
+            )
+            if result.error is not None:
+                return result
+            label = self.current_token.value
+            assert isinstance(label, str)
+            result.register_advancement()
+            self.advance()
+
+        # NEWLINE statements KEYWORD:END
+        if self.current_token.type == TT["NEWLINE"]:
+            self.then_s.append((loop_tok.pos_start, loop_tok.pos_end))
+            result.register_advancement()
+            self.advance()
+
+            # statements
+            body = result.register(self.statements(stop=[(TT["KEYWORD"], 'end')]))
+            if result.error is not None:
+                return result
+
+            # KEYWORD:END
+            result = self.check_for_and_advance(
+                result, "expected 'end'.", "KEYWORD", "end", "loop_expr", del_a_then=True
+            )
+        else:
+            # statement
+            body = result.register(self.statement())
+
+        if result.error is not None:
+            return result
+        assert body is not None
+        assert not isinstance(body, list)
+
+        return result.success(LoopNode(loop_tok.pos_start, body, label))
 
     def func_def(self) -> ParseResult:
         """

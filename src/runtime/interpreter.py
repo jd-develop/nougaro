@@ -76,6 +76,7 @@ class Interpreter:
             "IfNode": self.visit_IfNode,
             "ImportNode": self.visit_ImportNode,
             "ListNode": self.visit_ListNode,
+            "LoopNode": self.visit_LoopNode,
             "NoNode": self.visit_NoNode,
             "NumberENumberNode": self.visit_NumberENumberNode,
             "NumberNode": self.visit_NumberNode,
@@ -1169,6 +1170,55 @@ class Interpreter:
 
             if not condition.is_true():  # the condition isn't true: we break the loop
                 break
+
+        if outer_loop_should_continue:
+            assert result.break_or_continue_pos is not None
+            pos_start, pos_end = result.break_or_continue_pos
+            return result.success_continue(pos_start, pos_end, result.continue_label)
+        if outer_loop_should_break:
+            assert result.break_or_continue_pos is not None
+            pos_start, pos_end = result.break_or_continue_pos
+            return result.success_break(pos_start, pos_end, result.break_value, result.break_label)
+        if value_to_return is not None:
+            return result.success(value_to_return)
+        return result.success(
+            List(elements, node.pos_start, node.pos_end).set_context(ctx)
+        )
+
+    def visit_LoopNode(self, node: LoopNode, ctx: Context, methods_instead_of_funcs: bool) -> RTResult:
+        """Visit LoopNode"""
+        result = RTResult()
+        elements: list[Value] = []
+
+        value_to_return = None
+        outer_loop_should_break = False
+        outer_loop_should_continue = False
+        while True:
+            value = result.register(self.visit(node.body_node, ctx, methods_instead_of_funcs))
+            if result.loop_should_continue:
+                if self.lexer_metas.get("appendNoneOnContinue") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if result.continue_label is not None and node.label != result.continue_label:
+                    outer_loop_should_continue = True
+                    break
+                continue
+
+            if result.loop_should_break:
+                value_to_return = result.break_value  # which is a Value or None
+                if self.lexer_metas.get("appendNoneOnBreak") is not None:
+                    elements.append(NoneValue(node.body_node.pos_start, node.body_node.pos_end, False))
+                if result.break_label is not None and node.label != result.break_label:
+                    outer_loop_should_break = True
+                break
+
+            if result.should_return(True):
+                # error or 'return' statement
+                return result
+
+            if value is None:
+                value = NoneValue(node.body_node.pos_start, node.body_node.pos_end, False)
+
+            elements.append(value)
 
         if outer_loop_should_continue:
             assert result.break_or_continue_pos is not None

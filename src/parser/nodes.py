@@ -505,6 +505,33 @@ class DoWhileNode(Node):
         )
 
 
+class LoopNode(Node):
+    """Node for 'loop' structure.
+    Example: loop foo()
+    Here, body_node is a CallNode (identifier: foo, no args)*
+    """
+    def __init__(self, pos_start: _Position, body_node: Node, label: str | None = None):
+        self.body_node: Node = body_node
+        self.label = label
+
+        self.pos_start = pos_start
+        self.pos_end = self.body_node.pos_end
+
+    def __repr__(self):
+        label = f":{self.label}" if self.label is not None else ""
+        return f'loop{label} {self.body_node}'
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, WhileNode):
+            return False
+        if self.attr != other.attr:
+            return False
+        return (
+            self.body_node == other.body_node and
+            self.label == other.label
+        )
+
+
 class BreakNode(Node):
     """Node for `break` statement"""
     def __init__(self, pos_start: _Position, pos_end: _Position,

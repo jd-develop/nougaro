@@ -1,10 +1,10 @@
 (Note: this is the file printed when executing nougaro -h)
 The Nougaro programming language interpreter.
 If you want some help about programming in Nougaro, visit
-<https://github.com/jd-develop/nougaro/wiki>
+<https://nougaro.github.io/documentation/>
 
 Usage (assuming the command to run Nougaro is `nougaro`):
-nougaro ([filename]) ((-c|-d) "[command]") (--help)
+nougaro ([filename]) ((-c|-d) "[command]") (-h --help) (-v --version)
 
 Arguments:
  (nothing)       - open the shell
@@ -14,17 +14,20 @@ Options (assuming no filename is given):
  -c "command"
  --command "command"
                  - run a command with shell output
+
  -d "command"
  --cd "command"
  --command-dont-verbose "command"
                  - run a command without shell output
+
  -i filename
  --interactive filemane
                  - run a file, then open the shell: this is like running the
                    file interactively
+
  --help -h       - show this message and exit
- --version -V    - print version and exit
+ --version -v -V - print version and exit
 
 Any other argument is passed in Nougaro. Arguments can be retrieved using the
 built-in __args__ variable. For any other information, the documentation is
-available at <https://github.com/jd-develop/nougaro/wiki>.
+available at <https://nougaro.github.io/documentation/>

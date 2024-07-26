@@ -87,7 +87,7 @@
 ## Future releases
 
 * [X] eventually remove protected variables (finished 20/01/2024)
-* [ ] add `loop` (infinite loop)
+* [X] add `loop` (infinite loop) (finished 23/07/2024)
 * [ ] create highlight extension for VSCode
 * [ ] add unit tests
 * [ ] add complex numbers

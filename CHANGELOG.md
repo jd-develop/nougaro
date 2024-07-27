@@ -11,6 +11,10 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 ### Added
 * Added the `loop` loop, which is an infinite loop.
 
+### Calculator
+#### Changed
+* The `p` instruction can be used in any command (e.g. things like `1 2 + p` are now possible)
+
 ## 1.0.0 (2024-07-08)
 *As this change does not affect public API, this is released as 1.0.0*
 

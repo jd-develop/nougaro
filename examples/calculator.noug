@@ -111,6 +111,8 @@ while:main_loop True then
     if calcul in ["reseti", "ri"] then; var increment = 0; continue; end
     if calcul in ["printi"] then; print(increment); continue; end
     if calcul in ["p"] then
+        # although the 'p' instruction can be used inside 'commands', having only a 'p' as the input should not
+        # increase the 'i' value
         if len(stack) == 0 then print(0) \
         else print(stack(-1))
         continue
@@ -167,18 +169,26 @@ while:main_loop True then
                         replace(tokens, -1, tokens(-1)*10 + int(char))
                     else  # float
                         var floating_point += 1
-                        replace(tokens, -1, round(tokens(-1) + float(char)/round(10 ^ floating_point),\
-                                                               floating_point)\
-                               )
+                        replace(\
+                            tokens, -1,\
+                            round(\
+                                tokens(-1) + float(char)/round(10 ^ floating_point),\
+                                floating_point\
+                            )\
+                        )
                     end
                 else
                     if is_int(tokens(-1)) then
                         replace(tokens, -1, tokens(-1)*10 - int(char))
                     else  # float
                         var floating_point += 1
-                        replace(tokens, -1, round(tokens(-1) - float(char)/(10 ^ floating_point),\
-                                                               floating_point)\
-                               )
+                        replace(\
+                            tokens, -1,\
+                            round(\
+                                tokens(-1) - float(char)/(10 ^ floating_point),\
+                                floating_point\
+                            )\
+                        )
                     end
                 end
             else
@@ -270,10 +280,13 @@ while:main_loop True then
                 var stack = list(old_stack)
                 continue:main_loop
            end
+        elif token == "p" then
+            if len(stack) == 0 then print(0) \
+            else print(stack(-1))
         elif token == "pi" then
-           append(stack, math.pi)
+            append(stack, math.pi)
         elif token == "tau" then
-           append(stack, math.tau)
+            append(stack, math.tau)
         elif token == "ans" then
             append(stack, answer)
         elif token == "mod" and len(stack) > 1 and is_num(stack(-1)) and is_num(stack(-2)) then

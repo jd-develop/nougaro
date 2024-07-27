@@ -8,15 +8,21 @@ This is Nougaro version `1.0.0`.
 
 Nougaro is a programming language interpreted in Python.
 
-## Third-party modules (optional)
+It is a multi-paradigm programming language and supports imperative, functional and object-oriented programming.
 
- Python builtins that are not always builtin:
+Nougaro is weakly typed. Its syntax is inspired from Python and Basic.
 
-* `colorama` (`pip install colorama`)
-
- Under GNU/Linux, to allow browsing command history with the arrow keys:
-
-* `readline` (`pip install readline`)
+## Example
+```nougaro
+def fizzbuzz(n)
+    for i = 0 to n then
+        if i%15 == 0 then print("FizzBuzz") \
+        elif i%3 == 0 then print("Fizz") \
+        elif i%5 == 0 then print("Buzz") \
+        else print(i)
+    end
+end
+```
 
 ## Run
 
@@ -26,6 +32,16 @@ Nougaro is a programming language interpreted in Python.
  The code is compiled for Windows and GNU/Linux. Check it out in the [releases](https://github.com/jd-develop/nougaro/releases/) tab!
 
  Supports Python 3.11 and 3.12.
+
+### Third-party modules (optional)
+
+ Python builtins that are not always builtin:
+
+* `colorama` (`pip install colorama`)
+
+ Under GNU/Linux, to allow browsing command history with the arrow keys:
+
+* `readline` (`pip install readline`)
 
 ## Documentation
 

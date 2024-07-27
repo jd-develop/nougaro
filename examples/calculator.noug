@@ -39,8 +39,14 @@ def print_help(v)  # v is verbose
     print()
     print("Here all the variables:")
     print("          ans : result of last operation")
-    print("            i : value that gets incremented at each operation. Reset it with 'reseti' or 'ri'.")
+    print("            i : value that gets incremented at each operation.")
+    print("                Reset it with 'reseti' or 'ri' to reset it to 0.")
     print("                Print current value without incrementing with 'printi'.")
+    print("         gsto : value stored in the memory (see `sto` in the next section)")
+    print()
+    print("Here all the commands you can use inside an expression:")
+    print("            p : prints the last result (useful in dc mode)")
+    print("          sto : stores the last result in memory")
     print()
     print("You can exit the calculator using 'exit', 'done' or 'quit'.")
     print("You can clear the screen using 'clear' or 'cls'.")
@@ -98,6 +104,7 @@ var increment = 0
 
 var stack = []
 var error_msg = ""
+var storage = 0
 while:main_loop True then
     if verbose then
         var calcul = input("calc> ")
@@ -213,6 +220,8 @@ while:main_loop True then
             replace(tokens, -1, 'an')
         elif char == 's' and len(tokens) > 0 and tokens(-1) == "an" then
             replace(tokens, -1, 'ans')
+        elif char == 's' and len(tokens) > 0 and tokens(-1) == "g" then
+            replace(tokens, -1, "gs")
         elif char == 's' then
             append(tokens, char)
         elif char == 'q' and len(tokens) > 0 and tokens(-1) == "s" then
@@ -221,6 +230,16 @@ while:main_loop True then
             replace(tokens, -1, "sqr")
         elif char == "t" and len(tokens) > 0 and tokens(-1) == "sqr" then
             replace(tokens, -1, "sqrt")
+        elif char == "t" and len(tokens) > 0 and tokens(-1) == "s" then
+            replace(tokens, -1, "st")
+        elif char == "o" and len(tokens) > 0 and tokens(-1) == "st" then
+            replace(tokens, -1, "sto")
+        elif char == "g" then
+            append(tokens, char)
+        elif char == "t" and len(tokens) > 0 and tokens(-1) == "gs" then
+            replace(tokens, -1, "gst")
+        elif char == "o" and len(tokens) > 0 and tokens(-1) == "gst" then
+            replace(tokens, -1, "gsto")
         elif char == "t" then
             append(tokens, char)
         elif char == "p" then
@@ -348,6 +367,14 @@ while:main_loop True then
             append(stack, increment)
         elif token == "e" then
             append(stack, math.e)
+        elif token == "sto" then
+            if len(stack) > 0 then
+                var storage = stack(-1)
+            else
+                var storage = 0
+            end
+        elif token == "gsto" then
+            append(stack, storage)
         else
             if len(stack) >= 2 then
                 if token == "+" then

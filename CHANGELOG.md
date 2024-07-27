@@ -12,6 +12,10 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 * Added the `loop` loop, which is an infinite loop.
 
 ### Calculator
+#### Added
+* Added the `sto` instruction, that stores the last value in the stack into the memory.
+* Added the `gsto` variable, which is the value contained in the memory.
+
 #### Changed
 * The `p` instruction can be used in any command (e.g. things like `1 2 + p` are now possible)
 

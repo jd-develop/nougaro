@@ -18,11 +18,11 @@
 
     KEYWORD, IDENTIFIER, NE, INT, KEYWORD, KEYWORD, IDENTIFIER, PLUSEQ, INT, EOF
 
- The lexer uses the [position class](src/lexer/position.py) to do not lose itself in the raw code.
+ The lexer uses the [position class](src/lexer/position.py) to not lose itself in the raw code. Each token has a start and an end position.
 
 #### Parser
 
- After the lexer, the [parser](src/parser/parser.py) converts the tokens into [nodes](src/parser/nodes.py), following some [grammar rules](src/parser/grammar.txt). Nodes are bigger parts of the code, such as function definitions or binary operators.
+ After the lexer, the [parser](src/parser/parser.py) converts the tokens into an abstract syntax tree composed of [nodes](src/parser/nodes.py), following some [grammar rules](src/parser/grammar.txt). Nodes are bigger parts of the code, such as function definitions or binary operators.
 
  The lexer return a [parse result](src/parser/parse_result.py) where the main node of the file is stored, along with errors that may have occurred.
 
@@ -30,7 +30,7 @@
 
     list:[(while:(bin_op_comp:([var_access:[identifier:"a"]], !=, [num:int:10]) then:var_assign:([[identifier:"a"]] += [num:int:1])), False)]
 
- Ouch... Let's organize this mess to explain it easier.
+ Ouch… Let's organize this mess to explain it easier.
 
     list:[
        (
@@ -62,27 +62,31 @@
 
 ##### Context
 
- The [context](src/runtime/context.py) contain a lot of useful thing for the interpreter, such as the `display_name` (name of the function), booleans to store whether or not it should break or continue the loop, or which value to return in the fuction… It also stores the [**Symbol Table**](src/runtime/symbol_table.py).
+ The [context](src/runtime/context.py) contain a lot of useful thing for the interpreter, such as the `display_name` (name of the function), booleans to store whether or not it should break or continue the loop, or which value to return in the function… It also stores the [**Symbol Table**](src/runtime/symbol_table.py).
 
 ###### Variables and symbol tables
 
- The interpreter store all the variables in the Symbol Table. This is a table, with the name of the variables on one side and the values on the other side. It looks like that:
+ The interpreter stores all the variables in the Symbol Table. This is a dictionnary, with the name of the variables as the keys and the values as the, well, values. It looks like that:
 
     {
        "parent": None,
        "symbols": {
           "a": 10,
           "some_builtin_function": <built-in function "some_builtin_function">,
+          "another_variable": value
        }
     }
 
 When the Interpreter wants to create a variable, it creates an entry in the symbol table of the current Context. If it
 wants to access a variable, it checks in the symbol table of the current Context, but also in its parent, and its
-parent’s parent, etc. The only case where it doesn’t look into the parent symbol table is in built-in functions,
-because otherwise if an optional parameter is not given but the user already have a variable with the same name, the
-interpreter will look to this variable (see issue [#10](https://github.com/jd-develop/nougaro/issues/10)). By the way,
-this is why it is recommended in [this doc page](https://nougaro.github.io/jd-develop/documentation/1.0/Expand/Write-libs#get-arguments)
-to use the `getf` method of symbol table in built-in functions (see the difference in the code between `get` and `getf`).
+parent’s parent, etc.
+
+>[!Note]
+> The only case where it doesn’t look into the parent symbol table is in built-in functions,
+> because otherwise if an optional parameter is not given but the user already have a variable with the same name, the
+> interpreter will look to this variable (see issue [#10](https://github.com/jd-develop/nougaro/issues/10)). By the way,
+> this is why it is recommended in [this doc page](https://nougaro.github.io/jd-develop/documentation/1.0/Expand/Write-libs#get-arguments)
+> to use the `getf` method of symbol table in built-in functions (see the difference in the code between `get` and `getf`).
 
 The symbol table is set to its default value at the beginning of the execution of a program, using [this file](src/runtime/set_symbol_table.py)
 

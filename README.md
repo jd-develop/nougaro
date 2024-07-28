@@ -8,7 +8,7 @@ This is Nougaro version `1.0.0`.
 
 Nougaro is a programming language interpreted in Python.
 
-It is a multi-paradigm programming language and supports imperative, functional and object-oriented programming.
+It is a multi-paradigm programming language that supports imperative, functional and object-oriented programming.
 
 Nougaro is weakly typed. Its syntax is inspired from Python and Basic.
 

@@ -28,12 +28,14 @@ def clean_version_for_gh()(print_value=False, return_value=True)
     # in the GH issues and PRs
     var os = __os_name__
     var os_version = __os_release__ + " " + __os_version__
-    var nougaro_version = __noug_version__ + " (id: " + __version_id__ +\
-                                             ", data_version: " + __data_version__ + ")"
-    var final_str = \
+    var nougaro_version = (
+        __noug_version__ + " (id: " + __version_id__ + ", data_version: " + __data_version__ + ")"
+    )
+    var final_str = (
         "* OS: " + os +\
         "\n* OS version: " + os_version +\
         "\n* Nougaro version: " + nougaro_version
+    )
 
     if print_value then print(final_str)
     if return_value then return final_str

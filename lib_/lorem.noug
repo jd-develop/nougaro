@@ -11,17 +11,17 @@ def ipsum(paragraphs)
     assert is_int(paragraphs), "first argument of function 'lorem.ipsum' SHOULD be an integer."
     assert paragraphs >= 0, "first argument of function 'lorem.ipsum' SHOULD be positive."
     if paragraphs == 0 then return ""
-    var lorem_sentences = [\
-        "Quisque vitae varius ex, eu volutpat orci.",\
-        "Aenean ullamcorper orci et vulputate fermentum.",\
-        "Cras erat dui, finibus vel lectus ac, pharetra dictum odio.",\
-        "Nullam tempus scelerisque purus, sed mattis elit condimentum nec.",\
-        "Etiam risus sapien, auctor eu volutpat sit amet, porta in nunc.",\
-        "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.",\
-        "Proin ipsum purus, laoreet quis dictum a, laoreet sed ligula.",\
-        "Integer ultricies malesuada quam.",\
-        "Cras vel elit sed mi placerat pharetra eget vel odio.",\
-        "Duis ac nulla varius diam ultrices rutrum."\
+    var lorem_sentences = [
+        "Quisque vitae varius ex, eu volutpat orci.",
+        "Aenean ullamcorper orci et vulputate fermentum.",
+        "Cras erat dui, finibus vel lectus ac, pharetra dictum odio.",
+        "Nullam tempus scelerisque purus, sed mattis elit condimentum nec.",
+        "Etiam risus sapien, auctor eu volutpat sit amet, porta in nunc.",
+        "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.",
+        "Proin ipsum purus, laoreet quis dictum a, laoreet sed ligula.",
+        "Integer ultricies malesuada quam.",
+        "Cras vel elit sed mi placerat pharetra eget vel odio.",
+        "Duis ac nulla varius diam ultrices rutrum."
     ]
     var text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
     var last_paragraph_first_sentence = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."

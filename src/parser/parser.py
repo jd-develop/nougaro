@@ -774,7 +774,7 @@ class Parser:
 
     def assign_identifier(self) -> tuple[list[Node | Token], None] | tuple[None, Error]:
         """
-        assign_id  : (IDENTIFIER (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?* DOT)?* IDENTIFIER
+        assign_id  : (IDENTIFIER (LPAREN NEWLINE?* (MUL? expr (COMMA NEWLINE?* MUL? expr)?*)? NEWLINE?* RPAREN)?* DOT)?* IDENTIFIER
         """
         result = ParseResult()
         current_name_nodes_and_tokens_list: list[Node | Token] = []
@@ -796,6 +796,11 @@ class Parser:
                 result.register_advancement()
                 self.advance()
                 arg_nodes: list[tuple[Node, bool]] = []
+
+                cur_tok = self.current_token
+                while cur_tok is not None and cur_tok.type == TT["NEWLINE"]:
+                    result.register_advancement()
+                    cur_tok = self.advance()
 
                 comma_expected = False
                 mul = False
@@ -827,6 +832,11 @@ class Parser:
                     result.register_advancement()
                     self.advance()
 
+                    cur_tok = self.current_token
+                    while cur_tok is not None and cur_tok.type == TT["NEWLINE"]:
+                        result.register_advancement()
+                        cur_tok = self.advance()
+
                     if self.current_token.type == TT["MUL"]:  # MUL?
                         mul = True
                         # we advance
@@ -842,6 +852,11 @@ class Parser:
                     assert not isinstance(expr_node, list)
                     
                     arg_nodes.append((expr_node, mul))
+
+                cur_tok = self.current_token
+                while cur_tok is not None and cur_tok.type == TT["NEWLINE"]:
+                    result.register_advancement()
+                    cur_tok = self.advance()
 
                 pos_end = self.current_token.pos_end.copy()
                 result = self.check_for_and_advance(
@@ -1006,7 +1021,7 @@ class Parser:
 
     def call(self) -> ParseResult:
         """
-        call       : atom (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
+        call       : atom (LPAREN NEWLINE?* (MUL? expr (COMMA NEWLINE?* MUL? expr)?*)? NEWLINE?* RPAREN)?*
         """
         result = ParseResult()
 
@@ -1017,11 +1032,11 @@ class Parser:
         assert atom is not None
 
         assert self.current_token is not None
-        # (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
+        # (LPAREN NEWLINE?* (MUL? expr (COMMA NEWLINE?* MUL? expr)?*)? NEWLINE?* RPAREN)?*
         if self.current_token.type != TT["LPAREN"]:
             # not a function
             return result.success(atom)
-        
+
         call_node = atom
         # the '*' at the end of the grammar rule
         # in fact, if we have a()(), we call a, then we call its result. All of that is in one single grammar rule.
@@ -1029,6 +1044,11 @@ class Parser:
             result.register_advancement()
             self.advance()
             arg_nodes: list[tuple[Node, bool]] = []
+
+            cur_tok = self.current_token
+            while cur_tok is not None and self.current_token.type == TT["NEWLINE"]:
+                result.register_advancement()
+                cur_tok = self.advance()
 
             comma_expected = False
             mul = False
@@ -1064,6 +1084,11 @@ class Parser:
                 result.register_advancement()
                 self.advance()
 
+                cur_tok = self.current_token
+                while cur_tok is not None and self.current_token.type == TT["NEWLINE"]:
+                    result.register_advancement()
+                    cur_tok = self.advance()
+
                 if self.current_token.type == TT["MUL"]:  # MUL?
                     mul = True
                     # we advance
@@ -1079,6 +1104,11 @@ class Parser:
                 expr_and_mul = (expr_, mul)
                 
                 arg_nodes.append(expr_and_mul)
+
+            cur_tok = self.current_token
+            while cur_tok is not None and self.current_token.type == TT["NEWLINE"]:
+                result.register_advancement()
+                cur_tok = self.advance()
 
             pos_end = self.current_token.pos_end.copy()
             result = self.check_for_and_advance(
@@ -1097,7 +1127,7 @@ class Parser:
         """
         atom  : (INT|FLOAT)(E_INFIX INT)?|(STRING (STRING NEWLINE?*)?*)
               : (IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*)
-              : LPAREN expr RPAREN
+              : LPAREN NEWLINE?* expr NEWLINE?* RPAREN
               : DOLLAR IDENTIFIER
               : list_expr
               : if_expr
@@ -1150,13 +1180,13 @@ class Parser:
         # class_def
         elif token.matches(TT["KEYWORD"], 'class'):
             expr = result.register(self.class_def())
-        elif self.current_token.matches(TT["KEYWORD"], "else"):
+        elif token.matches(TT["KEYWORD"], "else"):
             return result.failure(InvalidSyntaxError(
                 token.pos_start, token.pos_end,
                 "expected valid expression. Maybe you forgot to close an 'end'?",
                 "src.parser.parser.Parser.atom"
             ))
-        elif self.current_token.type == TT["DEFAULT"]:
+        elif token.type == TT["DEFAULT"]:
             expr = DefaultNode(self.current_token.pos_start, self.current_token.pos_end)
             result.register_advancement()
             self.advance()
@@ -1270,18 +1300,30 @@ class Parser:
 
     def paren_expr(self) -> ParseResult:
         result = ParseResult()
+
         # we advance
         result.register_advancement()
         self.advance()
+
+        while self.current_token is not None and self.current_token.type == TT["NEWLINE"]:
+            result.register_advancement()
+            self.advance()
+
         # we register an expr
         expr = result.register(self.expr())
         if result.error is not None:  # we check for any error
             return result
         assert expr is not None
+
+        while self.current_token is not None and self.current_token.type == TT["NEWLINE"]:
+            result.register_advancement()
+            self.advance()
+
         # we check for right parenthesis
         result = self.check_for_and_advance(result, "expected ')'.", "RPAREN", None, "paren_expr")
         if result.error is not None:
             return result
+
         return result.success(expr)
     
     def dollar_print_expr(self, token: Token) -> ParseResult:
@@ -1300,7 +1342,7 @@ class Parser:
 
     def list_expr(self) -> ParseResult:
         """
-        list_expr  : LSQUARE (MUL? expr (COMMA MUL? expr)?*)? RSQUARE
+        list_expr  : LSQUARE NEWLINE?* (MUL? expr (COMMA NEWLINE?* MUL? expr)?*)? NEWLINE?* RSQUARE
         """
         # we create the result
         result = ParseResult()
@@ -1316,6 +1358,11 @@ class Parser:
         result = self.check_for_and_advance(result, "expected '['.", "LSQUARE", None, "list_expr")
         if result.error is not None:
             return result
+        
+        cur_tok = self.current_token
+        while cur_tok is not None and self.current_token.type == TT["NEWLINE"]:
+            result.register_advancement()
+            cur_tok = self.advance()
 
         if self.current_token.type == TT["RSQUARE"]:  # ] : we close the list
             pos_end = self.current_token.pos_end.copy()
@@ -1326,7 +1373,7 @@ class Parser:
             ))
         
         # there are elements
-        # MUL? expr (COMMA MUL? expr)?*
+        # MUL? expr (COMMA NEWLINE?* MUL? expr)?*
         if self.current_token.type == TT["MUL"]:  # MUL?
             mul = True
             # we advance
@@ -1343,11 +1390,16 @@ class Parser:
         
         element_nodes.append(expr_and_mul)
 
-        while self.current_token.type == TT["COMMA"]:  # (COMMA MUL? expr)?*
+        while self.current_token.type == TT["COMMA"]:  # (COMMA NEWLINE?* MUL? expr)?*
             mul = False
             # we advance
             result.register_advancement()
             self.advance()
+
+            cur_tok = self.current_token
+            while cur_tok is not None and self.current_token.type == TT["NEWLINE"]:
+                result.register_advancement()
+                cur_tok = self.advance()
 
             if self.current_token.type == TT["MUL"]:  # MUL?
                 mul = True
@@ -1365,10 +1417,15 @@ class Parser:
             
             element_nodes.append(expr_and_mul)
 
-        pos_end = self.current_token.pos_end.copy()
+        cur_tok = self.current_token
+        while cur_tok is not None and self.current_token.type == TT["NEWLINE"]:
+            result.register_advancement()
+            cur_tok = self.advance()
 
-        result = self.check_for_and_advance(result, "'[' was never closed.", "RSQUARE",
-                                            None, "list_expr", pos_start, first_tok_pos_end)
+        pos_end = self.current_token.pos_end.copy()
+        result = self.check_for_and_advance(
+                result, "'[' was never closed.", "RSQUARE", None, "list_expr", pos_start, first_tok_pos_end
+        )
         if result.error is not None:
             return result
         return result.success(ListNode(
@@ -1908,9 +1965,14 @@ class Parser:
         # LPAREN
         result = self.check_for_and_advance(result, errmsg, "LPAREN", None, "func_def")
 
+        cur_tok = self.current_token
+        while cur_tok is not None and cur_tok.type == TT["NEWLINE"]:
+            result.register_advancement()
+            cur_tok = self.advance()
+
         param_names_tokens: list[Token] = []
 
-        # (IDENTIFIER (COMMA IDENTIFIER)*)?
+        # (IDENTIFIER (COMMA NEWLINE?* IDENTIFIER)*)?
         errmsg = "expected identifier or ')'."
         if self.current_token.type == TT["IDENTIFIER"]:
             errmsg = "expected ',' or ')'."
@@ -1918,10 +1980,15 @@ class Parser:
             result.register_advancement()
             self.advance()
 
-            # (COMMA IDENTIFIER)*?
+            # (COMMA NEWLINE?* IDENTIFIER)*?
             while self.current_token.type == TT["COMMA"]:
                 result.register_advancement()
                 self.advance()
+
+                cur_tok = self.current_token
+                while cur_tok is not None and cur_tok.type == TT["NEWLINE"]:
+                    result.register_advancement()
+                    cur_tok = self.advance()
 
                 # IDENTIFIER
                 if self.current_token.type != TT["IDENTIFIER"]:
@@ -1940,6 +2007,11 @@ class Parser:
                 result.register_advancement()
                 self.advance()
         
+        cur_tok = self.current_token
+        while cur_tok is not None and cur_tok.type == TT["NEWLINE"]:
+            result.register_advancement()
+            cur_tok = self.advance()
+
         result = self.check_for_and_advance(result, errmsg, "RPAREN", None, "func_def")
         if result.error is not None:
             return result
@@ -1948,7 +2020,15 @@ class Parser:
         # optional_func_def_args?
         # LPAREN
         if self.current_token.type == TT["LPAREN"]:
-            result = self.advance_and_check_for(
+            result.register_advancement()
+            self.advance()
+
+            cur_tok = self.current_token
+            while cur_tok is not None and cur_tok.type == TT["NEWLINE"]:
+                result.register_advancement()
+                cur_tok = self.advance()
+
+            result = self.check_for(
                 result, "expected identifier after '('", "IDENTIFIER", origin_file="func_def"
             )
             
@@ -1965,10 +2045,15 @@ class Parser:
             assert not isinstance(node, list)
             optional_params.append((identifier, node))
 
-            # (COMMA IDENTIFIER EQ expr)*?
+            # (COMMA NEWLINE?* IDENTIFIER EQ expr)*?
             while self.current_token.type == TT["COMMA"]:
                 result.register_advancement()
                 self.advance()
+
+                cur_tok = self.current_token
+                while cur_tok is not None and cur_tok.type == TT["NEWLINE"]:
+                    result.register_advancement()
+                    cur_tok = self.advance()
 
                 # IDENTIFIER
                 if self.current_token.type != TT["IDENTIFIER"]:
@@ -1995,6 +2080,11 @@ class Parser:
                 assert node is not None
                 assert not isinstance(node, list)
                 optional_params.append((identifier, node))
+
+            cur_tok = self.current_token
+            while cur_tok is not None and cur_tok.type == TT["NEWLINE"]:
+                result.register_advancement()
+                cur_tok = self.advance()
 
             result = self.check_for_and_advance(
                 result, "expected ',' or ')'.", "RPAREN", None, "func_def"
@@ -2050,7 +2140,7 @@ class Parser:
     def class_def(self) -> ParseResult:
         """
             KEYWORD:CLASS IDENTIFIER?
-            (LPAREN IDENTIFIER? RPAREN)?
+            (LPAREN NEWLINE?* IDENTIFIER? NEWLINE?* RPAREN)?
             (ARROW expr)
           | (NEWLINE statements KEYWORD:END)
         """
@@ -2075,6 +2165,11 @@ class Parser:
             result.register_advancement()
             self.advance()
 
+            cur_tok = self.current_token
+            while cur_tok is not None and self.current_token.type == TT["NEWLINE"]:
+                result.register_advancement()
+                cur_tok = self.advance()
+
             # IDENTIFIER?
             if self.current_token.type == TT["IDENTIFIER"]:
                 parent_var_name_tok = self.current_token
@@ -2082,6 +2177,11 @@ class Parser:
                 self.advance()
             else:
                 parent_var_name_tok = None
+
+            cur_tok = self.current_token
+            while cur_tok is not None and self.current_token.type == TT["NEWLINE"]:
+                result.register_advancement()
+                cur_tok = self.advance()
 
             # RPAREN
             result = self.check_for_and_advance(result, "expected ')'.", "RPAREN", None, "class_def")

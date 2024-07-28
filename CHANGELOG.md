@@ -10,6 +10,19 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 
 ### Added
 * Added the `loop` loop, which is an infinite loop.
+* Add support for newlines after `(` and `[`, before `)` and `]` as well as, inside lists, calls, and function defs, newlines after commas.
+  For instance, this is now legal:
+  ```nougaro
+  def a(
+     b,
+     c
+  )(
+     d = 4,
+     e = 5
+  )
+      stuff
+  end
+  ```
 
 ### Calculator
 #### Added

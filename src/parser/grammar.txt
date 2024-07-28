@@ -20,7 +20,7 @@ expr          : var_assign
 var_assign    : KEYWORD:VAR assign_id (COMMA assign_id)?* assign_eq assign_expr
               : KEYWORD:VAR assign_id (INCREMENT|DECREMENT)
 
-assign_id     : (IDENTIFIER (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?* DOT)?* IDENTIFIER
+assign_id     : (IDENTIFIER (LPAREN NEWLINE?* (MUL? expr (COMMA NEWLINE?* MUL? expr)?*)? NEWLINE?* RPAREN)?* DOT)?* IDENTIFIER
 
 assign_eq     : EQ|PLUSEQ|MINUSEQ|MULTEQ|DIVEQ|POWEQ|FLOORDIVEQ|PERCEQ|OREQ|ANDEQ|XOREQ|BITWISEANDEQ|BITWISEOREQ|BITWISEXOREQ|EEEQ|GTEQ|GTEEQ|LTEQ|LTEEQ
 
@@ -39,12 +39,12 @@ factor        : (PLUS|MINUS) factor
 
 power         : call (DOT call)?* (POW factor)*
 
-call          : atom (LPAREN (MUL? expr (COMMA MUL? expr)?*)? RPAREN)?*
+call          : atom (LPAREN NEWLINE?* (MUL? expr (COMMA NEWLINE?* MUL? expr)?*)? NEWLINE?* RPAREN)?*
 
 atom          : (INT|FLOAT)(E_INFIX INT)?
               : STRING (STRING NEWLINE?*)?*
               : IDENTIFIER (INTERROGATIVE_PNT IDENTIFIER|expr)?*
-              : LPAREN expr RPAREN
+              : LPAREN NEWLINE? expr NEWLINE? RPAREN
               : DOLLAR IDENTIFIER
               : list_expr
               : if_expr
@@ -56,7 +56,7 @@ atom          : (INT|FLOAT)(E_INFIX INT)?
               : class_def
               : <default>
 
-list_expr     : LSQUARE (MUL? expr (COMMA MUL? expr)?*)? RSQUARE
+list_expr     : LSQUARE NEWLINE?* (MUL? expr (COMMA NEWLINE?* MUL? expr)?*)? NEWLINE?* RSQUARE
 
 if_expr       : KEYWORD:IF expr KEYWORD:THEN
                 ((statement if_expr_b|if_expr_c?)
@@ -90,11 +90,11 @@ loop_expr     : KEYWORD:LOOP (COLON IDENTIFIER)?
 func_def      : KEYWORD:DEF IDENTIFIER? func_def_args optional_func_def_args?
                 (ARROW expr)|(NEWLINE statements KEYWORD:END)
 
-func_def_args : LPAREN (IDENTIFIER (COMMA IDENTIFIER)*?)? RPAREN
+func_def_args : LPAREN NEWLINE?* (IDENTIFIER (COMMA NEWLINE?* IDENTIFIER)*?)? NEWLINE*? RPAREN
 
-optional_func_def_args : LPAREN IDENTIFIER EQ expr (COMMA IDENTIFIER EQ expr)*? RPAREN
+optional_func_def_args : LPAREN NEWLINE?* IDENTIFIER EQ expr (COMMA NEWLINE?* IDENTIFIER EQ expr)*? NEWLINE?* RPAREN
 
 class_def     : KEYWORD:CLASS IDENTIFIER?
-                (LPAREN IDENTIFIER? RPAREN)?
+                (LPAREN NEWLINE?* IDENTIFIER? NEWLINE?* RPAREN)?
                 (ARROW expr)
               | (NEWLINE statements KEYWORD:END)

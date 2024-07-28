@@ -73,6 +73,18 @@ def test_nougaro(print_OK)
 
     # basic syntax
     "a" ; "b"
+    (
+        assert True
+    )
+    [
+        def()->(assert True),
+        12
+    ](0)(
+
+    )
+    [
+
+    ]
 
     if print_OK then print("OK basic syntax")
 
@@ -90,7 +102,9 @@ def test_nougaro(print_OK)
     assert 1e3 == 1000
     assert 1e-3 == 0.001
     assert 1e+3 == 1000
-    assert 1__0e+1_0 == int("10" + "0"*10)
+    assert 1__0e+1_0 == int(
+        "10" + "0"*10
+    )
     assert 1__0e1_0 == int("10" + "0"*10)
     assert 0x90_8 == 8 + 9*(16^2)
     assert 0b10e2 == 200
@@ -188,7 +202,8 @@ def test_nougaro(print_OK)
     assert 1 in "123"
     assert None in "foo bar none foo"
     assert <default> in "foo bar <default>"
-    assert "bépo" in ["azerty", "qwerty", "bépo"]
+    assert "bépo" in ["azerty",
+        "qwerty", "bépo"]
     assert 1 > 0
     assert 1 >= 1
     assert 0 < 1
@@ -225,7 +240,9 @@ def test_nougaro(print_OK)
     assert not (False and 1/0)
     assert True or 1/0
     var a = 1
-    assert (is_int(a) and round(a)) == True
+    assert (
+        is_int(a) and round(a)
+    ) == True
     var a = "str"
     assert not (is_int(a) and round(a))
     del a
@@ -270,69 +287,69 @@ def test_nougaro(print_OK)
     assert (do var b += 1 then loop while b < 10) == [11]
     assert b == 11
 
-    var b = ( \
+    var b = (
         for i = 1 to 10 then
             if i%5 == 0 then break \
             else i
-        end \
+        end
     )
     assert b == [[1], [2], [3], [4]]
-    var b = ( \
+    var b = (
         for i = 1 to 10 then
             if i%5 == 0 then break and return 12 \
             else i
-        end \
+        end
     )
     assert b == 12
 
-    var b = ( \
+    var b = (
         for i in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] then
             if i%5 == 0 then break \
             else i
-        end \
+        end
     )
     assert b == [[1], [2], [3], [4]]
-    var b = ( \
+    var b = (
         for i in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] then
             if i%5 == 0 then break and return 12 \
             else i
-        end \
+        end
     )
     assert b == 12
 
     var i = 1
-    var b = ( \
+    var b = (
         while i <= 10 then
             if i%5 == 0 then break \
             else i
             var i++
-        end \
+        end
     )
     assert b == [[1, 2], [2, 3], [3, 4], [4, 5]]
-    var b = ( \
+    var b = (
         while i <= 10 then
             if i%5 == 0 then break and return 12 \
             else i
             var i++
-        end \
+        end
     )
     assert b == 12
 
     var i = 1
-    var b = ( \
+    var b = (
         do
             if i%5 == 0 then break \
             else i
             var i++
-        then loop while i <= 10 \
+        then loop while i <= 10
     )
     assert b == [[1, 2], [2, 3], [3, 4], [4, 5]]
-    var b = ( \
+    var b = (
         do
             if i%5 == 0 then break and return 12 \
             else i
             var i++
-        then loop while i <= 10 \
+        then loop while i <= 10
     )
     assert b == 12
 
@@ -428,7 +445,13 @@ def test_nougaro(print_OK)
             if i == 8 then break:outer else i
     end)
 
-    assert c == [[1, [0]], [2, [0, 1]], [3, [0, 1, 2]], [4, [0, 1, 2, 3]], [5, [0, 1, 2, 3, 4]], [6, [0, 1, 2, 3, 4, 5]], [7, [0, 1, 2, 3, 4, 5, 6]], [8, [0, 1, 2, 3, 4, 5, 6, 7]]]
+    assert c == [[1, [0]], [2, [0, 1]], [3, [0, 1, 2]], [4, [0, 1, 2, 3]], [
+        # test comment inside a list expression
+        5, [
+            0, 1,
+            2, 3, 4]
+        ], [6, [0, 1, 2, 3, 4, 5]], [7, [0, 1, 2, 3, 4, 5, 6]
+    ], [8, [0, 1, 2, 3, 4, 5, 6, 7]]]
 
     del b
     var c = 0
@@ -467,16 +490,39 @@ def test_nougaro(print_OK)
     assert this_is_a_function != func
     assert this_is_a_function == another_func != None
 
-    def function_with_optional_params1(a, b)(c = 2) -> (a+b)*c
+    def function_with_optional_params1(
+        a, b
+    )(
+        c = 2
+    ) -> (a+b)*c
     def function_with_optional_params2(a, b)(c = 2, d = 4)
         var intermediate_var = a+b
         var intermediate_var2 = c+d
         return intermediate_var * intermediate_var2
     end
+    def fn_with_opt_params3(
+    )(
+    e = 12
+    ) -> e
+    def fn_with_opt_params4(
+        a,
+        b
+    )(
+        e = 12,
+        # test comment inside func def opt params
+        f = 13
+    ) -> a+b+e+f
 
     assert function_with_optional_params1(1, 2) == 6
-    assert function_with_optional_params1(1, 2, <default>) == 6
-    assert function_with_optional_params1(1, 2, 3) == 9
+    assert function_with_optional_params1(
+        1,
+        # test comment inside a call
+        2,
+        <default>
+    ) == 6
+    assert function_with_optional_params1(
+        1, 2, 3
+    ) == 9
     assert function_with_optional_params1("foo_", "bar ") == "foo_bar foo_bar "
     assert function_with_optional_params1("foo_", "bar", 1) == "foo_bar"
 
@@ -495,6 +541,15 @@ def test_nougaro(print_OK)
     assert function_with_optional_params2("foo_", "bar", <default>, 0) == "foo_bar"*2
     assert function_with_optional_params2("foo_", "bar", 0, 0) == ""
 
+    assert fn_with_opt_params3() == 12
+    assert fn_with_opt_params3(<default>) == 12
+    assert fn_with_opt_params3(void) == void
+
+    assert fn_with_opt_params4(1, 1) == 27
+    assert fn_with_opt_params4(1, 1, <default>) == 27
+    assert fn_with_opt_params4(1, 1, <default>, 1) == 15
+    assert fn_with_opt_params4(1, 1, 1, 1) == 4
+
     assert function_with_optional_params1
 
     if print_OK then print("OK func")
@@ -509,6 +564,19 @@ def test_nougaro(print_OK)
 
     # classes
     var a = (class Test; var b5 = (class; var c = 2; end)(); end)()
+    assert a.b5.c == 2
+    assert Test == Test
+    assert a == a
+
+    var a = (class Test(); var b5 = (class(); var c = 2; end)(); end)()
+    assert a.b5.c == 2
+    assert Test == Test
+    assert a == a
+
+    var a = (class Test(
+# test comment inside class def
+    ); var b5 = (class(
+    ); var c = 2; end)(); end)()
     assert a.b5.c == 2
     assert Test == Test
     assert a == a
@@ -577,7 +645,10 @@ def test_nougaro(print_OK)
     end
     assert Test3().foo() == 7
 
-    class Test4(Test3)
+    class Test4(
+        Test3
+        # test comment inside class def
+    )
         def bar()
             assert this.d == 6
             assert this.b == 4
@@ -598,6 +669,10 @@ def test_nougaro(print_OK)
     var variable.test = 20
     var e(variable).test = 20
     assert variable.test == 20
+    var e(
+        variable
+    ).test = 40
+    assert variable.test == 40
     assert is_constructor(Test4)
     assert is_constructor(Test3)
     assert not is_constructor(e)

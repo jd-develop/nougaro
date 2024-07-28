@@ -4,12 +4,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# This file was made in Nougaro beta 0.18.0 version.
+# This file was made in Nougaro 1.0.0 version.
 import math
 import statistics
 import time
 
 # This is a comment
+/*
+    this is a multi-line comment
+    awesome
+*/
 # Basics :
 # Print
 print("Hello, world!")  # it prints the text then puts a back line
@@ -104,9 +108,7 @@ def fib(n)
         while a < n then
             print(a)
             var return_list += a
-            var c = a
-            var a = b
-            var b += c
+            var a, b = b, a+b
         end
         return return_list
     else
@@ -118,7 +120,7 @@ end
 print(fib(input_int("Enter number: ")))
 print()
 
-var a = def()->print("Hello, world!")  # you are not obliged to give a name to your function
+var a = def()->print("Hello, world!")  # you may not give a name to your function
 a()
 print()
 

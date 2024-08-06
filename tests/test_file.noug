@@ -9,11 +9,11 @@ import _conffiles as cf
 
 def test_nougaro(print_OK)
     var start_time = time.time()
-    
-    assert __noug_version__ == "1.0.0"
+
+    assert __noug_version__ == "1.1.0"
     import noug_version
-    assert noug_version.version_list == [1, 0, 0, "stable", 0]
-    assert noug_version.clean_version_for_nuitka_under_windows() == "1.0.0"
+    assert noug_version.version_list == [1, 1, 0, "stable", 0]
+    assert noug_version.clean_version_for_nuitka_under_windows() == "1.1.0"
     assert noug_version.clean_version_for_nuitka_under_windows(0, 0) == None
     assert noug_version.clean_version_for_gh(0, 0) == None
 

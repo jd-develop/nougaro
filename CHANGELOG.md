@@ -24,6 +24,9 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
   end
   ```
 
+### Changed
+* Version id has been increased to `10`
+
 ### Calculator
 #### Added
 * Added the `sto` instruction, that stores the last value in the stack into the memory.

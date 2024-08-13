@@ -6,11 +6,19 @@ This file is updated nearly every commit and copied to GH release changelog.
 
 Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. The Nougaro changelog has another section, `Calculator`, keeping track of the changes relative to the Nougaro Calculator under the same 6-sections format.
 
+## upcoming
+
+### Fixed
+
+#### Build scripts
+* Build scripts now copy `CHANGELOG.md`.
+* `build.bat` is now more verbose.
+
 ## 1.1.0 (2024-08-13)
 
 ### Added
 * Added the `loop` loop, which is an infinite loop.
-* Add support for newlines after `(` and `[`, before `)` and `]` as well as, inside lists, calls, and function defs, newlines after commas.
+* Add support for newlines after `(` and `[`, before `)` and `]`, as well as inside lists, calls, and function defs, and after commas.
   For instance, this is now legal:
   ```nougaro
   def a(

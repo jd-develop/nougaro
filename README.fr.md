@@ -39,7 +39,9 @@ end
 
 * `colorama` (`pip install colorama`)
 
- Sous GNU/Linux, pour permetter de naviguer dans l’historique des commandes en utilisant les flèches du clavier&nbsp;:
+ Sous GNU/Linux, pour permetter de naviguer dans l’historique des commandes en
+ utilisant les flèches du clavier, ainsi que pour sauvegarder l’historique de
+ commandes&nbsp;:
 
 * `readline` (`pip install readline`)
 

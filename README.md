@@ -39,7 +39,8 @@ end
 
 * `colorama` (`pip install colorama`)
 
- Under GNU/Linux, to allow browsing command history with the arrow keys:
+ Under GNU/Linux, to allow browsing command history with the arrow keys, and to
+ save the command history across sessions:
 
 * `readline` (`pip install readline`)
 

@@ -324,7 +324,7 @@ while:main_loop True then
         elif token == "log" and len(stack) > 1 and is_num(stack(-1)) and is_num(stack(-2)) then
             var number = stack(-2)
             var base = stack(-1)
-            if number <= 0 or base <= 1 then
+            if number <= 0 or base <= 0 or base == 1 then
                 var error_msg = "Error: math domain error with logarithm"
                 print_error(error_msg, verbose)
                 var stack = list(old_stack)

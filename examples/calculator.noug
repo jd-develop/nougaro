@@ -111,7 +111,7 @@ while:main_loop True then
     else
         var calcul = input()
     end
-    
+
     if calcul in ["exit", "exit()", "done", "quit", "q"] then break
     if calcul == "" then continue
     if calcul in ["clear", "cls"] then; clear(); continue; end
@@ -234,6 +234,8 @@ while:main_loop True then
             replace(tokens, -1, "st")
         elif char == "o" and len(tokens) > 0 and tokens(-1) == "st" then
             replace(tokens, -1, "sto")
+        elif char == "g" and len(tokens) > 0 and tokens(-1) == "lo" then
+            replace(tokens, -1, "log")
         elif char == "g" then
             append(tokens, char)
         elif char == "t" and len(tokens) > 0 and tokens(-1) == "gs" then
@@ -256,8 +258,6 @@ while:main_loop True then
             append(tokens, char)
         elif char == "o" and len(tokens) > 0 and tokens(-1) == "l" then
             replace(tokens, -1, "lo")
-        elif char == "g" and len(tokens) > 0 and tokens(-1) == "lo" then
-            replace(tokens, -1, "log")
         elif char == "n" and len(tokens) > 0 and tokens(-1) == "l" then
             replace(tokens, -1, "ln")
         elif char == "i" then
@@ -324,7 +324,7 @@ while:main_loop True then
         elif token == "log" and len(stack) > 1 and is_num(stack(-1)) and is_num(stack(-2)) then
             var number = stack(-2)
             var base = stack(-1)
-            if number <= 0 or base <= 0 then
+            if number <= 0 or base <= 1 then
                 var error_msg = "Error: math domain error with logarithm"
                 print_error(error_msg, verbose)
                 var stack = list(old_stack)

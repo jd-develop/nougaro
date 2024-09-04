@@ -41,7 +41,7 @@ class Math(ModuleFunction):
         """Return a copy of self"""
         copy = Math(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
-    
+
     def is_eq(self, other: Value):
         return isinstance(other, Math) and self.name == other.name
 
@@ -476,6 +476,13 @@ class Math(ModuleFunction):
                 return RTResult().failure(RunTimeError(
                     self.pos_start, self.pos_end,
                     f"Python ValueError: {e}",
+                    exec_context,
+                    origin_file="lib_.math_.Math.execute_math_log"
+                ))
+            except ZeroDivisionError as e:
+                return RTResult().failure(RTArithmeticError(
+                    self.pos_start, self.pos_end,
+                    "Python ZeroDivisionError: {e}",
                     exec_context,
                     origin_file="lib_.math_.Math.execute_math_log"
                 ))

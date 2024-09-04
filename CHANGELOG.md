@@ -9,10 +9,15 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 ## upcoming
 
 ### Fixed
+* Fixed a crash in `math.log` on base=1
 
 #### Build scripts
 * Build scripts now copy `CHANGELOG.md`.
 * `build.bat` is now more verbose.
+
+### Calculator
+#### Fixed
+* Fixed a crash with `log` on base=1
 
 ## 1.1.0 (2024-08-13)
 

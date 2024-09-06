@@ -69,7 +69,7 @@ def sort(
             comparison, error = _get_comparison_gt(list_to_sort, i)
             if error is not None:
                 return result.failure(error)
-            
+
             assert comparison is not None
 
             while i + 1 < len(list_to_sort) and comparison.is_true():
@@ -79,7 +79,7 @@ def sort(
                     return result.failure(error)
                 assert comparison is not None
 
-        sorted_ = list_to_sort  
+        sorted_ = list_to_sort
     elif mode == "sleep" or mode == "sleep-verbose":  # sleep sort
         # sleep sort was implemented by Mistera. Please refer to him if you have any questions about it, as I
         # completely don’t have any ideas on how tf asyncio works
@@ -90,7 +90,7 @@ def sort(
         for i in list_to_sort:
             if not isinstance(i, Number) or not isinstance(i.value, int):
                 return result.failure(RTTypeError(
-                    i.pos_start, i.pos_end, 
+                    i.pos_start, i.pos_end,
                     f"sleep mode: expected list of int, but found {i.type_} inside the list.",
                     exec_ctx,
                     origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"

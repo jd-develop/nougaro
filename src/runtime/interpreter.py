@@ -55,7 +55,7 @@ class Interpreter:
         self._methods = None
         self.init_methods()
         assert self._methods is not None
-        
+
     def init_methods(self):
         self._methods = {
             "AbsNode": self.visit_AbsNode,
@@ -427,7 +427,7 @@ class Interpreter:
 
         if error is not None:  # there is an error
             return res.failure(error)
-        
+
         assert result is not None
         return res.success(result.set_pos(node.pos_start, node.pos_end))
 
@@ -542,7 +542,7 @@ class Interpreter:
 
         if error is not None:  # there is an error
             return result.failure(error)
-        
+
         assert value is not None
         return result.success(value.set_pos(node.pos_start, node.pos_end))
 
@@ -638,7 +638,7 @@ class Interpreter:
                         "excepted identifier.",
                         ctx, origin_file=f"{_ORIGIN_FILE}.visit_VarAssignNode"
                     ))
-                
+
                 assert isinstance(var_name[0], Token)
                 assert isinstance(var_name[0].value, str)
                 final_var_name: str = var_name[0].value
@@ -671,7 +671,7 @@ class Interpreter:
                     value = result.register(self.visit(var_name[0], ctx, methods_instead_of_funcs))
                     if result.should_return():
                         return result
-                
+
                 assert isinstance(value, Value)
 
                 for node_or_tok in var_name[1:-1]:
@@ -866,7 +866,7 @@ class Interpreter:
         if result.should_return():  # check for errors
             return result
         assert assertion is not None
-        
+
         errmsg = result.register(self.visit(node.errmsg, ctx, methods_instead_of_funcs))  # we get the error message
         if result.should_return():  # check for errors
             return result
@@ -1054,7 +1054,7 @@ class Interpreter:
                 value = NoneValue(node.body_node.pos_start, node.body_node.pos_end, False)
 
             elements.append(value)
-        
+
         if outer_loop_should_continue:
             assert result.break_or_continue_pos is not None
             pos_start, pos_end = result.break_or_continue_pos
@@ -1103,7 +1103,7 @@ class Interpreter:
             if result.should_return(True):
                 # error or 'return' statement
                 return result
-            
+
             if value is None:
                 value = NoneValue(node.body_node.pos_start, node.body_node.pos_end, False)
 
@@ -1157,7 +1157,7 @@ class Interpreter:
             if result.should_return(True):
                 # error or 'return' statement
                 return result
-            
+
             if value is None:
                 value = NoneValue(node.body_node.pos_start, node.body_node.pos_end, False)
 
@@ -1571,7 +1571,7 @@ class Interpreter:
                 obj_attrs[key] = value.copy()
         object_ = Object(obj_attrs, constructor, constructor.pos_start, constructor.pos_end)
         object_.type_ = constructor.name
-        
+
         if call_with_module_context:
             assert constructor.module_context is not None
             inner_ctx = Context(constructor.name, constructor.pos_start, constructor.module_context)

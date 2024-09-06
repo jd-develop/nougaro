@@ -41,7 +41,7 @@ class Statistics(ModuleFunction):
         """Return a copy of self"""
         copy = Statistics(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
-    
+
     def is_eq(self, other: Value):
         return isinstance(other, Statistics) and self.name == other.name
 
@@ -460,7 +460,7 @@ class Statistics(ModuleFunction):
         "run_noug_dir": False,
         "noug_dir": False
     }
-    
+
     def execute_statistics_scope(self, exec_ctx: Context):
         """Returns the scope of a list, i.e. the difference between the max and the min value."""
         # Params:

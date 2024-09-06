@@ -42,7 +42,7 @@ class Token:
 
     def __str__(self):
         return repr(self)
-    
+
     def __eq__(self, other: object):
         if not isinstance(other, Token):
             return False

@@ -47,13 +47,13 @@ class Function(BaseFunction):
                 self.optional_params == other.optional_params
         are_nodes_eq = self.body_node == other.body_node
         return is_eq and are_nodes_eq
-    
+
     def get_comparison_eq(self, other: Value):
         return Number(self.is_eq(other), self.pos_start, other.pos_end), None
-    
+
     def get_comparison_ne(self, other: Value):
         return Number(not self.is_eq(other), self.pos_start, other.pos_end), None
-    
+
     def to_python_str(self):
         return self.__repr__()
 
@@ -104,7 +104,7 @@ class Function(BaseFunction):
             return_value = result.function_return_value
         else:
             return_value = NoneValue(self.pos_start, self.pos_end, False)
-        
+
         if return_value is None:
             return_value = NoneValue(self.pos_start, self.pos_end, False)
         return result.success(return_value)
@@ -153,7 +153,7 @@ class Method(Function):
         copy.set_context(self.context)
         copy.attributes = self.attributes.copy()
         return copy
-    
+
     def is_eq(self, other: Value):
         if not isinstance(other, Method):
             return False

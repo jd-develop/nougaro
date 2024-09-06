@@ -24,7 +24,7 @@ class Context:
     def __init__(self, display_name: str | None, entry_pos: Position, parent: Self | None = None,
                  value_im_attribute_of: str | None = None):
         """Note on value_im_attribute_of:
-        
+
         In commit a17aa2bc was introduced a bug where `(1).b` returned:
         > `AttributeError: attribute of 1 has no attribute 'b'.`
 

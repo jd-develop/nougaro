@@ -30,13 +30,13 @@ class BaseFunction(Value):
         # (if 'name' is None, we have something like `def()->foo`)
         self.type_ = 'func'
         self.call_with_module_context: bool = call_with_module_context
-    
+
     def __repr__(self) -> str:
         return "BaseFunction"
 
     def to_python_str(self) -> str:
         return repr(self)
-    
+
     def to_str(self):
         return String(repr(self), self.pos_start, self.pos_end).set_context(self.context), None
 
@@ -95,7 +95,7 @@ class BaseFunction(Value):
                       should_respect_args_number: bool = True):
         # this function is not overwritten
         """Make the args match to the param names in the symbol table.
-        
+
         Any <default> in the args must be replaced with a DefaultValue.
         """
         # We need the context for the symbol table :)

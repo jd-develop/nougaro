@@ -204,7 +204,7 @@ class Number(Value):
             return str(self.value)
         except ValueError:
             return "(this number can not be displayed)"
-    
+
     def to_python_str(self) -> str:
         """Returns self.value, as a python str"""
         return self.__repr__()
@@ -481,7 +481,7 @@ class List(Value):
 
     def __repr__(self):
         return f'[{", ".join([x.__str__() for x in self.elements])}]'
-    
+
     def to_python_str(self) -> str:
         return self.__repr__()
 
@@ -624,7 +624,7 @@ class List(Value):
             ).set_context(self.context), None
         else:
             return None, self.can_not_be_in(other)
-    
+
     def is_true(self):
         return bool(len(self.elements))
 
@@ -657,7 +657,7 @@ class Module(Value):
 
     def __repr__(self):
         return f"<module {self.name}>"
-    
+
     def to_python_str(self) -> str:
         return self.__repr__()
 
@@ -721,13 +721,13 @@ class Constructor(Value):
 
     def __repr__(self):
         return f"<class {self.name}>"
-    
+
     def to_python_str(self) -> str:
         return self.__repr__()
 
     def is_true(self):
         return False
-    
+
     def is_eq(self, other: Value):
         if not isinstance(other, Constructor):
             return False
@@ -798,10 +798,10 @@ class Object(Value):
 
     def __repr__(self):
         return f"<{self.type_} object>"
-    
+
     def to_python_str(self) -> str:
         return self.__repr__()
-    
+
     def is_eq(self, other: Value):
         if not isinstance(other, Object):
             return False
@@ -869,7 +869,7 @@ class NoneValue(Value):
 
     def __str__(self):
         return 'None'
-    
+
     def to_python_str(self) -> str:
         return self.__repr__()
 
@@ -954,7 +954,7 @@ class DefaultValue(Value):
 
     def __str__(self):
         return '<default>'
-    
+
     def to_python_str(self) -> str:
         return self.__repr__()
 

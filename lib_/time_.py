@@ -36,7 +36,7 @@ class Time(ModuleFunction):
         """Return a copy of self"""
         copy = Time(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
-    
+
     def is_eq(self, other: Value):
         return isinstance(other, Time) and self.name == other.name
 

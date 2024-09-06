@@ -37,7 +37,7 @@ class Position:
             self.colon = 0
 
         return self
-    
+
     def set_file_name(self, new_file_name: str):
         self.file_name = new_file_name
         return self

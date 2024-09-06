@@ -65,12 +65,12 @@ class SymbolTable:
     def set_parent(self, parent: Self):
         self.parent = parent
         return self
-    
+
     def __eq__(self, other: object):
         if not isinstance(other, SymbolTable):
             return False
         return self.symbols == other.symbols
-    
+
     def __ne__(self, other: object):
         return not self == other
 

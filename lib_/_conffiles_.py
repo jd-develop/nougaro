@@ -40,10 +40,10 @@ class Conffiles(ModuleFunction):
         """Return a copy of self"""
         copy = Conffiles(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
-    
+
     def is_eq(self, other: Value):
         return isinstance(other, Conffiles) and self.name == other.name
-    
+
     # functions
     def execute__conffiles_access_data(self, context: Context):
         """Returns the asked data. RTFileNotFoundError if file not found, or None if not_found_ok=True"""
@@ -56,7 +56,7 @@ class Conffiles(ModuleFunction):
                 file_name.pos_start, file_name.pos_end, "first", "_conffiles.access_data", "str", file_name,
                 context, origin_file="lib_._conffiles_.Conffiles.execute__conffiles_access_data"
             ))
-        
+
         if file_name.value == "please give me a syntax warning":
             eval("1 is 1")  # easter egg lol
 
@@ -67,7 +67,7 @@ class Conffiles(ModuleFunction):
                 not_found_ok.pos_start, not_found_ok.pos_end, "second", "_conffiles.access_data", "int", not_found_ok,
                 context, origin_file="lib_._conffiles_.Conffiles.execute__conffiles_access_data"
             ))
-        
+
         data = src.conffiles.access_data(file_name.value)
         if data is None:
             if not_found_ok.is_true():
@@ -76,7 +76,7 @@ class Conffiles(ModuleFunction):
                 file_name.pos_start, file_name.pos_end, f"config file not found: {file_name}.", context,
                 origin_file="lib_._conffiles_.Conffiles.execute__conffiles_access_data", custom=True
             ))
-        
+
         return RTResult().success(String(data, self.pos_start, self.pos_end).set_context(context))
 
     functions["access_data"] = {
@@ -101,7 +101,7 @@ class Conffiles(ModuleFunction):
                 file_name.pos_start, file_name.pos_end, "first", "_conffiles.write_data", "str", file_name,
                 context, origin_file="lib_._conffiles_.Conffiles.execute__conffiles_write_data"
             ))
-        
+
         data_to_write = nice_str_from_idk(data).value
 
         if name_reserved_ok is None:
@@ -113,7 +113,7 @@ class Conffiles(ModuleFunction):
                 name_reserved_ok.pos_start, name_reserved_ok.pos_end, "second", "_conffiles.write_data", "int", name_reserved_ok,
                 context, origin_file="lib_._conffiles_.Conffiles.execute__conffiles_write_data"
             ))
-        
+
         errmsg = src.conffiles.write_data(file_name.value, data_to_write, silent=True, return_error_messages=True)
 
         if errmsg is not None:
@@ -132,7 +132,7 @@ class Conffiles(ModuleFunction):
                     errmsg, context,
                     origin_file="lib_._conffiles_.Conffiles.execute__conffiles_write_data"
                 ))
-        
+
         return RTResult().success(NoneValue(self.pos_start, self.pos_end, False).set_context(context))
 
     functions["write_data"] = {

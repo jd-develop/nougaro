@@ -34,7 +34,7 @@ class UnicodeData(ModuleFunction):
         """Return a copy of self"""
         copy = UnicodeData(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
-    
+
     def is_eq(self, other: Value):
         return isinstance(other, UnicodeData) and self.name == other.name
 
@@ -311,7 +311,7 @@ class UnicodeData(ModuleFunction):
                     form.value, uni_str.value  # type: ignore
                 ), self.pos_start, self.pos_end
             )
-        ) 
+        )
 
     functions["normalize"] = {
         "function": execute_unicodedata_normalize,

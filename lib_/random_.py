@@ -33,7 +33,7 @@ class Random(ModuleFunction):
         """Return a copy of self"""
         copy = Random(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
-    
+
     def is_eq(self, other: Value):
         return isinstance(other, Random) and self.name == other.name
 
@@ -138,13 +138,13 @@ class Random(ModuleFunction):
                 list_.pos_start, list_.pos_end, "first", "random.shuffle", "list", list_,
                 exec_ctx, "lib_.random_.Random.execute_random_shuffle"
             ))
-        
+
         py_list = list_.elements.copy()
         random.shuffle(py_list)
         list_.elements = py_list
 
         return RTResult().success(list_)
-    
+
     functions["shuffle"] = {
         "function": execute_random_shuffle,
         "param_names": ["list_"],
@@ -153,7 +153,7 @@ class Random(ModuleFunction):
         "run_noug_dir": False,
         "noug_dir": False
     }
-    
+
     def execute_random_seed(self, exec_ctx: Context):
         """Set the seed to generate pseudo-random numbers."""
         # Params:
@@ -168,7 +168,7 @@ class Random(ModuleFunction):
             ))
         random.seed(seed.value)
         return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
-    
+
     functions["seed"] = {
         "function": execute_random_seed,
         "param_names": ["seed"],

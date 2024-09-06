@@ -145,7 +145,7 @@ while:main_loop True then
         print_in_red(error_msg)
         continue
     end
-    
+
     # tokenize
     var tokens = []
     var floating_point = 0
@@ -280,7 +280,7 @@ while:main_loop True then
 
     if debug.is_debug_enabled then \
         print(tokens)
-    
+
     # parse
     var i = -1
     var last_token = ""
@@ -415,7 +415,7 @@ while:main_loop True then
         end
         var last_token = token
     end
-    
+
     if len(stack) >= 1 then
         if verbose then print(stack(-1))
         var answer = stack(-1)

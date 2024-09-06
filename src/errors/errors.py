@@ -80,7 +80,7 @@ class Error:
             result += '\t' + line + '\n '
         result += f'{self.error_name}: {self.details}' if self.details != '' else f'{self.error_name}'
         return result
-    
+
     def set_pos(self, pos_start: Position, pos_end: Position):
         self.pos_start = pos_start
         self.pos_end = pos_end
@@ -168,7 +168,7 @@ class RunTimeError(Error):
                 lines_to_append.append((line_to_append, 1))
             pos = ctx.entry_pos
             ctx = ctx.parent
-        
+
         for line, count in lines_to_append:
             if count <= 5:
                 for _ in range(count):
@@ -180,7 +180,7 @@ class RunTimeError(Error):
             return f"(from {self.origin_file})\nTraceback (most recent call last):\n" + result
         else:
             return "Traceback (most recent call last):\n" + result
-        
+
 
 class RTIndexError(RunTimeError):
     """Index error (like '[1, 2](2)')"""

@@ -40,7 +40,7 @@ class Value:
 
     def __repr__(self) -> str:
         return "BaseValue"
-    
+
     def to_python_str(self) -> str:
         return "BaseValue"
 

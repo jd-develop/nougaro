@@ -31,10 +31,10 @@ class BaseBuiltInFunction(BaseFunction):
 
     def is_eq(self, other: Value):
         return isinstance(other, BaseBuiltInFunction) and self.name == other.name
-    
+
     def get_comparison_eq(self, other: Value):
         return Number(self.is_eq(other), self.pos_start, other.pos_end).set_context(self.context), None
-    
+
     def get_comparison_ne(self, other: Value):
         return Number(not self.is_eq(other), self.pos_start, other.pos_end).set_context(self.context), None
 

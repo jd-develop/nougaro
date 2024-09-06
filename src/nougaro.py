@@ -102,7 +102,7 @@ def run(
     # we make tokens with the Lexer
     if text is None:
         return NoneValue(DEFAULT_POSITION.copy(), DEFAULT_POSITION.copy(), False), None, lexer_metas
-    
+
     # Skip the NOUGAROIGNORE comments ###############
     lines = text.split("\n")
     new_lines: list[str] = []

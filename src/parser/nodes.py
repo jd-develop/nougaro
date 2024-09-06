@@ -26,7 +26,7 @@ class Node:
 
     def __eq__(self, other: object) -> bool:
         return False
-    
+
     def __ne__(self, other: object) -> bool:
         return not self == other
 
@@ -41,7 +41,7 @@ class NumberNode(Node):
 
     def __repr__(self):
         return f'num:{self.token}'
-    
+
     def __eq__(self, other: object):
         if not isinstance(other, NumberNode):
             return False
@@ -79,7 +79,7 @@ class StringNode(Node):
 
     def __repr__(self):
         return f'string_node:{self.token}'
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, StringNode):
             return False
@@ -97,7 +97,7 @@ class ListNode(Node):
 
     def __repr__(self):
         return f'list:{str(self.element_nodes)}'
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ListNode):
             return False
@@ -153,7 +153,7 @@ class VarAccessNode(Node):
 
     def __repr__(self):
         return f'var_access:{self.var_name_tokens_list}' + ('(is attr in var assign)' if self.attr else '')
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, VarAccessNode):
             return False
@@ -171,7 +171,7 @@ class VarDeleteNode(Node):
 
     def __repr__(self):
         return f'var_delete:{self.var_name_token}'
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, VarDeleteNode):
             return False
@@ -234,7 +234,7 @@ class BinOpCompNode(Node):
 
     def __repr__(self):
         return f'bin_op_comp:({", ".join([str(x) for x in self.nodes_and_tokens_list])})'
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, BinOpCompNode):
             return False
@@ -262,14 +262,14 @@ class UnaryOpNode(Node):
 
     def __repr__(self):
         return f'unary_op:({self.op_token}, {self.node})'
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, UnaryOpNode):
             return False
         if self.attr != other.attr:
             return False
         return self.op_token == other.op_token and self.node == other.node
-    
+
 
 class AbsNode(Node):
     """Node for the legacy absolute value syntax (|-12|)"""
@@ -348,7 +348,7 @@ class AssertNode(Node):
 
     def __repr__(self):
         return f'assert:({self.assertion}, {self.errmsg})'
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, AssertNode):
             return False
@@ -391,7 +391,7 @@ class ForNode(Node):
         label = f":{self.label}" if self.label is not None else ""
         return f"for{label} {self.var_name_token} = {self.start_value_node} to {self.end_value_node} step " \
                f"{self.step_value_node} then {self.body_node}"
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ForNode):
             return False
@@ -431,7 +431,7 @@ class ForNodeList(Node):
     def __repr__(self):
         label = f":{self.label}" if self.label is not None else ""
         return f"for{label} {self.var_name_token} in {self.list_node} then {self.body_node}"
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ForNodeList):
             return False
@@ -462,7 +462,7 @@ class WhileNode(Node):
     def __repr__(self):
         label = f":{self.label}" if self.label is not None else ""
         return f'while{label} {self.condition_node} then {self.body_node}'
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, WhileNode):
             return False
@@ -492,7 +492,7 @@ class DoWhileNode(Node):
     def __repr__(self):
         label = f":{self.label}" if self.label is not None else ""
         return f"do{label} {self.body_node} then loop while {self.condition_node}"
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, DoWhileNode):
             return False
@@ -550,7 +550,7 @@ class BreakNode(Node):
         if self.node_to_return is not None:
             return f"{repr_} and return {self.node_to_return}"
         return repr_
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, BreakNode):
             return False
@@ -611,7 +611,7 @@ class FuncDefNode(Node):
 
     def __repr__(self):
         return f'def:{self.var_name_token}({self.param_names_tokens}, {self.optional_params})->{self.body_node}'
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, FuncDefNode):
             return False
@@ -650,7 +650,7 @@ class ClassNode(Node):
             return f'class:{self.var_name_token}({self.parent_var_name_token})->{self.body_node}'
         else:
             return f'class:{self.var_name_token}->{self.body_node}'
-        
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ClassNode):
             return False
@@ -681,10 +681,10 @@ class CallNode(Node):
 
         self.pos_start = self.node_to_call.pos_start
         self.pos_end = pos_end
-    
+
     def __repr__(self):
         return f'call:{self.node_to_call}({self.arg_nodes})'
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, CallNode):
             return False
@@ -735,7 +735,7 @@ class ImportNode(Node):
         if self.as_identifier is None:
             return f"import:{'.'.join(names)}"
         return f'import:{".".join(names)}:as:{self.as_identifier}'
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ImportNode):
             return False
@@ -761,7 +761,7 @@ class ExportNode(Node):
             return f"export:{self.expr_or_identifier}"
         else:
             return f"export:{self.expr_or_identifier}:as:{self.as_identifier}"
-        
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ExportNode):
             return False
@@ -806,7 +806,7 @@ class WriteNode(Node):
 
     def __repr__(self):
         return f'write:({self.expr_to_write}{self.to_token.type}{self.file_name_expr} at line {self.line_number})'
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, WriteNode):
             return False
@@ -851,7 +851,7 @@ class ReadNode(Node):
 
     def __repr__(self):
         return f'read:({self.file_name_expr}>>{self.identifier} at line {self.line_number})'
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ReadNode):
             return False
@@ -874,14 +874,14 @@ class DollarPrintNode(Node):
 
     def __repr__(self):
         return f'${self.identifier}'
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, DollarPrintNode):
             return False
         if self.attr != other.attr:
             return False
         return self.identifier == other.identifier
-    
+
 
 class DefaultNode(Node):
     """<default> node"""
@@ -891,7 +891,7 @@ class DefaultNode(Node):
 
     def __repr__(self):
         return "<default>"
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, DefaultNode):
             return False
@@ -905,6 +905,6 @@ class NoNode(Node):
     """If the file to execute is empty or filled by back lines, this node is the only node of the node list."""
     def __repr__(self):
         return "NoNode"
-    
+
     def __eq__(self, other: object) -> bool:
         return isinstance(other, NoNode) and self.attr == other.attr

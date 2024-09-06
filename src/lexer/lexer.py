@@ -64,7 +64,7 @@ class Lexer:
                 chars_to_return = next_char
             else:
                 chars_to_return = ""
-            
+
             for _ in range(n_next_chars-1):
                 new_pos.advance(self.get_char(new_pos))
                 next_char = self.get_char(new_pos)
@@ -75,7 +75,7 @@ class Lexer:
         # get the next char in the code (or None if this is EOF (end of file))
         next_char = self.get_char(new_pos)
         return next_char
-    
+
     def is_empty_file(self, tokens: list[Token]):
         """Returns if the given list of tokens corresponds to an empty file or not."""
         if len(tokens) == 0:
@@ -337,7 +337,7 @@ class Lexer:
                 "src.lexer.lexer.Lexer.make_tokens"
             )
         current_char = self.advance()
-        
+
         meta_name = ""
         while current_char is not None and current_char in LETTERS:
             meta_name += current_char
@@ -349,7 +349,7 @@ class Lexer:
             while current_char is not None and current_char in LETTERS:
                 meta_argument += current_char
                 current_char = self.advance()
-        
+
         if current_char is not None and current_char in " \N{NBSP}\N{NNBSP}\t":
             current_char = self.advance()
 

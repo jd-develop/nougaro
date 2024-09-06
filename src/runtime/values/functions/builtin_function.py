@@ -163,7 +163,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         "run_noug_dir": False,
         "noug_dir": False
     }
-    
+
     def execute_print(self, exec_ctx: Context):
         """Print 'value'"""
         # Optional params:
@@ -443,7 +443,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                     ))
             else:
                 text = input()
-            
+
             try:
                 number = int(text)
                 break
@@ -454,7 +454,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 except ValueError:
                     print(f"'{text}' must be a number. Try again: ")
         return RTResult().success(Number(number, self.pos_start, self.pos_end))
-    
+
     builtin_functions["input_num"] = {
         "function": execute_input_num,
         "param_names": [],
@@ -880,7 +880,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 f'list index {index_.value} out of range.',
                 exec_ctx, "src.runtime.values.functions.builtin_function.BuiltInFunction.execute_get"
             ))
-    
+
     builtin_functions["get"] = {
         "function": execute_get,
         "param_names": ["list", "index"],
@@ -986,7 +986,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         max_ = max(list_)
         return RTResult().success(Number(max_, self.pos_start, self.pos_end))
-    
+
     builtin_functions["max"] = {
         "function": execute_max,
         "param_names": ["list"],
@@ -1086,7 +1086,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         final_list = List(new_list, self.pos_start, self.pos_end)
 
         return RTResult().success(final_list)
-    
+
     builtin_functions["split"] = {
         "function": execute_split,
         "param_names": ["str"],
@@ -1399,7 +1399,7 @@ class BuiltInFunction(BaseBuiltInFunction):
         return_example_value = exec_ctx.symbol_table.getf("return_example_value")
         if return_example_value is None:
             return_example_value = Number(False, self.pos_start, self.pos_end)
-        
+
         if not isinstance(return_example_value, Number):
             return RTResult().failure(RTTypeErrorF(
                 return_example_value.pos_start, return_example_value.pos_end,
@@ -1408,7 +1408,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             ))
 
         file_name = os.path.abspath(noug_dir + "/examples/" + example_name.value + ".noug")
-        
+
         exec_ctx.symbol_table.set(
             "file_name", String(file_name, self.pos_start, self.pos_end)
         )
@@ -1699,7 +1699,7 @@ class BuiltInFunction(BaseBuiltInFunction):
 
         if should_i_return.is_true():
             return self.execute_run(exec_ctx, run, noug_dir)
-        
+
         result = self.execute_run(exec_ctx, run, noug_dir)
         if result.error is not None:
             return result
@@ -1876,7 +1876,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             result = int(round(number_, n_digits.value))
         else:
             result = round(number_, n_digits.value)
-        
+
         return RTResult().success(Number(result, self.pos_start, self.pos_end))
 
     builtin_functions["round"] = {
@@ -1887,14 +1887,14 @@ class BuiltInFunction(BaseBuiltInFunction):
         "run_noug_dir": False,
         "noug_dir": False
     }
-    
+
     def execute_sort(self, exec_ctx: Context):
         """Like python’s sort()"""
         assert exec_ctx.symbol_table is not None
         result = RTResult()
         list_ = exec_ctx.symbol_table.getf("list_")
         mode = exec_ctx.symbol_table.getf("mode")
-        
+
         if not isinstance(list_, List):
             assert list_ is not None
             return result.failure(RTTypeErrorF(
@@ -2067,7 +2067,7 @@ class BuiltInFunction(BaseBuiltInFunction):
                 exec_ctx,
                 origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_path_exists"
             ))
-        
+
         path_exists = os.path.exists(path.value)
         return RTResult().success(Number(path_exists, self.pos_start, self.pos_end))
 

@@ -51,14 +51,14 @@ def _write_readme(readme_file: str, version_guide_file: str, version: str, versi
     with open(readme_file, "w+", encoding="UTF-8") as readme:
         if readme.readlines() != README_TEXT:
             readme.writelines(README_TEXT)
-    
-    
+
+
     if os.path.isfile(version_guide_file):
         with open(version_guide_file, "r+", encoding="UTF-8") as versions_f:
             versions = versions_f.readlines()
     else:
         versions = []
-    
+
     if f"Version {version} has an id of {version_id}.\n" not in versions:
         with open(version_guide_file, "a+", encoding="UTF-8") as versions_f_ap:
             versions_f_ap.write(f"Version {version} has an id of {version_id}.\n")
@@ -89,7 +89,7 @@ def _determine_config_directory():
     version, version_id = src.noug_version.VERSION, src.noug_version.VERSION_ID
 
     _write_readme(root_config_directory + "/" + "README.md", root_config_directory + "/" + "version_guide.txt", version, str(version_id))
-    
+
     version_directory = os.path.abspath(root_config_directory + "/" + str(version_id) + "/")
     if not os.path.isdir(version_directory):
         os.mkdir(version_directory)
@@ -150,7 +150,7 @@ def _find_files_in_legacy_directories():
             print_context = print_context_f.read()
     else:
         print_context = "0"
-    
+
     if debug.endswith("\n"):
         debug = debug[:-1]
     if print_context.endswith("\n"):
@@ -185,7 +185,7 @@ def create_config_files():
     # checks if the config path is empty (create or copy config files)
     if len(os.listdir(CONFIG_DIRECTORY)) == 0:
         _create_or_copy_files()
-    
+
     define_expected_type("debug", "int")
     define_expected_type("print_context", "int")
     define_expected_type("print_time", "int")

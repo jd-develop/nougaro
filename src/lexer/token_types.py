@@ -14,7 +14,7 @@
 # dict of all the token types
 TT = {
     "NEWLINE": 'new line',       # new line
-    
+
     "INT": 'int',                # integer, corresponds to python int
     "FLOAT": 'float',            # float number, corresponds to python float
     "STRING": 'str',             # string type, corresponds to python str
@@ -32,10 +32,10 @@ TT = {
     "POW": '^',                  # ^
     "PERC": '%',                 # %
     "FLOORDIV": '//',            # //
-    
+
     "TO": '>>',                  # >>
     "TO_AND_OVERWRITE": '!>>',   # !>>
-    
+
     "EQ": '=',                   # =
     "PLUSEQ": '+=',              # +=
     "INCREMENT": '++',           # ++
@@ -57,32 +57,32 @@ TT = {
     "GTEEQ": ">==",              # >==
     "LTEQ": "<<=",               # <<=
     "GTEQ": ">>=",               # >>=
-    
+
     "BITWISEOR": '|',            # |
     "LEGACYABS": 'legacy absolute value',  # | (legacy absolute value)
     "BITWISEAND": '&',           # &
     "BITWISEXOR": '^^',          # ^^
     "BITWISENOT": '~',           # ~
-    
+
     "EE": '==',                  # ==
     "NE": '!=',                  # !=
     "LT": '<',                   # <
     "GT": '>',                   # >
     "LTE": '<=',                 # <=
     "GTE": '>=',                 # >=
-    
+
     "RPAREN": ')',               # )
     "LPAREN": '(',               # (
     "RSQUARE": ']',              # ]
     "LSQUARE": '[',              # [
-    
+
     "COMMA": ',',                # ,
     "COLON": ':',                # :
     "ARROW": '->',               # ->
     "INTERROGATIVE_PNT": '?',    # ?
 
     "DOLLAR": "$",               # $
-    
+
     "EOF": 'end of file',        # end of file
 }
 

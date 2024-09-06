@@ -536,7 +536,7 @@ class Math(ModuleFunction):
                 value.pos_start, value.pos_end, "first", "math.factorial", "non-negative integer (int)", value,
                 exec_context, "lib_.math_.Math.execute_math_factorial"
             ))
-        
+
         if value.value < 0:
             return RTResult().failure(RunTimeError(
                 value.pos_start, value.pos_end,

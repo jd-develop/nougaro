@@ -45,10 +45,10 @@ class WebBrowser(ModuleFunction):
         """Return a copy of self"""
         copy = WebBrowser(self.name)
         return self.set_context_and_pos_to_a_copy(copy)
-    
+
     def is_eq(self, other: Value):
         return isinstance(other, WebBrowser) and self.name == other.name
-    
+
     # functions
     def open(self, context: Context):
         """
@@ -70,7 +70,7 @@ class WebBrowser(ModuleFunction):
                 url.pos_start, url.pos_end, "first", "webbrowser.open", "str", url,
                 context, "lib_.webbrowser_.WebBrowser.open"
             ))
-        
+
         if new is None:
             new = Number(0, url.pos_end, self.pos_end).set_context(context)
         if not (isinstance(new, Number) and isinstance(new.value, int)):
@@ -83,10 +83,10 @@ class WebBrowser(ModuleFunction):
                 new.pos_start, new.pos_end, "the 'new' argument should either be 0 (same window), 1 (new window), or 2 (new tab)",
                 context, origin_file="lib_.webbrowser_.WebBrowser.open"
             ))
-        
+
         if autoraise is None:
             autoraise = Number(True, self.pos_start, self.pos_end).set_context(context)
-        
+
         try:
             webbrowser.open(url.value, new.value, autoraise.is_true())
         except webbrowser.Error as e:

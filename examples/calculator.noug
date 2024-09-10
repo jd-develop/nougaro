@@ -105,7 +105,7 @@ var increment = 0
 var stack = []
 var error_msg = ""
 var storage = 0
-while:main_loop True then
+loop:main_loop
     if verbose then
         var calcul = input("calc> ")
     else

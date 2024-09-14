@@ -294,14 +294,11 @@ class BuiltInFunction(BaseBuiltInFunction):
         # * value
         assert exec_ctx.symbol_table is not None
         value = exec_ctx.symbol_table.getf('value')
-        easter_egg = exec_ctx.symbol_table.getf('easteregg?')
         if value is not None:  # if the value is defined
             try:
                 print_in_red(value.to_python_str())
                 easter_egg_trigger = "Is there an easter egg in this program? That would be so cool!"
-                if easter_egg is not None and value.to_python_str() == easter_egg_trigger:
-                    if isinstance(easter_egg, String) and easter_egg.value == "thanks":
-                        print("You’re welcome :)")
+                if value.to_python_str() == easter_egg_trigger:
                     return RTResult().success(String("Here you go!", self.pos_start, self.pos_end))
                 return RTResult().success(String(value.to_python_str(), self.pos_start, self.pos_end))
             except UnicodeEncodeError as e:
@@ -322,7 +319,7 @@ class BuiltInFunction(BaseBuiltInFunction):
     builtin_functions["print_in_red_ret"] = {
         "function": execute_print_in_red_ret,
         "param_names": [],
-        "optional_params": ["value", "easteregg?"],
+        "optional_params": ["value"],
         "should_respect_args_number": True,
         "run_noug_dir": False,
         "noug_dir": False

@@ -22,7 +22,7 @@ from src.runtime.values.functions.base_function import BaseFunction
 from src.runtime.runtime_result import RTResult
 from src.runtime.context import Context
 from src.runtime.symbol_table import SymbolTable
-from src.misc import clear_screen, RunFunction
+from src.misc import clear_screen, RunFunction, print_in_red
 from src.noug_version import LIB_VERSION
 import src.conffiles
 # built-in python imports
@@ -800,6 +800,10 @@ class Interpreter:
                 value.attributes[var_name[-1].value] = final_value
             else:
                 assert final_value is not None
+                if final_var_name == "javascript":
+                    print_in_red(
+                        "DEPRECATION WARNING: naming a variable 'javascript' is deprecated and will be removed in 2.0.0."
+                    )
                 ctx.symbol_table.set(final_var_name, final_value)
 
             final_values.append(final_value)

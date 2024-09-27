@@ -12,10 +12,15 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 * Added `math.gcd`, that takes exactly two integer arguments and return their
 gcd.
 
+### Changed
+* Any value can now be passed as `assert` error message (and will be converted
+to str)
+
 ### Fixed
 * Fixed a crash in `math.log` on base=1
 * Updated error messages when method in not defined in python-written modules
 (does not change anything to public API)
+* Optimised asserts a little bit
 
 #### Build scripts
 * Build scripts now copy `CHANGELOG.md`.

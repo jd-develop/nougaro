@@ -876,17 +876,10 @@ class Interpreter:
             return result
         assert errmsg is not None
 
-        if not isinstance(errmsg, String):  # we check if the error message is a String
-            return result.failure(RTTypeError(
-                errmsg.pos_start, errmsg.pos_end,
-                f"error message should be a str, not {errmsg.type_}.",
-                ctx, f"{_ORIGIN_FILE}.visit_Assert_Node"
-            ))
-
         if assertion.is_false():  # the assertion is not true, we return an error
             return result.failure(RTAssertionError(
                 assertion.pos_start, assertion.pos_end,
-                errmsg.value,
+                errmsg.to_python_str(),
                 ctx, f"{_ORIGIN_FILE}.visit_AssertNode"
             ))
 

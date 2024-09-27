@@ -562,6 +562,38 @@ class Math(ModuleFunction):
         "noug_dir": False
     }
 
+    def execute_math_gcd(self, exec_context: Context):
+        """Takes two arguments a and b, both relative integers, and return
+           their GCD. If one of them is zero, return the other. If both are 0,
+           return 0."""
+        assert exec_context.symbol_table is not None
+        a = exec_context.symbol_table.getf("a")
+        b = exec_context.symbol_table.getf("b")
+        if not (isinstance(a, Number) and isinstance(a.value, int)):
+            assert a is not None
+            return RTResult().failure(RTTypeErrorF(
+                a.pos_start, a.pos_end, "first", "math.gcd", "int", a,
+                exec_context, "lib_.math_.Math.execute_math_gcd"
+            ))
+        if not (isinstance(b, Number) and isinstance(b.value, int)):
+            assert b is not None
+            return RTResult().failure(RTTypeErrorF(
+                b.pos_start, b.pos_end, "second", "math.gcd", "int", b,
+                exec_context, "lib_.math_.Math.execute_math_gcd"
+            ))
+        result = Number(
+            math.gcd(a.value, b.value), self.pos_start, self.pos_end
+        )
+        return RTResult().success(result)
+
+    functions["gcd"] = {
+        "function": execute_math_gcd,
+        "param_names": ["a", "b"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir": False,
+        "noug_dir": False
+    }
 
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported
     # Constants
@@ -588,4 +620,5 @@ WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the modu
     "log": Math("log"),
     "log2": Math("log2"),
     "factorial": Math("factorial"),
+    "gcd": Math("gcd"),
 }

@@ -123,12 +123,17 @@ class ModuleFunction(BaseBuiltInFunction):
         return result.success(return_value)
 
     def no_visit_method(self, exec_ctx: Context):
-        """Method called when the func name given through self.name is not defined"""
+        """
+            Method called when the func name given through self.name is not
+            defined
+        """
         print(exec_ctx)
-        print(f"NOUGARO INTERNAL ERROR: No execute_{self.module_name}_{self.name} method defined in "
-              f"lib_.{self.module_name}_.\n"
-              f"Please report this bug at {self.link_for_bug_report} with all informations above.")
-        raise Exception(f'No execute_{self.module_name}_{self.name} method defined in lib_.{self.module_name}_.')
+        errmsg = f"No functions dict entry for method {self.name} in module " \
+                 f"{self.module_name} (in lib_.{self.module_name}_)."
+        print(f"NOUGARO INTERNAL ERROR: {errmsg}\n"
+              f"Please report this bug at {self.link_for_bug_report} with all "
+              f"the informations above.")
+        raise Exception(errmsg)
 
     def copy(self):
         """Return a copy of self"""

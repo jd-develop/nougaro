@@ -8,8 +8,14 @@ Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). I
 
 ## upcoming
 
+### Added
+* Added `math.gcd`, that takes exactly two integer arguments and return their
+gcd.
+
 ### Fixed
 * Fixed a crash in `math.log` on base=1
+* Updated error messages when method in not defined in python-written modules
+(does not change anything to public API)
 
 #### Build scripts
 * Build scripts now copy `CHANGELOG.md`.

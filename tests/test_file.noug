@@ -964,10 +964,22 @@ def test_nougaro(print_OK)
     assert math.e == 2.718281828459045
     assert math.factorial(0) == 1
     assert math.factorial(5) == 120
+    assert math.gcd(1, 1) == 1
+    var gcd = math.gcd
+    assert math.gcd(12, 15) == gcd(15, 12) == gcd(-15, 12) == gcd(-12, -15) == 3
+    assert math.gcd(12, 17) == gcd(17, 12) == 1
+    import random
+    for _ = 0 to 10 then
+        var a = random.randint(-100, 100)
+        var b = random.randint(-100, 100)
+        assert math.gcd(a, b) == math.gcd(b, a) == math.gcd(-a, b) == \
+            math.gcd(b, -a) == math.gcd(a, -b) == math.gcd(-b, a) == \
+            math.gcd(-a, -b) == math.gcd(-b, -a)
+        assert 1 <= math.gcd(a, b) <= 100, str([a, b])
+    end
 
     if print_OK then print("OK math lib")
 
-    import random
     assert 0 <= random.random() <= 1
     assert random.randint(1, 4) in (for i = 1 to 5 then i)  # in the list definition, 5 is excluded !
     assert random.choice(for i = 1 to 5 then i) in (for i = 1 to 5 then i)

@@ -189,12 +189,12 @@ loop:main_loop
                         replace(tokens, -1, tokens(-1)*10 - int(char))
                     else  # float
                         var floating_point += 1
-                        replace(\
-                            tokens, -1,\
-                            round(\
-                                tokens(-1) - float(char)/(10 ^ floating_point),\
+                        replace(
+                            tokens, -1,
+                            round(
+                                tokens(-1) - float(char)/(10 ^ floating_point),
                                 floating_point\
-                            )\
+                            )
                         )
                     end
                 end

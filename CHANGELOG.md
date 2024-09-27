@@ -15,12 +15,14 @@ gcd.
 ### Changed
 * Any value can now be passed as `assert` error message (and will be converted
 to str)
+* `$` and the following identifier can now be spaced (`$ id` is now valid)
 
 ### Fixed
 * Fixed a crash in `math.log` on base=1
 * Updated error messages when method in not defined in python-written modules
 (does not change anything to public API)
 * Optimised asserts a little bit
+* Fixed bug where identifiers after `$` could start with digits
 
 #### Build scripts
 * Build scripts now copy `CHANGELOG.md`.

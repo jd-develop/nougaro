@@ -1328,15 +1328,16 @@ class Parser:
 
     def dollar_print_expr(self, token: Token) -> ParseResult:
         result = ParseResult()
-        result = self.advance_and_check_for(result, "expected identifier or nothing after '$'",
-                                            "IDENTIFIER", None, "dollar_print_expr")
-        if result.error is not None:
-            return result
-
-        identifier = self.current_token
-        assert identifier is not None
         result.register_advancement()
         self.advance()
+
+        if self.current_token is not None and self.current_token.type == TT["IDENTIFIER"]:
+            identifier = self.current_token
+            assert identifier is not None
+            result.register_advancement()
+            self.advance()
+        else:
+            identifier = Token(TT["IDENTIFIER"], token.pos_start, token.pos_end, "")
 
         return result.success(DollarPrintNode(identifier, token.pos_start, identifier.pos_end.copy()))
 

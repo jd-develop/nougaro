@@ -278,9 +278,8 @@ class Lexer:
             # dollar-print
             elif self.current_char == "$":
                 there_is_a_space_or_a_tab_or_a_comment = False
-                dollar, id_ = self.make_dollar_print()
+                dollar = self.make_dollar_print()
                 tokens.append(dollar)
-                tokens.append(id_)
             else:
                 # illegal char
                 pos_start = self.pos.copy()
@@ -901,21 +900,8 @@ class Lexer:
         # current char is '$'
         dollar_pos = self.pos.copy()
         self.advance()
+        return Token(TT["DOLLAR"], pos_start=dollar_pos)
 
-        id_pos_start = self.pos.copy()
-        identifier = ""
-        if self.current_char is not None and self.current_char in IDENTIFIERS_LEGAL_CHARS:
-            identifier += self.current_char
-            self.advance()
-
-        # while not EOF and current char still in authorized chars in identifier and keywords
-        while self.current_char is not None and self.current_char in LETTERS_DIGITS + '_':
-            identifier += self.current_char
-            self.advance()
-
-        token_type = TT["KEYWORD"] if identifier in KEYWORDS else TT["IDENTIFIER"]  # KEYWORDS is the keywords list
-        return Token(TT["DOLLAR"], pos_start=dollar_pos), Token(token_type, id_pos_start, self.pos, identifier)
-    
     def make_e_infix(
             self,
             tok: Token, 

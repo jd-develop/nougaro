@@ -12,7 +12,7 @@
 from src.lexer.position import Position
 from src.lexer.token import Token
 from src.lexer.token_types import TT, KEYWORDS
-from src.constants import LETTERS, DIGITS, LETTERS_DIGITS, IDENTIFIERS_LEGAL_CHARS
+from src.constants import LETTERS, DIGITS, IDENTIFIERS_LEGAL_CHARS
 from src.errors.errors import InvalidSyntaxError, IllegalCharError, Error
 import src.conffiles
 # built-in python imports

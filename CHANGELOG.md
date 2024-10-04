@@ -23,6 +23,7 @@ to str)
 (does not change anything to public API)
 * Optimised asserts a little bit
 * Fixed bug where identifiers after `$` could start with digits
+* Better error messages
 
 #### Build scripts
 * Build scripts now copy `CHANGELOG.md`.

@@ -861,10 +861,13 @@ class Lexer:
                 self.advance()
                 token_type = TT["LTEQ"]
             else:
+                current_char_user_friendly = f"'{new_char}'"
+                if new_char is None:
+                    current_char_user_friendly = "(end of file)"
                 return None, InvalidSyntaxError(
                     pos_start,
                     self.pos,
-                    f"expected '=' after '<<', got '{self.current_char}'.",
+                    f"expected '=' after '<<', got {current_char_user_friendly}.",
                     "src.lexer.lexer.Lexer.make_less_than"
                 )
         elif self.current_char == "d" and self.next_char(7) == "efault>":  # <default>

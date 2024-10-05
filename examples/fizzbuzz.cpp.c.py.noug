@@ -40,10 +40,10 @@ void fizzbuzz(int n) {
     ## NOUGAROIGNORE
     */
         if (i%15 == 0)
-    /* 
+    /*
         !"""
         if i%15 == 0:
-            """        
+            """
         #! NOUGAROIGNORE
         if i%15 == 0 then
         ## NOUGAROIGNORE
@@ -66,10 +66,10 @@ void fizzbuzz(int n) {
             # */
             print("fizz");
             # /*
-        
+
         ## NOUGAROIGNORE
         elif i%5 == 0:
-            """        
+            """
         #! NOUGAROIGNORE
         elif i%5 == 0 then
         ## NOUGAROIGNORE
@@ -81,10 +81,10 @@ void fizzbuzz(int n) {
             # */
             print("buzz");
             # /*
-        
+
         ## NOUGAROIGNORE
         else:
-            """        
+            """
         #! NOUGAROIGNORE
         # */
         else

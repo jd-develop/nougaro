@@ -7,7 +7,7 @@
 # Lorem: a lorem ipsum library
 import random
 
-def ipsum(paragraphs)
+def ipsum()(paragraphs=1)
     assert is_int(paragraphs), "first argument of function 'lorem.ipsum' SHOULD be an integer."
     assert paragraphs >= 0, "first argument of function 'lorem.ipsum' SHOULD be positive."
     if paragraphs == 0 then return ""

@@ -16,6 +16,8 @@ gcd.
 * Any value can now be passed as `assert` error message (and will be converted
 to str)
 * `$` and the following identifier can now be spaced (`$ id` is now valid)
+* `paraghraphs` argument of function `lorem.ipsum` is now optional and defaults
+  to 1
 
 ### Fixed
 * Fixed a crash in `math.log` on base=1

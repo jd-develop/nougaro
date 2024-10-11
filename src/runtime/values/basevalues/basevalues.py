@@ -18,7 +18,7 @@ from src.runtime.context import Context
 from src.errors.errors import RunTimeError, RTArithmeticError, RTIndexError, RTOverflowError
 from src.lexer.position import Position as _Position
 # built-in python imports
-# no imports
+import math
 
 
 # IMPORTANT NOTE: THE DOC FOR ALL THE FUNCTIONS IN THIS FILE ARE IN value.py :)
@@ -94,6 +94,14 @@ class String(Value):
                 f"str '{self.value}' can not be converted to int.",
                 self.context,
                 origin_file="src.values.basevalues.String.to_int"
+            ))
+        except OverflowError as e:
+            assert self.context is not None
+            return None, RTResult().failure(RTOverflowError(
+                self.pos_start, self.pos_end,
+                str(e),
+                self.context,
+                origin_file="str.values.basevalues.String.to_int"
             ))
 
     def to_float(self):
@@ -429,6 +437,22 @@ class Number(Value):
         return String(self.__repr__(), self.pos_start, self.pos_end).set_context(self.context), None
 
     def to_int(self):
+        if abs(self.value) == float("inf"):
+            assert self.context is not None
+            return None, RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "cannot convert 'infinity' to int",
+                self.context,
+                origin_file="src.runtime.values.basevalues.basevalues.Number.to_int"
+            ))
+        elif isinstance(self.value, float) and math.isnan(self.value):
+            assert self.context is not None
+            return None, RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                "cannot convert 'NaN' to int",
+                self.context,
+                origin_file="src.runtime.values.basevalues.basevalues.Number.to_int"
+            ))
         return Number(int(self.value), self.pos_start, self.pos_end).set_context(self.context), None
 
     def to_float(self):

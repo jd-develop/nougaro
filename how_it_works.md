@@ -85,7 +85,7 @@ parent’s parent, etc.
 > The only case where it doesn’t look into the parent symbol table is in built-in functions,
 > because otherwise if an optional parameter is not given but the user already have a variable with the same name, the
 > interpreter will look to this variable (see issue [#10](https://github.com/jd-develop/nougaro/issues/10)). By the way,
-> this is why it is recommended in [this doc page](https://nougaro.github.io/jd-develop/documentation/1.0/Expand/Write-libs#get-arguments)
+> this is why it is recommended in [this doc page](https://nougaro.github.io/documentation/1.0/Expanding/Write-libs/#get-arguments)
 > to use the `getf` method of symbol table in built-in functions (see the difference in the code between `get` and `getf`).
 
 The symbol table is set to its default value at the beginning of the execution of a program, using [this file](src/runtime/set_symbol_table.py)

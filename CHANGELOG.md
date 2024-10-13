@@ -21,12 +21,14 @@ to str)
 
 ### Fixed
 * Fixed a crash in `math.log` on base=1
+* Fixed crashes in `math.log2` (I forgot to update this function when fixing
+  the same crashes in 0.18.0-beta)
 * Fixed a crash on `int(float("nan"))` and `int(float("inf"))`.
 * Fixed a bug where identifiers after `$` could start with digits
-* Updated error messages when method in not defined in python-written modules
-(does not change anything to public API)
 * Optimised asserts a little bit
 * Better error messages
+* *Updated error messages when method in not defined in python-written modules
+(does not change anything to public API)*
 
 #### Build scripts
 * Build scripts now copy `CHANGELOG.md`.

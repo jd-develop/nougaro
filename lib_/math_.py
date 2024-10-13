@@ -511,7 +511,29 @@ class Math(ModuleFunction):
                 exec_context, "lib_.math_.Math.execute_math_log2"
             ))
 
-        value_to_return = Number(math.log2(value.value), self.pos_start, self.pos_end)
+        if value.value <= 0:
+            return RTResult().failure(RunTimeError(
+                value.pos_start, value.pos_end,
+                f"math domain error: illegal value for logarithm: {value.value}.",
+                exec_context, origin_file="lib_.math.Math.execute_math_log"
+            ))
+
+        try:
+            value_to_return = Number(math.log2(value.value), self.pos_start, self.pos_end)
+        except ValueError as e:
+            return RTResult().failure(RunTimeError(
+                self.pos_start, self.pos_end,
+                f"Python ValueError: {e}",
+                exec_context,
+                origin_file="lib_.math_.Math.execute_math_log"
+            ))
+        except ZeroDivisionError as e:
+            return RTResult().failure(RTArithmeticError(
+                self.pos_start, self.pos_end,
+                "Python ZeroDivisionError: {e}",
+                exec_context,
+                origin_file="lib_.math_.Math.execute_math_log"
+            ))
 
         return RTResult().success(value_to_return)
 

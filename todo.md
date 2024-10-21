@@ -101,3 +101,7 @@
 * [ ] add `turtle`
 * [ ] add `socket`
 * [ ] add `requests`
+
+## What to do when Nougaro fully updates to…
+### Python 3.12
+src/runtime/values/tools/py2noug.py:19 @ 8ebc929

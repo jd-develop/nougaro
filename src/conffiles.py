@@ -8,8 +8,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """conffiles
-This file contains the create_or_update_config_files function, which creates and updates the format of config files
-depending on if files exists and what is their format (data-version).
+This file contains the create_config_files function, which creates and updates the format of config files
+depending on if files exists and what is their format (data-version), and some useful function to write and read
+from the config files.
 
 The configuration files are stored in the following places:
 * Under Unix (except macOS) or GNU/Linux

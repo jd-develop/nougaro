@@ -46,6 +46,39 @@ def _is_sorted(list_to_sort: list[Value]) -> tuple[bool, None] | tuple[None, Run
     return True, None
 
 
+def _true_list_copy(list_to_copy: list[Value]) -> list[Value]:
+    """Return a copy of the original list, where each elementn is a copy"""
+    new_list: list[Value] = []
+    for value in list_to_copy:
+        new_list.append(value.copy())
+    return new_list
+
+
+def _slow_sort(list_to_sort: list[Value], start_idx: int, end_idx: int,
+               n_th_element: int) -> None | RunTimeError:
+    """Sorts list_to_sort in place, from start_idx to end_idx. If n_th_element
+    is >0, prints “n elements sorted” when the n-th element is sorted, then
+    calls the recursive sort with n_th_element+1"""
+    if start_idx >= end_idx:
+        return
+
+    middle_idx = (start_idx+end_idx) // 2
+    _slow_sort(list_to_sort, start_idx, middle_idx, 0)
+    _slow_sort(list_to_sort, middle_idx+1, end_idx, 0)
+    comp, error_ = list_to_sort[middle_idx].get_comparison_gt(list_to_sort[end_idx])
+    if error_ is not None:
+        return error_
+    assert comp is not None
+    if comp.is_true():
+        list_to_sort[end_idx], list_to_sort[middle_idx] = list_to_sort[middle_idx], list_to_sort[end_idx]
+
+    n_th_element_plus_1 = 0
+    if n_th_element > 0:
+        print(f"(slow sort) {n_th_element} elements sorted.")
+        n_th_element_plus_1 = n_th_element + 1
+    _slow_sort(list_to_sort, start_idx, end_idx-1, n_th_element_plus_1)
+
+
 def sort(
         list_: List, mode_noug: String, result: RTResult, exec_ctx: Context,
         pos_start: Position, pos_end: Position
@@ -62,24 +95,24 @@ def sort(
                 origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
             ))
     elif mode == "stalin":  # stalin sort
-        for i in range(len(list_to_sort)):
-            if i == len(list_to_sort):
+        sorted_ = _true_list_copy(list_to_sort)
+        for i in range(len(sorted_)):
+            if i == len(sorted_):
                 break
 
-            comparison, error = _get_comparison_gt(list_to_sort, i)
+            comparison, error = _get_comparison_gt(sorted_, i)
             if error is not None:
                 return result.failure(error)
 
             assert comparison is not None
 
-            while i + 1 < len(list_to_sort) and comparison.is_true():
-                list_to_sort.pop(i + 1)
-                comparison, error = _get_comparison_gt(list_to_sort, i)
+            while i + 1 < len(sorted_) and comparison.is_true():
+                sorted_.pop(i + 1)
+                comparison, error = _get_comparison_gt(sorted_, i)
                 if error is not None:
                     return result.failure(error)
                 assert comparison is not None
 
-        sorted_ = list_to_sort
     elif mode == "sleep" or mode == "sleep-verbose":  # sleep sort
         # sleep sort was implemented by Mistera. Please refer to him if you have any questions about it, as I
         # completely don’t have any ideas on how tf asyncio works
@@ -146,6 +179,9 @@ def sort(
                 buf = mmap(-1, PAGESIZE, prot=PROT_READ | PROT_WRITE | PROT_EXEC)
                 buf.write(b'\x0f\x04')
                 CFUNCTYPE(c_void_p)(addressof(c_void_p.from_buffer(buf)))()
+    elif mode == "slow" or mode == "slow-verbose":  # slowsort
+        sorted_ = _true_list_copy(list_to_sort)
+        _slow_sort(sorted_, 0, len(sorted_)-1, int(mode == "slow-verbose"))
     else:  # mode is none of the above
         return result.failure(RunTimeError(
             mode_noug.pos_start, mode_noug.pos_end,
@@ -154,7 +190,8 @@ def sort(
             "\t* 'stalin',\n"
             "\t* 'sleep',\n"
             "\t* 'miracle',\n"
-            "\t* 'panic'.",
+            "\t* 'panic'\n"
+            "\t* 'slow'.",
             exec_ctx, origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
         ))
 

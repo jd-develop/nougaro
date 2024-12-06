@@ -4,13 +4,21 @@ Since 0.16.0-beta, Nougaro follows [Semantic Versioning](https://semver.org).
 
 This file is updated nearly every commit and copied to GH release changelog.
 
-Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com). It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`. The Nougaro changelog has another section, `Calculator`, keeping track of the changes relative to the Nougaro Calculator under the same 6-sections format.
+Since 0.19.0-beta, we use [this changelog format](https://keepachangelog.com).
+It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`,
+`Fixed`, `Security`. The Nougaro changelog has another section, `Calculator`,
+keeping track of the changes relative to the Nougaro Calculator under the same
+6-sections format.
 
 ## upcoming
 
 ### Added
+* Added two modes in the `sort` built-in function: `slow` and `slow-verbose`.
+  Both are [slowsort](https://en.wikipedia.org/wiki/Slowsort) implementations,
+  the former is silent and the latter prints how much elements are already
+  sorted.
 * Added `math.gcd`, that takes exactly two integer arguments and return their
-gcd.
+  gcd.
 
 ### Changed
 * Any value can now be passed as `assert` error message (and will be converted
@@ -27,6 +35,8 @@ to str)
 * Fixed a bug where identifiers after `$` could start with digits
 * Optimised asserts a little bit
 * Better error messages
+* Stalinsort no longer sorts the list in-place (it returns a “““sorted”””
+copy of the list instead of “““sorting””” the original list)
 * *Updated error messages when method in not defined in python-written modules
 (does not change anything to public API)*
 

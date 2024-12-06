@@ -849,14 +849,23 @@ def test_nougaro(print_OK)
 
     ## sorting algorithms
     assert sort(list("bepo")) == list("beop")
+
     assert sort([1, 2, 3, 4, 3, 2, 1, 5, 2, 6, 1, 2, 4, 3, 7]) == [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 5, 6, 7]
     assert sort([]) == []
     assert sort([0, -1]) == [-1, 0]
+
+    assert sort([1, 2, 3, 4, 3, 2, 1, 5, 2, 6, 1, 2, 4, 3, 7], "slow") == [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 5, 6, 7]
+    assert sort([], "slow") == []
+    assert sort([0, -1], "slow") == [-1, 0]
+
     assert sort([1, 2, 3, 4, 3, 2, 1, 5, 2, 6, 1, 2, 4, 3, 7], "stalin") == [1, 2, 3, 4, 5, 6, 7]
     assert sort([1, 2, 3, 4, 3, 2, 1, 5, 0, 6, -400, 2, 4, 3, 7], "stalin") == [1, 2, 3, 4, 5, 6, 7]
     assert sort([], "stalin") == []
     assert sort([-1, 0, -3], "stalin") == [-1, 0]
+
     assert reverse(sort([3, 1, 5, 6, 12, -4, 0, 9999999, 45])) == [9999999, 45, 12, 6, 5, 3, 1, 0, -4]
+    assert reverse(sort([3, 1, 5, 6, 12, -4, 0, 9999999, 45], "slow")) == [9999999, 45, 12, 6, 5, 3, 1, 0, -4]
+
     assert reverse("bépo") == "opéb" != "azerty"
     print("Executing sleep sort, this should take 4 seconds...")
     assert sort([1, 2, 3, 4, 3, 2, 1, 0, 4, 2, 4, 1, 2, 4, 3], "sleep-verbose") == [0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4]
@@ -868,6 +877,7 @@ def test_nougaro(print_OK)
     assert sort([], "panic") == []
     assert sort([1], "panic") == [1]
     assert sort([-1, 1, 2, 3, 4], "panic") == [-1, 1, 2, 3, 4]
+    assert sort([-1, 1, 2, 3, 4], "slow") == [-1, 1, 2, 3, 4]
 
     if print_OK then print("OK builtin funcs 12")
 

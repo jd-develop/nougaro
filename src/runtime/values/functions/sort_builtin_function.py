@@ -152,7 +152,7 @@ def sort(
         list_of_coroutines = [wait_and_append(i) for i in list_to_sort_only_nums]
         asyncio.run(execute_coroutine_list(list_of_coroutines))
     elif mode == "miracle":
-        sorted_ = list_to_sort
+        sorted_ = _true_list_copy(list_to_sort)
         is_sorted_, error = _is_sorted(sorted_)
         if error is not None:
             return result.failure(error)
@@ -161,7 +161,7 @@ def sort(
             if error is not None:
                 return result.failure(error)
     elif mode == "panic":
-        sorted_ = list_to_sort
+        sorted_ = _true_list_copy(list_to_sort)
         is_sorted_, error = _is_sorted(sorted_)
         if error is not None:
             return result.failure(error)

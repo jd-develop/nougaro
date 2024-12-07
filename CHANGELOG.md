@@ -36,7 +36,9 @@ to str)
 * Optimised asserts a little bit
 * Better error messages
 * Stalinsort no longer sorts the list in-place (it returns a “““sorted”””
-copy of the list instead of “““sorting””” the original list)
+  copy of the list instead of “““sorting””” the original list)
+* Miraclesort and panicsort now also return a copy of the original list
+  (if they return something…)
 * *Updated error messages when method in not defined in python-written modules
 (does not change anything to public API)*
 

@@ -13,10 +13,12 @@ keeping track of the changes relative to the Nougaro Calculator under the same
 ## upcoming
 
 ### Added
-* Added two modes in the `sort` built-in function: `slow` and `slow-verbose`.
+* Added two modes to the `sort` built-in function: `slow` and `slow-verbose`.
   Both are [slowsort](https://en.wikipedia.org/wiki/Slowsort) implementations,
   the former is silent and the latter prints how much elements are already
   sorted.
+* Added one other mode to the `sort` built-in function: `bogo`.
+  It is a [bogosort](https://en.wikipedia.org/wiki/Bogosort) implementation.
 * Added `math.gcd`, that takes exactly two integer arguments and return their
   gcd.
 

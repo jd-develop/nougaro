@@ -19,6 +19,7 @@ from src.runtime.values.tools.py2noug import noug2py
 # built-in python imports
 from typing import Coroutine, Any
 import sys
+import random  # for bogosort
 
 
 def _get_comparison_gt(list_to_sort_: list[Value], index_: int) -> tuple[Number, None] | tuple[None, RunTimeError]:
@@ -182,11 +183,22 @@ def sort(
     elif mode == "slow" or mode == "slow-verbose":  # slowsort
         sorted_ = _true_list_copy(list_to_sort)
         _slow_sort(sorted_, 0, len(sorted_)-1, int(mode == "slow-verbose"))
+    elif mode == "bogo":
+        sorted_ = _true_list_copy(list_to_sort)
+        is_sorted_, error = _is_sorted(sorted_)
+        if error is not None:
+            return result.failure(error)
+        while not is_sorted_:
+            random.shuffle(sorted_)
+            is_sorted_, error = _is_sorted(sorted_)
+            if error is not None:
+                return result.failure(error)
     else:  # mode is none of the above
         return result.failure(RunTimeError(
             mode_noug.pos_start, mode_noug.pos_end,
             "this mode does not exist. Available modes:\n"
             "    * 'timsort' (default),\n"
+            "    * 'bogo',\n"
             "    * 'miracle',\n"
             "    * 'panic',\n"
             "    * 'sleep',\n"

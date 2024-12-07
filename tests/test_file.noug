@@ -858,6 +858,12 @@ def test_nougaro(print_OK)
     assert sort([], "slow") == []
     assert sort([0, -1], "slow") == [-1, 0]
 
+    print("Executing bogosort, this may take an infinite amount of time…")
+    assert sort([1, 2, 3, 4, 3, 2, 1, 5, 2], "bogo") == [1, 1, 2, 2, 2, 3, 3, 4, 5]
+    assert sort([], "bogo") == []
+    assert sort([0, -1], "bogo") == [-1, 0]
+    print("Done.")
+
     assert sort([1, 2, 3, 4, 3, 2, 1, 5, 2, 6, 1, 2, 4, 3, 7], "stalin") == [1, 2, 3, 4, 5, 6, 7]
     assert sort([1, 2, 3, 4, 3, 2, 1, 5, 0, 6, -400, 2, 4, 3, 7], "stalin") == [1, 2, 3, 4, 5, 6, 7]
     assert sort([], "stalin") == []

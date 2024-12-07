@@ -10,7 +10,7 @@ It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`,
 keeping track of the changes relative to the Nougaro Calculator under the same
 6-sections format.
 
-## upcoming
+## 1.2.0 (2024-12-07)
 
 ### Added
 * Added two modes to the `sort` built-in function: `slow` and `slow-verbose`.

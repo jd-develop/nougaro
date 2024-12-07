@@ -68,7 +68,7 @@ def test_nougaro(print_OK)
     assert b?c?d?a?e?4 == 1
 
     if print_OK then /* comment */ assert $print( /* comment */ "OK print & comments" /*
-    
+
     */) == None /* comment */ # comment
 
     # basic syntax
@@ -890,7 +890,7 @@ def test_nougaro(print_OK)
     assert path_exists(__noug_dir__)
     assert path_exists(__noug_dir__ + "/tests/test_file.noug")
 
-    if print_OK then print("OK builtin funcs 13")
+    if print_OK then print("OK builtin funcs 13")
 
     # builtin variables
     assert __os_name__ in [\
@@ -991,7 +991,7 @@ def test_nougaro(print_OK)
         assert math.gcd(a, b) == math.gcd(b, a) == math.gcd(-a, b) == \
             math.gcd(b, -a) == math.gcd(a, -b) == math.gcd(-b, a) == \
             math.gcd(-a, -b) == math.gcd(-b, -a)
-        assert 1 <= math.gcd(a, b) <= 100, str([a, b])
+        assert 0 <= math.gcd(a, b) <= 100, str([a, b])
     end
 
     if print_OK then print("OK math lib")

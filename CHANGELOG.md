@@ -14,6 +14,7 @@ keeping track of the changes relative to the Nougaro Calculator under the same
 
 ### Fixed
 * Fix error message in `math.log` and `math.log2` when base = 1
+* Fix a crash in tests
 
 ## 1.2.0 (2024-12-07)
 

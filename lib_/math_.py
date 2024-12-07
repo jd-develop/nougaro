@@ -482,7 +482,7 @@ class Math(ModuleFunction):
             except ZeroDivisionError as e:
                 return RTResult().failure(RTArithmeticError(
                     self.pos_start, self.pos_end,
-                    "Python ZeroDivisionError: {e}",
+                    f"Python ZeroDivisionError: {e}",
                     exec_context,
                     origin_file="lib_.math_.Math.execute_math_log"
                 ))
@@ -530,7 +530,7 @@ class Math(ModuleFunction):
         except ZeroDivisionError as e:
             return RTResult().failure(RTArithmeticError(
                 self.pos_start, self.pos_end,
-                "Python ZeroDivisionError: {e}",
+                f"Python ZeroDivisionError: {e}",
                 exec_context,
                 origin_file="lib_.math_.Math.execute_math_log"
             ))

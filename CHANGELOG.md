@@ -26,6 +26,7 @@ to str)
 * `$` and the following identifier can now be spaced (`$ id` is now valid)
 * `paraghraphs` argument of function `lorem.ipsum` is now optional and defaults
   to 1
+* Version ID has been increased to `11`.
 
 ### Fixed
 * Fixed a crash in `math.log` on base=1

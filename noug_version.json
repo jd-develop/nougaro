@@ -1,10 +1,10 @@
 {
     "major": 1,
-    "minor": 1,
+    "minor": 2,
     "patch": 0,
     "phase": "stable",
     "release-serial": 0,
-    "version-id": 10,
+    "version-id": 11,
     "data-version": 7,
     "lib-version": 4
 }

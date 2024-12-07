@@ -186,12 +186,12 @@ def sort(
         return result.failure(RunTimeError(
             mode_noug.pos_start, mode_noug.pos_end,
             "this mode does not exist. Available modes:\n"
-            "\t* 'timsort' (default),\n"
-            "\t* 'stalin',\n"
-            "\t* 'sleep',\n"
-            "\t* 'miracle',\n"
-            "\t* 'panic'\n"
-            "\t* 'slow'.",
+            "    * 'timsort' (default),\n"
+            "    * 'miracle',\n"
+            "    * 'panic',\n"
+            "    * 'sleep',\n"
+            "    * 'slow',\n"
+            "    * 'stalin'.",
             exec_ctx, origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
         ))
 

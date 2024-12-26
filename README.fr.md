@@ -31,7 +31,7 @@ end
 
  Le code est compilé pour Windows et GNU/Linux. Disponible dans l'onglet [releases](https://github.com/jd-develop/nougaro/releases/)&nbsp;!
  
- Prend en charge Python 3.11 et 3.12. N’a pas été testé sous Python 3.13.
+ Prend en charge Python 3.11, 3.12 et 3.13.
 
 ### Modules tiers (optionnels)
 

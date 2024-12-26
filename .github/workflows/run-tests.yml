@@ -37,3 +37,14 @@ jobs:
     - name: Test (python 3.12)
       run: |
         sh run_tests.sh
+  test-313:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.13"
+    - name: Test (python 3.13)
+      run: |
+        sh run_tests.sh

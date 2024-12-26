@@ -890,6 +890,15 @@ def test_nougaro(print_OK)
     assert path_exists(__noug_dir__)
     assert path_exists(__noug_dir__ + "/tests/test_file.noug")
 
+    assert all([])
+    assert not any([])
+    assert all([True, True, True])
+    assert not all([True, False, True])
+    assert not all([False, False, False])
+    assert any([True, True, True])
+    assert any([True, False, True])
+    assert not any([False, False, False])
+
     if print_OK then print("OK builtin funcs 13")
 
     # builtin variables

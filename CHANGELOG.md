@@ -12,9 +12,20 @@ keeping track of the changes relative to the Nougaro Calculator under the same
 
 ## upcoming
 
+### Added
+* Added `all` and `any` built-in functions
+
 ### Fixed
 * Fix error message in `math.log` and `math.log2` when base = 1
 * Fix a crash in tests
+
+### Calculator
+#### Added
+* Added `swap` and `dup` commands!
+
+#### Changed
+* Changed how tokens are parsed. It is now MUCH cleaner in terms of source code,
+and provides more consistent error messages.
 
 ## 1.2.0 (2024-12-07)
 

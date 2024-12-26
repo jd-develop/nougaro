@@ -2077,4 +2077,54 @@ class BuiltInFunction(BaseBuiltInFunction):
         "noug_dir": False
     }
 
+    def execute_all(self, exec_ctx: Context) -> RTResult:
+        """Return TRUE if every value of the given list is true"""
+        assert exec_ctx.symbol_table is not None
+        list_ = exec_ctx.symbol_table.getf("list_")
+        if not isinstance(list_, List):
+            assert list_ is not None
+            return RTResult().failure(RTTypeErrorF(
+                list_.pos_start, list_.pos_end,
+                "first", "all", "list", list_,
+                exec_ctx,
+                origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_all"
+            ))
+
+        all_result = all(elt.is_true() for elt in list_)
+        return RTResult().success(Number(all_result, self.pos_start, self.pos_end))
+
+    builtin_functions["all"] = {
+        "function": execute_all,
+        "param_names": ["list_"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir": False,
+        "noug_dir": False
+    }
+
+    def execute_any(self, exec_ctx: Context) -> RTResult:
+        """Return TRUE if at least one of the values of the given list is true"""
+        assert exec_ctx.symbol_table is not None
+        list_ = exec_ctx.symbol_table.getf("list_")
+        if not isinstance(list_, List):
+            assert list_ is not None
+            return RTResult().failure(RTTypeErrorF(
+                list_.pos_start, list_.pos_end,
+                "first", "any", "list", list_,
+                exec_ctx,
+                origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_any"
+            ))
+
+        any_result = any(elt.is_true() for elt in list_)
+        return RTResult().success(Number(any_result, self.pos_start, self.pos_end))
+
+    builtin_functions["any"] = {
+        "function": execute_any,
+        "param_names": ["list_"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir": False,
+        "noug_dir": False
+    }
+
     # ==================

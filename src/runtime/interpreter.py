@@ -728,7 +728,7 @@ class Interpreter:
                 final_var_name: str = var_name[-1].value
                 variable_exists = final_var_name in value.attributes
                 if variable_exists:
-                    var_actual_value: Value | None = value.attributes[var_name[-1].value]
+                    var_actual_value: Value | None = value.attributes[final_var_name]
                 else:
                     var_actual_value: Value | None = None
 

@@ -239,8 +239,11 @@ class Parser:
                 else:
                     quote = "'"
                 # token
+                last_tok_is_identifier = last_token_type == TT["IDENTIFIER"]
+                current_tok_is_equal = self.current_token.type in \
+                    EQUALS + [TT["INCREMENT"], TT["DECREMENT"]]
                 missing_var_error_message = False
-                if last_token_type == TT["IDENTIFIER"] and self.current_token.type in EQUALS:
+                if last_tok_is_identifier and current_tok_is_equal:
                     # there was no new line but there is 'id =' (need 'var')
                     missing_var_error_message = True
                 elif last_token_type == TT["IDENTIFIER"] and self.current_token.type == TT["COMMA"]:
@@ -262,7 +265,8 @@ class Parser:
                         missing_var_error_message = True
                 error_msg = f"unexpected token: {quote}{self.current_token}{quote}."
                 if missing_var_error_message:
-                    error_msg += f" To declare a variable, use 'var' keyword."
+                    error_msg += " To declare or update a variable, use 'var' "\
+                                 "keyword."
                 return result.failure(InvalidSyntaxError(
                     self.current_token.pos_start, self.current_token.pos_end,
                     error_msg,

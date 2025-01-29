@@ -19,6 +19,7 @@ keeping track of the changes relative to the Nougaro Calculator under the same
 * Fix error message in `math.log` and `math.log2` when base = 1
 * Fix a crash in tests
 * Fix a crash when no name was given after `@meta`
+* Better error messages
 
 ### Calculator
 #### Added

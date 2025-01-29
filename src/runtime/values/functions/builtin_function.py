@@ -75,7 +75,6 @@ class BuiltInFunction(BaseBuiltInFunction):
             method_dict: BuiltinFunctionDict = self.builtin_functions[self.name]
         except KeyError:
             self.no_visit_method(exec_ctx)
-            return result
         method = method_dict["function"]
 
         optional_params: list[tuple[str, Value | None]] = [(param, None) for param in method_dict["optional_params"]]

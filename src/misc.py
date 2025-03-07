@@ -39,9 +39,11 @@ colorama_init()
 # COLORS
 # ##########
 # prints text in red.
-def print_in_red(txt: str = ""): print(foreRED + txt + foreRESET)
+def print_in_red(txt: str = "", end: str = "\n"):
+    print(foreRED + txt + foreRESET, end=foreRED + end + foreRESET)
 # prints text in green.
-def print_in_green(txt: str = ""): print(foreGREEN + txt + foreRESET)
+def print_in_green(txt: str = "", end: str = "\n"):
+    print(foreGREEN + txt + foreRESET, end=foreGREEN + end + foreRESET)
 
 
 # ##########

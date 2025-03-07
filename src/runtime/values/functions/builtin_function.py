@@ -30,7 +30,7 @@ import random
 import sys
 import subprocess
 import pathlib
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
     from src.runtime.interpreter import Interpreter
 
@@ -163,15 +163,46 @@ class BuiltInFunction(BaseBuiltInFunction):
         "noug_dir": False
     }
 
-    def execute_print(self, exec_ctx: Context):
-        """Print 'value'"""
-        # Optional params:
-        # * value
+    def _print(
+            self,
+            exec_ctx: Context,
+            function_name: Literal["print", "print_in_red", "print_in_green"],
+            ret: bool = False
+        ):
+        """Prints 'value' with end='end' with function 'function_name'. Returns if 'ret' is True."""
         assert exec_ctx.symbol_table is not None
+        end_value = exec_ctx.symbol_table.getf("end")
+        if end_value is None:
+            end = "\n"
+        else:
+            try:
+                end = end_value.to_python_str()
+            except AttributeError:
+                end = str(end_value)
+            except UnicodeEncodeError as e:
+                return RTResult().failure(RunTimeError(
+                    end_value.pos_start, end_value.pos_end,
+                    str(e), exec_ctx,
+                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction._print"
+                ))
+
+        if function_name == "print":
+            func = print
+        elif function_name == "print_in_red":
+            func = print_in_red
+        elif function_name == "print_in_green":
+            func = print_in_green
+
         value = exec_ctx.symbol_table.getf('value')
         if value is not None:  # if the value is defined
             try:
-                print(value.to_python_str())
+                func(value.to_python_str(), end=end)
+                if ret:
+                    if function_name == "print_in_red":
+                        easter_egg_trigger = "Is there an easter egg in this program? That would be so cool!"
+                        if value.to_python_str() == easter_egg_trigger:
+                            return RTResult().success(String("Here you go!", self.pos_start, self.pos_end))
+                    return RTResult().success(String(value.to_python_str(), self.pos_start, self.pos_end))
             except UnicodeEncodeError as e:
                 return RTResult().failure(RunTimeError(
                     value.pos_start, value.pos_end,
@@ -179,45 +210,42 @@ class BuiltInFunction(BaseBuiltInFunction):
                     origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_print"
                 ))
             except AttributeError:
-                print(str(value))
+                func(str(value), end=end)
+                if ret:
+                    return RTResult().success(String(str(value), self.pos_start, self.pos_end))
         else:  # the value is not defined, we just print a new line like in regular print() python builtin func
-            print()
+            func(end=end)
+            if ret:
+                return RTResult().success(String('', self.pos_start, self.pos_end))
         return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
+
+    def execute_print(self, exec_ctx: Context):
+        """Print 'value'"""
+        # Optional params:
+        # * value
+        # * end
+        return self._print(exec_ctx, "print")
 
     builtin_functions["print"] = {
         "function": execute_print,
         "param_names": [],
-        "optional_params": ["value"],
+        "optional_params": ["value", "end"],
         "should_respect_args_number": True,
         "run_noug_dir": False,
         "noug_dir": False
     }
 
     def execute_print_in_red(self, exec_ctx: Context):
-        """Print 'value' in red"""
+        """Print 'value' in red."""
         # Optional params:
         # * value
-        assert exec_ctx.symbol_table is not None
-        value = exec_ctx.symbol_table.getf('value')
-        if value is not None:  # if the value is defined
-            try:
-                print_in_red(value.to_python_str())
-            except UnicodeEncodeError as e:
-                return RTResult().failure(RunTimeError(
-                    value.pos_start, value.pos_end,
-                    str(e), exec_ctx,
-                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_print_in_red"
-                ))
-            except AttributeError:
-                print_in_red(str(value))
-        else:  # the value is not defined, we just print a new line like in regular print() python builtin func
-            print_in_red()
-        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
+        # * end
+        return self._print(exec_ctx, "print_in_red")
 
     builtin_functions["print_in_red"] = {
         "function": execute_print_in_red,
         "param_names": [],
-        "optional_params": ["value"],
+        "optional_params": ["value", "end"],
         "should_respect_args_number": True,
         "run_noug_dir": False,
         "noug_dir": False
@@ -227,56 +255,24 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Print 'value' in green"""
         # Optional params:
         # * value
-        assert exec_ctx.symbol_table is not None
-        value = exec_ctx.symbol_table.getf('value')
-        if value is not None:  # if the value is defined
-            try:
-                print_in_green(value.to_python_str())
-            except UnicodeEncodeError as e:
-                return RTResult().failure(RunTimeError(
-                    value.pos_start, value.pos_end,
-                    str(e), exec_ctx,
-                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_print_in_green"
-                ))
-            except AttributeError:
-                print_in_green(str(value))
-        else:  # the value is not defined, we just print a new line like in regular print() python builtin func
-            print_in_green()
-        return RTResult().success(NoneValue(self.pos_start, self.pos_end, False))
+        # * end
+        return self._print(exec_ctx, "print_in_green")
 
     builtin_functions["print_in_green"] = {
         "function": execute_print_in_green,
         "param_names": [],
-        "optional_params": ["value"],
+        "optional_params": ["value", "end"],
         "should_respect_args_number": True,
         "run_noug_dir": False,
         "noug_dir": False
     }
 
     def execute_print_ret(self, exec_ctx: Context):
-        """Print 'value' and returns 'value'"""
+        """Print 'value+end' and returns 'value' (default value for end:\\n)"""
         # Optional params:
         # * value
-        assert exec_ctx.symbol_table is not None
-        value = exec_ctx.symbol_table.getf('value')
-        if value is not None:  # if the value is defined
-            try:
-                print(value.to_python_str())
-                return RTResult().success(String(value.to_python_str(), self.pos_start, self.pos_end))
-            except UnicodeEncodeError as e:
-                return RTResult().failure(RunTimeError(
-                    value.pos_start, value.pos_end,
-                    str(e), exec_ctx,
-                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_print_ret"
-                ))
-            except AttributeError:
-                print(str(value))
-                return RTResult().success(String(str(value), self.pos_start, self.pos_end))
-        else:
-            # the value is not defined, we just print a new line like in regular print() python builtin func and return
-            # an empty str
-            print()
-            return RTResult().success(String('', self.pos_start, self.pos_end))
+        # * end
+        return self._print(exec_ctx, "print", True)
 
     builtin_functions["print_ret"] = {
         "function": execute_print_ret,
@@ -291,29 +287,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Print 'value' in red and returns 'value'"""
         # Optional params:
         # * value
-        assert exec_ctx.symbol_table is not None
-        value = exec_ctx.symbol_table.getf('value')
-        if value is not None:  # if the value is defined
-            try:
-                print_in_red(value.to_python_str())
-                easter_egg_trigger = "Is there an easter egg in this program? That would be so cool!"
-                if value.to_python_str() == easter_egg_trigger:
-                    return RTResult().success(String("Here you go!", self.pos_start, self.pos_end))
-                return RTResult().success(String(value.to_python_str(), self.pos_start, self.pos_end))
-            except UnicodeEncodeError as e:
-                return RTResult().failure(RunTimeError(
-                    value.pos_start, value.pos_end,
-                    str(e), exec_ctx,
-                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_print_in_red_ret"
-                ))
-            except AttributeError:
-                print_in_red(str(value))
-                return RTResult().success(String(str(value), self.pos_start, self.pos_end))
-        else:
-            # the value is not defined, we just print a new line like in regular print() python builtin func and return
-            # an empty str
-            print_in_red()
-            return RTResult().success(String('', self.pos_start, self.pos_end))
+        # * end
+        return self._print(exec_ctx, "print_in_red", True)
 
     builtin_functions["print_in_red_ret"] = {
         "function": execute_print_in_red_ret,
@@ -328,26 +303,8 @@ class BuiltInFunction(BaseBuiltInFunction):
         """Print 'value' in green and returns 'value'"""
         # Optional params:
         # * value
-        assert exec_ctx.symbol_table is not None
-        value = exec_ctx.symbol_table.getf('value')
-        if value is not None:  # if the value is defined
-            try:
-                print_in_green(value.to_python_str())
-                return RTResult().success(String(value.to_python_str(), self.pos_start, self.pos_end))
-            except UnicodeEncodeError as e:
-                return RTResult().failure(RunTimeError(
-                    value.pos_start, value.pos_end,
-                    str(e), exec_ctx,
-                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_print_in_green_ret"
-                ))
-            except AttributeError:
-                print_in_green(str(value))
-                return RTResult().success(String(str(value), self.pos_start, self.pos_end))
-        else:
-            # the value is not defined, we just print a new line like in regular print() python builtin func and return
-            # an empty str
-            print_in_green()
-            return RTResult().success(String('', self.pos_start, self.pos_end))
+        # * end
+        return self._print(exec_ctx, "print_in_green", True)
 
     builtin_functions["print_in_green_ret"] = {
         "function": execute_print_in_green_ret,

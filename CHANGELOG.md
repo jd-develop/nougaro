@@ -14,6 +14,7 @@ keeping track of the changes relative to the Nougaro Calculator under the same
 
 ### Added
 * Added `all` and `any` built-in functions
+* Added `end` optional parameter to all the print functions
 
 ### Fixed
 * Fix error message in `math.log` and `math.log2` when base = 1

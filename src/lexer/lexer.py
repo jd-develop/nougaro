@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2025  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -359,7 +359,6 @@ class Lexer:
                 "expected newline.",
                 "src.lexer.lexer.Lexer.make_tokens"
             )
-        self.advance()
 
         if meta_name == "":
             if dont_panic_on_errors: return
@@ -369,8 +368,10 @@ class Lexer:
                 "src.lexer.lexer.Lexer.make_tokens"
             )
 
+        self.advance()
+
         if self.debug:
-            print(f"[META] (indev feature) {meta_name=} {meta_argument=}")
+            print(f"[META] {meta_name=} {meta_argument=}")
         if meta_argument == "":
             self.metas[meta_name] = True
         else:

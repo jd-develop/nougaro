@@ -16,6 +16,10 @@ keeping track of the changes relative to the Nougaro Calculator under the same
 * Added `all` and `any` built-in functions
 * Added `end` optional parameter to all the print functions
 
+### Changed
+* Changed the notice shown when starting the shell to be more compliant with the
+  GPL
+
 ### Fixed
 * Fix error message in `math.log` and `math.log2` when base = 1
 * Fix a crash in tests

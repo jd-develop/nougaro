@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2025  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -93,7 +93,7 @@ def sort(
             return result.failure(RTTypeError(
                 list_.pos_start, list_.pos_end,
                 str(e), exec_ctx,
-                origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
+                origin_file="src.runtime.values.functions.sort_builtin_function.sort"
             ))
     elif mode == "stalin":  # stalin sort
         sorted_ = _true_list_copy(list_to_sort)
@@ -127,7 +127,7 @@ def sort(
                     i.pos_start, i.pos_end,
                     f"sleep mode: expected list of int, but found {i.type_} inside the list.",
                     exec_ctx,
-                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
+                    origin_file="src.runtime.values.functions.sort_builtin_function.sort"
                 ))
             if i.value < 0:
                 return result.failure(RTTypeError(
@@ -135,7 +135,7 @@ def sort(
                     f"sleep mode: expected list of positive integers, but found negative integer {i.value} inside "
                     f"the list.",
                     exec_ctx,
-                    origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
+                    origin_file="src.runtime.values.functions.sort_builtin_function.sort"
 
                 ))
             list_to_sort_only_nums.append(i.value)
@@ -204,7 +204,7 @@ def sort(
             "    * 'sleep',\n"
             "    * 'slow',\n"
             "    * 'stalin'.",
-            exec_ctx, origin_file="src.runtime.values.functions.builtin_function.BuiltInFunction.execute_sort"
+            exec_ctx, origin_file="src.runtime.values.functions.sort_builtin_function.sort"
         ))
 
     return result.success(List(sorted_, pos_start, pos_end))

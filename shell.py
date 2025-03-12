@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2025  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -184,10 +184,14 @@ def print_greet_text(
     print(f"Contribute: https://github.com/jd-develop/nougaro/")
     print(f"Changelog: see {noug_dir}/CHANGELOG.md")
     print()
-    print("This program is under GPL license. For more details, type __gpl__()")
-    print("or __gpl__(1) to stay in terminal.")
     print("This program comes with ABSOLUTELY NO WARRANTY; for details type")
     print("`__disclaimer_of_warranty__'.")
+    print("This program is under the GNU General Public License, meaning that")
+    print("this is free software, and you are welcome to redistribute it")
+    print("under certain conditions; type `__gpl__()' for details (or")
+    print("`__gpl__(1)' to stay in terminal).")
+    print("You should also have received a copy of the GPL along with this")
+    print("program.  If not, see <https://www.gnu.org/licences>.")
     print()
     print("Found a bug? Feel free to report it at")
     print("https://jd-develop.github.io/nougaro/bugreport.html")

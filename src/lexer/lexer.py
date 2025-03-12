@@ -702,7 +702,9 @@ class Lexer:
             _0prefixes: bool = True,
             mode: str = "int"
     ) -> tuple[Token, None] | tuple[None, Error]:
-        """Make number, int or float"""
+        """Make number, int or float. mode corresponds to the base:
+           `int` for base 10, `oct` for base 8, `bin` for base 2 and
+           `hex` for base 16"""
         num_str = ''
         dot_count = 0  # we can't have more than one dot, so we count them
         last_was_dot = False

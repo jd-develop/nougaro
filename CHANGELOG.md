@@ -20,6 +20,8 @@ keeping track of the changes relative to the Nougaro Calculator under the same
 * Fix error message in `math.log` and `math.log2` when base = 1
 * Fix a crash in tests
 * Fix a crash when no name was given after `@meta`
+* Fix methods not being able to access global variables when the file in which
+  the methods were declared was imported from another file
 * Better error messages
 
 ### Calculator

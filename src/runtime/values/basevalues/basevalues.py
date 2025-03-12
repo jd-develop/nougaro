@@ -807,6 +807,7 @@ class Constructor(Value):
         )
         copy.set_context(self.context)
         copy.module_context = self.module_context
+        copy.call_with_module_context = self.call_with_module_context
         copy.attributes = self.attributes.copy()
         return copy
 
@@ -877,6 +878,7 @@ class Object(Value):
         """Return a copy of self"""
         copy = Object(self.attributes, self.constructor, self.pos_start, self.pos_end, self.inner_context)
         copy.set_context(self.context)
+        copy.call_with_module_context = self.call_with_module_context
         copy.module_context = self.module_context
         copy.attributes = self.attributes.copy()
         return copy

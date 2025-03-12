@@ -1380,14 +1380,17 @@ class Interpreter:
                 use_context = value_to_call.module_context
             elif isinstance(value_to_call, Method):
                 use_context = outer_context
-                assert outer_context.symbol_table is not None
-                assert value_to_call.object_ is not None
-                outer_context.symbol_table.set("this", value_to_call.object_)
-                if outer_context.parent is not None:
-                    outer_context.symbol_table.parent = outer_context.parent.symbol_table
-                self.update_symbol_table(outer_context)
             else:
                 use_context = None
+
+            if isinstance(value_to_call, Method):
+                assert use_context is not None
+                assert use_context.symbol_table is not None
+                assert value_to_call.object_ is not None
+                use_context.symbol_table.set("this", value_to_call.object_)
+                if use_context.parent is not None:
+                    use_context.symbol_table.parent = use_context.parent.symbol_table
+                self.update_symbol_table(use_context)
 
             if outer_context.parent is None:
                 exec_from = f"{outer_context.display_name}"
@@ -1568,6 +1571,8 @@ class Interpreter:
                 obj_attrs[key] = value.copy()
         object_ = Object(obj_attrs, constructor, constructor.pos_start, constructor.pos_end)
         object_.type_ = constructor.name
+        object_.call_with_module_context = call_with_module_context
+        object_.module_context = constructor.module_context
 
         if call_with_module_context:
             assert constructor.module_context is not None
@@ -1588,8 +1593,12 @@ class Interpreter:
             if isinstance(value_to_set_object, Method):
                 if object_to_set_this is None:
                     value_to_set_object.object_ = object_
+                    value_to_set_object.module_context = object_.module_context
+                    value_to_set_object.call_with_module_context = object_.call_with_module_context
                 else:
                     value_to_set_object.object_ = object_to_set_this
+                    value_to_set_object.module_context = object_to_set_this.module_context
+                    value_to_set_object.call_with_module_context = object_to_set_this.call_with_module_context
 
         if result.should_return():  # check for errors
             return result
@@ -1832,7 +1841,7 @@ class Interpreter:
                 ctx, origin_file=f"{_ORIGIN_FILE}.visit_ExportNode"
             ))
 
-        if isinstance(value_to_export, BaseFunction):
+        if isinstance(value_to_export, BaseFunction) or isinstance(value_to_export, Constructor):
             value_to_export.call_with_module_context = True
             value_to_export.module_context = ctx.copy()
         assert isinstance(export_as_name, str)

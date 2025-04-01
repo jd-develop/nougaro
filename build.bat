@@ -58,6 +58,6 @@ echo "Renaming and compressing…"
 RENAME shell.dist nougaro-"%NOUGVERSION%"-windows-exe
 
 rem Finally, we compress the output directory to a .zip file
-rem Note: Windows 10 cames with tar
+rem Note: Windows 10 comes with tar
 tar -a -c -f nougaro-"%NOUGVERSION%"-windows-exe.zip nougaro-"%NOUGVERSION%"-windows-exe
 

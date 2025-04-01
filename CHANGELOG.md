@@ -31,6 +31,7 @@ keeping track of the changes relative to the Nougaro Calculator under the same
 ### Calculator
 #### Added
 * Added `swap` and `dup` commands!
+* Added `cos`, `sin`, `tan`, `acos`, `asin` and `atan` commands!
 
 #### Changed
 * Changed how tokens are parsed. It is now MUCH cleaner in terms of source code,

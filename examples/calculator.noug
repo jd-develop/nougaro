@@ -29,6 +29,12 @@ def print_help(v)  # v is verbose
     print()
     print("Here all the unary operators with their syntax:")
     print("     num sqrt : square root")
+    print("      num cos : cosine")
+    print("      num sin : sine")
+    print("      num tan : tangent")
+    print("     num acos : arccosine")
+    print("     num asin : arcsine")
+    print("     num atan : arctangent")
     print("         a ln : logarithm of base e")
     print("          a ! : factorial")
     print()
@@ -264,7 +270,35 @@ loop:main_loop
                 print_error(error_msg, verbose)
                 var stack = list(old_stack)
                 continue:main_loop
-           end
+            end
+        elif token == "cos" and len(stack) > 0 and is_num(stack(-1)) then
+            replace(stack, -1, math.cos(stack(-1)))
+        elif token == "sin" and len(stack) > 0 and is_num(stack(-1)) then
+            replace(stack, -1, math.sin(stack(-1)))
+        elif token == "tan" and len(stack) > 0 and is_num(stack(-1)) then
+            # no need to check for illegal value – I challenge you to make
+            # tangent crash with floating-point values…
+            replace(stack, -1, math.tan(stack(-1)))
+        elif token == "acos" and len(stack) > 0 and is_num(stack(-1)) then
+            if -1 <= stack(-1) <= 1 then
+                replace(stack, -1, math.acos(stack(-1)))
+            else
+                var error_msg = "Error: " + str(stack(-1)) + " is out of bounds for arccosine."
+                print_error(error_msg, verbose)
+                var stack = list(old_stack)
+                continue:main_loop
+            end
+        elif token == "asin" and len(stack) > 0 and is_num(stack(-1)) then
+            if -1 <= stack(-1) <= 1 then
+                replace(stack, -1, math.asin(stack(-1)))
+            else
+                var error_msg = "Error: " + str(stack(-1)) + " is out of bounds for arcsine."
+                print_error(error_msg, verbose)
+                var stack = list(old_stack)
+                continue:main_loop
+            end
+        elif token == "atan" and len(stack) > 0 and is_num(stack(-1)) then
+            replace(stack, -1, math.atan(stack(-1)))
         elif token == "p" then
             if len(stack) == 0 then print(0) \
             else print(stack(-1))

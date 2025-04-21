@@ -233,7 +233,7 @@ loop:main_loop
         elif char in "+-*/^!" then
             append(tokens, char)
         elif char in "abcdefghijklmnopqrstuvwxyz" then
-            if len(tokens) > 0 and all(for char in tokens(-1) then char in "abcdefghijklmnopqrstuvwxyz") then
+            if len(tokens) > 0 and is_str(tokens(-1)) and all(for char in tokens(-1) then char in "abcdefghijklmnopqrstuvwxyz") then
                 replace(tokens, -1, tokens(-1)+char)
             else
                 append(tokens, char)

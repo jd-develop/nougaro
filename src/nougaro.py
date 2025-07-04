@@ -42,7 +42,7 @@ import time
 # ##########
 # we create a symbol table, then we define base things a symbol table needs
 global_symbol_table = SymbolTable()
-set_symbol_table(global_symbol_table)  # This function is in src.set_symbol_table
+set_symbol_table(global_symbol_table)  # This function is in src.runtime.set_symbol_table
 default_symbol_table = global_symbol_table.copy()
 
 

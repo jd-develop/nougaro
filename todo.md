@@ -91,7 +91,7 @@
 * [ ] create highlight extension for VSCode
 * [ ] add unit tests
 * [ ] add complex numbers
-* [ ] do all the TODOs in the code (with the pretty good PyCharm 'TODO' tab)
+* [ ] do all the TODOs in the code
 * [ ] add builtin classes, or find a way to have builtin-methods in Values.
 * [ ] add `try catch`
 * [ ] add `raise`
@@ -101,6 +101,8 @@
 * [ ] add `turtle`
 * [ ] add `socket`
 * [ ] add `requests`
+
+* [ ] DOCS: paragraphs argument of lorem.ipsum is optional since 1.2.0
 
 ## What to do when Nougaro fully updates to…
 ### Python 3.12

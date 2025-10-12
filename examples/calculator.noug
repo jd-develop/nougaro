@@ -396,7 +396,7 @@ loop:main_loop
             var last_last = pop(stack)
             append(stack, last)
             append(stack, last_last)
-        else
+        elif token in ["+", "-", "/", "*", "^"] then
             if len(stack) >= 2 then
                 if token == "+" then
                     var result = stack(-2) + stack(-1)
@@ -428,11 +428,16 @@ loop:main_loop
                 pop(stack, -1)
                 append(stack, result)
             else
-                var error_msg = "Error: maybe there is not enough values in stack, or maybe you just typed the beginning of a command."
+                var error_msg = "Error: stack underflow"
                 print_error(error_msg, verbose)
                 var stack = list(old_stack)
                 continue:main_loop
             end
+        else
+            var error_msg = "Error: unknown command or operator: " + token
+            print_error(error_msg, verbose)
+            var stack = list(old_stack)
+            continue:main_loop
         end
         var last_token = token
     end

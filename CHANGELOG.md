@@ -36,6 +36,7 @@ keeping track of the changes relative to the Nougaro Calculator under the same
 #### Changed
 * Changed how tokens are parsed. It is now MUCH cleaner in terms of source code,
 and provides more consistent error messages.
+* Better error messages
 
 #### Fixed
 * Fixed a crash when putting letters after some number.

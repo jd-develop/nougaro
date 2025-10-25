@@ -39,8 +39,8 @@ File or directory               Brief explaination
 |  |                              Python
 |- src/                         Directory containing every other source code
 |  |                              file (except for shell.py)
-|  |- errors/                           
-|  |  |- errors.py              Source code for nougaro errors
+|  |- errors/
+|  |  |- errors.py              Source code for Nougaro errors
 |  |  |- strings_with_arrows.py
 |  |  |                         This file generates the '^^^^^' under the
 |  |  |                           problematic line in error msgs, using
@@ -49,13 +49,13 @@ File or directory               Brief explaination
 |  |  |- lexer.py               Source code for the Lexer
 |  |  |- position.py            Class that stores the position in a file
 |  |  |                           (index, line number, column)
+|  |  |- token.py               The Token class
 |  |  |- token_types.py         File containing different constants such as TT
 |  |  |                           (Token Types)
-|  |  |- token.py               The Token class
 |  |- parser/                   Every file related to the Parser
 |  |  |- grammar.txt            Explicitation of the syntax — not actually a
-|  |  |                           file that Nougaro uses, more a "documenta-
-|  |  |                           tion" file
+|  |  |                           file that Nougaro uses, more a "documentation"
+|  |  |                           file
 |  |  |- nodes.py               Every node (the parent Node class and every
 |  |  |                           other nodes)
 |  |  |- parse_result.py        Result of parsing (notably contains the error
@@ -79,13 +79,15 @@ File or directory               Brief explaination
 |  |  |  |  |                   Behaviour of built-in functions (such as print,
 |  |  |  |  |                     input, etc.)
 |  |  |  |  |- function.py      The Function class a user can instantiate using
-|  |  |  |  |                   def.
+|  |  |  |  |                     def.
+|  |  |  |  |- sort_builtin_function.py
+|  |  |  |  |                   Contains the definition of the `sort` built-in
+|  |  |  |  |                     function, separated from builtin_function.py
+|  |  |  |  |                     because it was too long
 |  |  |  |- tools/
 |  |  |  |  |- is_type.py       To check if a Value is of a certain type
 |  |  |  |  |- py2noug.py       Converts Nougaro values to Python values and
 |  |  |  |  |                     vice-versa.
-|  |  |  |- number_constants.py
-|  |  |  |                      The definition of True, False and null
 |  |  |- context.py             The Context class, that stores the current
 |  |  |                           scope’s name, symbol table, and so on.
 |  |  |- interpreter.py         Source code for the Interpreter
@@ -102,16 +104,20 @@ File or directory               Brief explaination
 |  |                              or valid characters for an identifier.
 |  |- misc.py                   Miscellaneous stuff
 |  |- noug_version.py           Consists of eight constants: `MAJOR`, `MINOR`,
-|  |                              `PATCH`, `PHASE`, `PHASE_MINOR`, `VERSION`
+|  |                              `PATCH`, `PHASE`, `RELEASE_SERIAL`, `VERSION`
 |  |                              (which is a `str`), `VERSION_ID`,
 |  |                              `DATA_VERSION`.
-|  |- nougaro.py                Described in how_it_works.md
+|  |- nougaro.py                Described in how_it_works.md. This file has an
+|  |                              important role of carrying results from the
+|  |                              lexer to the parser, then to the interpreter.
 |- tests/                       Directory containing files to test Nougaro
 |  |- lib_tests/, lib_test.noug, test_import_in_current_dir.noug
-|  |                            Files used to test to import nougaro libs that
+|  |                            Files used to test to import Nougaro libs that
 |  |                              are inside the current directory
-|  |- test_file.noug            File used to test nougaro. It is written in
-|  |                              nougaro
+|  |- metas/                    Some files to tests metas
+|  |- print_args/               Some files to test __args__
+|  |- test_file.noug            File used to test Nougaro. It is written in
+|  |                              Nougaro
 |  |- *.py                      Unit tests
 |- build.bat                    Compiles the project to .exe
 |- build.sh                     Compiles the project to GNU/Linux binary

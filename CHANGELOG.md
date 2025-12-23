@@ -10,7 +10,7 @@ It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`,
 keeping track of the changes relative to the Nougaro Calculator under the same
 6-sections format.
 
-## upcoming
+## 1.3.0 (2025-12-23)
 
 ### Added
 * Added `all` and `any` built-in functions
@@ -19,6 +19,7 @@ keeping track of the changes relative to the Nougaro Calculator under the same
 ### Changed
 * Changed the notice shown when starting the shell to be more compliant with the
   GPL
+* Version ID was increased to `12`.
 
 ### Fixed
 * Fix error message in `math.log` and `math.log2` when base = 1

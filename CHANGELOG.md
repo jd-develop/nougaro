@@ -10,6 +10,16 @@ It consists of 6 sections, titled `Added`, `Changed`, `Deprecated`, `Removed`,
 keeping track of the changes relative to the Nougaro Calculator under the same
 6-sections format.
 
+## [Unreleased]
+
+### Added
+* Added `math.ceil` and `math.floor` functions
+
+### Calculator
+#### Added
+* Added `int`, `ceil` and `floor`
+* Added `pop`
+
 ## 1.3.0 (2025-12-23)
 
 ### Added

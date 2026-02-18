@@ -617,6 +617,52 @@ class Math(ModuleFunction):
         "noug_dir": False
     }
 
+    def execute_math_floor(self, exec_context: Context):
+        """Takes one argument (type number) and returns its floor."""
+        assert exec_context.symbol_table is not None
+        a = exec_context.symbol_table.getf("a")
+        if not (isinstance(a, Number)):
+            assert a is not None
+            return RTResult().failure(RTTypeErrorF(
+                a.pos_start, a.pos_end, "first", "math.floor", "number", a,
+                exec_context, "lib_.math_.Math.execute_math_floor"
+            ))
+        result = Number(math.floor(a.value), self.pos_start, self.pos_end)
+        return RTResult().success(result)
+
+    functions["floor"] = {
+        "function": execute_math_floor,
+        "param_names": ["a"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir": False,
+        "noug_dir": False
+    }
+
+    def execute_math_ceil(self, exec_context: Context):
+        """Takes one argument (type number) and returns its ceil."""
+        assert exec_context.symbol_table is not None
+        a = exec_context.symbol_table.getf("a")
+        if not (isinstance(a, Number)):
+            assert a is not None
+            return RTResult().failure(RTTypeErrorF(
+                a.pos_start, a.pos_end, "first", "math.ceil", "number", a,
+                exec_context, "lib_.math_.Math.execute_math_ceil"
+            ))
+        result = Number(math.ceil(a.value), self.pos_start, self.pos_end)
+        return RTResult().success(result)
+
+    functions["ceil"] = {
+        "function": execute_math_ceil,
+        "param_names": ["a"],
+        "optional_params": [],
+        "should_respect_args_number": True,
+        "run_noug_dir": False,
+        "noug_dir": False
+    }
+
+
+
 WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the module is imported
     # Constants
     "pi": PI,
@@ -643,4 +689,6 @@ WHAT_TO_IMPORT = {  # what are the new entries in the symbol table when the modu
     "log2": Math("log2"),
     "factorial": Math("factorial"),
     "gcd": Math("gcd"),
+    "floor": Math("floor"),
+    "ceil": Math("ceil"),
 }

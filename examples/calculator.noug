@@ -35,6 +35,9 @@ def print_help(v)  # v is verbose
     print("     num acos : arccosine")
     print("     num asin : arcsine")
     print("     num atan : arctangent")
+    print("      num int : integer part (floor for num > 0, ceil. for num < 0)")
+    print("    num floor : floor")
+    print("     num ceil : ceil")
     print("         a ln : logarithm of base e")
     print("          a ! : factorial")
     print()
@@ -59,6 +62,7 @@ def print_help(v)  # v is verbose
     print("                '1 2 swap' is treated like '2 1')")
     print("          dup : duplicates the last value of the stack (for instance")
     print("                '1 dup' is treated like '1 1')")
+    print("          pop : deletes the last element of the stack")
     print("            s : prints the full stack")
     print("           ps")
     print("   printstack")
@@ -299,6 +303,12 @@ loop:main_loop
             end
         elif token == "atan" and len(stack) > 0 and is_num(stack(-1)) then
             replace(stack, -1, math.atan(stack(-1)))
+        elif token == "int" and len(stack) > 0 and is_num(stack(-1)) then
+            replace(stack, -1, int(stack(-1)))
+        elif token == "floor" and len(stack) > 0 and is_num(stack(-1)) then
+            replace(stack, -1, math.floor(stack(-1)))
+        elif token == "ceil" and len(stack) > 0 and is_num(stack(-1)) then
+            replace(stack, -1, math.ceil(stack(-1)))
         elif token == "p" then
             if len(stack) == 0 then print(0) \
             else print(stack(-1))
@@ -396,6 +406,14 @@ loop:main_loop
             var last_last = pop(stack)
             append(stack, last)
             append(stack, last_last)
+        elif token == "pop" then
+            if len(stack) == 0 then
+                var error_msg = "Error: stack underflow"
+                print_error(error_msg, verbose)
+                var stack = list(old_stack)
+                continue:main_loop
+            end
+            pop(stack)
         elif token in ["+", "-", "/", "*", "^"] then
             if len(stack) >= 2 then
                 if token == "+" then

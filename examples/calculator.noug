@@ -114,7 +114,7 @@ if verbose then
     print("This calculator uses the Reverse Polish Notation.")
     print("Type 'help' for more info and for all the operators and constants.")
     print()
-    print("Nougaro Calculator  Copyright (C) 2023-2024  Jean Dubois")
+    print("Nougaro Calculator  Copyright (C) 2023-2026  Jean Dubois")
     print("This program comes with ABSOLUTELY NO WARRANTY.")
     print("This is free software, and you are welcome to redistribute it")
     print("under certain conditions.")

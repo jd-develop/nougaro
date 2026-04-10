@@ -63,6 +63,8 @@ def print_help(v)  # v is verbose
     print("          dup : duplicates the last value of the stack (for instance")
     print("                '1 dup' is treated like '1 1')")
     print("          pop : deletes the last element of the stack")
+    print("         drop")
+    print("          rot : if the stack is ... a b c d, rot changes it to ... a c d b")
     print("            s : prints the full stack")
     print("           ps")
     print("   printstack")
@@ -108,13 +110,12 @@ else
 end
 
 if verbose then
-    print()
     print("Welcome to the Nougaro calculator!")
     print("Enter 'exit' to exit, 'cls' or 'clear' to clear the screen.")
     print("This calculator uses the Reverse Polish Notation.")
     print("Type 'help' for more info and for all the operators and constants.")
     print()
-    print("Nougaro Calculator  Copyright (C) 2023-2024  Jean Dubois")
+    print("Nougaro Calculator  Copyright (C) 2023-2026  Jean Dubois")
     print("This program comes with ABSOLUTELY NO WARRANTY.")
     print("This is free software, and you are welcome to redistribute it")
     print("under certain conditions.")
@@ -406,7 +407,7 @@ loop:main_loop
             var last_last = pop(stack)
             append(stack, last)
             append(stack, last_last)
-        elif token == "pop" then
+        elif token == "pop" or token == "drop" then
             if len(stack) == 0 then
                 var error_msg = "Error: stack underflow"
                 print_error(error_msg, verbose)
@@ -414,6 +415,19 @@ loop:main_loop
                 continue:main_loop
             end
             pop(stack)
+        elif token == "rot" then
+            if len(stack) < 3 then
+                var error_msg = "Error: stack underflow"
+                print_error(error_msg, verbose)
+                var stack = list(old_stack)
+                continue:main_loop
+            end
+            var c = pop(stack)
+            var b = pop(stack)
+            var a = pop(stack)
+            append(stack, c)
+            append(stack, a)
+            append(stack, b)
         elif token in ["+", "-", "/", "*", "^"] then
             if len(stack) >= 2 then
                 if token == "+" then

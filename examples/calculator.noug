@@ -39,6 +39,7 @@ def print_help(v)  # v is verbose
     print("    num floor : floor")
     print("     num ceil : ceil")
     print("         a ln : logarithm of base e")
+    print("      num abs : absolute value")
     print("          a ! : factorial")
     print()
     print("Here all the constants:")
@@ -310,6 +311,8 @@ loop:main_loop
             replace(stack, -1, math.floor(stack(-1)))
         elif token == "ceil" and len(stack) > 0 and is_num(stack(-1)) then
             replace(stack, -1, math.ceil(stack(-1)))
+        elif token == "abs" and len(stack) > 0 and is_num(stack(-1)) then
+            replace(stack, -1, math.abs(stack(-1)))
         elif token == "p" then
             if len(stack) == 0 then print(0) \
             else print(stack(-1))

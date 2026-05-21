@@ -17,7 +17,7 @@ keeping track of the changes relative to the Nougaro Calculator under the same
 
 ### Calculator
 #### Added
-* Added `int`, `ceil` and `floor`
+* Added `int`, `abs`, `ceil` and `floor`
 * Added `pop` (alias: `drop`) and `dup`
 
 ## 1.3.0 (2025-12-23)

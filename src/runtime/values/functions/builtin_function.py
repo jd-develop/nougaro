@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2025  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2026  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -1472,6 +1472,7 @@ class BuiltInFunction(BaseBuiltInFunction):
             "Armstrong": "https://www.youtube.com/watch?v=Dkqsh0kkjFw",
             "Bidonville": "https://www.youtube.com/watch?v=sh6jpbxjFKY",
             "Tu verras": "https://www.youtube.com/watch?v=rK3r-AqlNjU",
+            "Le coq et la pendule": "https://www.youtube.com/watch?v=zOMX--iszkc",
         }  # PR if you want to add more songs :)
         if song is None:  # if the song is not given, we pick up a random one
             import webbrowser

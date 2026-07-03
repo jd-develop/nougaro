@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2025  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2026  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,8 @@ import os
 import platform
 import pathlib
 from datetime import datetime
-if platform.system().lower() in ["linux", "darwin"] or "bsd" in platform.system().lower():
+if platform.system().lower() in ["linux", "darwin"] or \
+        "bsd" in platform.system().lower():
     try:
         import readline  # browse command history
     except ImportError:
@@ -43,7 +44,8 @@ else:
     readline = None
 
 
-def check_arguments(args: list[str], noug_dir: str, version: str) -> tuple[str, str | None, bool, bool]:
+def check_arguments(args: list[str], noug_dir: str, version: str) -> \
+        tuple[str, str | None, bool, bool]:
     """Returns a file to exec, the line to exec, and dont_verbose"""
     if len(args) == 0:
         return "<stdin>", None, False, False
@@ -57,7 +59,8 @@ def check_arguments(args: list[str], noug_dir: str, version: str) -> tuple[str, 
         sys.exit()
 
     if args[0] in ["-h", "-H", "--help"]:
-        with open(f"{noug_dir}/src/cli_help.txt", "r", encoding="UTF-8") as help_file:
+        with open(f"{noug_dir}/src/cli_help.txt", "r", encoding="UTF-8") \
+        as help_file:
             help_text = help_file.readlines()
         for line in help_text[1:]:
             print(line, end="")
@@ -75,8 +78,9 @@ def check_arguments(args: list[str], noug_dir: str, version: str) -> tuple[str, 
             sys.exit(1)
         # note that bash, zsh and fiSH automatically delete quotes.
         # TODO: test in windows cmd and powershell
-        assert isinstance(line_to_exec, str), "please report this bug on GitHub: https://github.com/" \
-                                              "jd-develop/nougaro/issues"
+        assert isinstance(line_to_exec, str), \
+            "please report this bug on GitHub: https://github.com/jd-develop/" \
+            "nougaro/issues"
         # del args[0]  # this line is commented because when you execute a file, say using `nougaro file.noug`,
         #              # __args__(0) is set to `"file.noug"`, so when using `nougaro -c`, `-c` should be the default
         #              # argument in __args__(0)
@@ -85,11 +89,14 @@ def check_arguments(args: list[str], noug_dir: str, version: str) -> tuple[str, 
         if args[0] in ["-i", "--interactive"]:
             interactive = True
             del args[0]
-        if not os.path.exists(args[0]):  # we check if the file exist, if not we quit with an error message
+        if not os.path.exists(args[0]):
+            # we check if the file exist, if not we quit with an error message
             print_in_red(f"[nougaro] file '{args[0]}' does not exist.")
             sys.exit(-1)  # DO NOT USE exit() OR quit() PYTHON BUILTINS !!!
+                          # (it breaks with Nuitka)
         elif args[0] in ["<stdin>", "<stdout>", "<commandline>"]:
-            # these names can not be files : <stdin> is the shell input and <stdout> is his output
+            # these names can not be files : <stdin> is the shell input and
+            # <stdout> is his output
             print_in_red(
                 f"[nougaro] file '{args[0]}' can not be used by Nougaro because this name is used internally.\n"
                 f"[nougaro] This is not an unexpected error, you do not need to open an issue on GitHub.\n"
@@ -102,7 +109,8 @@ def check_arguments(args: list[str], noug_dir: str, version: str) -> tuple[str, 
     return path, line_to_exec, dont_verbose, interactive
 
 
-def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: list[str], interactive: bool):
+def execute_file(path: str, debug_on: bool, noug_dir: str, version: str,
+                 args: list[str], interactive: bool):
     work_dir = os.path.dirname(os.path.realpath(path))
     endswith_slash = work_dir.endswith("/") or work_dir.endswith("\\")
     if endswith_slash:
@@ -117,7 +125,8 @@ def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: l
         error = None
     else:  # the file isn't empty, let's run it !
         try:
-            _, error, _ = nougaro.run(path, file_content, noug_dir, version, args=args, work_dir=work_dir)
+            _, error, _ = nougaro.run(path, file_content, noug_dir, version,
+                                      args=args, work_dir=work_dir)
         except KeyboardInterrupt:  # if CTRL+C, just exit the Nougaro shell
             print_in_red("\nKeyboardInterrupt")
             error = None
@@ -129,15 +138,17 @@ def execute_file(path: str, debug_on: bool, noug_dir: str, version: str, args: l
             if not interactive:
                 sys.exit()
 
-    if error is not None:  # there is an error, so before exiting we have to say "OH NO IT'S BROKEN"
+    if error is not None:  # there is an error, so we print it before exiting
         print_in_red(error.as_string())
         if not interactive:
             sys.exit(1)
 
 
-def print_result_and_error(result: Value | None, error: Error | None, dont_verbose: bool,
-                           exit_on_cd: bool = False, should_print_stuff: bool = True):
-    if error is not None:  # there is an error, we print it in RED because OMG AN ERROR
+def print_result_and_error(
+        result: Value | None, error: Error | None, dont_verbose: bool,
+        exit_on_cd: bool = False, should_print_stuff: bool = True
+):
+    if error is not None:  # there is an error, we print it in red
         print_in_red(error.as_string())
         return
     if result is None:
@@ -153,18 +164,22 @@ def print_result_and_error(result: Value | None, error: Error | None, dont_verbo
 
     if not should_print_stuff:
         return
-    if len(result.elements) == 1:  # there is one single result, let's print it without the "[]".
-        if result.elements[0].should_print:  # if the value should be printed, let's print it!
+    if len(result.elements) == 1:
+        # there is one single result, let's print it without the "[]".
+        if result.elements[0].should_print:  # the value should be printed
             print(result.elements[0])
-    else:  # there is multiple results, when there is multi-line statements (like `print(a);var a+=1`)
-        # this code is to know what the list contains
-        # if the list contains only NoneValues that shouldn't be printed, we don't print it
-        # in any other case, we do.
+    else:
+        # there are multiple results (multi-line statements (e.g.
+        # `print(a);var a+=1`))
+        # This code determines what the list contains
+        # * if the list contains only NoneValues that shouldn't be printed, we
+        #   don't print it
+        # * in any other case, we do.
         should_print = False
         for e in result.elements:
             if e.should_print:
                 should_print = True
-                break  # same here
+                break
         if should_print:  # if we should print, we print
             print(result)
 
@@ -238,7 +253,7 @@ def run_shell(
         print_greet_text(debug_on, noug_dir, work_dir, print_context, print_time)
 
     previous_metas = None
-    while True:  # the shell loop (like game loop in a video game but, obviously, Nougaro isn't a video game)
+    while True:  # the shell loop
         try:  # we ask for an input to be interpreted
             if should_print_stuff:
                 text = input("nougaro> ")
@@ -260,14 +275,17 @@ def run_shell(
                 '<stdin>', text, noug_dir, VERSION, args=args,
                 work_dir=work_dir, lexer_metas=previous_metas
             )
-        except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
+        except KeyboardInterrupt:
+            # if CTRL+C, just stop to run the line and ask for another input
             print_in_red("\nKeyboardInterrupt")
             continue  # continue the `while True` loop
         except EOFError:
             print_in_red("\nEOF")
             return  # breaks the `while True` loop and stops the function
 
-        print_result_and_error(result, error, dont_verbose, should_print_stuff=should_print_stuff)
+        print_result_and_error(
+            result, error, dont_verbose, should_print_stuff=should_print_stuff
+        )
 
 
 def main():
@@ -313,10 +331,13 @@ def main():
     #     print(f"Argument {i:>6}: {arg}")
 
     # Uncomment the last 3 lines to understand the following line.
-    # Tested on Windows and Linux. Tested after compiling with Nuitka on Windows and Linux.
+    # Tested on Windows and GNU/Linux. Tested after compiling with Nuitka on
+    # Windows and GNU/Linux.
     del args[0]
 
-    path, line_to_exec, dont_verbose, interactive = check_arguments(args, noug_dir, VERSION)
+    path, line_to_exec, dont_verbose, interactive = check_arguments(
+        args, noug_dir, VERSION
+    )
 
     has_to_run_a_file = path not in ["<stdin>", "<commandline>"]
     if has_to_run_a_file:
@@ -331,7 +352,8 @@ def main():
         work_dir += "/"
 
     # We print stuff if this is an interactive shell.
-    # HOWEVER, if we are in a pipe, like `echo "$" | nougaro`, we don’t want our prompt to be printed
+    # HOWEVER, if we are in a pipe, like `echo "$" | nougaro`, we don’t want our
+    # prompt to be printed
     should_print_stuff = sys.stdin.isatty()
 
     if path == "<stdin>":  # we open the shell
@@ -351,8 +373,12 @@ def main():
             sys.exit()
 
         try:  # we try to run it
-            result, error, _ = nougaro.run('<commandline>', line_to_exec, noug_dir, VERSION, args=args, work_dir=work_dir)
-        except KeyboardInterrupt:  # if CTRL+C, just stop to run the line and ask for another input
+            result, error, _ = nougaro.run(
+                '<commandline>', line_to_exec, noug_dir, VERSION, args=args,
+                work_dir=work_dir
+            )
+        except KeyboardInterrupt:
+            # if CTRL+C, just stop to run the line and ask for another input
             print_in_red("\nKeyboardInterrupt")
             sys.exit()
         except EOFError:

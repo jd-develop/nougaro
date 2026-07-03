@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 # Nougaro : a python-interpreted high-level programming language
-# Copyright (C) 2021-2024  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
+# Copyright (C) 2021-2026  Jean Dubois (https://github.com/jd-develop) <jd-dev@laposte.net>
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
@@ -16,10 +16,11 @@ from src.runtime.values.basevalues.basevalues import String, Number, List, Value
 from typing import Any
 
 
-# This next line should be uncommented when the project (fully) switches to python 3.12, and the type of the "value"
-# argument in the "py2noug" function should be defined as "val"
-# (todo)
-# type val = Value | str | int | float | bool | list[val] | dict[val, val] | None
+# This next line should be uncommented when the project (fully) switches to
+# python 3.12, and the type of the "value" argument in the "py2noug" function
+# should be defined as "val"
+# (TODO)
+# type val = Value | str | int | float | bool | list[val] | dict[val, val] | tuple[val, ...] | None
 def py2noug(
         value: Value | str | int | float | bool | list[Any] | dict[Any, Any] | tuple[Any, ...] | None,
         pos_start: _Position, pos_end: _Position

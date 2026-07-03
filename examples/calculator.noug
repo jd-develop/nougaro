@@ -179,6 +179,7 @@ loop:main_loop
         var current_tok = char
         if char in "0123456789" then
             if len(tokens) != 0 and not is_num(tokens(-1)) then
+                # TODO fix bug where -0.(...) and -.(...) are not properly parsed
                 if tokens(-1) == "-" then
                     pop(tokens, -1)
                     append(tokens, -int(char))

@@ -15,6 +15,10 @@ keeping track of the changes relative to the Nougaro Calculator under the same
 ### Added
 * Added `math.ceil` and `math.floor` functions
 
+### Fixed
+* Fixed a crash which occured when the integer passed into `float()` was too big
+  – it now shows a proper OverflowError from Nougaro
+
 ### Calculator
 #### Added
 * Added `int`, `abs`, `ceil` and `floor`

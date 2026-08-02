@@ -456,7 +456,17 @@ class Number(Value):
         return Number(int(self.value), self.pos_start, self.pos_end).set_context(self.context), None
 
     def to_float(self):
-        return Number(float(self.value), self.pos_start, self.pos_end).set_context(self.context), None
+        try:
+            return Number(float(self.value), self.pos_start, self.pos_end).set_context(self.context), None
+        except OverflowError as e:
+            assert self.context is not None
+            errmsg = str(e)
+            return None, RTResult().failure(RTOverflowError(
+                self.pos_start, self.pos_end,
+                errmsg,
+                self.context,
+                origin_file="src.runtime.values.basevalues.basevalues.Number.to_float"
+            ))
 
     def to_list(self):
         list_: list[Value] = []

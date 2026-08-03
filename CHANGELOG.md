@@ -24,6 +24,9 @@ keeping track of the changes relative to the Nougaro Calculator under the same
 * Added `int`, `abs`, `ceil` and `floor`
 * Added `pop` (alias: `drop`) and `dup`
 
+#### Fixed
+* Fixed the bug where `-0.x` and `-.x` were parsed as `0.x`
+
 ## 1.3.0 (2025-12-23)
 
 ### Added
